@@ -69,6 +69,7 @@
 	</properties>
 
 	<modules>
+		<module>enrichment-common</module>
 		<module>enrichment-translation</module>
 		<module>enrichment-ner</module>
 		<module>enrichment-web</module>
