@@ -35,6 +35,11 @@
 			<artifactId>google-cloud-translate</artifactId>
 			<version>${version.googleTranslation}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${version.json}</version>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>

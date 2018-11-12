@@ -6,15 +6,12 @@ import javax.annotation.Resource;
 
 import org.junit.Test;
 
-import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;;
 
-
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration({ "/entity-solr-context.xml" })
-public class TranslationGoogleServiceTest {
+public class ETranslationEuropaServiceTest {
 
 	@Resource
-	TranslationGoogleServiceImpl translationGoogleService;
+	ETranslationEuropaServiceImpl eTranslationEuropaService;
 	
 	private static final String testString = "Mein Großvater, Joseph (Arthur Maria) Kister, geb. 25.9.1887 in Essen, " +
 			"diente während des 1. Weltkriegs zunächst in der Infanterie in Frankreich. " +
@@ -28,8 +25,7 @@ public class TranslationGoogleServiceTest {
 			"und Rollfilm-Negative erhalten, einige mit genauen Angaben über Belichtungszeit, Tageszeit und Lichtverhältnisse.";
 	
 	@Test
-	public void testTranslationGoogleImplementation() {
-		
+	public void testETranslationEuropaImplementation() {
 		String expectedTranslation = "My grandfather, Joseph (Arthur Maria) Kister, b. 25.9.1887 in Essen, " + 
 				"served during the 1st World War first in the infantry in France. By his own admission, this was \"too dirty\" for him " + 
 				"and he therefore applied to the Air Force. He had his missions from June 1918 from St. Remy. " + 
@@ -41,15 +37,13 @@ public class TranslationGoogleServiceTest {
 				"From the years 1916-1918 about 100 photo plates and roll film negatives have been preserved, some with exact " + 
 				"information about exposure time, time of day and light conditions.";
 		
-		//String jsonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\EU-Europeana-enrichment-d92edee4115a.json";
-		String jsonPath = "";
+		String config = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\eTranslation.txt";
 		int size = expectedTranslation.length();
 		
-		translationGoogleService = new TranslationGoogleServiceImpl(jsonPath);
-		String translatedText = translationGoogleService.translateText(testString, "de");
-		System.out.println("Translated text: " + translatedText);
-		assertNotNull(translatedText);
-		assertEquals(expectedTranslation, translatedText);
+		eTranslationEuropaService = new ETranslationEuropaServiceImpl(config);
+		String text = eTranslationEuropaService.translateText(testString, "de");
+		//TODO: callback is missing
+		assertNotNull(text);
 		
 	}
 
