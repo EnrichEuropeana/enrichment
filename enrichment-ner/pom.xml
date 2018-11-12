@@ -40,6 +40,11 @@
 			<artifactId>spring-context</artifactId>
 			<version>${version.spring}</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>${version.stanfordCoreNLP}</version>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>

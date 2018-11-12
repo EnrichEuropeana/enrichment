@@ -66,6 +66,7 @@
 		<version.springBoot>1.3.2.RELEASE</version.springBoot>
 		<version.springBootMongoStarter>2.0.3.RELEASE</version.springBootMongoStarter>
 		<version.jackson>2.9.4</version.jackson>
+		<version.stanfordCoreNLP>3.9.2</version.stanfordCoreNLP>
 	</properties>
 
 	<modules>
