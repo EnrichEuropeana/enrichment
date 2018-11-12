@@ -68,6 +68,7 @@
 		<version.jackson>2.9.4</version.jackson>
 		<version.stanfordCoreNLP>3.9.2</version.stanfordCoreNLP>
 		<version.googleTranslation>1.39.0</version.googleTranslation>
+		<version.json>20180813</version.json>
 	</properties>
 
 	<modules>
