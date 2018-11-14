@@ -12,29 +12,40 @@ import org.json.JSONObject;
 
 public class EnrichmentServiceImpl implements EnrichmentService{
 
-	@Resource
-	//NERService stanfordNerModel3Service;
-	//NERService stanfordNerModel4Service;
-	//NERService stanfordNerModel7Service;
+	//@Resource
+	NERService stanfordNerModel3Service;
+	NERService stanfordNerModel4Service;
+	NERService stanfordNerModel7Service;
 	
-	//private static final String stanfordNerModel3 = "Stanford_NER_Model_3";
-	//private static final String stanfordNerModel4 = "Stanford_NER_Model_4";
-	//private static final String stanfordNerModel7 = "Stanford_NER_Model_7";
+	private static final String stanfordNerModel3 = "Stanford_NER_model_3";
+	private static final String stanfordNerModel4 = "Stanford_NER_model_4";
+	private static final String stanfordNerModel7 = "Stanford_NER_model_7";
 	
+	@Override
+	public void init() {
+		// TODO Auto-generated method stub
+		//Initialize default NER model
+		stanfordNerModel3Service = new NERStanfordServiceImpl();
+		stanfordNerModel3Service.init();
+		stanfordNerModel4Service = new NERStanfordServiceImpl();
+		stanfordNerModel4Service.init(NERStanfordServiceImpl.classifier_model_4);
+		stanfordNerModel7Service = new NERStanfordServiceImpl();
+		stanfordNerModel7Service.init(NERStanfordServiceImpl.classifier_model_7);
+	}
 
 	@Override
 	public String annotateText(String text, String tool) {
 		TreeMap<String, TreeSet<String>> map;
 		switch(tool){
-			//case stanfordNerModel3:
-				//map = stanfordNerModel3Service.identifyNER(text);
-			//	break;
-			/*case stanfordNerModel4:
+			case stanfordNerModel3:
+				map = stanfordNerModel3Service.identifyNER(text);
+				break;
+			case stanfordNerModel4:
 				map = stanfordNerModel4Service.identifyNER(text);
 				break;
 			case stanfordNerModel7:
 				map = stanfordNerModel7Service.identifyNER(text);
-				break;*/
+				break;
 			default:
 				//TODO:Return tool is not supported
 				map = new TreeMap<String, TreeSet<String>>();
@@ -42,19 +53,6 @@ public class EnrichmentServiceImpl implements EnrichmentService{
 		}
 		
 		return new JSONObject(map).toString();
-	}
-
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-		//Initialize default NER model
-		//stanfordNerModel3Service = new NERStanfordServiceImpl();
-		//stanfordNerModel3Service.init();
-		/*stanfordNerModel4Service = new NERStanfordServiceImpl();
-		stanfordNerModel4Service.init(NERStanfordServiceImpl.classifier_model_4);
-		stanfordNerModel7Service = new NERStanfordServiceImpl();
-		stanfordNerModel7Service.init(NERStanfordServiceImpl.classifier_model_7);*/
-		System.out.println("Service init function");
 	}
 
 }

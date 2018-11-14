@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.ner.service.impl;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -18,22 +19,22 @@ public class NERStanfordServiceImpl implements NERService{
 	/*
 	 * All types of classifier (Person, Location, Organization, ... )
 	 */
-	public static final String classifier_model_3 = "src/main/resources/classifiers/stanford/english.all.3class.distsim.crf.ser.gz";
-	public static final String classifier_model_4 = "src/main/resources/classifiers/stanford/english.conll.4class.distsim.crf.ser.gz";
-	public static final String classifier_model_7 = "src/main/resources/classifiers/stanford/english.muc.7class.distsim.crf.ser.gz";
+	public static final String classifier_model_3 = "classifiers/stanford/english.all.3class.distsim.crf.ser.gz";
+	public static final String classifier_model_4 = "classifiers/stanford/english.conll.4class.distsim.crf.ser.gz";
+	public static final String classifier_model_7 = "classifiers/stanford/english.muc.7class.distsim.crf.ser.gz";
 	
 	private CRFClassifier<CoreLabel> classifier;
 	
 	@Override
 	public void init() {
-		File file = new File(classifier_model_3);
-		classifier = CRFClassifier.getClassifierNoExceptions(file.getAbsolutePath());
+		URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model_3);
+		classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
 	}
 	
 	@Override
 	public void init(String model) {
-		File file = new File(model);
-		classifier = CRFClassifier.getClassifierNoExceptions(file.getAbsolutePath());
+		URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
+		classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
 	}
 	
 	@Override
