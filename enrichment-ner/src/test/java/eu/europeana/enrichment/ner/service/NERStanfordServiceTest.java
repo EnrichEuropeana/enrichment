@@ -45,5 +45,33 @@ public class NERStanfordServiceTest {
 		assertEquals(expectedMap, map);
 		
 	}
+	
+	private static final String testString2 = "Russian Joe Smith was born in California. "
+			+ "In 2017, he went to Paris, France in the summer. " + "His flight left at 3:00pm on July 10th, 2017. "
+			+ "After eating some escargot for the first time, Joe said, \"That was delicious!\" "
+			+ "He sent a postcard to his sister Jane Smith. "
+			+ "After hearing about Joe's trip, Jane decided she might go to France one day. Google 'World War'";
+	private static final TreeMap<String, TreeSet<String>> expectedMap2;
+	static {
+		expectedMap2 = new TreeMap<String, TreeSet<String>>();
+		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe Smith", "Joe", "Jane Smith", "Jane"));
+		expectedMap2.put(NERClassification.PERSON.toString(), person);
+		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
+		expectedMap2.put(NERClassification.LOCATION.toString(), location);
+		TreeSet<String> organization = new TreeSet<String>(Arrays.asList("Google"));
+		expectedMap2.put(NERClassification.ORGANIZATION.toString(), organization);
+		TreeSet<String> misc = new TreeSet<String>(Arrays.asList("Russian", "World War"));
+		expectedMap2.put(NERClassification.MISC.toString(), misc);
+	}
+	
+	@Test
+	public void testNERStanfordImplementationModel4() {
+		nerStanfordService = new NERStanfordServiceImpl();
+		nerStanfordService.init(NERStanfordServiceImpl.classifier_model_4);
+		TreeMap<String, TreeSet<String>> map = nerStanfordService.identifyNER(testString2);
+		assertNotNull(map);
+		assertEquals(expectedMap2, map);
+		
+	}
 
 }

@@ -30,35 +30,25 @@ import io.swagger.annotations.ApiOperation;
 public class NERController extends BaseRest {
 
 	//@Resource
-	//EnrichmentService enrichmentService;
+	EnrichmentService enrichmentService;
 	
 	@Override
 	protected void init() {
-		//super.init();
+		super.init();
 		//Load all NER tools
-		//enrichmentService = new EnrichmentServiceImpl();
-		//enrichmentService.init();
+		enrichmentService = new EnrichmentServiceImpl();
+		enrichmentService.init();
 	}
 	
-	@ApiOperation(value = "Annotate text", nickname = "getNERAnnotation")
+	@ApiOperation(value = "Annotate text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getNERAnnotation")
 	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNERAnnotation(@RequestBody EnrichmentNERRequest nerRequest) {
 
-		//try {			
-			//validateApiKey(wskey);
+		String jsonLd = enrichmentService.annotateText(nerRequest.text, nerRequest.tool);
+		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 		
-			String jsonLd = "";//enrichmentService.annotateText(nerRequest.text, nerRequest.tool);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-			
-			return response;
-	
-		//} catch (RuntimeException e) {
-			//not found .. 
-			//throw new InternalServerException(e);
-		//} catch (Exception e) {
-			//throw new InternalServerException(e);
-		//}				
+		return response;
 	}
 	
 }
