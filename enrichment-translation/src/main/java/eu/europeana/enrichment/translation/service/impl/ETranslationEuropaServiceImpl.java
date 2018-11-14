@@ -34,8 +34,10 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	private String credentialUsername;
 	private String credentialPwd;
 
-	public ETranslationEuropaServiceImpl(String filePath) {
-		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+
+	@Override
+	public void init(String credentialFilePath) {
+		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] splitString = line.split("=");

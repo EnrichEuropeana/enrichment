@@ -45,6 +45,12 @@
 			<artifactId>stanford-corenlp</artifactId>
 			<version>${version.stanfordCoreNLP}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-translate</artifactId>
+			<version>${version.googleTranslation}</version>
+			
+		</dependency>
 		<!-- for some reasons -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

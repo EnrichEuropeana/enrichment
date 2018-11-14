@@ -72,7 +72,7 @@
 		<version.json>20180813</version.json>
 		<version.servletJstl>1.2</version.servletJstl>
 		<version.mapstruct>1.2.0.Final</version.mapstruct>
-		<version.googleGuava>18.0</version.googleGuava>
+		<version.googleGuava>27.0-jre</version.googleGuava>
 	</properties>
 
 	<modules>

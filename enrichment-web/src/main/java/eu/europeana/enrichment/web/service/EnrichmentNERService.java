@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.web.service;
 
-public interface EnrichmentService {
+public interface EnrichmentNERService {
 
 	public void init();
 	
