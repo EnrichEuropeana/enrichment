@@ -7,16 +7,15 @@ import javax.annotation.Resource;
 
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
-import eu.europeana.enrichment.web.service.EnrichmentService;
+import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
 
-public class EnrichmentServiceImpl implements EnrichmentService{
+public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 	//@Resource
 	NERService stanfordNerModel3Service;
 	NERService stanfordNerModel4Service;
 	NERService stanfordNerModel7Service;
-	
 	private static final String stanfordNerModel3 = "Stanford_NER_model_3";
 	private static final String stanfordNerModel4 = "Stanford_NER_model_4";
 	private static final String stanfordNerModel7 = "Stanford_NER_model_7";

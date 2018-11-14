@@ -26,21 +26,23 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 	// Instantiates a client
     Translate translate;
 
-    public TranslationGoogleServiceImpl(String jsonPath) {
-    	try {
+    private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
+
+	@Override
+	public void init(String credentialFilePath) {
+		try {
     		// You can specify a credential file by providing a path to GoogleCredentials.
     		// Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-    		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(jsonPath)).createScoped(Lists.newArrayList("https://www.googleapis.com/auth/cloud-platform"));
+    		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialFilePath))
+    				.createScoped(Lists.newArrayList(credentialScope));
         	translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
     	}
     	catch (Exception e) {
 			// TODO: handle exception
     		System.err.println(e.getMessage());
 		}
-    	
-    }
-
-	
+	}
+    
 	@Override
 	public String translateText(String text, String sourceLanguage) throws TranslationException {
 		
@@ -55,6 +57,5 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 
 		return translation.getTranslatedText();
 	}
-	
 	
 }
