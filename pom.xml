@@ -56,6 +56,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<version.enrichmentAPI>0.0.1-SNAPSHOT</version.enrichmentAPI>
 		<version.apiCommons>0.0.1-SNAPSHOT</version.apiCommons>
 		<version.java>1.8</version.java>
 		<version.junit>4.11</version.junit>
@@ -69,6 +70,9 @@
 		<version.stanfordCoreNLP>3.9.2</version.stanfordCoreNLP>
 		<version.googleTranslation>1.39.0</version.googleTranslation>
 		<version.json>20180813</version.json>
+		<version.servletJstl>1.2</version.servletJstl>
+		<version.mapstruct>1.2.0.Final</version.mapstruct>
+		<version.googleGuava>18.0</version.googleGuava>
 	</properties>
 
 	<modules>

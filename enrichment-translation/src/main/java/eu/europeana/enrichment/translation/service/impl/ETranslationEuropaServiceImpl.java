@@ -5,34 +5,24 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
-import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.DigestScheme;
-import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.google.gson.JsonArray;
-
 public class ETranslationEuropaServiceImpl implements TranslationService {
 
-	private static final String url = "https://webgate.ec.europa.eu/etranslation/si/translate";
+	private static final String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
 	private static final String domain = "SPD";
 	private static final String application = "Europeana Enrichment";
 	private static final String username = "denis.katic@ait.ac.at";
@@ -85,8 +75,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 
 		// .put("externalReference", "123")
 		JSONObject jsonBody = new JSONObject().put("priority", 0)
-				.put("externalReference", "123")
-				.put("callerInformation", new JSONObject().put("application", application).put("username", username))
+				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
 				.put("sourceLanguage", sourceLanguage.toUpperCase())
 				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
 				.put("domain", domain)
@@ -105,14 +94,14 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @return
 	 */
 	private void createHttpRequest(String content) {
-		CredentialsProvider credsProvider = new BasicCredentialsProvider();
-	    credsProvider.setCredentials(AuthScope.ANY,
-	      new UsernamePasswordCredentials(credentialUsername, credentialPwd));
-		
-		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
-				.setDefaultCredentialsProvider(credsProvider)
-				.build()) {
-			HttpPost request = new HttpPost(url);
+		try {
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		    credsProvider.setCredentials(AuthScope.ANY,
+		      new UsernamePasswordCredentials(credentialUsername, credentialPwd));
+			CloseableHttpClient httpClient = HttpClientBuilder.create()
+					.setDefaultCredentialsProvider(credsProvider).build();
+			
+			HttpPost request = new HttpPost(baseUrl);
 			StringEntity params = new StringEntity(content, "UTF-8");
 			request.addHeader("content-type", "application/json");
 			request.setEntity(params);
@@ -121,7 +110,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 
 			System.out.println("(eTranslation) Http reponse: " + responeString);
 
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
 		}
 	}

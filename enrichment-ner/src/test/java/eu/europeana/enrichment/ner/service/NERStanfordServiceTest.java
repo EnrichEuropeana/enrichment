@@ -39,6 +39,7 @@ public class NERStanfordServiceTest {
 	@Test
 	public void testNERStanfordImplementationModel3() {
 		nerStanfordService = new NERStanfordServiceImpl();
+		nerStanfordService.init();
 		TreeMap<String, TreeSet<String>> map = nerStanfordService.identifyNER(testString);
 		assertNotNull(map);
 		assertEquals(expectedMap, map);

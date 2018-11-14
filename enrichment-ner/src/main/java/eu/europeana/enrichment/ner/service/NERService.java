@@ -7,8 +7,8 @@ import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 
 public interface NERService {
 
-	public static final String HANDLER_ANNOTATE = "/annotate";
-	
+	public void init();
+	public void init(String model);
 	
 	/**
 	 * This method identifies named entities.
