@@ -29,7 +29,7 @@
         ">
     
     <!-- entity properties -->    
-   <util:properties id="enrichmentProperties" location="classpath:config/enrichment.properties" scope="singleton" />
+   <!--  util:properties id="enrichmentProperties" location="classpath:config/enrichment.properties" scope="singleton" /-->
    
    <!-- to be used for internationalization/externalization purposes  
    <beans:bean id="entity_i18n_messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
@@ -37,5 +37,7 @@
 		<beans:property name="defaultEncoding" value="utf-8"/>	 	
     </beans:bean>
      -->
+
+     <!-- beans:bean name="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl"/-->
   
 </beans:beans>

@@ -24,12 +24,14 @@ public class NERStanfordServiceImpl implements NERService{
 	
 	private CRFClassifier<CoreLabel> classifier;
 	
-	public NERStanfordServiceImpl() {
+	@Override
+	public void init() {
 		File file = new File(classifier_model_3);
 		classifier = CRFClassifier.getClassifierNoExceptions(file.getAbsolutePath());
 	}
 	
-	public NERStanfordServiceImpl(String model) {
+	@Override
+	public void init(String model) {
 		File file = new File(model);
 		classifier = CRFClassifier.getClassifierNoExceptions(file.getAbsolutePath());
 	}
