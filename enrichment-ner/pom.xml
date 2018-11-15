@@ -45,6 +45,11 @@
 			<artifactId>stanford-corenlp</artifactId>
 			<version>${version.stanfordCoreNLP}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${version.json}</version>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>

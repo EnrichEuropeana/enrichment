@@ -6,6 +6,7 @@ import java.util.TreeSet;
 import javax.annotation.Resource;
 
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.ner.service.impl.NERSpacyServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
@@ -20,6 +21,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private static final String stanfordNerModel4 = "Stanford_NER_model_4";
 	private static final String stanfordNerModel7 = "Stanford_NER_model_7";
 	
+	NERService spaCyService;
+	private static final String spaCyName = "spaCy";
+	
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
@@ -30,6 +34,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		stanfordNerModel4Service.init(NERStanfordServiceImpl.classifier_model_4);
 		stanfordNerModel7Service = new NERStanfordServiceImpl();
 		stanfordNerModel7Service.init(NERStanfordServiceImpl.classifier_model_7);
+		
+		spaCyService = new NERSpacyServiceImpl();
 	}
 
 	@Override
@@ -44,6 +50,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				break;
 			case stanfordNerModel7:
 				map = stanfordNerModel7Service.identifyNER(text);
+				break;
+			case spaCyName:
+				map = spaCyService.identifyNER(text);
 				break;
 			default:
 				//TODO:Return tool is not supported
