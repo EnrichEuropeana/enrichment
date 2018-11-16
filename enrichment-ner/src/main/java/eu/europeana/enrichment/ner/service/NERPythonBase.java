@@ -16,13 +16,22 @@ import org.json.JSONObject;
 
 public abstract class NERPythonBase {
 
-	public static final String pythonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Scripts\\python.exe";
+	private static final String pythonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Scripts\\python.exe";
+	private static final String mainScriptPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\Europeana\\scripts4java\\main.py";
+	private String pythonCommand;
 	
-	public void runPythonScript(String command,
-			NERPythonCommunicationInterface<BufferedWriter, BufferedReader, BufferedReader> communicationInterface) {
+	public NERPythonBase() {
+		StringBuilder cmdBuilder = new StringBuilder();
+		cmdBuilder.append(pythonPath);
+		cmdBuilder.append(" -u ");
+		cmdBuilder.append(mainScriptPath);
+		pythonCommand = cmdBuilder.toString();
+	}
+	
+	public void runPythonScript(NERPythonCommunicationInterface<BufferedWriter, BufferedReader, BufferedReader> communicationInterface) {
 		Process process;
 		try {
-			process = Runtime.getRuntime().exec(command);
+			process = Runtime.getRuntime().exec(pythonCommand);
 
 			OutputStream stdin = process.getOutputStream();
 			InputStream stderr = process.getErrorStream();
