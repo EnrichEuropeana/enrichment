@@ -73,6 +73,7 @@
 		<version.servletJstl>1.2</version.servletJstl>
 		<version.mapstruct>1.2.0.Final</version.mapstruct>
 		<version.googleGuava>27.0-jre</version.googleGuava>
+		<version.apacheHttp>4.5.5</version.apacheHttp>
 	</properties>
 
 	<modules>
