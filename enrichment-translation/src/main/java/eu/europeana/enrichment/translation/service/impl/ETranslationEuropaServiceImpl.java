@@ -5,6 +5,7 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
@@ -71,9 +72,13 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @return a stringified json including the base64 string
 	 */
 	private String createTranslationBody(String text, String sourceLanguage) {
-
-		byte[] bytesEncoded = Base64.encodeBase64(text.getBytes());
-		String base64content = new String(bytesEncoded);
+		String base64content = "";
+		try {
+			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
+			base64content = new String(bytesEncoded);
+		}catch(UnsupportedEncodingException ex) {
+			System.out.println(ex.getMessage());
+		}
 
 		// .put("externalReference", "123")
 		JSONObject jsonBody = new JSONObject().put("priority", 0)

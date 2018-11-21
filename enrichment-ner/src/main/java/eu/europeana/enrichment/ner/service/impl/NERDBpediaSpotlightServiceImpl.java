@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.ner.service.impl;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
