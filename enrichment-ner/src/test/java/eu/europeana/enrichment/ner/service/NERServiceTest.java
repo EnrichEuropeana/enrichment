@@ -23,8 +23,8 @@ public class NERServiceTest {
 	private final String storyFilePath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\ExportItems.json";
 	private final String storeFolder = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\test\\";
 	private final String storyId = "17034";
-	private String storyString;
 	
+	private String storyString;
 	private static final TreeMap<String, TreeSet<String>> expectedMapStory17034;
 	static {
 		expectedMapStory17034 = new TreeMap<String, TreeSet<String>>();
@@ -38,6 +38,21 @@ public class NERServiceTest {
 		expectedMapStory17034.put(NERClassification.MISC.toString(), misc);
 	}
 	
+	//Only 27.928 chars
+	private String storyPartString;
+	private static final TreeMap<String, TreeSet<String>> expectedMapStory17034_Part;
+	static {
+		expectedMapStory17034_Part = new TreeMap<String, TreeSet<String>>();
+		TreeSet<String> person = new TreeSet<String>(Arrays.asList());
+		expectedMapStory17034_Part.put(NERClassification.PERSON.toString(), person);
+		TreeSet<String> location = new TreeSet<String>(Arrays.asList());
+		expectedMapStory17034_Part.put(NERClassification.LOCATION.toString(), location);
+		TreeSet<String> organization = new TreeSet<String>(Arrays.asList());
+		expectedMapStory17034_Part.put(NERClassification.ORGANIZATION.toString(), organization);
+		TreeSet<String> misc = new TreeSet<String>(Arrays.asList());
+		expectedMapStory17034_Part.put(NERClassification.MISC.toString(), misc);
+	}
+	
 	//define all ner tools
 	NERService nerServiceStanfordModel3;
 	NERService nerServiceStanfordModel4;
@@ -45,8 +60,6 @@ public class NERServiceTest {
 	NERService nerServiceDBpediaSpotlight;
 	NERService nerServicePython; //for NLTK and spaCy
 	
-	JSONObject pythonSpaCyRequest;
-	JSONObject pythonNLTKRequest;
 	
 	public NERServiceTest() {
 		//Initialize all ner tools 
@@ -61,13 +74,26 @@ public class NERServiceTest {
 		nerServicePython = new NERPythonServiceImpl();
 		
 		storyString = loadSpecificStory();
+		storyPartString = storyString.substring(0, 27928);
+	}
+	
+	@Test
+	public void testNERToolAccuracyOnPartStory() {
+		System.out.println("Story ("+storyId+")");
+		if(storyString.isEmpty() || storyString.equals(""))
+			fail("No Story "+ storyId +" found!");
+
+		TreeMap<String, TreeSet<String>> mapStanfordModel3 = nerServiceStanfordModel3.identifyNER(storyPartString);
+		TreeMap<String, TreeSet<String>> mapStanfordModel4 = nerServiceStanfordModel4.identifyNER(storyPartString);
+		TreeMap<String, TreeSet<String>> mapStanfordModel7 = nerServiceStanfordModel7.identifyNER(storyPartString);
+		TreeMap<String, TreeSet<String>> mapDBpediaSpotlight = nerServiceDBpediaSpotlight.identifyNER(storyPartString);
 		
-		pythonSpaCyRequest = new JSONObject();
-		pythonSpaCyRequest.put("tool", "spaCy");
-		pythonSpaCyRequest.put("text", storyString);
-		pythonNLTKRequest = new JSONObject();
-		pythonNLTKRequest.put("tool", "nltk");
-		pythonNLTKRequest.put("text", storyString);
+		TreeMap<String, TreeSet<String>> mapSpaCy = nerServicePython.identifyNER(
+				new JSONObject().put("tool", "spaCy").put("text", storyString).toString());
+		TreeMap<String, TreeSet<String>> mapNLTK = nerServicePython.identifyNER(
+				new JSONObject().put("tool", "nltk").put("text", storyString).toString());
+		
+		assertTrue(false);
 	}
 	
 	@Test
@@ -81,8 +107,10 @@ public class NERServiceTest {
 		TreeMap<String, TreeSet<String>> mapStanfordModel7 = nerServiceStanfordModel7.identifyNER(storyString);
 		TreeMap<String, TreeSet<String>> mapDBpediaSpotlight = nerServiceDBpediaSpotlight.identifyNER(storyString);
 		
-		TreeMap<String, TreeSet<String>> mapSpaCy = nerServicePython.identifyNER(pythonSpaCyRequest.toString());
-		TreeMap<String, TreeSet<String>> mapNLTK = nerServicePython.identifyNER(pythonNLTKRequest.toString());
+		TreeMap<String, TreeSet<String>> mapSpaCy = nerServicePython.identifyNER(
+				new JSONObject().put("tool", "spaCy").put("text", storyPartString).toString());
+		TreeMap<String, TreeSet<String>> mapNLTK = nerServicePython.identifyNER(
+				new JSONObject().put("tool", "nltk").put("text", storyPartString).toString());
 		
 		assertTrue(false);
 	}

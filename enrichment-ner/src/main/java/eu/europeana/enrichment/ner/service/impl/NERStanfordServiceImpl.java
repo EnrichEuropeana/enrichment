@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.ner.service.impl;
 
-import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.TreeMap;
