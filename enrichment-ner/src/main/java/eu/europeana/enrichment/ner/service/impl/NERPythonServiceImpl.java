@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.Base64;
 
 import eu.europeana.enrichment.ner.service.NERPythonCommunicationInterface;
 import eu.europeana.enrichment.ner.service.NERService;
@@ -32,7 +33,10 @@ public class NERPythonServiceImpl extends NERPythonBase implements NERService{
 		super.runPythonScript(new NERPythonCommunicationInterface<BufferedWriter, BufferedReader, BufferedReader>() {
 			@Override
 			public void comInterface(BufferedWriter writer, BufferedReader reader, BufferedReader error) throws IOException{
-				writer.write(text);
+				byte[] bytesEncoded = Base64.getEncoder().encode(text.getBytes("UTF-8"));
+				String inputString = new String(bytesEncoded, "UTF-8");
+				writer.write(inputString);
+				//writer.write("{end}\n");
 				writer.flush();
 				writer.close();
 				
@@ -48,9 +52,12 @@ public class NERPythonServiceImpl extends NERPythonBase implements NERService{
 					sb.append(currentLine);
 				}
 				String pythonErrorResponse = sb.toString();
+				
+				byte[] bytesDecoded = Base64.getDecoder().decode(pythonResponse.getBytes("UTF-8"));
+				String pythonResponseText = new String(bytesDecoded, "UTF-8");
 				//System.out.println("Python response: " + pythonResponse);
 				
-				map = readJSON(pythonResponse);
+				map = readJSON(pythonResponseText);
 			}
 		});
 		
