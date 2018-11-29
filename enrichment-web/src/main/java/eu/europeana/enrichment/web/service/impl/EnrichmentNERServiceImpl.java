@@ -6,7 +6,7 @@ import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
-import eu.europeana.enrichment.ner.model.NEREntry;
+import eu.europeana.enrichment.common.definitions.NamedEntity;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
@@ -76,9 +76,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				break;
 		}
 		
-		TreeMap<String, ArrayList<NEREntry>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
+		TreeMap<String, ArrayList<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
 		
-		return new JSONObject(entitiesWithPositions).toString();
+		return new JSONObject(map).toString();
 	}
 
 }

@@ -1,17 +1,19 @@
-package eu.europeana.enrichment.ner.model;
+package eu.europeana.enrichment.common.model;
 
 import java.util.ArrayList;
 
-public class NEREntry {
+import eu.europeana.enrichment.common.definitions.NamedEntity;
+
+public class NamedEntityImpl implements NamedEntity{
 
 	public String key;
 	public ArrayList<Integer> positions; //Offset position
 	
-	public NEREntry() {
+	public NamedEntityImpl() {
 		init();
 	}
 	
-	public NEREntry(String key) {
+	public NamedEntityImpl(String key) {
 		init();
 		this.key = key;
 	}
@@ -42,5 +44,4 @@ public class NEREntry {
 	public void setPositions(ArrayList<Integer> positions) {
 		this.positions = positions;
 	}
-	
 }
