@@ -17,11 +17,6 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.mongodb.morphia</groupId>
-			<artifactId>morphia</artifactId>
-			<version>${version.mongodb}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 			<version>${version.spring}</version>
@@ -43,6 +38,18 @@
 			<artifactId>commons-nosql</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${version.log4j2}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${version.log4j2}</version>
+		</dependency>	
+		
+		
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>
@@ -56,5 +63,13 @@
 			<version>${version.junit}</version>
 			<scope>test</scope>
 		</dependency>
+		
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>2.1.0.RELEASE</version>
+        </dependency>
+		
 	</dependencies>
+	
 </project>

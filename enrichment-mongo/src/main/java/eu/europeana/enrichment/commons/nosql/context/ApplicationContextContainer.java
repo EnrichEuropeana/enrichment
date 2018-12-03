@@ -1,14 +1,13 @@
-package eu.europeana.enrichment.mongo.nosql.context;
+package eu.europeana.enrichment.commons.nosql.context;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class ApplicationContextContainer implements ApplicationContextAware {
+public class ApplicationContextContainer {
 
 	private static ApplicationContext applicationContext;
 
-	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		applicationContext = context;
 	}
@@ -20,4 +19,5 @@ public class ApplicationContextContainer implements ApplicationContextAware {
 	public static <T> T getBean(Class<T> beanClazz, String beanName) {
 		return applicationContext.getBean(beanName, beanClazz);
 	}
+	
 }

@@ -57,7 +57,7 @@
 		<version.enrichmentAPI>0.0.1-SNAPSHOT</version.enrichmentAPI>
 		<version.apiCommons>0.0.1-SNAPSHOT</version.apiCommons>
 		<version.java>1.8</version.java>
-		<version.junit>4.11</version.junit>
+		<version.junit>4.12</version.junit>
 		<version.springSecurity>4.1.0.RELEASE</version.springSecurity>
 		<version.spring>5.0.7.RELEASE</version.spring>
 		<version.log4j2>2.9.1</version.log4j2>
@@ -72,8 +72,9 @@
 		<version.mapstruct>1.2.0.Final</version.mapstruct>
 		<version.googleGuava>27.0-jre</version.googleGuava>
 		<version.apacheHttp>4.5.5</version.apacheHttp>
-		<version.mongodb>1.3.2</version.mongodb>
-		<version.commonsApi>0.2.5-SNAPSHOT</version.commonsApi>
+		<version.mongodb>3.4.1</version.mongodb>
+		<version.commonsApi>0.2.5-RELEASE</version.commonsApi>
+		<version.ioinformatics>0.1.1</version.ioinformatics>
 	</properties>
 
 	<modules>
