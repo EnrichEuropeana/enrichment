@@ -1,46 +1,40 @@
 package eu.europeana.enrichment.mongo.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.List;
+
+import javax.annotation.Resource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.common.model.NamedEntityImpl;
+import eu.europeana.enrichment.mongo.config.MongoConfig;
+import eu.europeana.enrichment.mongo.controller.PersistentNamedEntityController;
+import eu.europeana.enrichment.mongo.model.DaoNamedEntity;
+import eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl;
+import eu.europeana.enrichment.mongo.model.PersistentNamedEntity;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({ "/set-mongo-test.xml"})
+@ContextConfiguration({ "/mongo-config.xml"})
 public class PersistentNamedEntityServiceTest {
 
-	private static final String testString = "Joe Smith was born in California. "
-			+ "In 2017, he went to Paris, France in the summer. " + "His flight left at 3:00pm on July 10th, 2017. "
-			+ "After eating some escargot for the first time, Joe said, \"That was delicious!\" "
-			+ "He sent a postcard to his sister Jane Smith. "
-			+ "After hearing about Joe's trip, Jane decided she might go to France one day.";
-	private static final TreeMap<String, TreeSet<String>> expectedMap;
-	static {
-		expectedMap = new TreeMap<String, TreeSet<String>>();
-		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe Smith", "Joe", "Jane Smith", "Jane"));
-		expectedMap.put("PERSON", person);
-		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
-		expectedMap.put("LOCATION", location);
-	}
+	@Resource(name = "namedEntityDao")
+	DaoNamedEntityImpl namedEntityDao;
 	
 	@Test
-	public void testNERStanfordImplementationModel3() {
-		NamedEntity namedEntity = new NamedEntityImpl("Joe Smith");
-		namedEntity.addPosition(0);
+	public void test() throws Exception {
+		PersistentNamedEntity entity = new PersistentNamedEntity("Person_1");
+		//controller.saveNamedEntity(entity);
+		namedEntityDao.saveNamedEntity(entity);
 		
-		//(Pers)
-		
+		fail("Not yet implemented");
 	}
-	
+
 }

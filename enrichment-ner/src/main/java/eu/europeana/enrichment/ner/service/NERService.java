@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.ner.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -31,8 +32,8 @@ public interface NERService {
 	 * @param originalText is the transcribed text where the NER needs to be located
 	 * @return all findings including their original position at the transcribed text
 	 */
-	default TreeMap<String, ArrayList<NamedEntity>> getPositions(TreeMap<String, TreeSet<String>> findings, String originalText){
-		TreeMap<String, ArrayList<NamedEntity>> entitiesWithPositions = new TreeMap<String, ArrayList<NamedEntity>>();
+	default TreeMap<String, List<NamedEntity>> getPositions(TreeMap<String, TreeSet<String>> findings, String originalText){
+		TreeMap<String, List<NamedEntity>> entitiesWithPositions = new TreeMap<String, List<NamedEntity>>();
 		
 		//TODO: report named entities which we could not find in the original text
 		TreeMap<String, TreeSet<String>> notFoundEntities = new TreeMap<String, TreeSet<String>>();
@@ -41,7 +42,7 @@ public interface NERService {
 			String classification = classificiationDict.getKey();
 			TreeSet<String> entities = classificiationDict.getValue();
 			
-			ArrayList<NamedEntity> newEntities = new ArrayList<NamedEntity>();
+			List<NamedEntity> newEntities = new ArrayList<NamedEntity>();
 			TreeSet<String> notFound = new TreeSet<String>();
 			
 			for(String entityKey : entities) {

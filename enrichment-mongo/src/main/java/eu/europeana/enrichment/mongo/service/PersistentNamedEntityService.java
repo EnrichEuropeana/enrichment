@@ -1,17 +1,16 @@
 package eu.europeana.enrichment.mongo.service;
 
-import eu.europeana.api.commons.nosql.service.AbstractNoSqlService;
+import java.util.List;
+
 import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.mongo.model.internal.PersistentNamedEntity;
+import eu.europeana.enrichment.mongo.model.DaoNamedEntity;
 
-public interface PersistentNamedEntityService extends AbstractNoSqlService<PersistentNamedEntity, String>{
+public interface PersistentNamedEntityService {
 
-	public NamedEntity store(NamedEntity object);
 	
-	public PersistentNamedEntity findByID(String identifier);
-	
-	public PersistentNamedEntity update(PersistentNamedEntity namedEntity);
-	
-	public void remove(String identifier);
-	
+	public DaoNamedEntity findNamedEntity(String key);
+	public List<DaoNamedEntity> getAllNamedEntities();
+	public void saveNamedEntity(NamedEntity entity);
+	public void saveNamedEntities(List<NamedEntity> entities);
+
 }

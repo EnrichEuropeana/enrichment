@@ -15,18 +15,28 @@
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
 	">
 
-	<!-- TEST BEANS AND PROPERTIES First  -->
-	<util:properties id="mongoProperties" 
-		location="test-config/mongo-test.properties" />
-	<!-- Embedded mongo server -->
-	<bean id="set_embedded_mongo" class="eu.europeana.api.commons.nosql.embedded.EmbeddedMongoServer" init-method="start" destroy-method="stop"/>
+	<util:properties id="setProperties" 
+		location="mongodb.properties" />
+
+	<bean name="enrich_mongo_contextcontainer" class="eu.europeana.enrichment.commons.nosql.context.ApplicationContextContainer"/>
+
+	<bean id="enrich_db_mongoConnector" class="eu.europeana.corelib.db.wrapper.ApiMongoConnector" destroy-method="close"/>
 	
-	<import resource="mongo-context.xml"/>
-	
+	<bean id="enrich_db_morphia_datastore" factory-bean="enrich_db_mongoConnector" factory-method="createDatastore">
+		<constructor-arg value="#{setProperties['mongodb.enrich.connectionUrl']}" type="java.lang.String" />
+		<constructor-arg value="#{setProperties['mongodb.set.truststore']}" type="java.lang.String" />
+		<constructor-arg value="#{setProperties['mongodb.set.truststorepass']}" type="java.lang.String" />
+	</bean>
+
+	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl">
+		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
+	</bean>
 </beans>

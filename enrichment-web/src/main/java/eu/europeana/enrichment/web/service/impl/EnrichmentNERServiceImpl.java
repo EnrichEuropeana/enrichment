@@ -1,18 +1,25 @@
 package eu.europeana.enrichment.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
 import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.mongo.controller.PersistentNamedEntityController;
+import eu.europeana.enrichment.mongo.model.DaoNamedEntity;
+import eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
@@ -31,9 +38,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private static final String spaCyName = "spaCy";
 	private static final String nltkName = "nltk";
 	
+	@Autowired
+	PersistentNamedEntityController saveService;
+	
 	@Override
 	public void init() {
 		// TODO Auto-generated method stub
+		//saveService = new PersistentNamedEntityServiceImpl();
 		//Initialize default NER model
 		stanfordNerModel3Service = new NERStanfordServiceImpl();
 		stanfordNerModel3Service.init();
@@ -76,7 +87,15 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				break;
 		}
 		
-		TreeMap<String, ArrayList<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
+		TreeMap<String, List<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
+		
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("mongo-config.xml");
+		DaoNamedEntityImpl daonamedentity = ctx.getBean("namedEntityDao", DaoNamedEntityImpl.class);
+		for (String key : entitiesWithPositions.keySet()) {
+			for (NamedEntity entity : entitiesWithPositions.get(key)) {
+				daonamedentity.saveNamedEntity(new eu.europeana.enrichment.mongo.model.PersistentNamedEntity(entity.getKey()));
+			}
+		}
 		
 		return new JSONObject(map).toString();
 	}
