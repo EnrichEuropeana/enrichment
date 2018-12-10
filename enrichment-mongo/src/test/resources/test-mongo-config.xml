@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2007-2012 The Europeana Foundation Licenced under the EUPL, 
+	Version 1.1 (the "Licence") and subsequent versions as approved by the European 
+	Commission; You may not use this work except in compliance with the Licence. 
+	You may obtain a copy of the Licence at: http://joinup.ec.europa.eu/software/page/eupl 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the Licence is distributed on an "AS IS" basis, without warranties 
+	or conditions of any kind, either express or implied. See the Licence for 
+	the specific language governing permissions and limitations under the Licence. -->
+
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+	">
+
+	<!--  util:properties id="mongoProperties" 
+		location="config/enrichment.properties" /-->
+
+	<bean name="enrich_mongo_contextcontainer" class="eu.europeana.enrichment.commons.nosql.context.ApplicationContextContainer"/>
+
+	<bean id="enrich_db_mongoConnector" class="eu.europeana.corelib.db.wrapper.ApiMongoConnector" destroy-method="close"/>
+	
+	<bean id="enrich_db_morphia_datastore" factory-bean="enrich_db_mongoConnector" factory-method="createDatastore">
+		<constructor-arg value="#{setProperties['mongodb.enrich.connectionUrl']}" type="java.lang.String" />
+		<constructor-arg value="#{setProperties['mongodb.set.truststore']}" type="java.lang.String" />
+		<constructor-arg value="#{setProperties['mongodb.set.truststorepass']}" type="java.lang.String" />
+	</bean>
+
+	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl">
+		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
+	</bean>
+</beans>

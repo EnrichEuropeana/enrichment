@@ -15,24 +15,21 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.mongo.config.MongoConfig;
-import eu.europeana.enrichment.mongo.controller.PersistentNamedEntityController;
-import eu.europeana.enrichment.mongo.model.DaoNamedEntity;
-import eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl;
-import eu.europeana.enrichment.mongo.model.PersistentNamedEntity;
+import eu.europeana.enrichment.mongo.dao.NamedEntityDao;
+import eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration({ "/mongo-config.xml"})
 public class PersistentNamedEntityServiceTest {
 
 	@Resource(name = "namedEntityDao")
-	DaoNamedEntityImpl namedEntityDao;
+	NamedEntityDaoImpl namedEntityDao;
 	
 	@Test
 	public void test() throws Exception {
-		PersistentNamedEntity entity = new PersistentNamedEntity("Person_1");
+		/*PersistentNamedEntity entity = new PersistentNamedEntity("Person_1");
 		//controller.saveNamedEntity(entity);
-		namedEntityDao.saveNamedEntity(entity);
+		namedEntityDao.saveNamedEntity(entity);*/
 		
 		fail("Not yet implemented");
 	}

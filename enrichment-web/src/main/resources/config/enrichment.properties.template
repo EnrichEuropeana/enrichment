@@ -37,3 +37,9 @@ solr.facetLimit=750
 
 #placeholder to store generation timestamp
 entity.properties.timestamp=-1
+
+mongodb.enrich.connectionUrl=mongodb://127.0.0.1:27017/enrich_test
+#the name of the truststore. Must be available in the classpath in the /config folder
+mongodb.set.truststore=
+#password required to access the truststore
+mongodb.set.truststorepass=

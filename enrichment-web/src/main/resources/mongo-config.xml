@@ -23,20 +23,25 @@
 		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
 	">
 
-	<util:properties id="setProperties" 
-		location="mongodb.properties" />
+	<!--  util:properties id="enrichmentProperties" 
+		location="config/enrichment.properties" /-->
+
+	
 
 	<bean name="enrich_mongo_contextcontainer" class="eu.europeana.enrichment.commons.nosql.context.ApplicationContextContainer"/>
 
 	<bean id="enrich_db_mongoConnector" class="eu.europeana.corelib.db.wrapper.ApiMongoConnector" destroy-method="close"/>
 	
 	<bean id="enrich_db_morphia_datastore" factory-bean="enrich_db_mongoConnector" factory-method="createDatastore">
-		<constructor-arg value="#{setProperties['mongodb.enrich.connectionUrl']}" type="java.lang.String" />
-		<constructor-arg value="#{setProperties['mongodb.set.truststore']}" type="java.lang.String" />
-		<constructor-arg value="#{setProperties['mongodb.set.truststorepass']}" type="java.lang.String" />
+		<constructor-arg value="mongodb://127.0.0.1:27017/enrichment" type="java.lang.String" />
+		<constructor-arg value="" type="java.lang.String" />
+		<constructor-arg value="" type="java.lang.String" />
 	</bean>
 
-	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl">
+	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl">
 		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
 	</bean>
+	
+	<bean id="persistentNamedEntityService" class="eu.europeana.enrichment.mongo.service.PersistentNamedEntityServiceImpl"/>
+	
 </beans>

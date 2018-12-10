@@ -8,9 +8,7 @@ import java.util.TreeSet;
 import javax.annotation.Resource;
 
 import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.mongo.controller.PersistentNamedEntityController;
-import eu.europeana.enrichment.mongo.model.DaoNamedEntity;
-import eu.europeana.enrichment.mongo.model.DaoNamedEntityImpl;
+import eu.europeana.enrichment.common.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
@@ -18,8 +16,7 @@ import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
@@ -38,8 +35,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private static final String spaCyName = "spaCy";
 	private static final String nltkName = "nltk";
 	
-	@Autowired
-	PersistentNamedEntityController saveService;
+	@Resource(name = "persistentNamedEntityService")
+	PersistentNamedEntityService persistentNamedEntityService;
 	
 	@Override
 	public void init() {
@@ -89,11 +86,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		TreeMap<String, List<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
 		
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("mongo-config.xml");
-		DaoNamedEntityImpl daonamedentity = ctx.getBean("namedEntityDao", DaoNamedEntityImpl.class);
 		for (String key : entitiesWithPositions.keySet()) {
 			for (NamedEntity entity : entitiesWithPositions.get(key)) {
-				daonamedentity.saveNamedEntity(new eu.europeana.enrichment.mongo.model.PersistentNamedEntity(entity.getKey()));
+				entity.setClassificationType(key);
+				
+				//Check if NamedEntity already exist
+				NamedEntity dbEntity = persistentNamedEntityService.findNamedEntity(entity.getKey());
+				if(dbEntity != null) {
+					System.out.println("NamedEntity ("+ entity.getKey() +") already exist.");
+				}
+				else
+					persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}
 		
