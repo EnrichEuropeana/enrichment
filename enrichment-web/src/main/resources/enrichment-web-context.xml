@@ -42,7 +42,9 @@
 	<!--  beans:import resource="entity-solr-context.xml"/-->
 	<!-- USING OTHER MODULES -->
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
+	<beans:import resource="mongo-config.xml"/>
 	
+    <beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl" init-method="init"/>
     
     <!--  java api bean -->
 	<!-- beans:bean id="enrichmentService" class="eu.europeana.enrichment.web.service.impl.EnrichmentServiceImpl">

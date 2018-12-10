@@ -1,13 +1,20 @@
 package eu.europeana.enrichment.common.model;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
 
 import eu.europeana.enrichment.common.definitions.NamedEntity;
 
 public class NamedEntityImpl implements NamedEntity{
 
+	//id will be used for storing MongoDB _id
+	@Id
+    public String _id;
+	public String classificationtype;
 	public String key;
-	public ArrayList<Integer> positions; //Offset position
+	public List<Integer> positions; //Offset position
 	
 	public NamedEntityImpl() {
 		init();
@@ -27,6 +34,14 @@ public class NamedEntityImpl implements NamedEntity{
 		return key;
 	}
 	
+	public String getClassificationType() {
+		return this.classificationtype;
+	}
+	
+	public void setClassificationType(String classificationtype) {
+		this.classificationtype = classificationtype;
+	}
+	
 	public String getKey() {
 		return key;
 	}
@@ -38,10 +53,15 @@ public class NamedEntityImpl implements NamedEntity{
 		positions.add(position);
 	}
 	
-	public ArrayList<Integer> getPositions() {
+	public List<Integer> getPositions() {
 		return positions;
 	}
-	public void setPositions(ArrayList<Integer> positions) {
+	public void setPositions(List<Integer> positions) {
 		this.positions = positions;
+	}
+
+	@Override
+	public String getId() {
+		return null;
 	}
 }
