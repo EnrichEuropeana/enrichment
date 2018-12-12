@@ -2,6 +2,11 @@ package eu.europeana.enrichment.web.service.impl;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.annotation.Cacheable;
+
+import eu.europeana.enrichment.common.definitions.TranslationEntity;
+import eu.europeana.enrichment.common.model.TranslationEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
@@ -21,6 +26,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	private static final String googleCredentialFilePath = "";
 	private static final String eTranslationCredentialFilePath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\eTranslation.txt";
 	
+	@Resource(name = "persistentTranslationEntityService")
+	PersistentTranslationEntityService persistentTranslationEntityService;
+	
 	@Override
 	public void init() {
 		googleTranslationService = new TranslationGoogleServiceImpl();
@@ -30,8 +38,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		eTranslationService.init(eTranslationCredentialFilePath);
 	}
 
+	@Cacheable("translationResults")
 	@Override
 	public String translate(String text, String sourceLanguage, String tool) {
+		
+		TranslationEntity entity = new TranslationEntityImpl();
+		entity.setOriginalText(text);
+		entity.setSHA256Hash(text);
+		entity.setTool(tool);
+		TranslationEntity persistentEntity = persistentTranslationEntityService.findTranslationEntity(entity.getSHA256Hash());
+		if(persistentEntity != null)
+			return persistentEntity.getTranslatedText();
+		
 		String returnValue;
 		switch (tool) {
 		case googleToolName:
@@ -45,6 +63,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			returnValue = "";
 			break;
 		}
+		
+		TranslationEntity newEntity = new TranslationEntityImpl();
+		newEntity.setOriginalText(text);
+		newEntity.setSHA256Hash(text);
+		newEntity.setTool(tool);
+		newEntity.setTranslatedText(returnValue);
+		persistentTranslationEntityService.saveTranslationEntity(newEntity);
+		
 		return returnValue;
 	}
 

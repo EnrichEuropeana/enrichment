@@ -24,7 +24,7 @@ import org.json.JSONObject;
 public class ETranslationEuropaServiceImpl implements TranslationService {
 
 	private static final String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
-	private static final String domain = "SPD";
+	private static final String domain = "SPD"; //"Europeana";
 	private static final String application = "Europeana Enrichment";
 	private static final String username = "denis.katic@ait.ac.at";
 	private static final String requesterCallback = null;

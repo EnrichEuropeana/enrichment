@@ -44,7 +44,11 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
-    <beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl" init-method="init"/>
+    <beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl" init-method="init">
+    </beans:bean>
+    
+    <beans:bean id="enrichmentTranslationService" class="eu.europeana.enrichment.web.service.impl.EnrichmentTranslationServiceImpl" init-method="init">
+    </beans:bean>
     
     <!--  java api bean -->
 	<!-- beans:bean id="enrichmentService" class="eu.europeana.enrichment.web.service.impl.EnrichmentServiceImpl">

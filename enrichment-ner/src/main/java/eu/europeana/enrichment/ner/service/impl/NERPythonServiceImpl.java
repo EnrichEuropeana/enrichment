@@ -48,10 +48,11 @@ public class NERPythonServiceImpl extends NERPythonBase implements NERService{
 				String pythonResponse = sb.toString();
 				
 				sb = new StringBuilder();
-				while ((currentLine = reader.readLine()) != null) {
+				while ((currentLine = error.readLine()) != null) {
 					sb.append(currentLine);
 				}
 				String pythonErrorResponse = sb.toString();
+				System.out.println("Python error: " + pythonErrorResponse);
 				
 				byte[] bytesDecoded = Base64.getDecoder().decode(pythonResponse.getBytes("UTF-8"));
 				String pythonResponseText = new String(bytesDecoded, "UTF-8");
