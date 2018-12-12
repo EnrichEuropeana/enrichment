@@ -1,22 +1,14 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
-import eu.europeana.api.commons.nosql.dao.impl.NosqlDaoImpl;
 import eu.europeana.enrichment.common.definitions.NamedEntity;
 import eu.europeana.enrichment.common.model.NamedEntityImpl;
 
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
-	private static final String NAMEDENTITY_COLLECTION = "NamedEntity";
 	private Datastore datastore; 
 	
 	public NamedEntityDaoImpl( Datastore datastore) {

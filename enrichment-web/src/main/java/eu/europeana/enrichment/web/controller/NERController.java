@@ -2,6 +2,8 @@ package eu.europeana.enrichment.web.controller;
 
 import javax.annotation.Resource;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import io.swagger.annotations.ApiOperation;
 
 
 @RestController
+@EnableCaching
 @SwaggerSelect
 @Api(tags = "NER annotation service", description=" ")
 public class NERController extends BaseRest {

@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.web.controller;
 
+import javax.annotation.Resource;
+
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,18 +20,20 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@EnableCaching
 @SwaggerSelect
 @Api(tags = "Translation service", description=" ")
 public class TranslationController extends BaseRest {
 
-	EnrichmentTranslationService enrichmentService;
+	@Resource
+	EnrichmentTranslationService enrichmentTranslationService;
 	
 	@Override
 	protected void init() {
 		super.init();
 		//Load all NER tools
-		enrichmentService = new EnrichmentTranslationServiceImpl();
-		enrichmentService.init();
+		//enrichmentService = new EnrichmentTranslationServiceImpl();
+		//enrichmentService.init();
 	}
 	
 	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "getTranslation")
@@ -36,7 +41,7 @@ public class TranslationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(@RequestBody EnrichmentTranslationRequest translationRequest) {
 
-		String translation = enrichmentService.translate(translationRequest.text, translationRequest.sourceLanguage, translationRequest.tool);
+		String translation = enrichmentTranslationService.translate(translationRequest.text, translationRequest.sourceLanguage, translationRequest.tool);
 		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
 		return response;

@@ -16,6 +16,7 @@ import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
+import org.springframework.cache.annotation.Cacheable;
 
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
@@ -55,6 +56,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		pythonService = new NERPythonServiceImpl();
 	}
 
+	@Cacheable("nerResults")
 	@Override
 	public String annotateText(String text, String tool) {
 		TreeMap<String, TreeSet<String>> map;

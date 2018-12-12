@@ -17,6 +17,21 @@
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 	<context:annotation-config />
+	
+	<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+        <property name="caches">
+            <set>
+                <bean
+                  class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+                  name="nerResults"/>
+                  <bean
+	              class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean"
+	              name="translationResults"/> 
+            </set>
+        </property>
+    </bean>
+	
+	
 	<mvc:annotation-driven>
 		<mvc:message-converters register-defaults="true">
 			<bean class="org.springframework.http.converter.StringHttpMessageConverter">

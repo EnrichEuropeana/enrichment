@@ -1,9 +1,6 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import java.util.List;
-
 import eu.europeana.enrichment.common.definitions.NamedEntity;
-
 
 public interface NamedEntityDao {
 	
