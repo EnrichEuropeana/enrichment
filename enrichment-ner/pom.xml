@@ -55,6 +55,7 @@
 			<artifactId>json</artifactId>
 			<version>${version.json}</version>
 		</dependency>
+		
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>

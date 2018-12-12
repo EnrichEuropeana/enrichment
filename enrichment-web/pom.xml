@@ -173,6 +173,12 @@
             <version>2.1.0.RELEASE</version>
         </dependency>
 		
+		<dependency>
+			<groupId>org.languagetool</groupId>
+			<artifactId>language-en</artifactId>
+			<version>${version.languagetool}</version>
+		</dependency>
+		
 	</dependencies>
 	
 	<build>
