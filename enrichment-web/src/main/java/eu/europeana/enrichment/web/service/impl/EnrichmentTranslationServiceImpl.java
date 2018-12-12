@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -7,6 +9,7 @@ import org.springframework.cache.annotation.Cacheable;
 import eu.europeana.enrichment.common.definitions.TranslationEntity;
 import eu.europeana.enrichment.common.model.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
+import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
@@ -29,6 +32,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Resource(name = "persistentTranslationEntityService")
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	
+	TranslationLanguageTool translationLanguageTool = new TranslationLanguageTool();
+	
 	@Override
 	public void init() {
 		googleTranslationService = new TranslationGoogleServiceImpl();
@@ -38,7 +43,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		eTranslationService.init(eTranslationCredentialFilePath);
 	}
 
-	@Cacheable("translationResults")
+	//@Cacheable("translationResults")
 	@Override
 	public String translate(String text, String sourceLanguage, String tool) {
 		
@@ -47,8 +52,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		entity.setSHA256Hash(text);
 		entity.setTool(tool);
 		TranslationEntity persistentEntity = persistentTranslationEntityService.findTranslationEntity(entity.getSHA256Hash());
-		if(persistentEntity != null)
+		if(persistentEntity != null) {
 			return persistentEntity.getTranslatedText();
+		}
 		
 		String returnValue;
 		switch (tool) {
@@ -63,6 +69,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			returnValue = "";
 			break;
 		}
+		
+		if(returnValue.equals(""))
+			return returnValue;
+		
+		String translatedText = persistentEntity.getTranslatedText();
+		List<String> sentences = translationLanguageTool.sentenceSplitter(translatedText);
+		for (String translatedSentence : sentences) {
+			double ratio = translationLanguageTool.checkLangauge(translatedSentence);
+			System.out.println("Sentence ratio: " + ratio + " ("+translatedSentence+")");
+			//TODO: save ratio
+		}
+		
 		
 		TranslationEntity newEntity = new TranslationEntityImpl();
 		newEntity.setOriginalText(text);

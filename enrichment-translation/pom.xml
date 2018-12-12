@@ -40,6 +40,11 @@
 			<artifactId>json</artifactId>
 			<version>${version.json}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.languagetool</groupId>
+			<artifactId>language-en</artifactId>
+			<version>${version.languagetool}</version>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>
