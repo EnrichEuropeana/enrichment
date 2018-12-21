@@ -7,6 +7,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
+import eu.europeana.enrichment.ner.internal.EuropeanaEntityService;
+import eu.europeana.enrichment.ner.internal.EuropeanaEntityServiceImpl;
+import eu.europeana.enrichment.ner.internal.WikidataService;
+import eu.europeana.enrichment.ner.internal.WikidataServiceImpl;
 import eu.europeana.enrichment.common.definitions.NamedEntity;
 import eu.europeana.enrichment.common.model.NamedEntityImpl;
 
@@ -61,7 +65,26 @@ public interface NERService {
 			notFoundEntities.put(classification, notFound);
 		}
 		
-		
 		return entitiesWithPositions;
+	}
+	
+	default void addInformation(TreeMap<String, List<NamedEntity>> findings){
+		EuropeanaEntityService europeanaEntityService = new EuropeanaEntityServiceImpl();
+		WikidataService wikidataService = new WikidataServiceImpl();
+		
+		for (Map.Entry<String, List<NamedEntity>> classificiationDict : findings.entrySet()) {
+			String classification = classificiationDict.getKey();
+			List<NamedEntity> entities = classificiationDict.getValue();
+			
+			for(NamedEntity entity : entities) {
+				String europeanaResponse = europeanaEntityService.getEntitySuggestions(entity.getKey(), "All");//classification);
+				System.out.println("Europeana response: " + europeanaResponse);
+				entity.addEuopeanaId("");
+				List<String> wikidataIds = wikidataService.getWikidataIdWithLabel(entity.getKey());
+				System.out.println("Wikidata response size: " + wikidataIds.size());
+				entity.addWikidataId("");
+				
+			}
+		}
 	}
 }
