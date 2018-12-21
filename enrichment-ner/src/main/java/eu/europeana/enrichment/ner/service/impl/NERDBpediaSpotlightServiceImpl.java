@@ -5,7 +5,9 @@ import java.util.TreeSet;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -112,10 +114,14 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			
 			URIBuilder builder = new URIBuilder(baseUrl);
-			builder.setParameter("text", text);
+			//builder.setParameter("text", text);
 			
-			HttpGet request = new HttpGet(builder.build());
+			HttpPost request = new HttpPost(baseUrl);
+			String requestString = String.format("text=%s", text);
+			StringEntity params = new StringEntity(requestString, "UTF-8");
 			request.addHeader("Accept", "application/json");
+			request.addHeader("Content-Type", "application/x-www-form-urlencoded");
+			request.setEntity(params);
 			HttpResponse result = httpClient.execute(request);
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 

@@ -15,6 +15,8 @@ public class NamedEntityImpl implements NamedEntity{
 	public String classificationtype;
 	public String key;
 	public List<Integer> positions; //Offset position
+	public List<String> europeanaIds;
+	public List<String> wikidataIds;
 	
 	public NamedEntityImpl() {
 		init();
@@ -28,6 +30,8 @@ public class NamedEntityImpl implements NamedEntity{
 	void init() {
 		key = "";
 		positions = new ArrayList<Integer>();
+		europeanaIds = new ArrayList<String>();
+		wikidataIds = new ArrayList<String>();
 	}
 	
 	public String toString() {
@@ -62,6 +66,36 @@ public class NamedEntityImpl implements NamedEntity{
 
 	@Override
 	public String getId() {
-		return null;
+		return _id;
+	}
+
+	@Override
+	public List<String> getEuropeanaIds() {
+		return europeanaIds;
+	}
+
+	@Override
+	public void setEuropeanaIds(List<String> ids) {
+		this.europeanaIds = ids;
+	}
+
+	@Override
+	public void addEuopeanaId(String id) {
+		this.europeanaIds.add(id);
+	}
+
+	@Override
+	public List<String> getWikidataIds() {
+		return wikidataIds;
+	}
+
+	@Override
+	public void setWikidataIds(List<String> ids) {
+		this.wikidataIds = ids;
+	}
+
+	@Override
+	public void addWikidataId(String id) {
+		wikidataIds.add(id);
 	}
 }

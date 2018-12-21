@@ -21,6 +21,7 @@ public class NERStanfordServiceImpl implements NERService{
 	public static final String classifier_model_3 = "classifiers/stanford/english.all.3class.distsim.crf.ser.gz";
 	public static final String classifier_model_4 = "classifiers/stanford/english.conll.4class.distsim.crf.ser.gz";
 	public static final String classifier_model_7 = "classifiers/stanford/english.muc.7class.distsim.crf.ser.gz";
+	public static final String classifier_model_german = "classifiers/stanford/german.conll.germeval2014.hgc_175m_600.crf.ser.gz;";
 	
 	private CRFClassifier<CoreLabel> classifier;
 	

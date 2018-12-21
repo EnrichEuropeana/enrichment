@@ -12,4 +12,12 @@ public interface NamedEntity {
 	void addPosition(Integer position);
 	List<Integer> getPositions();
 	void setPositions(List<Integer> positions);
+	
+	List<String> getEuropeanaIds();
+	void setEuropeanaIds(List<String> ids);
+	void addEuopeanaId(String id);
+	List<String> getWikidataIds();
+	void setWikidataIds(List<String> ids);
+	void addWikidataId(String id);
+	
 }
