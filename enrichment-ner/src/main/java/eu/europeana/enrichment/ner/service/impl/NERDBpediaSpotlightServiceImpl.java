@@ -48,7 +48,17 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		JSONObject responseJson = new JSONObject(jsonString);
 		//TODO: exception handling 
 		JSONObject annotationObject = responseJson.getJSONObject(annotationKey);
-		JSONArray findings = annotationObject.getJSONArray(surfaceFormKey);
+		
+		if(annotationObject.isNull(surfaceFormKey))
+			return map;
+		
+		Object findingsObj = annotationObject.get(surfaceFormKey);
+		JSONArray findings = new JSONArray();
+		if(findingsObj instanceof JSONArray)
+			findings = (JSONArray) findingsObj;
+		else {
+			findings.put((JSONObject) findingsObj);
+		}
 		
 		processFindings(findings, map);
 

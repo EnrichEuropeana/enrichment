@@ -79,7 +79,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		TreeMap<String, List<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
 		//stanfordNerModel3Service.addInformation(entitiesWithPositions);
-		/*
+		
 		for (String key : entitiesWithPositions.keySet()) {
 			for (NamedEntity entity : entitiesWithPositions.get(key)) {
 				entity.setType(key);
@@ -93,7 +93,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}
-		*/
+		
 		return new JSONObject(map).toString();
 	}
 
