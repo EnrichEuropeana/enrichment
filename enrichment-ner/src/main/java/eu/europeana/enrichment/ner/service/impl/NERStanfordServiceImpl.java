@@ -24,19 +24,20 @@ public class NERStanfordServiceImpl implements NERService{
 	public static final String classifier_model_german = "classifiers/stanford/german.conll.germeval2014.hgc_175m_600.crf.ser.gz;";
 	
 	private CRFClassifier<CoreLabel> classifier;
+	private String classifier_model; 
 	
-	@Override
-	public void init() {
-		URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model_3);
-		classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+	public NERStanfordServiceImpl(String model) {
+		this.classifier_model = model;
+		if(classifier_model.isEmpty()) {
+			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model_3);
+			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+		}
+		else {
+			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model);
+			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+		}
 	}
-	
-	@Override
-	public void init(String model) {
-		URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
-		classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
-	}
-	
+		
 	@Override
 	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {
 		List<List<CoreLabel>> classify = classifier.classify(text);

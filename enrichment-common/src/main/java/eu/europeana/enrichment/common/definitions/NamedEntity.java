@@ -5,8 +5,8 @@ import java.util.List;
 public interface NamedEntity {
 	
 	String getId();
-	String getClassificationType();
-	void setClassificationType(String classificationtype);
+	String getType();
+	void setType(String classificationtype);
 	String getKey();
 	void setKey(String key);
 	void addPosition(Integer position);

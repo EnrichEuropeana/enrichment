@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public abstract class NERPythonBase {
 
-	private static final String pythonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Scripts\\python.exe";
+	private static final String pythonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv64\\Scripts\\python.exe";
 	private static final String mainScriptPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\Europeana\\scripts4java\\main.py";
 	private String pythonCommand;
 	

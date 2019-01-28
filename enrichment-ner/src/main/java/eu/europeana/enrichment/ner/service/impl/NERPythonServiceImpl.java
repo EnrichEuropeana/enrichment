@@ -15,16 +15,6 @@ import eu.europeana.enrichment.ner.service.NERPythonBase;
 public class NERPythonServiceImpl extends NERPythonBase implements NERService{
 
 	TreeMap<String, TreeSet<String>> map;
-	
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void init(String model) {
-		// TODO Auto-generated method stub
-	}
 
 	@Override
 	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {

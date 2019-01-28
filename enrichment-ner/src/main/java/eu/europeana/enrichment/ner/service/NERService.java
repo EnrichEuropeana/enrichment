@@ -16,9 +16,6 @@ import eu.europeana.enrichment.common.model.NamedEntityImpl;
 
 public interface NERService {
 
-	public void init();
-	public void init(String model);
-	
 	/**
 	 * This method identifies named entities.
 	 * 

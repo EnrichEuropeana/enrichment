@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @EnableCaching
 @SwaggerSelect
-@Api(tags = "NER annotation service", description=" ")
+@Api(tags = "NER get entities service", description=" ")
 public class NERController extends BaseRest {
 
 	@Resource
@@ -40,12 +40,12 @@ public class NERController extends BaseRest {
 //		enrichmentNerService.init();
 	}
 	
-	@ApiOperation(value = "Annotate text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getNERAnnotation")
-	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.POST},
+	@ApiOperation(value = "Get entities from text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getNEREntities")
+	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNERAnnotation(@RequestBody EnrichmentNERRequest nerRequest) {
+	public ResponseEntity<String> getNEREntities(@RequestBody EnrichmentNERRequest nerRequest) {
 
-		String jsonLd = enrichmentNerService.annotateText(nerRequest.text, nerRequest.tool);
+		String jsonLd = enrichmentNerService.getEntities(nerRequest.text, nerRequest.tool);
 		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 		
 		return response;

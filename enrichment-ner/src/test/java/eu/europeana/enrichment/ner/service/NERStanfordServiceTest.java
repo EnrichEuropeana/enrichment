@@ -37,8 +37,7 @@ public class NERStanfordServiceTest {
 	
 	@Test
 	public void testNERStanfordImplementationModel3() {
-		nerStanfordService = new NERStanfordServiceImpl();
-		nerStanfordService.init();
+		nerStanfordService = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_3);
 		TreeMap<String, TreeSet<String>> map = nerStanfordService.identifyNER(testString);
 		assertNotNull(map);
 		assertEquals(expectedMap, map);
@@ -65,8 +64,7 @@ public class NERStanfordServiceTest {
 	
 	@Test
 	public void testNERStanfordImplementationModel4() {
-		nerStanfordService = new NERStanfordServiceImpl();
-		nerStanfordService.init(NERStanfordServiceImpl.classifier_model_4);
+		nerStanfordService = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_4);
 		TreeMap<String, TreeSet<String>> map = nerStanfordService.identifyNER(testString2);
 		assertNotNull(map);
 		assertEquals(expectedMap2, map);

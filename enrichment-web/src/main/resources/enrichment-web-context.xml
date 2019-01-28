@@ -44,8 +44,32 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
-    <beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl" init-method="init">
+	<!-- NER service beans -->
+	<!--  https://docs.spring.io/spring/docs/2.5.3/reference/beans.html#beans-factory-collaborators -->
+	
+	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<beans:constructor-arg type="String" value="classifiers/stanford/english.all.3class.distsim.crf.ser.gz"/>
+	</beans:bean>
+	<beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<beans:constructor-arg type="String" value="classifiers/stanford/english.conll.4class.distsim.crf.ser.gz"/>
+	</beans:bean>
+	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<beans:constructor-arg type="String" value="classifiers/stanford/english.muc.7class.distsim.crf.ser.gz"/>
+	</beans:bean>
+	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<beans:constructor-arg type="String" value="classifiers/stanford/german.conll.germeval2014.hgc_175m_600.crf.ser.gz"/>
+	</beans:bean>
+	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl" />
+	<beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl" />
+	
+	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl" init-method="init">
     </beans:bean>
+    
+    
+	<!-- Translation service beans -->
+	<beans:bean id="googleTranslationService" class="eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl" />
+	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl" />
+	<beans:bean id="translationLanguageTool" class="eu.europeana.enrichment.translation.internal.TranslationLanguageTool" />
     
     <beans:bean id="enrichmentTranslationService" class="eu.europeana.enrichment.web.service.impl.EnrichmentTranslationServiceImpl" init-method="init">
     </beans:bean>

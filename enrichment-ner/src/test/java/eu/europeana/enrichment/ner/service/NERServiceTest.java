@@ -63,12 +63,9 @@ public class NERServiceTest {
 	
 	public NERServiceTest() {
 		//Initialize all ner tools 
-		nerServiceStanfordModel3 = new NERStanfordServiceImpl();
-		nerServiceStanfordModel3.init();
-		nerServiceStanfordModel4 = new NERStanfordServiceImpl();
-		nerServiceStanfordModel4.init(NERStanfordServiceImpl.classifier_model_4);
-		nerServiceStanfordModel7 = new NERStanfordServiceImpl();
-		nerServiceStanfordModel7.init(NERStanfordServiceImpl.classifier_model_7);
+		nerServiceStanfordModel3 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_3);
+		nerServiceStanfordModel4 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_4);
+		nerServiceStanfordModel7 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_7);
 		
 		nerServiceDBpediaSpotlight = new NERDBpediaSpotlightServiceImpl();
 		nerServicePython = new NERPythonServiceImpl();
