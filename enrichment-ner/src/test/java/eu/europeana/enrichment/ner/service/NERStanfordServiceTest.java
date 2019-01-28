@@ -34,7 +34,7 @@ public class NERStanfordServiceTest {
 		expectedMap.put(NERClassification.LOCATION.toString(), location);
 	}
 	
-	
+	/*
 	@Test
 	public void testNERStanfordImplementationModel3() {
 		nerStanfordService = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_3);
@@ -70,5 +70,5 @@ public class NERStanfordServiceTest {
 		assertEquals(expectedMap2, map);
 		
 	}
-
+	*/
 }

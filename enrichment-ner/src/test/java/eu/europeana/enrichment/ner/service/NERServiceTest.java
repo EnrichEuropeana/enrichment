@@ -63,17 +63,19 @@ public class NERServiceTest {
 	
 	public NERServiceTest() {
 		//Initialize all ner tools 
+		/*
 		nerServiceStanfordModel3 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_3);
 		nerServiceStanfordModel4 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_4);
 		nerServiceStanfordModel7 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_7);
+		*/
+		//nerServiceDBpediaSpotlight = new NERDBpediaSpotlightServiceImpl();
+		//nerServicePython = new NERPythonServiceImpl();
 		
-		nerServiceDBpediaSpotlight = new NERDBpediaSpotlightServiceImpl();
-		nerServicePython = new NERPythonServiceImpl();
-		
-		storyString = loadSpecificStory();
+		//storyString = loadSpecificStory();
 		storyPartString = storyString.substring(0, 27928);
 	}
 	
+	/*
 	@Test
 	public void testNERToolAccuracyOnPartStory() {
 		System.out.println("Story ("+storyId+")");
@@ -166,5 +168,5 @@ public class NERServiceTest {
 			System.err.println(e.getMessage());
 		}
 		
-	}
+	}*/
 }

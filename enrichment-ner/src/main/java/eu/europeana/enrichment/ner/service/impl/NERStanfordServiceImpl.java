@@ -15,25 +15,14 @@ import eu.europeana.enrichment.ner.service.NERService;
 
 public class NERStanfordServiceImpl implements NERService{
 
-	/*
-	 * All types of classifier (Person, Location, Organization, ... )
-	 */
-	public static final String classifier_model_3 = "classifiers/stanford/english.all.3class.distsim.crf.ser.gz";
-	public static final String classifier_model_4 = "classifiers/stanford/english.conll.4class.distsim.crf.ser.gz";
-	public static final String classifier_model_7 = "classifiers/stanford/english.muc.7class.distsim.crf.ser.gz";
-	public static final String classifier_model_german = "classifiers/stanford/german.conll.germeval2014.hgc_175m_600.crf.ser.gz;";
-	
 	private CRFClassifier<CoreLabel> classifier;
-	private String classifier_model; 
 	
 	public NERStanfordServiceImpl(String model) {
-		this.classifier_model = model;
-		if(classifier_model.isEmpty()) {
-			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model_3);
-			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+		if(model.isEmpty()) {
+			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {
-			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(classifier_model);
+			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
 			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
 		}
 	}

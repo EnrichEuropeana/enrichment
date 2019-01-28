@@ -2,8 +2,6 @@ package eu.europeana.enrichment.web.service;
 
 public interface EnrichmentNERService {
 
-	public void init();
-	
 	/*
 	 * This method applies named entity recognition and returns a json string
 	 * 

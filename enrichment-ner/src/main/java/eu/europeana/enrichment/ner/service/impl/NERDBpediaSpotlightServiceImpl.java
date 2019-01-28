@@ -20,10 +20,7 @@ import eu.europeana.enrichment.ner.service.NERService;
 
 public class NERDBpediaSpotlightServiceImpl implements NERService{
 
-	// docker command: docker run --name spotlight -p 2222:80 -it dbpedia/spotlight-english spotlight.sh
-	
-	//TODO: config file  ("http://api.dbpedia-spotlight.org/en")
-	private static final String baseUrl = "http://localhost:2222/rest/candidates";
+	private String baseUrl;
 	
 	// Json response keys
 	private static final String nameKey = "@name";
@@ -35,6 +32,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	private static final String annotationKey = "annotation";
 	private static final String offsetKey = "@offset";
 	
+	public NERDBpediaSpotlightServiceImpl(String baseUrl) {
+		this.baseUrl = baseUrl;
+	}
 
 	@Override
 	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {

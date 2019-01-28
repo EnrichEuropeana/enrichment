@@ -28,14 +28,6 @@ public class TranslationController extends BaseRest {
 	@Resource
 	EnrichmentTranslationService enrichmentTranslationService;
 	
-	@Override
-	protected void init() {
-		super.init();
-		//Load all NER tools
-		//enrichmentService = new EnrichmentTranslationServiceImpl();
-		//enrichmentService.init();
-	}
-	
 	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "getTranslation")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)

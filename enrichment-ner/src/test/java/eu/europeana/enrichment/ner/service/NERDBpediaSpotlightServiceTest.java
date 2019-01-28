@@ -32,7 +32,7 @@ public class NERDBpediaSpotlightServiceTest {
 	}
 	
 	NERService dbpediaSpotlightService;
-	
+	/*
 	@Test
 	public void testNERDBpediaSpotlightImplementationModel4() {
 		dbpediaSpotlightService = new NERDBpediaSpotlightServiceImpl();
@@ -41,5 +41,5 @@ public class NERDBpediaSpotlightServiceTest {
 		assertEquals(expectedMap, map);
 		
 	}
-
+	*/
 }

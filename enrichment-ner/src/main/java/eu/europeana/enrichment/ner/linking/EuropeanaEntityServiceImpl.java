@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.internal;
+package eu.europeana.enrichment.ner.linking;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -24,7 +24,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 	
 	//http://entity-api-test.eanadev.org/entity/search?wskey=apidemo&query=label%3AGermany&lang=all&type=Place&sort=derived_score%2Bdesc&page=0&pageSize=10
 	@Override
-	public String getEntitySuggestions(String text, String classificationType) {
+	public String getEntitySuggestions(String text, String classificationType, String language) {
 		List<String> entityIDs = new ArrayList<>();
 		String textURIEncoded = "";
 		String sortUrlEncoded = "derived_score+desc";
@@ -39,7 +39,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 			e.printStackTrace();
 		}
 		//List<Entity> suggestions = europeanaApiClient.getSuggestions(key, textURIEncoded, "en", "100");
-		List<Entity> suggestions = europeanaApiClient.getSearch(key, textURIEncoded, "all", classificationType, sortUrlEncoded, "0", "100");
+		List<Entity> suggestions = europeanaApiClient.getSearch(key, textURIEncoded, language, classificationType, sortUrlEncoded, "0", "100");
 		if(suggestions != null && suggestions.size() > 0) {
 			for(Entity entity : suggestions) {
 				entityIDs.add(entity.getEntityId());
