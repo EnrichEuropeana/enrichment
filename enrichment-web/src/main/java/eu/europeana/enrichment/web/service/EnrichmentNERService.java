@@ -12,6 +12,6 @@ public interface EnrichmentNERService {
 	 * @return a all findings including positions
 	 * @throws
 	 */
-	public String annotateText(String text, String tool);  
+	public String getEntities(String text, String tool);  
 	
 }

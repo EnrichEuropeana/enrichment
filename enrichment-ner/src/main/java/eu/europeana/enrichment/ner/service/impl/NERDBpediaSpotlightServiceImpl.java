@@ -35,17 +35,6 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	private static final String annotationKey = "annotation";
 	private static final String offsetKey = "@offset";
 	
-	@Override
-	public void init() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void init(String model) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {

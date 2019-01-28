@@ -76,6 +76,7 @@
 		<version.commonsApi>0.2.5-RELEASE</version.commonsApi>
 		<version.ioinformatics>0.1.1</version.ioinformatics>
 		<version.languagetool>4.3</version.languagetool>
+		<version.entityApi>0.0.5-SNAPSHOT</version.entityApi>
 	</properties>
 
 	<modules>

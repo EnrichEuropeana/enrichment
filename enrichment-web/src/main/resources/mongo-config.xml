@@ -23,17 +23,17 @@
 		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
 	">
 
-	<!--  util:properties id="enrichmentProperties" 
-		location="config/enrichment.properties" /-->
-
-	
-
 	<bean name="enrich_mongo_contextcontainer" class="eu.europeana.enrichment.commons.nosql.context.ApplicationContextContainer"/>
 
 	<bean id="enrich_db_mongoConnector" class="eu.europeana.corelib.db.wrapper.ApiMongoConnector" destroy-method="close"/>
 	
+	
+	<!-- util:properties id="enrichProperties" location="/config/enrichment.properties" /-->
+	<context:property-placeholder location="classpath:config/enrichment.properties" />
+	
+	<!--  constructor String connectionUri, String truststore, String truststorePass  -->
 	<bean id="enrich_db_morphia_datastore" factory-bean="enrich_db_mongoConnector" factory-method="createDatastore">
-		<constructor-arg value="mongodb://127.0.0.1:27017/enrichment" type="java.lang.String" />
+		<constructor-arg value="${enrich.mongodb.connectionUri}" type="java.lang.String" />
 		<constructor-arg value="" type="java.lang.String" />
 		<constructor-arg value="" type="java.lang.String" />
 	</bean>

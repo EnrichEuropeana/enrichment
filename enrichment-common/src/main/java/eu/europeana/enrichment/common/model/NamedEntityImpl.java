@@ -12,7 +12,7 @@ public class NamedEntityImpl implements NamedEntity{
 	//id will be used for storing MongoDB _id
 	@Id
     public String _id;
-	public String classificationtype;
+	public String type;
 	public String key;
 	public List<Integer> positions; //Offset position
 	public List<String> europeanaIds;
@@ -38,12 +38,12 @@ public class NamedEntityImpl implements NamedEntity{
 		return key;
 	}
 	
-	public String getClassificationType() {
-		return this.classificationtype;
+	public String getType() {
+		return this.type;
 	}
 	
-	public void setClassificationType(String classificationtype) {
-		this.classificationtype = classificationtype;
+	public void setType(String classificationtype) {
+		this.type = classificationtype;
 	}
 	
 	public String getKey() {

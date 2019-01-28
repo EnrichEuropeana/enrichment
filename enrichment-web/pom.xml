@@ -168,6 +168,35 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
+			<groupId>eu.europeana.entity</groupId>
+			<artifactId>entity-definitions</artifactId>
+			<version>${version.entityApi}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>eu.europeana.entity</groupId>
+			<artifactId>entity-utils</artifactId>
+			<version>${version.entityApi}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-jdk14</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.3</version>
+		</dependency>
+		
+		<dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-mongodb</artifactId>
             <version>2.1.0.RELEASE</version>

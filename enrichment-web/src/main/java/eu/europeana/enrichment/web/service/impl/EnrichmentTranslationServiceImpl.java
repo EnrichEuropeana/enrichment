@@ -17,8 +17,9 @@ import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {
 
-	//@Resource
+	@Resource(name = "googleTranslationService")
 	TranslationService googleTranslationService;
+	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
 	
 	private static final String googleToolName = "Google";
@@ -32,14 +33,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Resource(name = "persistentTranslationEntityService")
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	
-	TranslationLanguageTool translationLanguageTool = new TranslationLanguageTool();
+	@Resource(name = "translationLanguageTool")
+	TranslationLanguageTool translationLanguageTool;
 	
 	@Override
 	public void init() {
-		googleTranslationService = new TranslationGoogleServiceImpl();
+		if(googleTranslationService == null)
+			return;
 		googleTranslationService.init(googleCredentialFilePath);
-		
-		eTranslationService = new ETranslationEuropaServiceImpl();
 		eTranslationService.init(eTranslationCredentialFilePath);
 	}
 

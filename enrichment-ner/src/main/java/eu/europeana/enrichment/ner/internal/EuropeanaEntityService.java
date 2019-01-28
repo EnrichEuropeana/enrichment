@@ -4,6 +4,6 @@ public interface EuropeanaEntityService {
 
 	public String getEntitySuggestions(String text, String classificationType);
 	
-	public String retriveEntity(String id);
+	public String retriveEntity(String idUrl);
 	
 }
