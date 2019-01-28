@@ -23,14 +23,11 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 //https://cloud.google.com/translate/docs/reference/libraries
 public class TranslationGoogleServiceImpl implements TranslationService{
 
-	// Instantiates a client
     Translate translate;
-
     private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
 
-	@Override
-	public void init(String credentialFilePath) {
-		try {
+    public TranslationGoogleServiceImpl(String credentialFilePath) {
+    	try {
     		// You can specify a credential file by providing a path to GoogleCredentials.
     		// Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
     		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialFilePath))
@@ -41,7 +38,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 			// TODO: handle exception
     		System.err.println(e.getMessage());
 		}
-	}
+    }
     
 	@Override
 	public String translateText(String text, String sourceLanguage) throws TranslationException {

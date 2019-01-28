@@ -5,10 +5,6 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 
 public interface TranslationService {
 	
-	public static final String HANDLER_ANNOTATE = "/translate";
-	
-	public void init(String credentialFilePath);
-	
 	/**
 	 * This method identifies named entities.
 	 * 

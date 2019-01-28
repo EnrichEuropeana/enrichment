@@ -23,21 +23,25 @@ import org.json.JSONObject;
 
 public class ETranslationEuropaServiceImpl implements TranslationService {
 
-	private static final String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
-	private static final String domain = "SPD"; //"Europeana";
-	private static final String application = "Europeana Enrichment";
-	private static final String username = "denis.katic@ait.ac.at";
-	private static final String requesterCallback = null;
-	private static final String errorCallback = null;
-	private static final String emailDestination = "denis.katic@ait.ac.at";
-	private static final String fileFormat = "txt";
-	private static final String targetLanguage = "en";
+	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
+	private String domain;
+	private String requesterCallback;
+	private String errorCallback;
+	private String emailDestination = "denis.katic@ait.ac.at";
+	private String fileFormat = "txt";
+	private String targetLanguage = "en";
 	private String credentialUsername;
 	private String credentialPwd;
 
-
-	@Override
-	public void init(String credentialFilePath) {
+	public ETranslationEuropaServiceImpl(String credentialFilePath, String domain,
+			String requesterCallback, String errorCallback) {
+		readCredentialFile(credentialFilePath);
+		this.domain = domain;
+		this.requesterCallback = requesterCallback;
+		this.errorCallback = errorCallback;
+	}
+	
+	private void readCredentialFile(String credentialFilePath) {
 		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 			String line;
 			while ((line = br.readLine()) != null) {

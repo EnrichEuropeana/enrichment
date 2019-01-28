@@ -25,24 +25,11 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	private static final String googleToolName = "Google";
 	private static final String eTranslationToolName = "eTranslation";
 	
-	//TODO: write credential file path to config
-	//private static final String googleCredentialFilePath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\EU-Europeana-enrichment-d92edee4115a.json";
-	private static final String googleCredentialFilePath = "";
-	private static final String eTranslationCredentialFilePath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\eTranslation.txt";
-	
 	@Resource(name = "persistentTranslationEntityService")
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	
 	@Resource(name = "translationLanguageTool")
 	TranslationLanguageTool translationLanguageTool;
-	
-	@Override
-	public void init() {
-		if(googleTranslationService == null)
-			return;
-		googleTranslationService.init(googleCredentialFilePath);
-		eTranslationService.init(eTranslationCredentialFilePath);
-	}
 
 	//@Cacheable("translationResults")
 	@Override
@@ -81,7 +68,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			System.out.println("Sentence ratio: " + ratio + " ("+translatedSentence+")");
 			//TODO: save ratio
 		}
-		
 		
 		TranslationEntity newEntity = new TranslationEntityImpl();
 		newEntity.setOriginalText(text);

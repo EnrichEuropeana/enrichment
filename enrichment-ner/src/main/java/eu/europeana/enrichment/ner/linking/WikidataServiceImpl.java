@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.internal;
+package eu.europeana.enrichment.ner.linking;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -19,7 +19,7 @@ public class WikidataServiceImpl implements WikidataService {
 	private static final String baseUrl = "https://query.wikidata.org/sparql";
 	private String geonamesIdQueryString = "SELECT ?city ?cityLabel WHERE { ?city wdt:P1566 \"%s\" . "
 			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"e\"}};";
-	private String labelQueryString = "SELECT ?city ?cityLabel WHERE { ?city rdfs:label \"%s\" @en . "
+	private String labelQueryString = "SELECT ?city ?cityLabel WHERE { ?city rdfs:label \"%s\" @%s . "
 			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"e\"}}";
 	
 	//TODO: add type to distinguish between Place/Location and Agent/Person
@@ -31,8 +31,8 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getWikidataIdWithLabel(String label) {
-		String query = String.format(labelQueryString, label);
+	public List<String> getWikidataIdWithLabel(String label, String language) {
+		String query = String.format(labelQueryString, label, language);
 		return processResponse(createRequest(query));
 	}
 	

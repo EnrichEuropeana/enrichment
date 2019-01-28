@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.web.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -10,7 +9,6 @@ import javax.annotation.Resource;
 import eu.europeana.enrichment.common.definitions.NamedEntity;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,16 +43,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	@Resource(name = "persistentNamedEntityService")
 	PersistentNamedEntityService persistentNamedEntityService;
 	
-	@Override
-	public void init() {
-		/*
-		if(stanfordNerModel3Service == null)
-			return;
-		stanfordNerModel3Service.init();
-		stanfordNerModel4Service.init(NERStanfordServiceImpl.classifier_model_4);
-		stanfordNerModel7Service.init(NERStanfordServiceImpl.classifier_model_7);*/
-	}
-
 	//@Cacheable("nerResults")
 	@Override
 	public String getEntities(String text, String tool) {

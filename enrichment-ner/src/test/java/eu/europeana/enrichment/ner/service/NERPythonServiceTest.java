@@ -34,6 +34,7 @@ public class NERPythonServiceTest {
 	
 	NERService nerPythonService;
 	
+	/*
 	@Test
 	public void testNERPythonSpaCyImplementation() {
 		nerPythonService = new NERPythonServiceImpl();
@@ -71,5 +72,5 @@ public class NERPythonServiceTest {
 				map.get(NERClassification.PERSON.toString()));
 		assertEquals(expectedNLTKMap.get(NERClassification.LOCATION.toString()), 
 				map.get(NERClassification.LOCATION.toString()));
-	}
+	}*/
 }

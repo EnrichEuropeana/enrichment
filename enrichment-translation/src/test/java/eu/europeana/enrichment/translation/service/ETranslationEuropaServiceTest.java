@@ -40,8 +40,8 @@ public class ETranslationEuropaServiceTest {
 		String config = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\eTranslation.txt";
 		int size = expectedTranslation.length();
 		
-		eTranslationEuropaService = new ETranslationEuropaServiceImpl();
-		eTranslationEuropaService.init(config);
+		//eTranslationEuropaService = new ETranslationEuropaServiceImpl();
+		//eTranslationEuropaService.init(config);
 		String text = eTranslationEuropaService.translateText(testString, "de");
 		//TODO: callback is missing
 		assertNotNull(text);

@@ -2,8 +2,6 @@ package eu.europeana.enrichment.web.service;
 
 public interface EnrichmentTranslationService {
 
-	public void init();
-	
 	/*
 	 * This method translates a transcribed text
 	 * 

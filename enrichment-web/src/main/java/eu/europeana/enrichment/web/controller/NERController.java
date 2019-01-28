@@ -28,18 +28,6 @@ public class NERController extends BaseRest {
 	@Resource
 	EnrichmentNERService enrichmentNerService;
 	
-	public NERController() {
-		super();
-	}
-	
-	@Override
-	protected void init() {
-		super.init();
-		//Load all NER tools
-//		enrichmentNerService = new EnrichmentNERServiceImpl();
-//		enrichmentNerService.init();
-	}
-	
 	@ApiOperation(value = "Get entities from text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getNEREntities")
 	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
