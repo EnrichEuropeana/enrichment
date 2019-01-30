@@ -26,6 +26,14 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     Translate translate;
     private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
 
+    /*
+     * This class constructor reads to Google Cloud credentials and 
+     * initialized the Google translate tool.
+     * 
+     * @param credentialFilePath		is the path to the Google Cloud
+     * 									credential file
+     * @return
+     */
     public TranslationGoogleServiceImpl(String credentialFilePath) {
     	try {
     		// You can specify a credential file by providing a path to GoogleCredentials.

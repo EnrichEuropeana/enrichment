@@ -83,10 +83,11 @@
 		<beans:constructor-arg type="String" value="enrich.translation.google.credentials"/>
 	</beans:bean>
 	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
-		<beans:constructor-arg type="String" value="enrich.translation.eTranslation.credentials"/>
-		<beans:constructor-arg type="String" value="enrich.translation.eTranslation.domain"/>
-		<beans:constructor-arg type="String" value="enrich.translation.eTranslation.requesterCallback"/>
-		<beans:constructor-arg type="String" value="enrich.translation.eTranslation.errorCallback"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.domain}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.requesterCallback}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.errorCallback}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.emailDestination}"/>
 	</beans:bean>
 	<beans:bean id="translationLanguageTool" class="eu.europeana.enrichment.translation.internal.TranslationLanguageTool" />
     
