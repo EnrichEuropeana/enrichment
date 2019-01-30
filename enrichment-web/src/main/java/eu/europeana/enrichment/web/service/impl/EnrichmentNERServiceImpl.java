@@ -8,6 +8,7 @@ import javax.annotation.Resource;
 
 import eu.europeana.enrichment.common.definitions.NamedEntity;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
+import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
@@ -16,6 +17,11 @@ import org.springframework.cache.annotation.Cacheable;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
+	/*
+	 * Loading all NER services
+	 */
+	@Resource(name = "nerLinkingService")
+	NERLinkingService nerLinkingService;
 	@Resource(name = "stanfordNerModel3Service")
 	NERService stanfordNerModel3Service;
 	@Resource(name = "stanfordNerModel4Service")
@@ -24,18 +30,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERService stanfordNerModel7Service;
 	@Resource(name = "stanfordNerGermanModelService")
 	NERService stanfordNerGermanModelService;
+	@Resource(name = "dbpediaSpotlightService")
+	NERService dbpediaSpotlightService;
+	@Resource(name = "pythonService")
+	NERService pythonService;
+	
+	/*
+	 * Defining the available tools for named entities
+	 */
 	private static final String stanfordNerModel3 = "Stanford_NER_model_3";
 	private static final String stanfordNerModel4 = "Stanford_NER_model_4";
 	private static final String stanfordNerModel7 = "Stanford_NER_model_7";
 	private static final String stanfordNerModelGerman = "Stanford_NER_model_German";
-	
-	
-	@Resource(name = "dbpediaSpotlightService")
-	NERService dbpediaSpotlightService;
 	private static final String dbpediaSpotlightName = "DBpedia_Spotlight";
-	
-	@Resource(name = "pythonService")
-	NERService pythonService;
 	private static final String spaCyName = "spaCy";
 	private static final String nltkName = "nltk";
 	private static final String flairName = "flair";
@@ -45,7 +52,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	//@Cacheable("nerResults")
 	@Override
-	public String getEntities(String text, String tool) {
+	public String getEntities(String text, String tool, List<String> linking) {
 		TreeMap<String, TreeSet<String>> map;
 		switch(tool){
 			case stanfordNerModel3:
@@ -78,8 +85,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		
 		TreeMap<String, List<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
-		//stanfordNerModel3Service.addInformation(entitiesWithPositions);
+		nerLinkingService.addLinkingInformation(entitiesWithPositions, linking, "en");
 		
+
 		for (String key : entitiesWithPositions.keySet()) {
 			for (NamedEntity entity : entitiesWithPositions.get(key)) {
 				entity.setType(key);

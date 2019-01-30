@@ -1,28 +1,28 @@
 package eu.europeana.enrichment.ner.enumeration;
 
 /*
- * Enum for unified classification
+ * Enum for unified named entity classification
  */
 
 public enum NERClassification {
-	PERSON {
+	AGENT {
 		public String toString() {
-			return "PERSON";
+			return "agent";
 		}
 	},
-	LOCATION {
+	PLACE {
 		public String toString() {
-			return "LOCATION";
+			return "place";
 		}
 	},
 	ORGANIZATION {
 		public String toString() {
-			return "ORGANIZATION";
+			return "organization";
 		}
 	},
 	MISC {
 		public String toString() {
-			return "MISC";
+			return "misc";
 		}
 	}
 }

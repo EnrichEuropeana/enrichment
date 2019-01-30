@@ -17,19 +17,25 @@ import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {
 
+	/*
+	 * Loading all translation services
+	 */
 	@Resource(name = "googleTranslationService")
 	TranslationService googleTranslationService;
 	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
 	
+	/*
+	 * Defining the available tools for translation
+	 */
 	private static final String googleToolName = "Google";
 	private static final String eTranslationToolName = "eTranslation";
 	
-	@Resource(name = "persistentTranslationEntityService")
-	PersistentTranslationEntityService persistentTranslationEntityService;
-	
 	@Resource(name = "translationLanguageTool")
 	TranslationLanguageTool translationLanguageTool;
+	
+	@Resource(name = "persistentTranslationEntityService")
+	PersistentTranslationEntityService persistentTranslationEntityService;
 
 	//@Cacheable("translationResults")
 	@Override

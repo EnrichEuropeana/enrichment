@@ -17,10 +17,11 @@ import eu.europeana.enrichment.common.model.NamedEntityImpl;
 public interface NERService {
 
 	/**
-	 * This method identifies named entities.
+	 * This method identifies named entities based on the translated text.
 	 * 
-	 * @param text
-	 * @return a TreeMap with all findings
+	 * @param text					translated text in English
+	 * @return 						a TreeMap based on the classification type
+	 * 								including all named entities findings
 	 * @throws NERAnnotateException	
 	 */
 	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException;
@@ -29,9 +30,12 @@ public interface NERService {
 	 * This methods is the default implementation for getting the positions of the NER entities
 	 * on the original text
 	 * 
-	 * @param findings are the NER findings which are generated throw the identifyNER function
-	 * @param originalText is the transcribed text where the NER needs to be located
-	 * @return all findings including their original position at the transcribed text
+	 * @param 						findings are the NER findings which are 
+	 * 								generated throw the identifyNER function
+	 * @param 						originalText is the transcribed text where 
+	 * 								the NER needs to be located
+	 * @return 						all findings including their original 
+	 * 								position at the transcribed text
 	 */
 	default TreeMap<String, List<NamedEntity>> getPositions(TreeMap<String, TreeSet<String>> findings, String originalText){
 		TreeMap<String, List<NamedEntity>> entitiesWithPositions = new TreeMap<String, List<NamedEntity>>();
@@ -63,27 +67,5 @@ public interface NERService {
 		}
 		
 		return entitiesWithPositions;
-	}
-	
-	default void addInformation(TreeMap<String, List<NamedEntity>> findings){
-		EuropeanaEntityService europeanaEntityService = new EuropeanaEntityServiceImpl();
-		WikidataService wikidataService = new WikidataServiceImpl();
-		
-		for (Map.Entry<String, List<NamedEntity>> classificiationDict : findings.entrySet()) {
-			String classification = classificiationDict.getKey();
-			List<NamedEntity> entities = classificiationDict.getValue();
-			
-			for(NamedEntity entity : entities) {
-				// TODO: change classificiation and laguage from all to specific
-				String europeanaResponse = europeanaEntityService.getEntitySuggestions(entity.getKey(), "all", "all");//classification);
-				System.out.println("Europeana response: " + europeanaResponse);
-				entity.addEuopeanaId("");
-				
-				List<String> wikidataIds = wikidataService.getWikidataIdWithLabel(entity.getKey(), "en");
-				System.out.println("Wikidata response size: " + wikidataIds.size());
-				entity.addWikidataId("");
-				
-			}
-		}
 	}
 }

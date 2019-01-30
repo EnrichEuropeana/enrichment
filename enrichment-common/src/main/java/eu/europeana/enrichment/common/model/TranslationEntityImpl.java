@@ -33,7 +33,8 @@ public class TranslationEntityImpl implements TranslationEntity{
 		MessageDigest digest;
 		try {
 			digest = MessageDigest.getInstance("SHA-256");
-			byte[] hash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+			String textWithoutWithespace = text.replaceAll("\\s+","");
+			byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
 			hashKey = new String(hash, "UTF-8");
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block

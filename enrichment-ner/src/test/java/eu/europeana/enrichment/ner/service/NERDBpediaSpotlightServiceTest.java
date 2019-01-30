@@ -22,9 +22,9 @@ public class NERDBpediaSpotlightServiceTest {
 	static {
 		expectedMap = new TreeMap<String, TreeSet<String>>();
 		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe Smith", "Google"));
-		expectedMap.put(NERClassification.PERSON.toString(), person);
+		expectedMap.put(NERClassification.AGENT.toString(), person);
 		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
-		expectedMap.put(NERClassification.LOCATION.toString(), location);
+		expectedMap.put(NERClassification.PLACE.toString(), location);
 		TreeSet<String> organization = new TreeSet<String>(Arrays.asList("Google"));
 		expectedMap.put(NERClassification.ORGANIZATION.toString(), organization);
 		TreeSet<String> misc = new TreeSet<String>(Arrays.asList("Russian", "Jane Smith", "escargot", "postcard"));

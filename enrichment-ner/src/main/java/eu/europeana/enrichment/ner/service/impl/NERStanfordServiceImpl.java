@@ -17,6 +17,10 @@ public class NERStanfordServiceImpl implements NERService{
 
 	private CRFClassifier<CoreLabel> classifier;
 	
+	/*
+	 * This class constructor loads a model for the Stanford named
+	 * entity recognition and classification
+	 */
 	public NERStanfordServiceImpl(String model) {
 		if(model.isEmpty()) {
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
@@ -36,9 +40,9 @@ public class NERStanfordServiceImpl implements NERService{
 	/*
 	 * This methods combines words and creates a TreeMap based on the classification
 	 * 
-	 * @param classify contains all words including their classification
-	 * @return a TreeMap with all relevant words
-	 * @throws NERAnnotateException
+	 * @param classify 					contains all words including their classification
+	 * @return 							a TreeMap with all relevant words
+	 * @throws 							NERAnnotateException
 	 */
 	//TODO: check where exception could appear
 	private TreeMap<String, TreeSet<String>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
@@ -51,8 +55,8 @@ public class NERStanfordServiceImpl implements NERService{
 				String word = coreLabel.word();
 				String category = coreLabel.get(CoreAnnotations.AnswerAnnotation.class);
 				// Check if previous word is from the same category
-				if (category.equals(previousCategory) && (category.equals(NERClassification.PERSON.toString()) || 
-						category.equals(NERClassification.LOCATION.toString()) || 
+				if (category.equals(previousCategory) && (category.equals(NERClassification.AGENT.toString()) || 
+						category.equals(NERClassification.PLACE.toString()) || 
 						category.equals(NERClassification.ORGANIZATION.toString()) || 
 						category.equals(NERClassification.MISC.toString()))) {
 					word = previousWord + " " + word;

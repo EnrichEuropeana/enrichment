@@ -56,6 +56,12 @@ public class SwaggerConfig {
 		return docketConfig;
 	}
 
+	/*
+	 * This method defines the web service API information displayed on the web page
+	 * 
+	 * @return							a ApiInfo object including title, description
+	 * 									and contact informations
+	 */
 	ApiInfo apiInfo() {
 
 		String appTitle = StringUtils.isNotBlank(title) ? title : "REST API";
@@ -66,6 +72,11 @@ public class SwaggerConfig {
 				"Creative Commons CC0 1.0 Universal Public Domain Dedication", "http://creativecommons.org/publicdomain/zero/1.0/");
 	}
 
+	/*
+	 * This method defines which port and host should be used for the web service
+	 *  
+	 * @return							a specific url on which the web service will listen
+	 */
 	private String getHostAndPort() {
 		String url = StringUtils.isNotBlank(hostUrl) ? hostUrl : "localhost:8080";
 		if (url.toLowerCase().indexOf("/api") != -1) {

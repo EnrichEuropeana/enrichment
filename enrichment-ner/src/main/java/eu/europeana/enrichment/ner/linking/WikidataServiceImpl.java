@@ -17,12 +17,13 @@ import org.apache.http.util.EntityUtils;
 public class WikidataServiceImpl implements WikidataService {
 
 	private static final String baseUrl = "https://query.wikidata.org/sparql";
+	/*
+	 * Defining Wikidata sparql query construct for Geonames ID and Label search
+	 */
 	private String geonamesIdQueryString = "SELECT ?city ?cityLabel WHERE { ?city wdt:P1566 \"%s\" . "
-			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"e\"}};";
-	private String labelQueryString = "SELECT ?city ?cityLabel WHERE { ?city rdfs:label \"%s\" @%s . "
 			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"e\"}}";
-	
-	//TODO: add type to distinguish between Place/Location and Agent/Person
+	private String labelQueryString = "SELECT ?city ?cityLabel WHERE { ?city rdfs:label \"%s\"@%s . "
+			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"e\"}}";
 	
 	@Override
 	public List<String> getWikidataId(String geonameId) {
@@ -36,7 +37,15 @@ public class WikidataServiceImpl implements WikidataService {
 		return processResponse(createRequest(query));
 	}
 	
+	/*
+	 * This method process the response of the Wikidata sparql query and
+	 * returns a list of Wikidata entity urls or null
+	 * 
+	 *  @param response				is the response body of the Wikidata sparql query
+	 *  @return						a list of Wikidata entity entity or empty list
+	 */
 	private List<String> processResponse(String reponse){
+		//TODO: implement function and add type to distinguish between Place/Location and Agent/Person
 		List<String> retValue = new ArrayList<>();
 		if(reponse == null || reponse.equals(""))
 			return retValue;
@@ -45,6 +54,14 @@ public class WikidataServiceImpl implements WikidataService {
 		return retValue;
 	}
 	
+	/*
+	 * This method creates the Wikidata request, extracts the response body
+	 * from the rest and returns the response body
+	 * 
+	 * @param query					is the Wikidata sparql Geonames ID or 
+	 * 								label search query
+	 * @return						response body or null
+	 */
 	private String createRequest(String query) {
 		try {
 			URIBuilder builder = new URIBuilder(baseUrl);

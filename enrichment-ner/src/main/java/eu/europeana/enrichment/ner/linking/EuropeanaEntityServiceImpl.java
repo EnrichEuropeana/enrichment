@@ -6,23 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
+import javax.annotation.Resource;
 
 import eu.europeana.entity.client.web.WebEntityProtocolApi;
-import eu.europeana.entity.client.web.WebEntityProtocolApiImpl;
 import eu.europeana.entity.definitions.model.Entity;
 
 public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 
-	private String key = "apidemo";
-	
+	/*
+	 * Europeana API key
+	 */
+	private String key;
+	@Resource(name= "europeanaApiClient")
 	private WebEntityProtocolApi europeanaApiClient;
 	
-	public EuropeanaEntityServiceImpl() {
-		europeanaApiClient = new WebEntityProtocolApiImpl();
+	public EuropeanaEntityServiceImpl(String key) {
+		this.key = key;
 	}
 	
-	//http://entity-api-test.eanadev.org/entity/search?wskey=apidemo&query=label%3AGermany&lang=all&type=Place&sort=derived_score%2Bdesc&page=0&pageSize=10
 	@Override
 	public String getEntitySuggestions(String text, String classificationType, String language) {
 		List<String> entityIDs = new ArrayList<>();
@@ -37,6 +38,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		//List<Entity> suggestions = europeanaApiClient.getSuggestions(key, textURIEncoded, "en", "100");
 		List<Entity> suggestions = europeanaApiClient.getSearch(key, textURIEncoded, language, classificationType, sortUrlEncoded, "0", "100");
@@ -49,7 +51,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 	}
 
 	@Override
-	public String retriveEntity(String idUrl) {
+	public String retriveEntity(String idUrl, String language) {
 		Entity entity = europeanaApiClient.retrieveEntityWithUrl(idUrl);
 		if(entity == null)
 			return "";
@@ -58,6 +60,8 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 			return prefLabelMap.get("");
 		else if(prefLabelMap.containsKey("en"))
 			return prefLabelMap.get("en");
+		else if(prefLabelMap.containsKey(language))
+			return prefLabelMap.get(language);
 		
 		return entity.getInternalType();
 	}
