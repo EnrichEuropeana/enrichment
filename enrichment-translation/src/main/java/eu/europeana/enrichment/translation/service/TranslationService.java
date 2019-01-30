@@ -6,11 +6,12 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 public interface TranslationService {
 	
 	/**
-	 * This method identifies named entities.
+	 * This method translate the original transcribed text into English
 	 * 
-	 * @param text is the transcribed text
-	 * @param sourceLanguage is the language of the transcribed text
-	 * @return the translated text
+	 * @param text 						original transcribed text
+	 * @param sourceLanguage 			is the language of the transcribed text
+	 * @return 							the English translation of the
+	 * 									original transcribed text
 	 * @throws TranslationException	
 	 */
 	public String translateText(String text, String sourceLanguage) throws TranslationException;

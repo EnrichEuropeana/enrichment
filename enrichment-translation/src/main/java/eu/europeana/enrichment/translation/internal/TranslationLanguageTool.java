@@ -14,10 +14,21 @@ public class TranslationLanguageTool {
 
 	JLanguageTool langTool;
 	
+	/*
+	 * This class constructor initialized JLanguageTool with 
+	 * the American English corpus 
+	 */
 	public TranslationLanguageTool() {
 		langTool = new JLanguageTool(new AmericanEnglish());
 	}
 	
+	/*
+	 * This method divides the translated text into sentences 
+	 * for further steps.
+	 * 
+	 * @param text						is the translated text
+	 * @return							a list of sentences
+	 */
 	public List<String> sentenceSplitter(String text){
 		List<String> retValue = new ArrayList<String>();
 		BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
@@ -31,7 +42,14 @@ public class TranslationLanguageTool {
 		return retValue;
 	}
 	
-	public double checkLangauge(String sentence) {
+	/*
+	 * This method calculates the English word ratio based on the non English words
+	 * and the size of this sentences.
+	 * 
+	 * @param sentence					is one sentence of the translated text
+	 * @return							English sentence ratio
+	 */
+	public double getLanguageRatio(String sentence) {
 		List<RuleMatch> matches;
 		List<String> nonEnglishWords = new ArrayList<>();
 		int nonEnglishWordsSize = 0;

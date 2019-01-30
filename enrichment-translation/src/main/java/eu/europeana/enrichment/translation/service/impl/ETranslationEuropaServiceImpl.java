@@ -27,20 +27,26 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	private String domain;
 	private String requesterCallback;
 	private String errorCallback;
-	private String emailDestination = "denis.katic@ait.ac.at";
+	private String emailDestination;
 	private String fileFormat = "txt";
 	private String targetLanguage = "en";
 	private String credentialUsername;
 	private String credentialPwd;
 
 	public ETranslationEuropaServiceImpl(String credentialFilePath, String domain,
-			String requesterCallback, String errorCallback) {
+			String requesterCallback, String errorCallback, String emailDestination) {
 		readCredentialFile(credentialFilePath);
 		this.domain = domain;
 		this.requesterCallback = requesterCallback;
 		this.errorCallback = errorCallback;
+		this.emailDestination = emailDestination;
 	}
 	
+	/*
+	 * This method reads the necessary eTranslation credentials 
+	 * 
+	 * @param credentialFilePath		is the path to the credential file
+	 */
 	private void readCredentialFile(String credentialFilePath) {
 		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 			String line;
@@ -69,11 +75,10 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * This method creates the translation request body including all information
 	 * and the base64 encoded text
 	 * 
-	 * @param text this is the transcribed text
-	 * 
-	 * @param sourceLanguage
-	 * 
-	 * @return a stringified json including the base64 string
+	 * @param text 						this is the transcribed text
+	 * @param sourceLanguage			is the original language of transcribed text
+	 * @return							a stringified JSON including the transcribed
+	 * 									text as a base64 string
 	 */
 	private String createTranslationBody(String text, String sourceLanguage) {
 		String base64content = "";
@@ -99,9 +104,11 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 
 	/*
-	 * This method creates the request to eTranslation server
+	 * This method creates a request to the eTranslation server including
+	 * the transcribed text which should be translated.
 	 * 
-	 * @param content is the base64 content which contains transcribed text and other information
+	 * @param content 					is the base64 content which contains 
+	 * 									the transcribed text and other information
 	 * @return
 	 */
 	private void createHttpRequest(String content) {
