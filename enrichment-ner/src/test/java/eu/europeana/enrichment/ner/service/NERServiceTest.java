@@ -29,9 +29,9 @@ public class NERServiceTest {
 	static {
 		expectedMapStory17034 = new TreeMap<String, TreeSet<String>>();
 		TreeSet<String> person = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.PERSON.toString(), person);
+		expectedMapStory17034.put(NERClassification.AGENT.toString(), person);
 		TreeSet<String> location = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.LOCATION.toString(), location);
+		expectedMapStory17034.put(NERClassification.PLACE.toString(), location);
 		TreeSet<String> organization = new TreeSet<String>(Arrays.asList());
 		expectedMapStory17034.put(NERClassification.ORGANIZATION.toString(), organization);
 		TreeSet<String> misc = new TreeSet<String>(Arrays.asList());
@@ -44,9 +44,9 @@ public class NERServiceTest {
 	static {
 		expectedMapStory17034_Part = new TreeMap<String, TreeSet<String>>();
 		TreeSet<String> person = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.PERSON.toString(), person);
+		expectedMapStory17034_Part.put(NERClassification.AGENT.toString(), person);
 		TreeSet<String> location = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.LOCATION.toString(), location);
+		expectedMapStory17034_Part.put(NERClassification.PLACE.toString(), location);
 		TreeSet<String> organization = new TreeSet<String>(Arrays.asList());
 		expectedMapStory17034_Part.put(NERClassification.ORGANIZATION.toString(), organization);
 		TreeSet<String> misc = new TreeSet<String>(Arrays.asList());

@@ -1,14 +1,20 @@
 package eu.europeana.enrichment.ner.enumeration;
 
+/*
+ * Enum for DBpedia spotlight classification
+ * which should convert their classification into the unified 
+ * named entity classification (NERClassification)
+ */
+
 public enum NERDBpediaClassification {
-	PERSON {
+	AGENT {
 		public String toString() {
-			return NERClassification.PERSON.toString();
+			return NERClassification.AGENT.toString();
 		}
 	},
-	LOCATION {
+	PLACE {
 		public String toString() {
-			return NERClassification.LOCATION.toString();
+			return NERClassification.PLACE.toString();
 		}
 	},
 	ORGANIZATION {
@@ -21,7 +27,7 @@ public enum NERDBpediaClassification {
 			return NERClassification.MISC.toString();
 		}
 	};
-	
+
 	public static boolean isPerson(String classificationString) {
 		if(classificationString.contains("DBpedia:Person") || classificationString.contains("DBpedia:Writer") || 
 				classificationString.contains("DBpedia:Agent"))

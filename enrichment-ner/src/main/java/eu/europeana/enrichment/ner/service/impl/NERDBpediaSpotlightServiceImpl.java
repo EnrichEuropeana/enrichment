@@ -22,7 +22,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 	private String baseUrl;
 	
-	// Json response keys
+	/*
+	 * DBpedia spotlight JSON response keys 
+	 */
 	private static final String nameKey = "@name";
 	private static final String finalScoreKey = "@finalScore";
 	private static final String labelKey = "@label";
@@ -43,6 +45,14 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		return map;
 	}
 	
+	/*
+	 * This method parses the DBpedia spotlight JSON response into a TreeMap
+	 * which is separated by classification types
+	 * 
+	 * @param jsonString			is the JSON string response of the previous request
+	 * @return						a TreeMap of named entities which are separated
+	 * 								based on their classification type
+	 */
 	private TreeMap<String, TreeSet<String>> readJSON(String jsonString){
 		TreeMap<String, TreeSet<String>> map = new TreeMap<String, TreeSet<String>>();
 		JSONObject responseJson = new JSONObject(jsonString);
@@ -65,6 +75,15 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		return map;
 	}
 	
+	/*
+	 * This method process the specific JSON area of the response into a TreeMap
+	 * separated by classification type (e.g. agent, place, ..)
+	 * 
+	 * @param findings				is the JSON response of the DBpedia spotlight request
+	 * @param map					is the TreeMap which could already have some named entities
+	 * return						the map parameter will be extended by all findings of
+	 * 								the JSON response
+	 */
 	private void processFindings(JSONArray findings, TreeMap<String, TreeSet<String>> map){
 		for (int index = 0; index < findings.length(); index++) {
 			JSONObject entity = findings.getJSONObject(index);
@@ -81,11 +100,11 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			boolean classificationFound = false;
 			if(NERDBpediaClassification.isPerson(entityTypes)) {
 				classificationFound = true;
-				setEntityToMap(NERDBpediaClassification.PERSON.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.AGENT.toString(), entityName, map);
 			}
 			if(NERDBpediaClassification.isLocation(entityTypes)) {
 				classificationFound = true;
-				setEntityToMap(NERDBpediaClassification.LOCATION.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.PLACE.toString(), entityName, map);
 			}
 			if(NERDBpediaClassification.isOrganization(entityTypes)) {
 				classificationFound = true;
@@ -97,6 +116,17 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		}
 	}
 	
+	/*
+	 * This method adds new DBpedia spotlight named entities into the TreeMap which 
+	 * is separated by classification type (e.g. agent, place, ..)
+	 * 
+	 * @param entityType			is the classification type of the new DBpedia spotlight named entity
+	 * 								(e.g. place for Vienna)
+	 * @param entityName			represents the label of the new DBpedia spotlight named entity
+	 * @param map					is a TreeMap which already contains some named entities and this
+	 * 								TreeMap will be extended by the new DBpedia spotlight named entity
+	 * return						the map parameter will be changed through this function
+	 */
 	private void setEntityToMap(String entityType, String entityName, TreeMap<String, TreeSet<String>> map) {
 		if(map.containsKey(entityType)) {
 			map.get(entityType).add(entityName);
@@ -108,6 +138,14 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		}
 	}
 	
+	/*
+	 * This method creates the DBpedia spotlight query and extracts the response body for 
+	 * further steps
+	 * 
+	 * @param text					is the translated text which is send to the DBpedia spotlight 
+	 * 								for named entity recognition and classification
+	 * @return						response body which should be a JSON or empty string
+	 */
 	private String createRequest(String text) {
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();

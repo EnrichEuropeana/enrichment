@@ -29,9 +29,9 @@ public class NERStanfordServiceTest {
 	static {
 		expectedMap = new TreeMap<String, TreeSet<String>>();
 		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe Smith", "Joe", "Jane Smith", "Jane"));
-		expectedMap.put(NERClassification.PERSON.toString(), person);
+		expectedMap.put(NERClassification.AGENT.toString(), person);
 		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
-		expectedMap.put(NERClassification.LOCATION.toString(), location);
+		expectedMap.put(NERClassification.PLACE.toString(), location);
 	}
 	
 	/*

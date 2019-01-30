@@ -23,9 +23,9 @@ public class NERPythonServiceTest {
 	static {
 		expectedSpaCyMap = new TreeMap<String, TreeSet<String>>();
 		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe Smith", "Joe", "Jane Smith", "Jane"));
-		expectedSpaCyMap.put(NERClassification.PERSON.toString(), person);
+		expectedSpaCyMap.put(NERClassification.AGENT.toString(), person);
 		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
-		expectedSpaCyMap.put(NERClassification.LOCATION.toString(), location);
+		expectedSpaCyMap.put(NERClassification.PLACE.toString(), location);
 		TreeSet<String> organization = new TreeSet<String>(Arrays.asList("Google"));
 		expectedSpaCyMap.put(NERClassification.ORGANIZATION.toString(), organization);
 		TreeSet<String> misc = new TreeSet<String>(Arrays.asList("Russian", "World War"));
