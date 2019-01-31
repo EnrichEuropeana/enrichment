@@ -34,18 +34,18 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void saveNamedEntity(NamedEntity entity) {
+		//TODO: update
 		this.datastore.save(entity);
 	}
 
 	@Override
 	public void deleteNamedEntity(NamedEntity entity) {
-		deleteByKey(entity.getId());
+		deleteByKey(entity.getKey());
 	}
 
 	@Override
 	public void deleteByKey(String key) {
-		//Query query = new Query(Criteria.where("key").is(key));
-		//this.datastore.delete(query);
+		datastore.delete(datastore.find(NamedEntityImpl.class).filter("key", key));
 	}
 
 	

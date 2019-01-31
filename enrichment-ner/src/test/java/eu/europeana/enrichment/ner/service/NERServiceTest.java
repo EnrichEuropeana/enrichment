@@ -6,167 +6,104 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.annotation.Resource;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class NERServiceTest {
 
-	private final String storyFilePath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\ExportItems.json";
-	private final String storeFolder = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\test\\";
-	private final String storyId = "17034";
+	@Resource(name= "stanfordNerModel3Service")
+	NERService stanfordNerModel3Service;
+	@Resource(name= "stanfordNerModel4Service")
+	NERService stanfordNerModel4Service;
+	@Resource(name= "stanfordNerModel7Service")
+	NERService stanfordNerModel7Service;
+	@Resource(name= "dbpediaSpotlightService")
+	NERService dbpediaSpotlightService;
+	@Resource(name= "stanfordNerModel3Service")
+	NERService pythonService;
 	
-	private String storyString;
-	private static final TreeMap<String, TreeSet<String>> expectedMapStory17034;
+	//@Resource(name= "nerLinkingService")
+	//NERLinkingService nerLinkingService;
+	
+	private static final String testString = "Joe was born in California. "
+			+ "In 2017, he went to Paris, France in the summer. " + "His flight left at 3:00pm on July 10th, 2017. "
+			+ "After eating some escargot for the first time, Joe said, \"That was delicious!\" "
+			+ "He sent a postcard to his sister Jane. "
+			+ "After hearing about Joe's trip, Jane decided she might go to France one day.";
+	private static final TreeMap<String, TreeSet<String>> expectedMap;
 	static {
-		expectedMapStory17034 = new TreeMap<String, TreeSet<String>>();
-		TreeSet<String> person = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.AGENT.toString(), person);
-		TreeSet<String> location = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.PLACE.toString(), location);
-		TreeSet<String> organization = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.ORGANIZATION.toString(), organization);
-		TreeSet<String> misc = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034.put(NERClassification.MISC.toString(), misc);
+		expectedMap = new TreeMap<String, TreeSet<String>>();
+		TreeSet<String> person = new TreeSet<String>(Arrays.asList("Joe", "Jane"));
+		expectedMap.put(NERClassification.AGENT.toString(), person);
+		TreeSet<String> location = new TreeSet<String>(Arrays.asList("California", "Paris", "France"));
+		expectedMap.put(NERClassification.PLACE.toString(), location);
 	}
-	
-	//Only 27.928 chars
-	private String storyPartString;
-	private static final TreeMap<String, TreeSet<String>> expectedMapStory17034_Part;
-	static {
-		expectedMapStory17034_Part = new TreeMap<String, TreeSet<String>>();
-		TreeSet<String> person = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.AGENT.toString(), person);
-		TreeSet<String> location = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.PLACE.toString(), location);
-		TreeSet<String> organization = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.ORGANIZATION.toString(), organization);
-		TreeSet<String> misc = new TreeSet<String>(Arrays.asList());
-		expectedMapStory17034_Part.put(NERClassification.MISC.toString(), misc);
-	}
-	
-	//define all ner tools
-	NERService nerServiceStanfordModel3;
-	NERService nerServiceStanfordModel4;
-	NERService nerServiceStanfordModel7;
-	NERService nerServiceDBpediaSpotlight;
-	NERService nerServicePython; //for NLTK and spaCy
-	
-	
-	public NERServiceTest() {
-		//Initialize all ner tools 
-		/*
-		nerServiceStanfordModel3 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_3);
-		nerServiceStanfordModel4 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_4);
-		nerServiceStanfordModel7 = new NERStanfordServiceImpl(NERStanfordServiceImpl.classifier_model_7);
-		*/
-		//nerServiceDBpediaSpotlight = new NERDBpediaSpotlightServiceImpl();
-		//nerServicePython = new NERPythonServiceImpl();
 		
-		//storyString = loadSpecificStory();
-		storyPartString = storyString.substring(0, 27928);
-	}
-	
-	/*
 	@Test
-	public void testNERToolAccuracyOnPartStory() {
-		System.out.println("Story ("+storyId+")");
-		if(storyString.isEmpty() || storyString.equals(""))
-			fail("No Story "+ storyId +" found!");
-
-		TreeMap<String, TreeSet<String>> mapStanfordModel3 = nerServiceStanfordModel3.identifyNER(storyPartString);
-		TreeMap<String, TreeSet<String>> mapStanfordModel4 = nerServiceStanfordModel4.identifyNER(storyPartString);
-		TreeMap<String, TreeSet<String>> mapStanfordModel7 = nerServiceStanfordModel7.identifyNER(storyPartString);
-		TreeMap<String, TreeSet<String>> mapDBpediaSpotlight = nerServiceDBpediaSpotlight.identifyNER(storyPartString);
-		
-		TreeMap<String, TreeSet<String>> mapSpaCy = nerServicePython.identifyNER(
-				new JSONObject().put("tool", "spaCy").put("text", storyString).toString());
-		TreeMap<String, TreeSet<String>> mapNLTK = nerServicePython.identifyNER(
-				new JSONObject().put("tool", "nltk").put("text", storyString).toString());
-		
-		assertTrue(false);
+	public void stanfordNERServiceTest() {
+		assertTrue("Stanford model 3 classifier failed in comparison!", 
+				resultComparison(stanfordNerModel3Service.identifyNER(testString)));
+		assertTrue("Stanford model 4 classifier failed in comparison!", 
+				resultComparison(stanfordNerModel4Service.identifyNER(testString)));
+		assertTrue("Stanford model 7 classifier failed in comparison!", 
+				resultComparison(stanfordNerModel7Service.identifyNER(testString)));
+		System.out.println("Works");
 	}
 	
 	@Test
-	public void testNERToolAccuracy() {
-		System.out.println("Story ("+storyId+")");
-		if(storyString.isEmpty() || storyString.equals(""))
-			fail("No Story "+ storyId +" found!");
-
-		TreeMap<String, TreeSet<String>> mapStanfordModel3 = nerServiceStanfordModel3.identifyNER(storyString);
-		TreeMap<String, TreeSet<String>> mapStanfordModel4 = nerServiceStanfordModel4.identifyNER(storyString);
-		TreeMap<String, TreeSet<String>> mapStanfordModel7 = nerServiceStanfordModel7.identifyNER(storyString);
-		TreeMap<String, TreeSet<String>> mapDBpediaSpotlight = nerServiceDBpediaSpotlight.identifyNER(storyString);
-		
-		TreeMap<String, TreeSet<String>> mapSpaCy = nerServicePython.identifyNER(
-				new JSONObject().put("tool", "spaCy").put("text", storyPartString).toString());
-		TreeMap<String, TreeSet<String>> mapNLTK = nerServicePython.identifyNER(
-				new JSONObject().put("tool", "nltk").put("text", storyPartString).toString());
-		
-		assertTrue(false);
-	}
-
-	private String loadSpecificStory() {
-		StringBuilder sbStory = new StringBuilder();
-		JSONArray fileJSON = new JSONArray(loadFile());
-		JSONArray tableData = null;
-		for(int index = 0; index < fileJSON.length(); index++) {
-			JSONObject tmpObject = fileJSON.getJSONObject(index);
-			if(tmpObject.getString("type").equals("table"))
-			{
-				tableData = tmpObject.getJSONArray("data");
-				break;
-			}
-		}
-		if(tableData == null)
-			return "";
-		//Note: Appending story items works because the values are sorted
-		for(int index = 0; index < tableData.length(); index++) {
-			JSONObject tmpObject = tableData.getJSONObject(index);
-			if(storyId.equals(tmpObject.getString("story_id")) && !tmpObject.getString("transcription").isEmpty()) {
-				sbStory.append(tmpObject.getString("transcription"));
-				sbStory.append(" ");
-			}
-		}
-		return sbStory.toString();
+	public void pythonNERServiceTest() {
+		//NLTK section
+		assertTrue("Python nltk classifier failed in comparison!", 
+				resultComparison(pythonService.identifyNER(
+						new JSONObject().put("tool", "nltk").put("text", testString).toString())));
+		//spaCy section
+		assertTrue("Python spaCy classifier failed in comparison!", 
+				resultComparison(pythonService.identifyNER(
+						new JSONObject().put("tool", "spaCy").put("text", testString).toString())));
 	}
 	
-	private String loadFile() {
-		try (BufferedReader br = new BufferedReader(new FileReader(storyFilePath))) {
-			StringBuilder sb = new StringBuilder();
-			String line;
-			while ((line = br.readLine()) != null) {
-				sb.append(line);
-			}
-			return sb.toString();
-		} catch (Exception e) {
-			// TODO: handle exception
-			System.err.println(e.getMessage());
-			return "";
-		}
+	@Test
+	public void dbpediaNERServiceTest() {
+		assertTrue("DBpedia spotlight classifier failed in comparison!", 
+				resultComparison(dbpediaSpotlightService.identifyNER(testString)));
 	}
 	
-	private void writeStoryToFile() {
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append(storeFolder);
-			sb.append(storyId);
-			sb.append(".txt");
-			PrintWriter out = new PrintWriter(sb.toString());
-			out.write(storyString);
-			out.close();
-		}
-		catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
+	@Test
+	public void nerLinkingServiceTest() {
 		
-	}*/
+	}
+	
+	public boolean resultComparison(TreeMap<String, TreeSet<String>> serviceResult) {
+		for(Map.Entry<String, TreeSet<String>> entry : expectedMap.entrySet()) {
+			String classificationType = entry.getKey();
+			TreeSet<String> expectedNamedEntities = entry.getValue();
+			if(!serviceResult.containsKey(classificationType))
+				return false;
+			
+			TreeSet<String> serviceNamedEntities = serviceResult.get(classificationType);
+			for(String expectedNmedEntity : expectedNamedEntities) {
+				if(!serviceNamedEntities.contains(expectedNmedEntity))
+					return false;
+			}
+			
+		}
+		return true;
+	}
 }
