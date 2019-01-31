@@ -16,42 +16,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.FileCopyUtils;
 
+import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration({ "/entity-solr-context.xml" })
-public class TranslationGoogleServiceTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:test-translation-config.xml")
+public class TranslationServiceTest {
 
-	@Resource
-	TranslationGoogleServiceImpl translationGoogleService;
+	@Resource(name= "googleTranslationService")
+	TranslationService googleTranslationService;
+	@Resource(name= "eTranslationService")
+	TranslationService eTranslationService;
 	
-	private static final String testString = "Mein Großvater, Joseph (Arthur Maria) Kister, geb. 25.9.1887 in Essen, " +
-			"diente während des 1. Weltkriegs zunächst in der Infanterie in Frankreich.";
+	@Resource(name= "translationLanguageTool")
+	TranslationLanguageTool translationLanguageTool;
+	
+	private static final String testText = "Die Tagebücher stammen aus dem Nachlass von Eduard Scheer, der Staatsbaumeister in Göppingen war.";
+	private static final String testLanguage = "de";
+	private static final String expectedTranslation = "The diaries are from the estate of Eduard Scheer, who was state master builder in Göppingen.";
 	
 	@Test
-	public void testTranslationGoogleImplementation() {
-		
-		/*
-		String expectedTranslation = "My grandfather, Joseph (Arthur Maria) Kister, b. 25.9.1887 in Essen, " + 
-				"served during the 1st World War first in the infantry in France.";
-		
-		//String jsonPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\EU-Europeana-enrichment-d92edee4115a.json";
-		String jsonPath = "";
-		int size = expectedTranslation.length();
-		
-		translationGoogleService = new TranslationGoogleServiceImpl();
-		translationGoogleService.init(jsonPath);
-		String translatedText = translationGoogleService.translateText(testString, "de");
-		System.out.println("Translated text: " + translatedText);
-		assertNotNull(translatedText);
-		assertEquals(expectedTranslation, translatedText);*/
-		assertFalse(true);
-		
+	public void googleTranslationServiceTest() {
+		String serviceResult = googleTranslationService.translateText(testText, testLanguage);
+		if(!serviceResult.equals(expectedTranslation))
+			fail("Google translation result not equal to expected result!");
 	}
 	
+	@Test
+	public void eTranslationServiceTest() {
+		String serviceResult = eTranslationService.translateText(testText, testLanguage);
+		if(!serviceResult.equals(expectedTranslation))
+			fail("eTranslation result not equal to expected result!");
+	}
+	
+	@Test
+	public void translationCalculationServiceTest() {
+		
+		double germanTextRatio = translationLanguageTool.getLanguageRatio(testText);
+		double translatedTextRatio =translationLanguageTool.getLanguageRatio(expectedTranslation);
+		
+		if(germanTextRatio == 0 || translatedTextRatio == 0)
+			fail("English word ratio could not be calculated!");
+		
+		if(germanTextRatio > 0.25 || translatedTextRatio < 0.75)
+			fail("English word ratio is wrong!");
+	}
+	
+	/*
 	@Test
 	public void testReadAndProcessNistor() throws InvalidPasswordException, IOException {
 		
@@ -79,18 +96,6 @@ public class TranslationGoogleServiceTest {
                 	// only the second page
                 	index++;
                 }
-                
-                
-                //String pdfFileInText = tStripper.getText(document);
-                //System.out.println("Text:" + st);
-
-				// split by whitespace
-                /*
-                String lines[] = pdfFileInText.split("\\r?\\n");
-                for (String line : lines) {
-                    System.out.println(line);
-                }*/
-
             }
 
         }
@@ -122,6 +127,6 @@ public class TranslationGoogleServiceTest {
 			googlePages.clear();
 		}
 		
-	}
+	}*/
 
 }

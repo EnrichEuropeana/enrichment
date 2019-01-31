@@ -13,8 +13,9 @@ public class TranslationEntityImpl implements TranslationEntity{
 
 	@Id
     public String _id;
-	public String hashKey;
+	public String key;
 	public String originalText;
+	public String originalLanguage;
 	public String translatedText;
 	public String tool;
 	
@@ -24,28 +25,16 @@ public class TranslationEntityImpl implements TranslationEntity{
 	}
 
 	@Override
-	public String getSHA256Hash() {
-		return hashKey;
+	public String getKey() {
+		return key;
 	}
 
 	@Override
-	public void setSHA256Hash(String text) {
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("SHA-256");
-			String textWithoutWithespace = text.replaceAll("\\s+","");
-			byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
-			hashKey = new String(hash, "UTF-8");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			hashKey = null;
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			hashKey = null;
-			e.printStackTrace();
-		}
-		
+	public void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+		String textWithoutWithespace = text.replaceAll("\\s+","");
+		byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
+		key = new String(hash, "UTF-8");
 	}
 
 	@Override
@@ -58,6 +47,16 @@ public class TranslationEntityImpl implements TranslationEntity{
 		this.originalText = originalText;
 	}
 
+	@Override
+	public String getOriginalLanguage() {
+		return originalLanguage;
+	}
+	
+	@Override
+	public void setOriginalLanguage(String language) {
+		this.originalLanguage = language;
+	}
+	
 	@Override
 	public String getTranslatedText() {
 		return translatedText;

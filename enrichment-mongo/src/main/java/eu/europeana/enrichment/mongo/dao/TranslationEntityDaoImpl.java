@@ -6,7 +6,6 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.common.definitions.TranslationEntity;
-import eu.europeana.enrichment.common.model.NamedEntityImpl;
 import eu.europeana.enrichment.common.model.TranslationEntityImpl;
 
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
@@ -20,7 +19,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	@Override
 	public TranslationEntity findTranslationEntity(String key) {
 		Query<TranslationEntityImpl> persistentNamedEntities = datastore.createQuery(TranslationEntityImpl.class);
-		persistentNamedEntities.field("hashKey").equal(key);
+		persistentNamedEntities.field("key").equal(key);
 		List<TranslationEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
@@ -35,13 +34,12 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void deleteTranslationEntity(TranslationEntity entity) {
-		deleteByKey(entity.getId());
+		deleteByKey(entity.getKey());
 	}
 
 	@Override
 	public void deleteByKey(String key) {
-		// TODO Auto-generated method stub
-		
+		datastore.delete(datastore.find(TranslationEntityImpl.class).filter("key", key));
 	}
 
 }

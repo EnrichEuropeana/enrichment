@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2007-2012 The Europeana Foundation Licenced under the EUPL, 
+	Version 1.1 (the "Licence") and subsequent versions as approved by the European 
+	Commission; You may not use this work except in compliance with the Licence. 
+	You may obtain a copy of the Licence at: http://joinup.ec.europa.eu/software/page/eupl 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the Licence is distributed on an "AS IS" basis, without warranties 
+	or conditions of any kind, either express or implied. See the Licence for 
+	the specific language governing permissions and limitations under the Licence. -->
+
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+	">
+
+	<context:property-placeholder location="classpath:test-enrichment.properties" />
+	
+	<!-- bean id="europeanaApiClient" class="eu.europeana.entity.client.web.WebEntityProtocolApiImpl" />
+	<bean id="europeanaEntityService" class="eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.linking.europeana.apikey}"/>
+	</bean>
+	<bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
+	<bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" /-->
+	
+	<bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
+	</bean>
+	<bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
+	</bean>
+	<bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.stanford.model7}"/>
+	</bean>
+	<bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
+	</bean>
+	<bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
+		<constructor-arg type="String" value="${enrich.ner.python.path}"/>
+		<constructor-arg type="String" value="${enrich.ner.python.script}"/>
+	</bean>
+	
+	
+</beans>

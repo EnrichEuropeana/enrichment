@@ -23,30 +23,19 @@
 		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
 	">
 
-	<bean name="enrich_mongo_contextcontainer" class="eu.europeana.enrichment.commons.nosql.context.ApplicationContextContainer"/>
-
-	<bean id="enrich_db_mongoConnector" class="eu.europeana.corelib.db.wrapper.ApiMongoConnector" destroy-method="close"/>
+	<context:property-placeholder location="classpath:test-enrichment.properties" />
 	
-	
-	<!-- util:properties id="enrichProperties" location="/config/enrichment.properties" /-->
-	<context:property-placeholder location="classpath:config/enrichment.properties" />
-	
-	<!--  constructor String connectionUri, String truststore, String truststorePass  -->
-	<bean id="enrich_db_morphia_datastore" factory-bean="enrich_db_mongoConnector" factory-method="createDatastore">
-		<constructor-arg value="${enrich.mongodb.connectionUri}" type="java.lang.String" />
-		<constructor-arg value="${enrich.mongodb.truststore}" type="java.lang.String" />
-		<constructor-arg value="${enrich.mongodb.truststorepass}" type="java.lang.String" />
+	<bean id="googleTranslationService" class="eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl">
+		<constructor-arg type="String" value="enrich.translation.google.credentials"/>
 	</bean>
-
-	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl">
-		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
+	<bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
+		<constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
+		<constructor-arg type="String" value="${enrich.translation.eTranslation.domain}"/>
+		<constructor-arg type="String" value="${enrich.translation.eTranslation.requesterCallback}"/>
+		<constructor-arg type="String" value="${enrich.translation.eTranslation.errorCallback}"/>
+		<constructor-arg type="String" value="${enrich.translation.eTranslation.emailDestination}"/>
 	</bean>
+	<bean id="translationLanguageTool" class="eu.europeana.enrichment.translation.internal.TranslationLanguageTool" />
 	
-	<bean id="translationEntityDao" class="eu.europeana.enrichment.mongo.dao.TranslationEntityDaoImpl">
-		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
-	</bean>
-	
-	<bean id="persistentNamedEntityService" class="eu.europeana.enrichment.mongo.service.PersistentNamedEntityServiceImpl"/>
-	<bean id="persistentTranslationEntityService" class="eu.europeana.enrichment.mongo.service.PersistentTranslationEntityServiceImpl"/>
 	
 </beans>
