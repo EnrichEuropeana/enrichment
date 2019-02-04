@@ -72,6 +72,7 @@
 	<beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
 		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
+        <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
 	</beans:bean>
 	
 	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl">
