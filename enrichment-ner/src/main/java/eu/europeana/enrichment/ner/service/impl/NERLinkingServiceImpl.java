@@ -20,8 +20,8 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	/*
 	 * Tool names for named entity linking defined 
 	 */
-	private String wikidataName = "wikidata";
-	private String europeanaName = "europeana";
+	private String wikidataName = "Wikidata";
+	private String europeanaName = "Europeana";
 	
 	@Override
 	public void addLinkingInformation(TreeMap<String, List<NamedEntity>> findings, List<String> linkingTools, String sourceLanguage) {
@@ -47,12 +47,14 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				if(europeana) {
 					String europeanaResponse = europeanaEntityService.getEntitySuggestions(entity.getKey(), "all", "en");//classification);
 					System.out.println("Europeana response: " + europeanaResponse);
-					entity.addEuopeanaId(europeanaResponse);
+					if(europeanaResponse != null && !europeanaResponse.isEmpty())
+						entity.addEuopeanaId(europeanaResponse);
 				}
 				if(wikidata) {
+					//TODO: implement information retrieval from Wikidata
 					List<String> wikidataIds = wikidataService.getWikidataIdWithLabel(entity.getKey(), "en");
 					System.out.println("Wikidata response size: " + wikidataIds.size());
-					entity.addWikidataId("");
+					//entity.addWikidataId("");
 				}
 			}
 		}

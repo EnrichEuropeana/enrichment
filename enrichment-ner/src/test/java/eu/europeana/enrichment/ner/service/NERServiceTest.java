@@ -39,9 +39,6 @@ public class NERServiceTest {
 	@Resource(name= "stanfordNerModel3Service")
 	NERService pythonService;
 	
-	//@Resource(name= "nerLinkingService")
-	//NERLinkingService nerLinkingService;
-	
 	private static final String testString = "Joe was born in California. "
 			+ "In 2017, he went to Paris, France in the summer. " + "His flight left at 3:00pm on July 10th, 2017. "
 			+ "After eating some escargot for the first time, Joe said, \"That was delicious!\" "
@@ -83,11 +80,6 @@ public class NERServiceTest {
 	public void dbpediaNERServiceTest() {
 		assertTrue("DBpedia spotlight classifier failed in comparison!", 
 				resultComparison(dbpediaSpotlightService.identifyNER(testString)));
-	}
-	
-	@Test
-	public void nerLinkingServiceTest() {
-		
 	}
 	
 	public boolean resultComparison(TreeMap<String, TreeSet<String>> serviceResult) {

@@ -2,16 +2,19 @@ package eu.europeana.enrichment.ner.service.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URL;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.core.io.ClassPathResource;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -27,11 +30,15 @@ public class NERPythonServiceImpl implements NERService{
 	/*
 	 * This class constructor is used to create the required python command
 	 */
-	public NERPythonServiceImpl(String pythonPath, String scriptPath) {
+	public NERPythonServiceImpl(String pythonPath, String scriptPath, String spaCyModel) throws IOException {
+		File resource = new ClassPathResource(scriptPath).getFile();
 		StringBuilder cmdBuilder = new StringBuilder();
 		cmdBuilder.append(pythonPath);
 		cmdBuilder.append(" -u ");
-		cmdBuilder.append(scriptPath);
+		cmdBuilder.append(resource.getAbsolutePath());
+		cmdBuilder.append(" --spaCy \"");
+		cmdBuilder.append(spaCyModel);
+		cmdBuilder.append("\"");
 		pythonCommand = cmdBuilder.toString();
 	}
 
