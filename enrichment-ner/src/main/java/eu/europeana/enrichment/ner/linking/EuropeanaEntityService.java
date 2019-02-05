@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.ner.linking;
 
+import java.util.List;
+
 public interface EuropeanaEntityService {
 
 	/*
@@ -10,9 +12,9 @@ public interface EuropeanaEntityService {
 	 * @param text					named entity label
 	 * @param classificationType	named entity classification type (e.g. place, agent, ..)
 	 * @param language				original languages (this will be used if no entity was found with "en"
-	 * @return 						string of Europeana IDs (e.g. http://data.europeana.eu/place/base/73) 
+	 * @return 						a list of Europeana IDs (e.g. http://data.europeana.eu/place/base/73) 
 	 */
-	public String getEntitySuggestions(String text, String classificationType, String language);
+	public List<String> getEntitySuggestions(String text, String classificationType, String language);
 	
 	/*
 	 * This method returns the Europeana entity preferred label of a Europeana ID url.

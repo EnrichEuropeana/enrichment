@@ -102,7 +102,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 		}
 		
-		return new JSONObject(map).toString();
+		return new JSONObject(entitiesWithPositions).toString();
 	}
 
 }

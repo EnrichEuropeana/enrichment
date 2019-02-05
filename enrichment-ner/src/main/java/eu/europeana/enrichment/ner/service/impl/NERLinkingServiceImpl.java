@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.ner.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -7,6 +8,7 @@ import java.util.TreeMap;
 import javax.annotation.Resource;
 
 import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
@@ -43,18 +45,29 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			List<NamedEntity> entities = classificiationDict.getValue();
 			
 			for(NamedEntity entity : entities) {
-				// TODO: change classificiation and laguage from all to specific
+				// TODO: change classification and language from all to specific
 				if(europeana) {
-					String europeanaResponse = europeanaEntityService.getEntitySuggestions(entity.getKey(), "all", "en");//classification);
-					System.out.println("Europeana response: " + europeanaResponse);
-					if(europeanaResponse != null && !europeanaResponse.isEmpty())
-						entity.addEuopeanaId(europeanaResponse);
+					List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(entity.getKey(), "all", "en");//classification);
+					if(europeanaIDs != null && europeanaIDs.size() > 0) {
+						for(String europeanaID : europeanaIDs) {
+							entity.addEuopeanaId(europeanaID);
+						}
+					}
+					//TODO: else block if no entry was found then with sourceLanguage flag
 				}
 				if(wikidata) {
 					//TODO: implement information retrieval from Wikidata
-					List<String> wikidataIds = wikidataService.getWikidataIdWithLabel(entity.getKey(), "en");
-					System.out.println("Wikidata response size: " + wikidataIds.size());
-					//entity.addWikidataId("");
+					List<String> wikidataIDs = new ArrayList<>();
+					if(classification == NERClassification.AGENT.toString())
+						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(entity.getKey(), "en");
+					else if(classification == NERClassification.PLACE.toString())
+						wikidataIDs = wikidataService.getWikidataPlaceIdWithLabel(entity.getKey(), "en");
+					if(wikidataIDs != null && wikidataIDs.size() > 0) {
+						for(String wikidataID : wikidataIDs) {
+							entity.addWikidataId(wikidataID);
+						}
+					}
+					// TODO: else block if no entry was found then with sourceLanguage flag
 				}
 			}
 		}

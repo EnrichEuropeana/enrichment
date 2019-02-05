@@ -25,7 +25,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 	}
 	
 	@Override
-	public String getEntitySuggestions(String text, String classificationType, String language) {
+	public List<String> getEntitySuggestions(String text, String classificationType, String language) {
 		List<String> entityIDs = new ArrayList<>();
 		String textURIEncoded = "";
 		String sortUrlEncoded = "derived_score+desc";
@@ -47,7 +47,9 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 				entityIDs.add(entity.getEntityId());
 			}
 		}
-		return String.join(",", entityIDs);
+		else
+			return null;
+		return entityIDs;
 	}
 
 	@Override
