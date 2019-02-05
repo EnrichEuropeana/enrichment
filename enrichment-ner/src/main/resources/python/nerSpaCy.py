@@ -18,9 +18,13 @@ class MySpacy:
                 entity_name = ent.text
 
                 if ent.label_ == 'GPE' or ent.label_ == 'LOC':
-                    entity_type = "PLACE"
+                    entity_type = "place"
                 elif ent.label_ == "ORG":
-                    entity_type = "ORGANIZATION"
+                    entity_type = "organization"
+                elif ent.label_ == "PERSON":
+                    entity_type = "agent"
+                elif ent.label_ == "MISC":
+                    entity_type = "misc"
                 else:
                     entity_type = ent.label_
 

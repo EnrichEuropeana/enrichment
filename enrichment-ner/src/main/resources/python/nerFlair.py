@@ -23,6 +23,14 @@ class MyFlair:
         named_entities = {}
         for entity in sentence.get_spans('ner'):
             entity_type = entity.tag
+            if entity_type == "LOC":
+                entity_type = "place"
+            elif entity_type == "PER":
+                entity_type = "agent"
+            elif entity_type == "ORG":
+                entity_type = "organization"
+            elif entity_type == "MISC":
+                entity_type = "misc"
             entity_name = entity.text
             if not entity_type in named_entities:
                 named_entities[entity_type] = []
