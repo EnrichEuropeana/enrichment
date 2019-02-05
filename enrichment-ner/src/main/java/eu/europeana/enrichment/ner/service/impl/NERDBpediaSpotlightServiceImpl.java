@@ -98,11 +98,11 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			String correctType = NERDBpediaClassification.MISC.toString();
 			//TODO:check if type contains more then one type (like person and location for one entity)
 			boolean classificationFound = false;
-			if(NERDBpediaClassification.isPerson(entityTypes)) {
+			if(NERDBpediaClassification.isAgent(entityTypes)) {
 				classificationFound = true;
 				setEntityToMap(NERDBpediaClassification.AGENT.toString(), entityName, map);
 			}
-			if(NERDBpediaClassification.isLocation(entityTypes)) {
+			if(NERDBpediaClassification.isPlace(entityTypes)) {
 				classificationFound = true;
 				setEntityToMap(NERDBpediaClassification.PLACE.toString(), entityName, map);
 			}

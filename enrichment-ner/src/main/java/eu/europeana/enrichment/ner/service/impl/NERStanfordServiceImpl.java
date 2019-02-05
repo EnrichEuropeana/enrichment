@@ -9,6 +9,7 @@ import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
+import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
 
@@ -55,10 +56,20 @@ public class NERStanfordServiceImpl implements NERService{
 				String word = coreLabel.word();
 				String category = coreLabel.get(CoreAnnotations.AnswerAnnotation.class);
 				// Check if previous word is from the same category
-				if (category.equals(previousCategory) && (category.equals(NERClassification.AGENT.toString()) || 
-						category.equals(NERClassification.PLACE.toString()) || 
-						category.equals(NERClassification.ORGANIZATION.toString()) || 
-						category.equals(NERClassification.MISC.toString()))) {
+				String originalCategory = category;
+				if(NERStanfordClassification.isAgent(category))
+					category = NERClassification.AGENT.toString();
+				else if(NERStanfordClassification.isPlace(category))
+					category = NERClassification.PLACE.toString();
+				else if(NERStanfordClassification.isOrganization(category))
+					category = NERClassification.ORGANIZATION.toString();
+				else if(NERStanfordClassification.isMisc(category))
+					category = NERClassification.MISC.toString();
+				
+				if (category.equals(previousCategory) && (NERStanfordClassification.isAgent(originalCategory) || 
+						NERStanfordClassification.isPlace(originalCategory) ||
+						NERStanfordClassification.isOrganization(originalCategory) ||
+						NERStanfordClassification.isMisc(originalCategory))) {
 					word = previousWord + " " + word;
 					map.get(category).remove(previousWord);
 				}

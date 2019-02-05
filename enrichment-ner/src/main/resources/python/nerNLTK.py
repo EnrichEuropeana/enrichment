@@ -21,8 +21,14 @@ class MyNLTK:
             if hasattr(tagged_tree, 'label'):
                 entity_name = ' '.join(c[0] for c in tagged_tree.leaves())
 
-                if tagged_tree.label() == "GPE" or tagged_tree.label() == "GSP":
-                    entity_type = "PLACE"
+                if tagged_tree.label() == "GPE" or tagged_tree.label() == "GSP" or tagged_tree.label() == "LOCATION":
+                    entity_type = "place"
+                elif tagged_tree.label() == "PERSON":
+                    entity_type = "agent"
+                elif tagged_tree.label() == "ORGANIZATION":
+                    entity_type = "organization"
+                elif tagged_tree.label() == "MISC":
+                    entity_type = "misc"
                 else:
                     entity_type = tagged_tree.label()
 
