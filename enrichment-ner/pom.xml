@@ -16,15 +16,30 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${version.enrichmentAPI}</version>
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 
 	<artifactId>enrichment-ner</artifactId>
 	<name>Enrichment - Named Entity Recognition module</name>
 	
-	
 	<dependencies>
+		<!-- enrichment  -->
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-definition</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-mongo</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.entity</groupId>
+  			<artifactId>entity-client</artifactId>
+			<version>${version.entityApi}</version>
+		</dependency>
 	
 		<dependency>
 			<groupId>org.apache.commons</groupId>

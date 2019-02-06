@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntity;
 
 /*
  * This interface defines database actions for named entities

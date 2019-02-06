@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.common.definitions;
+package eu.europeana.enrichment.model;
 
 import java.util.List;
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.dao.TranslationEntityDaoImpl;;
 
 public class PersistentTranslationEntityServiceImpl implements PersistentTranslationEntityService {

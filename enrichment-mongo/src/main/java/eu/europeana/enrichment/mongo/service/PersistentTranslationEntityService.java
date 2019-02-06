@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
 
 public interface PersistentTranslationEntityService {
 

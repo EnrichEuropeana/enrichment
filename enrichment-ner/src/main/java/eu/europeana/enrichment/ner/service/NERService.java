@@ -7,12 +7,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
-import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;
-import eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl;
-import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.ner.linking.WikidataServiceImpl;
-import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.common.model.NamedEntityImpl;
+import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 
 public interface NERService {
 

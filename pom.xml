@@ -11,10 +11,7 @@
 
 	<groupId>eu.europeana.enrich</groupId>
 	<artifactId>enrichment-services</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<!-- 
-	<version>${version.enrichment}</version>
-	 -->
+	<version>${version.enrichmentAPI}</version>
 	<packaging>pom</packaging>
 	<name>Enrichment services</name>
 
@@ -87,7 +84,8 @@
 		<module>enrichment-ner</module>
 		<module>enrichment-web</module>
     <module>enrichment-mongo</module>
-  </modules>
+    <module>enrichment-definition</module>
+	</modules>
 
 	<build>
 		<!-- configure source and output locations -->

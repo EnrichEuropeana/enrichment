@@ -5,8 +5,8 @@ import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;
-import eu.europeana.enrichment.common.model.TranslationEntityImpl;
+import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.model.TranslationEntityImpl;
 
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
 

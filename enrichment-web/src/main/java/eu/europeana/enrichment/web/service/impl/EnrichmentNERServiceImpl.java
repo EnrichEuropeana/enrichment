@@ -6,14 +6,13 @@ import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
-
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
