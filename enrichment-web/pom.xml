@@ -16,7 +16,7 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${version.enrichmentAPI}</version>
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 
@@ -24,6 +24,34 @@
 	<name>Enrichment - RESTful  web services module</name>
 	
 	<dependencies>
+		<!-- enrichment projects  -->
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-definition</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-mongo</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.entity</groupId>
+  			<artifactId>entity-client</artifactId>
+			<version>${version.entityApi}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-ner</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-translation</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		
+		
 		<!-- Other -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -181,6 +209,18 @@
 				<exclusion>
 					<artifactId>slf4j-jdk14</artifactId>
 					<groupId>org.slf4j</groupId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.common.model;
+package eu.europeana.enrichment.mongo.model;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 
 import org.springframework.data.annotation.Id;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
 
 public class TranslationEntityImpl implements TranslationEntity{
 
@@ -19,7 +19,6 @@ public class TranslationEntityImpl implements TranslationEntity{
 	public String translatedText;
 	public String tool;
 	
-	@Override
 	public String getId() {
 		return _id;
 	}

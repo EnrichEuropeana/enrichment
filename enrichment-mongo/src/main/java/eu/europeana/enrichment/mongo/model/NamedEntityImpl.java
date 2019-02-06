@@ -1,11 +1,12 @@
-package eu.europeana.enrichment.common.model;
+package eu.europeana.enrichment.mongo.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntity;
+
 
 public class NamedEntityImpl implements NamedEntity{
 
@@ -33,6 +34,11 @@ public class NamedEntityImpl implements NamedEntity{
 		europeanaIds = new ArrayList<String>();
 		wikidataIds = new ArrayList<String>();
 	}
+	
+	public String getId() {
+		return _id;
+	}
+	
 	@Override
 	public String toString() {
 		return key;
@@ -64,11 +70,6 @@ public class NamedEntityImpl implements NamedEntity{
 	@Override
 	public void setPositions(List<Integer> positions) {
 		this.positions = positions;
-	}
-
-	@Override
-	public String getId() {
-		return _id;
 	}
 
 	@Override

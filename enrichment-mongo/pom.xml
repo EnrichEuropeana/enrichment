@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>${version.enrichmentAPI}</version>
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 	<artifactId>enrichment-mongo</artifactId>
@@ -16,6 +16,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<dependencies>
+		<!-- enrichment projects  -->
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-definition</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		
+	
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>

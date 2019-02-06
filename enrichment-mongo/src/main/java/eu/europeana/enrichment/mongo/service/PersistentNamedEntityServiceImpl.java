@@ -4,10 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.springframework.stereotype.Service;
-
-import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.mongo.dao.NamedEntityDao;
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl;
 
 

@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;;
+import eu.europeana.enrichment.model.TranslationEntity;
 
 /*
  * This interface defines database actions for translation entries

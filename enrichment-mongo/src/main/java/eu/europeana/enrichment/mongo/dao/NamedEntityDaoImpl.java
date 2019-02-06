@@ -4,8 +4,9 @@ import java.util.List;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
-import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.common.model.NamedEntityImpl;
+
+import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 
 public class NamedEntityDaoImpl implements NamedEntityDao {
 

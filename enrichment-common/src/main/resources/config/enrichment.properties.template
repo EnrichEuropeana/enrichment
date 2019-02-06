@@ -1,7 +1,8 @@
-#template for configuration properties
 
 # MongoDB configuration
 enrich.mongodb.connectionUri=mongodb://127.0.0.1:27017/enrichment
+enrich.mongodb.truststore=
+enrich.mongodb.truststorepass=
 
 # Named entity recognition and classification section
 # NER Stanford classifier configuration
@@ -11,7 +12,9 @@ enrich.ner.stanford.model7=classifiers/stanford/english.muc.7class.distsim.crf.s
 enrich.ner.stanford.modelGerman=classifiers/stanford/german.conll.germeval2014.hgc_175m_600.crf.ser.gz
 # NER Python configuration
 enrich.ner.python.path=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv64\\Scripts\\python.exe
-enrich.ner.python.script=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\Europeana\\scripts4java\\main.py
+enrich.ner.python.script=python/main.py
+# NER python spaCy NLP model
+enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Lib\\site-packages\\en_core_web_sm\\en_core_web_sm-2.0.0
 # NER DBpedia spotlight configuration
 # Additional: 
 #	Docker command: docker pull dbpedia/spotlight-english
@@ -32,3 +35,5 @@ enrich.translation.eTranslation.domain=SPD
 enrich.translation.eTranslation.requesterCallback=
 enrich.translation.eTranslation.errorCallback=
 enrich.translation.eTranslation.emailDestination=denis.katic@ait.ac.at
+
+

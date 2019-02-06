@@ -7,7 +7,7 @@ import java.util.TreeMap;
 
 import javax.annotation.Resource;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;
 import eu.europeana.enrichment.ner.linking.WikidataService;

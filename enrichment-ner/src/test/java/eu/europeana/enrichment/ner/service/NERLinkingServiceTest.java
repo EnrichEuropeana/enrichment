@@ -15,9 +15,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import edu.stanford.nlp.util.Maps;
-import eu.europeana.enrichment.common.definitions.NamedEntity;
-import eu.europeana.enrichment.common.model.NamedEntityImpl;
+import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 
 @RunWith(SpringJUnit4ClassRunner.class)

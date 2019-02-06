@@ -8,13 +8,11 @@ import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.Cacheable;
 
-import eu.europeana.enrichment.common.definitions.TranslationEntity;
-import eu.europeana.enrichment.common.model.TranslationEntityImpl;
+import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.model.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
-import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
-import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {

@@ -3,7 +3,7 @@ package eu.europeana.enrichment.ner.service;
 import java.util.List;
 import java.util.TreeMap;
 
-import eu.europeana.enrichment.common.definitions.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntity;
 
 public interface NERLinkingService {
 
