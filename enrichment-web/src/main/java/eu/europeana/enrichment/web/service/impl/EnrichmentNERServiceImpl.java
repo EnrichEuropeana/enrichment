@@ -187,7 +187,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					 * Create default position
 					 */
 					PositionEntity defaultPosition = new PositionEntityImpl();
-					defaultPosition.addOfssetPosition(-1);
+					//defaultPosition.addOfssetPosition(-1);
 					defaultPosition.setStoryItemEntity(dbStoryItemEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					if(dbEntity != null) {
@@ -199,21 +199,28 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 							tmpClassificationTreeSet.add(dbEntity);
 					}
 					else {
-						NamedEntity newNamedEntity = new NamedEntityImpl(entityLabel);
-						newNamedEntity.setType(classificationType);
-						newNamedEntity.addPositionEntity(defaultPosition);
-						tmpClassificationTreeSet.add(newNamedEntity);
+						dbEntity = new NamedEntityImpl(entityLabel);
+						dbEntity.setType(classificationType);
+						dbEntity.addPositionEntity(defaultPosition);
+						tmpClassificationTreeSet.add(dbEntity);
 					}
+					
+					/*
+					 * Add positions to named entity
+					 */
+					tmpTool.getPositions(dbEntity, dbStoryItemEntity, dbTranslationEntity);
+					/*
+					 * Add linking information to named entity
+					 */
+					nerLinkingService.addLinkingInformation(dbEntity, linking, "en");
 				}
 			}
 		}
 		
-		//TODO: add position and linking info
+		
 		/*
-		TreeMap<String, List<NamedEntity>> entitiesWithPositions = stanfordNerModel3Service.getPositions(map, text);
-		nerLinkingService.addLinkingInformation(entitiesWithPositions, linking, "en");
-		*/
-
+		 * Save and update all named entities
+		 */
 		for (String key : resultMap.keySet()) {
 			for (NamedEntity entity : resultMap.get(key)) {
 				persistentNamedEntityService.saveNamedEntity(entity);
@@ -246,7 +253,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
 					}
 				}
-				
+				tmpNamedEntity.setType(null);
 			}
 		}
 	}

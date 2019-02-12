@@ -26,7 +26,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	private String europeanaName = "Europeana";
 	
 	@Override
-	public void addLinkingInformation(TreeMap<String, List<NamedEntity>> findings, List<String> linkingTools, String sourceLanguage) {
+	public void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage) {
 		if(linkingTools == null || linkingTools.size() == 0)
 			return;
 		
@@ -39,39 +39,31 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			else if(linkingTool.equals(europeanaName))
 				europeana = true;
 		}
-			
-		for (Map.Entry<String, List<NamedEntity>> classificiationDict : findings.entrySet()) {
-			String classification = classificiationDict.getKey();
-			List<NamedEntity> entities = classificiationDict.getValue();
-			
-			for(NamedEntity entity : entities) {
-				// TODO: change classification and language from all to specific
-				if(europeana) {
-					List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(entity.getKey(), "all", "en");//classification);
-					if(europeanaIDs != null && europeanaIDs.size() > 0) {
-						for(String europeanaID : europeanaIDs) {
-							entity.addEuopeanaId(europeanaID);
-						}
-					}
-					//TODO: else block if no entry was found then with sourceLanguage flag
-				}
-				if(wikidata) {
-					//TODO: implement information retrieval from Wikidata
-					List<String> wikidataIDs = new ArrayList<>();
-					if(classification == NERClassification.AGENT.toString())
-						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(entity.getKey(), "en");
-					else if(classification == NERClassification.PLACE.toString())
-						wikidataIDs = wikidataService.getWikidataPlaceIdWithLabel(entity.getKey(), "en");
-					if(wikidataIDs != null && wikidataIDs.size() > 0) {
-						for(String wikidataID : wikidataIDs) {
-							entity.addWikidataId(wikidataID);
-						}
-					}
-					// TODO: else block if no entry was found then with sourceLanguage flag
+
+		// TODO: change classification and language from all to specific
+		if(europeana) {
+			List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getKey(), "all", "en");//classification);
+			if(europeanaIDs != null && europeanaIDs.size() > 0) {
+				for(String europeanaID : europeanaIDs) {
+					namedEntity.addEuopeanaId(europeanaID);
 				}
 			}
+			//TODO: else block if no entry was found then with sourceLanguage flag
 		}
-		
+		if(wikidata) {
+			//TODO: implement information retrieval from Wikidata
+			List<String> wikidataIDs = new ArrayList<>();
+			if(namedEntity.getType() == NERClassification.AGENT.toString())
+				wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getKey(), "en");
+			else if(namedEntity.getType() == NERClassification.PLACE.toString())
+				wikidataIDs = wikidataService.getWikidataPlaceIdWithLabel(namedEntity.getKey(), "en");
+			if(wikidataIDs != null && wikidataIDs.size() > 0) {
+				for(String wikidataID : wikidataIDs) {
+					namedEntity.addWikidataId(wikidataID);
+				}
+			}
+			// TODO: else block if no entry was found then with sourceLanguage flag
+		}
 	}
 
 }
