@@ -5,8 +5,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.NotSaved;
+import org.mongodb.morphia.annotations.Transient;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+
 
 import eu.europeana.enrichment.model.StoryItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -14,7 +17,7 @@ import eu.europeana.enrichment.model.TranslationEntity;
 public class TranslationEntityImpl implements TranslationEntity{
 
 	@Id
-    public String _id;
+    public String _id = new ObjectId().toString();
 	public String key;
 	public String language;
 	public String translatedText;
@@ -22,6 +25,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	public String eTranslationId;
 	public String storyItemId;
 	@Transient
+	@NotSaved
 	private StoryItemEntity storyItemEntity;
 	
 	public String getETranslationId() {
@@ -87,7 +91,10 @@ public class TranslationEntityImpl implements TranslationEntity{
 	@Override
 	public void setStoryItemEntity(StoryItemEntity storyItemEntity) {
 		this.storyItemEntity = storyItemEntity;
-		setStoryItemId(storyItemEntity.getStoryItemId());
+		if(storyItemEntity != null)
+			setStoryItemId(storyItemEntity.getStoryItemId());
+		else
+			setStoryItemId(null);
 	}
 	
 	public String getStoryItemId() {

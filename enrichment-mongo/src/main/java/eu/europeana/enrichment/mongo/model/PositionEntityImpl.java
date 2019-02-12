@@ -1,8 +1,10 @@
 package eu.europeana.enrichment.mongo.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.annotation.Transient;
+import org.mongodb.morphia.annotations.NotSaved;
+import org.mongodb.morphia.annotations.Transient;
 
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryItemEntity;
@@ -14,9 +16,15 @@ public class PositionEntityImpl implements PositionEntity{
 	public String storyItemId;
 	public String translationKey;
 	@Transient
+	@NotSaved
 	StoryItemEntity storyItemEntity;
 	@Transient
+	@NotSaved
 	TranslationEntity translationEntity;
+	
+	public PositionEntityImpl() {
+		offsets = new ArrayList<>();
+	}
 	
 	public String getStoryItemId() {
 		return storyItemId;
@@ -42,7 +50,10 @@ public class PositionEntityImpl implements PositionEntity{
 	@Override
 	public void setStoryItemEntity(StoryItemEntity storyItemEntity) {
 		this.storyItemEntity = storyItemEntity;
-		setStoryItemId(storyItemEntity.getStoryItemId());
+		if(storyItemEntity != null)
+			setStoryItemId(storyItemEntity.getStoryItemId());
+		else
+			setStoryItemId(null);
 	}
 
 	@Override
@@ -53,7 +64,10 @@ public class PositionEntityImpl implements PositionEntity{
 	@Override
 	public void setTranslationEntity(TranslationEntity translationEntity) {
 		this.translationEntity = translationEntity;
-		setTranslationKey(translationEntity.getKey());
+		if(translationEntity != null)
+			setTranslationKey(translationEntity.getKey());
+		else
+			setTranslationKey(null);
 	}
 	
 	@Override

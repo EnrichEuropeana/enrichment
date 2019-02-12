@@ -6,8 +6,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+import org.mongodb.morphia.annotations.NotSaved;
+import org.mongodb.morphia.annotations.Transient;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.StoryItemEntity;
@@ -17,7 +19,7 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id;
+    public String _id = new ObjectId().toString();
 	public String storyItemId;
 	public String language;
 	public String type;
@@ -25,6 +27,7 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 	public String hashKey;
 	public String storyId;
 	@Transient
+	@NotSaved
 	private StoryEntity storyEntity;
 	
 	public String getStoryId() {
@@ -47,7 +50,10 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 	@Override
 	public void setStoryEntity(StoryEntity storyEntity) {
 		this.storyEntity = storyEntity;
-		setStoryId(storyEntity.getStoryId());
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
+		else
+			setStoryId(null);
 	}
 
 	@Override

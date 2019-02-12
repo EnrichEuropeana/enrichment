@@ -3,6 +3,7 @@ package eu.europeana.enrichment.mongo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
@@ -14,7 +15,7 @@ public class NamedEntityImpl implements NamedEntity{
 
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id;
+    public String _id = new ObjectId().toString();
 	public String type;
 	public String key;
 	public List<String> europeanaIds;

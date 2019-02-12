@@ -60,6 +60,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String textType = requestParam.getType();
 			String tool = requestParam.getTool();
 			String sourceLanguage = requestParam.getSourceLanguage();
+			Boolean sendRequest = requestParam.getSendRequest();
 			
 			/*
 			 * Check if story / storyItem already exist and
@@ -94,6 +95,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 			if(tmpStoryItemEntity == null) {
 				tmpStoryItemEntity = new StoryItemEntityImpl();
+				tmpStoryItemEntity.setStoryItemId(storyItemId);
 				tmpStoryItemEntity.setStoryEntity(tmpStoryEntity);
 				tmpStoryItemEntity.setKey(originalText);
 				tmpStoryItemEntity.setLanguage(sourceLanguage);
@@ -113,15 +115,17 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");
 
-			String returnValue;
+			String returnValue = "-1";
 			switch (tool) {
 			case googleToolName:
-				returnValue = googleTranslationService.translateText(originalText, sourceLanguage);
+				if(sendRequest)
+					returnValue = googleTranslationService.translateText(originalText, sourceLanguage);
 				tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			case eTranslationToolName:
-				returnValue = eTranslationService.translateText(originalText, sourceLanguage);
+				if(sendRequest)
+					returnValue = eTranslationService.translateText(originalText, sourceLanguage);
 				tmpTranslationEntity.setKey(returnValue);
 				break;
 			default:
@@ -155,4 +159,35 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		}
 	}
 
+	@Override
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam) {
+		String storyId = requestParam.getStoryId();
+		String storyItemId = requestParam.getStoryItemId();
+		String translatedText = requestParam.getText();
+		String textType = requestParam.getType();
+		String tool = requestParam.getTool();
+		String language = requestParam.getSourceLanguage();
+		
+		if(storyItemId.isEmpty() || translatedText.isEmpty() || tool.isEmpty() || language.isEmpty()) {
+			//TODO: proper exception handling
+			return "";
+		}
+		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
+				findTranslationEntityWithStoryInformation(storyItemId, tool, language);
+		if(dbTranslationEntity == null) {
+			//TODO: proper exception handling
+			return "";
+		}
+		try {
+			dbTranslationEntity.setKey(translatedText);
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+			// TODO proper exception handling
+			e.printStackTrace();
+			return "";
+		}
+		dbTranslationEntity.setTranslatedText(translatedText);
+		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+		return "Done";
+	}
+	
 }

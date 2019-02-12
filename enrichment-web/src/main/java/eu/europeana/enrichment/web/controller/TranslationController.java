@@ -53,4 +53,17 @@ public class TranslationController extends BaseRest {
 		return response;
 	}
 	
+	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation")
+	@RequestMapping(value = "/enrichment/uploadTranslation", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadTranslation(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody EnrichmentTranslationRequest translationRequest) {
+
+		String translation = enrichmentTranslationService.uploadTranslation(translationRequest);
+		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+		
+		return response;
+	}
+	
 }

@@ -23,6 +23,8 @@ import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
+
+import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -98,8 +100,21 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryItemEntity.getStoryItemId(), false));
 		}
 		//TODO: check if update is need (e.g.: linking tools)
-		if(tmpNamedEntities.size() > 0)
-			return new JSONObject(tmpNamedEntities).toString();
+		if(tmpNamedEntities.size() > 0) {
+			TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
+			for(int index = tmpNamedEntities.size()-1; index >=0; index--) {
+				NamedEntity tmpNamedEntity = tmpNamedEntities.get(index);
+				String classificationType = tmpNamedEntity.getType();
+				if(!resultMap.containsKey(classificationType))
+					resultMap.put(classificationType, new ArrayList<>());
+				List<NamedEntity> classificationNamedEntities = resultMap.get(classificationType);
+				if(!classificationNamedEntities.stream().anyMatch(x -> x.getKey().equals(tmpNamedEntity.getKey()))) {
+					classificationNamedEntities.add(tmpNamedEntity);
+				}
+			}
+			prepareOutput(resultMap, storyItemIds);
+			return new JSONObject(resultMap).toString();
+		}
 		
 		boolean python = false;
 		NERService tmpTool;
@@ -130,7 +145,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				return null;
 		}
 		
-		TreeMap<String, TreeSet<NamedEntity>> resultMap = new TreeMap<>();
+		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		/*
 		 * Apply named entity recognition on all story item translations
 		 */
@@ -147,7 +162,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			TreeMap<String, TreeSet<String>> tmpResult = tmpTool.identifyNER(text);
 
 			for (String classificationType : tmpResult.keySet()) {
-				TreeSet<NamedEntity> tmpClassificationTreeSet = new TreeSet<>();
+				List<NamedEntity> tmpClassificationTreeSet = new ArrayList<>();
 				/*
 				 * Check if already named entities exists from the previous story item
 				 */
@@ -172,7 +187,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					 * Create default position
 					 */
 					PositionEntity defaultPosition = new PositionEntityImpl();
-					defaultPosition.addOfssetPosition(-1);;
+					defaultPosition.addOfssetPosition(-1);
 					defaultPosition.setStoryItemEntity(dbStoryItemEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					if(dbEntity != null) {
@@ -204,7 +219,35 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}
+		
+		/*
+		 * Output preparation
+		 */
+		prepareOutput(resultMap, storyItemIds);
 		return new JSONObject(resultMap).toString();
 	}
 	
+	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, List<String> storyItemIds) {
+		for (String classificationType : resultMap.keySet()) {
+			List<NamedEntity> namedEntities = resultMap.get(classificationType);
+			for(int index = namedEntities.size()-1; index >= 0; index--) {
+				NamedEntity tmpNamedEntity = namedEntities.get(index);
+				List<PositionEntity> tmpPositions = tmpNamedEntity.getPositionEntities();
+				for(int posIndex = tmpPositions.size()-1; posIndex >= 0; posIndex--) {
+					PositionEntity tmpPositionEntity = tmpPositions.get(posIndex);
+					String tmpStoryItemId = tmpPositionEntity.getStoryItemId();
+					if(!storyItemIds.contains(tmpStoryItemId))
+						tmpPositions.remove(posIndex);
+					else {
+						tmpPositionEntity.setStoryItemEntity(null);
+						tmpPositionEntity.setStoryItemId(tmpStoryItemId);
+						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
+						tmpPositionEntity.setTranslationEntity(null);
+						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
+					}
+				}
+				
+			}
+		}
+	}
 }
