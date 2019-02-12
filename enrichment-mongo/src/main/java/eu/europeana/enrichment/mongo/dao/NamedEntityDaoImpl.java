@@ -63,9 +63,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, boolean translation) {
 		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);
 		if(translation)
-			persistentNamedEntities.field("positionEntities.translationKey").equal(itemId);
+			persistentNamedEntities.disableValidation().field("positionEntities.translationKey").equal(itemId);
 		else
-			persistentNamedEntities.field("positionEntities.storyItemId").equal(itemId);
+			persistentNamedEntities.disableValidation().field("positionEntities.storyItemId").equal(itemId);
 		List<NamedEntityImpl> result = persistentNamedEntities.asList();
 		List<NamedEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {

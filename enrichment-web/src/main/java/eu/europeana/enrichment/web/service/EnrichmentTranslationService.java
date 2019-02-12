@@ -18,4 +18,5 @@ public interface EnrichmentTranslationService {
 	 */
 	public String translate(EnrichmentTranslationRequest requestParam);  
 	
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam);  
 }

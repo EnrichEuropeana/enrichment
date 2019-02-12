@@ -13,7 +13,14 @@ public class EnrichmentTranslationRequest {
 	public String type;
 	public String tool;
 	public String sourceLanguage;
+	public Boolean sendRequest;
 	
+	public Boolean getSendRequest() {
+		return sendRequest;
+	}
+	public void setSendRequest(Boolean sendRequest) {
+		this.sendRequest = sendRequest;
+	}
 	public String getStoryId() {
 		return storyId;
 	}
