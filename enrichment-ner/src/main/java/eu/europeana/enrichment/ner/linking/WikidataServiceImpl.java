@@ -33,9 +33,10 @@ public class WikidataServiceImpl implements WikidataService {
 	 * Wikidata place search
 	 * Geographical object: Q618123
 	 * Location: Q17334923
+	 * Geographic location: Q2221906
 	 */
 	private String placeLabelQueryString = "SELECT ?item ?description ?type WHERE {\r\n"
-			+ "   ?item rdfs:label \"%s\"@%s;\r\n p:P31/ps:P31/wdt:P279* wd:Q17334923;\r\n"
+			+ "   ?item rdfs:label \"%s\"@%s;\r\n p:P31/ps:P31/wdt:P279* wd:Q2221906;\r\n"
 			+ "      #wdt:P31 ?type;\r\n" + "      schema:description ?description.\r\n"
 			+ "  FILTER((LANG(?description)) = \"en\") }";
 

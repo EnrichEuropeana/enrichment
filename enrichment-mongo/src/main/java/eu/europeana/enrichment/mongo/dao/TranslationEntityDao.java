@@ -8,9 +8,10 @@ import eu.europeana.enrichment.model.TranslationEntity;
 public interface TranslationEntityDao {
 
 	public TranslationEntity findTranslationEntity(String key);
+	public TranslationEntity findTranslationEntityWithStoryInformation(String storyItemId, String tool, String language);
 	//public List<TranslationEntity> getAllTranslationEntities();
 	public void saveTranslationEntity(TranslationEntity entity);
 	public void deleteTranslationEntity(TranslationEntity entity);
-	public void deleteByKey(String key);
+	public void deleteTranslationEntityByKey(String key);
 	
 }

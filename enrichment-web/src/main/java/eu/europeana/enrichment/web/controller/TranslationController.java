@@ -47,7 +47,7 @@ public class TranslationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestBody EnrichmentTranslationRequest translationRequest) {
 
-		String translation = enrichmentTranslationService.translate(translationRequest.text, translationRequest.sourceLanguage, translationRequest.tool);
+		String translation = enrichmentTranslationService.translate(translationRequest);
 		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
 		return response;

@@ -20,11 +20,10 @@ public interface NamedEntity {
 	void setKey(String key);
 	/*
 	 * Named entity position at the original text
-	 * Position list contains only offset
 	 */
-	void addPosition(Integer position);
-	List<Integer> getPositions();
-	void setPositions(List<Integer> positions);
+	void addPositionEntity(PositionEntity positionEntity);
+	List<PositionEntity> getPositionEntities();
+	void setPositionEntities(List<PositionEntity> positions);
 	
 	/*
 	 * Named entity linking information
