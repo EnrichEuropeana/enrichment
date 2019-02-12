@@ -19,5 +19,5 @@ public interface NERLinkingService {
 	 * 									used if not entity linking was found with "en"
 	 * @return							no return but the findings will be changed
 	 */
-	void addLinkingInformation(TreeMap<String, List<NamedEntity>> findings, List<String> linkingTools, String sourceLanguage);
+	void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage);
 }
