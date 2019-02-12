@@ -2,6 +2,8 @@ package eu.europeana.enrichment.web.service;
 
 import java.util.List;
 
+import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
+
 public interface EnrichmentNERService {
 
 	/*
@@ -21,6 +23,6 @@ public interface EnrichmentNERService {
 	 * 									at the original text
 	 * @throws
 	 */
-	public String getEntities(String text, String tool, List<String> linking);  
+	public String getEntities(EnrichmentNERRequest requestParam);  
 	
 }

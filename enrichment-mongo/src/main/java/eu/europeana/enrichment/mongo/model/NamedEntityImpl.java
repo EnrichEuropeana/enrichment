@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.PositionEntity;
 
 
 public class NamedEntityImpl implements NamedEntity{
@@ -15,9 +17,9 @@ public class NamedEntityImpl implements NamedEntity{
     public String _id;
 	public String type;
 	public String key;
-	public List<Integer> positions;
 	public List<String> europeanaIds;
 	public List<String> wikidataIds;
+	public List<PositionEntity> positionEntities;
 	
 	public NamedEntityImpl() {
 		init();
@@ -30,7 +32,7 @@ public class NamedEntityImpl implements NamedEntity{
 	
 	void init() {
 		key = "";
-		positions = new ArrayList<Integer>();
+		positionEntities = new ArrayList<>();
 		europeanaIds = new ArrayList<String>();
 		wikidataIds = new ArrayList<String>();
 	}
@@ -58,18 +60,6 @@ public class NamedEntityImpl implements NamedEntity{
 	@Override
 	public void setKey(String key) {
 		this.key = key;
-	}
-	@Override
-	public void addPosition(Integer position) {
-		positions.add(position);
-	}
-	@Override
-	public List<Integer> getPositions() {
-		return positions;
-	}
-	@Override
-	public void setPositions(List<Integer> positions) {
-		this.positions = positions;
 	}
 
 	@Override
@@ -100,5 +90,20 @@ public class NamedEntityImpl implements NamedEntity{
 	@Override
 	public void addWikidataId(String id) {
 		wikidataIds.add(id);
+	}
+
+	@Override
+	public void addPositionEntity(PositionEntity positionEntity) {
+		positionEntities.add(positionEntity);
+	}
+
+	@Override
+	public void setPositionEntities(List<PositionEntity> positions) {
+		positionEntities = positions;
+	}
+
+	@Override
+	public List<PositionEntity> getPositionEntities() {
+		return positionEntities;
 	}
 }

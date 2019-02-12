@@ -50,13 +50,13 @@ public interface NERService {
 				NamedEntity nerEntity = new NamedEntityImpl(entityKey);
 				int index = originalText.indexOf(entityKey);
 				while(index >= 0) {
-					nerEntity.addPosition(index);
+					//nerEntity.addPosition(index);
 					index = originalText.indexOf(entityKey, index+entityKey.length());
 				}
-				if(nerEntity.getPositions().size() > 0)
+				/*if(nerEntity.getPositions().size() > 0)
 					newEntities.add(nerEntity);
 				else
-					notFound.add(entityKey);
+					notFound.add(entityKey);*/
 			}
 			entitiesWithPositions.put(classification, newEntities);
 			notFoundEntities.put(classification, notFound);

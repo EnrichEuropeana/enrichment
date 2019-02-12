@@ -135,6 +135,24 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<!-- Test Geolocation -->
+		<dependency>
+		  <groupId>com.google.maps</groupId>
+		  <artifactId>google-maps-services</artifactId>
+		  <version>0.9.1</version>
+		</dependency>
+		<!-- dependency>
+		  <groupId>me.atlis</groupId>
+		  <artifactId>nominatim-api</artifactId>
+		  <version>1.0.0</version>
+		</dependency-->
+		<dependency>
+		  <groupId>fr.dudie</groupId>
+		  <artifactId>nominatim-api</artifactId>
+		  <version>3.3</version>
+		</dependency>
+		<!-- Test Geolocation -->
+		
 	</dependencies>
 	
 	

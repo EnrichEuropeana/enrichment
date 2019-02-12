@@ -9,15 +9,24 @@ import java.util.List;
  */
 public class EnrichmentNERRequest {
 
-	public String text;
+	public String storyId;
+	public List<String> storyItemIds;
 	public String tool;
 	public List<String> linking;
+	public String translationTool;
+	public String translationLanguage;
 	
-	public String getText() {
-		return text;
+	public String getStoryId() {
+		return storyId;
 	}
-	public void setText(String text) {
-		this.text = text;
+	public void setStoryId(String storyId) {
+		this.storyId = storyId;
+	}
+	public List<String> getStoryItemIds() {
+		return storyItemIds;
+	}
+	public void setStoryItemIds(List<String> storyItemIds) {
+		this.storyItemIds = storyItemIds;
 	}
 	public String getTool() {
 		return tool;
@@ -30,5 +39,17 @@ public class EnrichmentNERRequest {
 	}
 	public void setLinking(List<String> linking) {
 		this.linking = linking;
+	}
+	public String getTranslationTool() {
+		return translationTool;
+	}
+	public void setTranslationTool(String translationTool) {
+		this.translationTool = translationTool;
+	}
+	public String getTranslationLanguage() {
+		return translationLanguage;
+	}
+	public void setTranslationlanguage(String translationLanguage) {
+		this.translationLanguage = translationLanguage;
 	}
 }

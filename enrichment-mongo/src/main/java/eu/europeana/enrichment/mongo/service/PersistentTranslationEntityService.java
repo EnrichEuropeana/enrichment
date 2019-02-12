@@ -14,6 +14,7 @@ public interface PersistentTranslationEntityService {
 	 * @return							a database translation entry 
 	 */
 	public TranslationEntity findTranslationEntity(String key);
+	public TranslationEntity findTranslationEntityWithStoryInformation(String storyItemId, String tool, String language);
 	/*
 	 * This method retrieves all translation entries from the Mongo database
 	 * 
