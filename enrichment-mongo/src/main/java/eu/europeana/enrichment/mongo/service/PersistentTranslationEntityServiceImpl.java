@@ -16,6 +16,10 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	public TranslationEntity findTranslationEntity(String key) {
 		return translationEntityDao.findTranslationEntity(key);
 	}
+	@Override
+	public TranslationEntity findTranslationEntityWithStoryInformation(String storyItemId, String tool, String language) {
+		return translationEntityDao.findTranslationEntityWithStoryInformation(storyItemId, tool, language);
+	}
 
 	@Override
 	public List<TranslationEntity> getAllTranslationEntities() {

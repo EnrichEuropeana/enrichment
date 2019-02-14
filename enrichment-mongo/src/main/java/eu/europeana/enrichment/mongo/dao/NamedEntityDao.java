@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.util.List;
+
 import eu.europeana.enrichment.model.NamedEntity;
 
 /*
@@ -8,9 +10,10 @@ import eu.europeana.enrichment.model.NamedEntity;
 public interface NamedEntityDao {
 	
 	public NamedEntity findNamedEntity(String key);
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, boolean translation);
 	//public List<NamedEntity> getAllNamedEntities();
 	public void saveNamedEntity(NamedEntity entity);
 	public void deleteNamedEntity(NamedEntity entity);
-	public void deleteByKey(String key);
+	public void deleteNamedEntityByKey(String key);
 
 }

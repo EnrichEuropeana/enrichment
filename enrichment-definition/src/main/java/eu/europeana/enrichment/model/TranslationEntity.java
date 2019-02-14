@@ -17,12 +17,10 @@ public interface TranslationEntity {
 	String getKey();
 	void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 	/*
-	 * Complete text including original and translated version
+	 * Translated text and language
 	 */
-	String getOriginalText();
-	void setOriginalText(String originalText);
-	String getOriginalLanguage();
-	void setOriginalLanguage(String language);
+	String getLanguage();
+	void setLanguage(String language);
 	String getTranslatedText();
 	void setTranslatedText(String translatedText);
 	/*
@@ -30,4 +28,10 @@ public interface TranslationEntity {
 	 */
 	String getTool();
 	void setTool(String tool);
+	
+	/*
+	 * Transcribathon and Europeana StoryItem
+	 */
+	StoryItemEntity getStoryItemEntity();
+	void setStoryItemEntity(StoryItemEntity storyItemEntity);
 }
