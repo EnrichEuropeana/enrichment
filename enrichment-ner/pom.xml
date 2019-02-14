@@ -135,6 +135,13 @@
 			<scope>test</scope>
 		</dependency>
 		
+		<!-- iText library for creating PDF files, used to ease testing -->
+		<dependency>
+    		<groupId>com.itextpdf</groupId>
+    		<artifactId>itextpdf</artifactId>
+    		<version>5.5.13</version>
+		</dependency>
+		
 	</dependencies>
 	
 	

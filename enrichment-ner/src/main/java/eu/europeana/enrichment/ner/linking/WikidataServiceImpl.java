@@ -15,12 +15,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class WikidataServiceImpl implements WikidataService {
+	
+	Logger logger = LogManager.getLogger(getClass());
 
-	private static final String baseUrl = "https://query.wikidata.org/sparql";
+	private static final String baseUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
@@ -32,11 +36,13 @@ public class WikidataServiceImpl implements WikidataService {
 	/*
 	 * Wikidata place search
 	 * Geographical object: Q618123
+	 * Geographic location: Q2221906
 	 * Location: Q17334923
 	 */
 	private String placeLabelQueryString = "SELECT ?item ?description ?type WHERE {\r\n"
-			+ "   ?item rdfs:label \"%s\"@%s;\r\n p:P31/ps:P31/wdt:P279* wd:Q17334923;\r\n"
-			+ "      #wdt:P31 ?type;\r\n" + "      schema:description ?description.\r\n"
+			+ "   ?item rdfs:label \"%s\"@%s; \r\n p:P31/ps:P31/wdt:P279* ?type; \r\n"
+			+ "      schema:description ?description.\r\n"
+			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q12371824,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568)) \r\n"
 			+ "  FILTER((LANG(?description)) = \"en\") }";
 
 	/*
@@ -56,6 +62,10 @@ public class WikidataServiceImpl implements WikidataService {
 	private final String wikidataDescriptionKey = "description";
 	private final String wikidataValueKey = "value";
 	
+	public Logger getLogger() {
+		return logger;
+	}
+
 	@Override
 	public List<String> getWikidataId(String geonameId) {
 		String query = String.format(geonamesIdQueryString, geonameId);
@@ -93,15 +103,24 @@ public class WikidataServiceImpl implements WikidataService {
 		// and Agent/Person
 		List<String> retValue = new ArrayList<>();
 		if (reponse == null || reponse.equals(""))
+		{
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: null" + "\n");
 			return retValue;
+		}
+				
 
 		JSONObject responseJson = new JSONObject(reponse);
 		if(!responseJson.has(wikidataResultKey))
+		{
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
 			return retValue;
+		}
 		JSONObject resultObj = responseJson.getJSONObject(wikidataResultKey);
 		if(!resultObj.has(wikidataBindingsKey))
+		{
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
 			return retValue;
-		
+		}
 		JSONArray bindingsArray = resultObj.getJSONArray(wikidataBindingsKey);
 		for(int index = 0; bindingsArray.length() > index; index++) {
 			JSONObject bindingsObj = bindingsArray.getJSONObject(index);
@@ -112,6 +131,8 @@ public class WikidataServiceImpl implements WikidataService {
 			if(!retValue.contains(cityValue))
 				retValue.add(cityValue);
 		}
+		
+		logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
 		return retValue;
 	}
 
@@ -128,12 +149,16 @@ public class WikidataServiceImpl implements WikidataService {
 			URIBuilder builder = new URIBuilder(baseUrl);
 			builder.addParameter("query", query);
 
+			logger.info(this.getClass().getSimpleName() + ": " + query);
+			logger.info(this.getClass().getSimpleName() + builder.toString());
+
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			HttpGet request = new HttpGet(builder.build());
 			request.addHeader("content-type", "application/json");
 			request.addHeader("accept", "application/json");
 			HttpResponse result = httpClient.execute(request);
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
+			
 			// TODO: check status code
 			return responeString;
 
