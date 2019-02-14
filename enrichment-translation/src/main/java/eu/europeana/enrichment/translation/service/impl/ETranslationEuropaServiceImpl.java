@@ -67,8 +67,8 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	public String translateText(String text, String sourceLanguage) throws TranslationException {
 		// TODO: check if credential != null
 		String contentBody = createTranslationBody(text, sourceLanguage);
-		createHttpRequest(contentBody);
-		return null;
+		String reponse = createHttpRequest(contentBody);
+		return reponse;
 	}
 
 	/*
@@ -109,9 +109,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * 
 	 * @param content 					is the base64 content which contains 
 	 * 									the transcribed text and other information
-	 * @return
+	 * @return							response
 	 */
-	private void createHttpRequest(String content) {
+	private String createHttpRequest(String content) {
 		try {
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		    credsProvider.setCredentials(AuthScope.ANY,
@@ -127,9 +127,11 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 
 			System.out.println("(eTranslation) Http reponse: " + responeString);
-
+			return responeString;
 		} catch (Exception ex) {
+			//TODO: proper exception handling
 			System.err.println(ex.getMessage());
+			return "";
 		}
 	}
 

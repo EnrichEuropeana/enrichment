@@ -40,8 +40,8 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 			e.printStackTrace();
 			return null;
 		}
-		List<Entity> suggestions = europeanaApiClient.getSuggestions(key, textURIEncoded, "en", "100");
-		//List<Entity> suggestions = europeanaApiClient.getSearch(key, textURIEncoded, language, classificationType, sortUrlEncoded, "0", "100");
+		//List<Entity> suggestions = europeanaApiClient.getSuggestions(key, textURIEncoded, "en", "100");
+		List<Entity> suggestions = europeanaApiClient.getSearch(key, textURIEncoded, language, classificationType, sortUrlEncoded, "0", "100");
 		if(suggestions != null && suggestions.size() > 0) {
 			for(Entity entity : suggestions) {
 				entityIDs.add(entity.getEntityId());

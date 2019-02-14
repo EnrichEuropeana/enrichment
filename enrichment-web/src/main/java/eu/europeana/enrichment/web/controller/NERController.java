@@ -47,7 +47,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestBody EnrichmentNERRequest nerRequest) {
 
-		String jsonLd = enrichmentNerService.getEntities(nerRequest.text, nerRequest.tool, nerRequest.linking);
+		String jsonLd = enrichmentNerService.getEntities(nerRequest);
 		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 		
 		return response;

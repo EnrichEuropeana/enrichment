@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.service;
 
+import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
+
 public interface EnrichmentTranslationService {
 
 	/*
@@ -14,6 +16,7 @@ public interface EnrichmentTranslationService {
 	 * 									a ID will be returned
 	 * @throws
 	 */
-	public String translate(String text, String sourceLanguage, String tool);  
+	public String translate(EnrichmentTranslationRequest requestParam);  
 	
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam);  
 }

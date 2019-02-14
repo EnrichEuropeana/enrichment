@@ -5,19 +5,36 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.NotSaved;
+import org.mongodb.morphia.annotations.Transient;
 import org.springframework.data.annotation.Id;
 
+
+import eu.europeana.enrichment.model.StoryItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 public class TranslationEntityImpl implements TranslationEntity{
 
 	@Id
-    public String _id;
+    public String _id = new ObjectId().toString();
 	public String key;
-	public String originalText;
-	public String originalLanguage;
+	public String language;
 	public String translatedText;
 	public String tool;
+	public String eTranslationId;
+	public String storyItemId;
+	@Transient
+	@NotSaved
+	private StoryItemEntity storyItemEntity;
+	
+	public String getETranslationId() {
+		return eTranslationId;
+	}
+	
+	public void setETranslationId(String eTranslationId) {
+		this.eTranslationId = eTranslationId;
+	}
 	
 	public String getId() {
 		return _id;
@@ -37,23 +54,13 @@ public class TranslationEntityImpl implements TranslationEntity{
 	}
 
 	@Override
-	public String getOriginalText() {
-		return originalText;
-	}
-
-	@Override
-	public void setOriginalText(String originalText) {
-		this.originalText = originalText;
-	}
-
-	@Override
-	public String getOriginalLanguage() {
-		return originalLanguage;
+	public String getLanguage() {
+		return language;
 	}
 	
 	@Override
-	public void setOriginalLanguage(String language) {
-		this.originalLanguage = language;
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 	
 	@Override
@@ -76,4 +83,25 @@ public class TranslationEntityImpl implements TranslationEntity{
 		this.tool = tool;
 	}
 
+	@Override
+	public StoryItemEntity getStoryItemEntity() {
+		return this.storyItemEntity;
+	}
+
+	@Override
+	public void setStoryItemEntity(StoryItemEntity storyItemEntity) {
+		this.storyItemEntity = storyItemEntity;
+		if(storyItemEntity != null)
+			setStoryItemId(storyItemEntity.getStoryItemId());
+		else
+			setStoryItemId(null);
+	}
+	
+	public String getStoryItemId() {
+		return storyItemId;
+	}
+
+	public void setStoryItemId(String storyItemId) {
+		this.storyItemId = storyItemId;
+	}
 }

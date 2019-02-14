@@ -45,7 +45,7 @@ public class NERLinkingServiceTest {
 	public void nerLinkingServiceTest() {
 		NamedEntity placeEntity = new NamedEntityImpl(testPlace);
 		TreeMap<String, List<NamedEntity>> testFindings = initTestCase();
-		nerLinkingService.addLinkingInformation(testFindings, Arrays.asList("Europeana", "Wikidata"), "de");
+		//nerLinkingService.addLinkingInformation(testFindings, Arrays.asList("Europeana", "Wikidata"), "de");
 		
 		List<NamedEntity> agents = testFindings.get(NERClassification.AGENT.toString());
 		if(agents.get(0).getEuropeanaIds().size() == 0)
