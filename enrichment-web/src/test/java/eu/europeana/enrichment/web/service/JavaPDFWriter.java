@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.service;
+package eu.europeana.enrichment.web.service;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -121,32 +121,33 @@ public class JavaPDFWriter
         		
         		NamedEntity nextNEREntity=NEREntitiesIterator.next();
         		
-        		Iterator<Integer> PositionsIterator = nextNEREntity.getPositions().iterator();
-            	while(PositionsIterator.hasNext()) {
-            		
-            		Integer nextPosition=PositionsIterator.next();            		
-            		
-            		//here we have to update where to insert a symbol based on already inserted symbols
-        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.intValue());
-            		
-        			if(key.equalsIgnoreCase("agent"))
-        			{
-            			sb.insert(positionToInsert, SPADE);
-        			}
-        			else if(key.equalsIgnoreCase("organization"))
-        			{
-        				//this symbol is a HEART character
-        				sb.insert(positionToInsert, HEART);
-        			}
-        			else if(key.equalsIgnoreCase("place"))
-        			{
-        				//this symbol is a DIAMOND character
-        				sb.insert(positionToInsert, DIAMOND);
-        			}
-            		
-            		allAddedPositions.add(nextPosition);
-            		
-            	}
+//        		Iterator<Integer> PositionsIterator = nextNEREntity.getPositions().iterator();
+//        		
+//            	while(PositionsIterator.hasNext()) {
+//            		
+//            		Integer nextPosition=PositionsIterator.next();            		
+//            		
+//            		//here we have to update where to insert a symbol based on already inserted symbols
+//        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.intValue());
+//            		
+//        			if(key.equalsIgnoreCase("agent"))
+//        			{
+//            			sb.insert(positionToInsert, SPADE);
+//        			}
+//        			else if(key.equalsIgnoreCase("organization"))
+//        			{
+//        				//this symbol is a HEART character
+//        				sb.insert(positionToInsert, HEART);
+//        			}
+//        			else if(key.equalsIgnoreCase("place"))
+//        			{
+//        				//this symbol is a DIAMOND character
+//        				sb.insert(positionToInsert, DIAMOND);
+//        			}
+//            		
+//            		allAddedPositions.add(nextPosition);
+//            		
+//            	}
         	}
 		
 		}

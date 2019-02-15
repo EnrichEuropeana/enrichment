@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.service;
+package eu.europeana.enrichment.web.service;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -102,12 +102,13 @@ public class NERServiceReadDocument {
             	            	
             	//writting positions where the entities are found in the text
             	writer.append("Positions: ");
-            	Iterator<Integer> PositionsIterator = nextNEREntity.getPositions().iterator();
-            	while(PositionsIterator.hasNext()) {
-            		
-            		Integer nextPosition=PositionsIterator.next();
-            		writer.append(nextPosition.toString() + ", ");
-            	}
+            	
+//            	Iterator<Integer> PositionsIterator = nextNEREntity.getPositions().iterator();
+//            	while(PositionsIterator.hasNext()) {
+//            		
+//            		Integer nextPosition=PositionsIterator.next();
+//            		writer.append(nextPosition.toString() + ", ");
+//            	}
             	
             	writer.newLine();
             	writer.newLine();

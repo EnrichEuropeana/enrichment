@@ -72,6 +72,28 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	//@Cacheable("nerResults")
 	@Override
 	public String getEntities(EnrichmentNERRequest requestParam) {
+		
+		List<String> storyItemIds = requestParam.getStoryItemIds();
+		
+		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam);
+		/*
+		 * Output preparation
+		 */
+		if(resultMap.isEmpty()) {
+			return "";
+		}
+		else
+		{
+			prepareOutput(resultMap, storyItemIds);
+			return new JSONObject(resultMap).toString();
+		}
+	}
+	
+	@Override
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) {
+		
+		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
+		
 		String storyId = requestParam.getStoryId();
 		List<String> storyItemIds = requestParam.getStoryItemIds();
 		String tool = requestParam.getTool();
@@ -83,7 +105,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		if(storyItemIds.size() == 0 && storyId.isEmpty())
 		{
 			//TODO: throw exception
-			return "";
+			return resultMap;
 		}
 		else if(storyItemIds.size() == 0) {
 			tmpStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntitiesFromStory(storyId);
@@ -101,7 +123,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		//TODO: check if update is need (e.g.: linking tools)
 		if(tmpNamedEntities.size() > 0) {
-			TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
+			//TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 			for(int index = tmpNamedEntities.size()-1; index >=0; index--) {
 				NamedEntity tmpNamedEntity = tmpNamedEntities.get(index);
 				String classificationType = tmpNamedEntity.getType();
@@ -112,8 +134,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					classificationNamedEntities.add(tmpNamedEntity);
 				}
 			}
-			prepareOutput(resultMap, storyItemIds);
-			return new JSONObject(resultMap).toString();
+			return resultMap;
+			//prepareOutput(resultMap, storyItemIds);
+			//return new JSONObject(resultMap).toString();
 		}
 		
 		boolean python = false;
@@ -143,9 +166,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			default:
 				//TODO:Return tool is not supported
 				return null;
-		}
+		}			
 		
-		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
+		
 		/*
 		 * Apply named entity recognition on all story item translations
 		 */
@@ -226,12 +249,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}
-		
-		/*
-		 * Output preparation
-		 */
-		prepareOutput(resultMap, storyItemIds);
-		return new JSONObject(resultMap).toString();
+
+		return resultMap;
 	}
 	
 	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, List<String> storyItemIds) {
