@@ -22,29 +22,21 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
 	">
-
-	<context:property-placeholder location="classpath:test-enrichment-book-dumitru.properties" />
-	<bean id="europeanaEntityServiceBookDumitru" class="eu.europeana.enrichment.ner.service.NERServiceReadDocument">
-		<constructor-arg type="String" value="${enrich.ner.book.dumitru}"/>
-		<constructor-arg type="String" value="${enrich.ner.book.dumitru.output}"/>
-		<constructor-arg type="String" value="${enrich.ner.book.dumitru.output.formatted.pdf}"/>
+      
+	<!-- context:property-placeholder location="classpath:test-enrichment-book-dumitru.properties" /-->
+	
+	<import resource="../../src/main/resources/enrichment-web-context.xml" />
+	
+	<bean id="europeanaEntityServiceBookDumitru" class="eu.europeana.enrichment.web.service.NERServiceReadDocument">
+		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.pdf}"/>
 	</bean>
 	
-	<bean id="europeanaJavaPDFWriter" class="eu.europeana.enrichment.ner.service.JavaPDFWriter" />
-		
-	<bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
-	</bean>
-	
-	<bean id="europeanaApiClient" class="eu.europeana.entity.client.web.WebEntityProtocolApiImpl" />
-	<bean id="europeanaEntityService" class="eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl">
-		<constructor-arg type="String" value="${enrich.ner.linking.europeana.apikey}"/>
-	</bean>
-	<bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
-	<bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
 	
 	
+	<bean id="europeanaEnrichmentNERRequest" class="eu.europeana.enrichment.web.model.EnrichmentNERRequest" />
 	
-	
+	<bean id="europeanaJavaPDFWriter" class="eu.europeana.enrichment.web.service.JavaPDFWriter" />
 	
 </beans>

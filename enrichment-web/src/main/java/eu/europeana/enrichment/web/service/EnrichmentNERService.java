@@ -1,7 +1,9 @@
 package eu.europeana.enrichment.web.service;
 
 import java.util.List;
+import java.util.TreeMap;
 
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -24,5 +26,11 @@ public interface EnrichmentNERService {
 	 * @throws
 	 */
 	public String getEntities(EnrichmentNERRequest requestParam);  
+	
+	/*
+	 * This method does the same as {@link eu.europeana.enrichment.web.service.EnrichmentNERService#getEntities(EnrichmentNERRequest)
+	 * but returns the list of NamedEntity instead of a JSON String  
+	 */
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam);
 	
 }
