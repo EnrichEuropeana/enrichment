@@ -51,9 +51,9 @@ public class NERServiceTestBookDumitru {
 		
 		List<String> linkingTools = Arrays.asList("Wikidata");
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
-		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTest");
-		europeanaEnrichmentNERRequest.setStoryItemIds(new ArrayList<String>());
-		europeanaEnrichmentNERRequest.setTool("stanfordNerModel3");
+		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTranslate");
+		europeanaEnrichmentNERRequest.setStoryItemIds(Arrays.asList("bookDumitruTest2"));
+		europeanaEnrichmentNERRequest.setTool("Stanford_NER_model_3");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
 		
 		TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
