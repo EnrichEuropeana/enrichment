@@ -20,7 +20,7 @@ public class PersistentStoryItemEntityServiceImpl implements PersistentStoryItem
 	@Override
 	public List<StoryItemEntity> findStoryItemEntitiesFromStory(String storyId) {
 		// TODO Auto-generated method stub
-		return null;
+		return storyItemEntityDao.findStoryItemEntitiesFromStory(storyId);
 	}
 
 	@Override
