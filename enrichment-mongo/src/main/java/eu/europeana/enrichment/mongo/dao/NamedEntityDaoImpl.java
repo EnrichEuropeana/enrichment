@@ -58,6 +58,25 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			return dbEntity;
 		}
 	}
+	
+	@Override
+	public List<NamedEntity> findAllNamedEntities() {
+		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);		
+		List<NamedEntityImpl> result = persistentNamedEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else
+		{
+			List<NamedEntity> tmpResult = new ArrayList<>();
+			for(int index = result.size()-1; index >= 0; index--) {
+				NamedEntity dbEntity = result.get(index);
+				addAdditonalInformation(dbEntity);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
+	}
+	
 
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, boolean translation) {
