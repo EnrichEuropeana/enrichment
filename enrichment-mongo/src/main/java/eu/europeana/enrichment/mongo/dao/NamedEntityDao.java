@@ -15,5 +15,6 @@ public interface NamedEntityDao {
 	public void saveNamedEntity(NamedEntity entity);
 	public void deleteNamedEntity(NamedEntity entity);
 	public void deleteNamedEntityByKey(String key);
+	public List<NamedEntity> findAllNamedEntities();
 
 }
