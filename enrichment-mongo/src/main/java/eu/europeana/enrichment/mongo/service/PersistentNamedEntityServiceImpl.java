@@ -24,8 +24,7 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 
 	@Override
 	public List<NamedEntity> getAllNamedEntities() {
-		// TODO Auto-generated method stub
-		return null;
+		return namedEntityDao.findAllNamedEntities();
 	}
 
 	@Override
