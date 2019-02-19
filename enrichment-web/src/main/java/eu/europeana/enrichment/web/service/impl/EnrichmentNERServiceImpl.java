@@ -79,7 +79,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		/*
 		 * Output preparation
 		 */
-		if(resultMap.isEmpty()) {
+		if(resultMap == null || resultMap.isEmpty()) {
 			return "";
 		}
 		else
@@ -94,6 +94,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		
+		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
 		List<String> storyItemIds = requestParam.getStoryItemIds();
 		String tool = requestParam.getTool();

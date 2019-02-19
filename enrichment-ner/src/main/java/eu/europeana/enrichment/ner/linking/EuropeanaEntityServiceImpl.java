@@ -54,7 +54,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 
 	@Override
 	public String retriveEntity(String idUrl, String language) {
-		Entity entity = null;//europeanaApiClient.retrieveEntityWithUrl(idUrl);
+		Entity entity = europeanaApiClient.retrieveEntityWithUrl(idUrl);
 		if(entity == null)
 			return "";
 		Map<String, String> prefLabelMap = entity.getPrefLabel();

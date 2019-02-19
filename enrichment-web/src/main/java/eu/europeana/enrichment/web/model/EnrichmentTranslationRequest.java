@@ -11,7 +11,7 @@ public class EnrichmentTranslationRequest {
 	public String storyItemId;
 	public String text;
 	public String type;
-	public String tool;
+	public String translationTool;
 	public String sourceLanguage;
 	public Boolean sendRequest;
 	
@@ -46,11 +46,11 @@ public class EnrichmentTranslationRequest {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public String getTool() {
-		return tool;
+	public String getTranslationTool() {
+		return translationTool;
 	}
-	public void setTool(String tool) {
-		this.tool = tool;
+	public void setTranslationTool(String tool) {
+		this.translationTool = tool;
 	}
 	public String getSourceLanguage() {
 		return sourceLanguage;
