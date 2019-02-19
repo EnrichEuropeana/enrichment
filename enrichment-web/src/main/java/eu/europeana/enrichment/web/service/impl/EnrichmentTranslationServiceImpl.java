@@ -53,12 +53,13 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Override
 	public String translate(EnrichmentTranslationRequest requestParam) {
 		try {
+			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
 			String storyId = requestParam.getStoryId();
 			String storyItemId = requestParam.getStoryItemId();
 			String originalText = requestParam.getText();
 			String textType = requestParam.getType();
-			String tool = requestParam.getTool();
+			String translationTool = requestParam.getTranslationTool();
 			String sourceLanguage = requestParam.getSourceLanguage();
 			Boolean sendRequest = requestParam.getSendRequest();
 			
@@ -77,11 +78,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					//TODO: compare text hashes if there are equal, if not throw exception
 					//Check if translation already exists
 					TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryInformation(storyItemId, tool, sourceLanguage);
+							findTranslationEntityWithStoryInformation(storyItemId, translationTool, sourceLanguage);
 					if(dbTranslationEntity != null)
 						return dbTranslationEntity.getTranslatedText();
 					
-					if(originalText.isEmpty() && !dbStoryItemEntity.getText().isEmpty()) {
+					if((originalText == null || originalText.isEmpty()) && 
+							!(dbStoryItemEntity.getText() == null || dbStoryItemEntity.getText().isEmpty())) {
 						// Reuse of dbStoryItemEntity text if original text is not given
 						originalText = dbStoryItemEntity.getText();
 					}
@@ -111,12 +113,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
 			tmpTranslationEntity.setStoryItemEntity(tmpStoryItemEntity);
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
-			tmpTranslationEntity.setTool(tool);
+			tmpTranslationEntity.setTool(translationTool);
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");
 
 			String returnValue = "-1";
-			switch (tool) {
+			switch (translationTool) {
 			case googleToolName:
 				if(sendRequest)
 					returnValue = googleTranslationService.translateText(originalText, sourceLanguage);
@@ -165,15 +167,15 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String storyItemId = requestParam.getStoryItemId();
 		String translatedText = requestParam.getText();
 		String textType = requestParam.getType();
-		String tool = requestParam.getTool();
+		String translationTool = requestParam.getTranslationTool();
 		String language = requestParam.getSourceLanguage();
 		
-		if(storyItemId.isEmpty() || translatedText.isEmpty() || tool.isEmpty() || language.isEmpty()) {
+		if(storyItemId.isEmpty() || translatedText.isEmpty() || translationTool.isEmpty() || language.isEmpty()) {
 			//TODO: proper exception handling
 			return "";
 		}
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithStoryInformation(storyItemId, tool, language);
+				findTranslationEntityWithStoryInformation(storyItemId, translationTool, language);
 		if(dbTranslationEntity == null) {
 			//TODO: proper exception handling
 			return "";

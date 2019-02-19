@@ -23,7 +23,7 @@ public class NERStanfordServiceImpl implements NERService{
 	 * entity recognition and classification
 	 */
 	public NERStanfordServiceImpl(String model) {
-		if(model.isEmpty()) {
+		if(model == null || model.isEmpty()) {
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {

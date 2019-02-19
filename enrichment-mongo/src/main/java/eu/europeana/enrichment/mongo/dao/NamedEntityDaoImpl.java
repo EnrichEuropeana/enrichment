@@ -33,11 +33,11 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			PositionEntity dbPositionEntity = positions.get(index);
 			String storyItemId = dbPositionEntity.getStoryItemId();
 			String translationKey = dbPositionEntity.getTranslationKey();
-			if(!storyItemId.isEmpty()) {
+			if(storyItemId != null && !storyItemId.isEmpty()) {
 				StoryItemEntity dbStoryItemEntity = storyItemEntityDao.findStoryItemEntity(storyItemId);
 				dbPositionEntity.setStoryItemEntity(dbStoryItemEntity);
 			}
-			if(!translationKey.isEmpty()) {
+			if(translationKey != null && !translationKey.isEmpty()) {
 				TranslationEntity dbTranslationEntity = translationEntityDao.findTranslationEntity(translationKey);
 				dbPositionEntity.setTranslationEntity(dbTranslationEntity);
 			}
