@@ -38,7 +38,7 @@ import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
  * 2. upload the translation of the text using the REST-POST query to localhost:8080/enrichment/translation (please define all fields like storyItemId, tool, etc.)
  * 3. upload the text of the translation using another REST POST call to : localhost:8080/enrichment/uploadTranslation (please note that the previous call in 2. will just create the StoryItemEntity and StoryItem in the db) 
  * 4. update the europeanaEnrichmentNERRequest variable in the code below so that the storyItemId is the same as the one sent in the REST request
- * 5. delete all NamedEntities from the db and start the Test
+ * 
  */
 
 public class NERServiceTestBookDumitru {
