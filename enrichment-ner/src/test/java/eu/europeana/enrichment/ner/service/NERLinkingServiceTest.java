@@ -33,20 +33,28 @@ public class NERLinkingServiceTest {
 	private TreeMap<String, List<NamedEntity>> initTestCase() {
 		TreeMap<String, List<NamedEntity>> testFindings = new TreeMap<>();
 		List<NamedEntity> agents = new ArrayList<>();
-		agents.add(new NamedEntityImpl(testAgent));
-		testFindings.put(NERClassification.AGENT.toString(), agents);
+		NamedEntity tmpAgentNamedEntity = new NamedEntityImpl(testAgent);
+		tmpAgentNamedEntity.setType(NERClassification.AGENT.toString());
+		agents.add(tmpAgentNamedEntity);
+		testFindings.put(tmpAgentNamedEntity.getType(), agents);
 		List<NamedEntity> places = new ArrayList<>();
-		places.add(new NamedEntityImpl(testPlace));
-		testFindings.put(NERClassification.PLACE.toString(), places);
+		NamedEntity tmpPlaceNamedEntity = new NamedEntityImpl(testPlace);
+		tmpPlaceNamedEntity.setType(NERClassification.PLACE.toString());
+		places.add(tmpPlaceNamedEntity);
+		testFindings.put(tmpPlaceNamedEntity.getType(), places);
 		return testFindings;
 	}
 	
 	@Test
 	public void nerLinkingServiceTest() {
-		NamedEntity placeEntity = new NamedEntityImpl(testPlace);
 		TreeMap<String, List<NamedEntity>> testFindings = initTestCase();
-		//nerLinkingService.addLinkingInformation(testFindings, Arrays.asList("Europeana", "Wikidata"), "de");
+		for(String namedEntityClassification : testFindings.keySet()) {
+			for(NamedEntity namedEntity : testFindings.get(namedEntityClassification)) {
+				nerLinkingService.addLinkingInformation(namedEntity, Arrays.asList("Europeana", "Wikidata"), "de");
+			}
+		}
 		
+		// TODO: Agent label search doesn't work
 		List<NamedEntity> agents = testFindings.get(NERClassification.AGENT.toString());
 		if(agents.get(0).getEuropeanaIds().size() == 0)
 			fail("No Europeana entry for \"Franz Ferdinand\" found!");

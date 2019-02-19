@@ -12,14 +12,10 @@ public interface EnrichmentNERService {
 	 * This method applies named entity recognition and classification based
 	 * on the translated text.
 	 * 
-	 * @param text 						is the translated text where named entity
-	 * 									recognition and classification should be applied.
-	 * @param tool						is a string which specifies which named entity
-	 * 									recognition and classification tool should be used
-	 * 									(e.g. Stanford_NER_model_3, nltk, ...)							
-	 * @param linking					defines if and which semantic web repositories
-	 * 									should be used for named entity linkage 
-	 * 									(e.g. ["wikidata", "europeana"])
+	 * @param requestParam				contains information about story, story item,
+	 * 									translation and linking tools which are
+	 * 									used to retrieve story items from DB and to
+	 * 									apply NER on this specific data. 						
 	 * @return 							all named entities which were found on the 
 	 * 									translated text including their positions
 	 * 									at the original text
