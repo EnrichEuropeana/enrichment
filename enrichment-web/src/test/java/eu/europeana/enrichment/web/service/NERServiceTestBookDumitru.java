@@ -83,6 +83,7 @@ public class NERServiceTestBookDumitru {
 			}
 		}
 		
+		
 		//update the text field of the StoryItemEntity and the TranslationEntity in the mongodb 
 		//because from the .txt file because if we upload it over REST call, the positions of the found entities in the text from the json request and from the .txt file are different which confuses the PDF writer to write it to the pdf file in a right way
 		StoryItemEntity dbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity("bookDumitruTest2");				
