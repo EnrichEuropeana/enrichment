@@ -31,10 +31,10 @@ public class ParamValidationException extends HttpException{
 	}
 	
 	public ParamValidationException(String i18nKey, String parameterName, String parameterValue, HttpStatus status, Throwable th){
-		this(i18nKey, i18nKey, new String[]{parameterValue}, status, th);
+		this(null, i18nKey, new String[]{parameterName, parameterValue}, status, th);
 	}
 	
 	public ParamValidationException(String message, String i18nKey, String[] i18nParams, HttpStatus status, Throwable th){
-		super(message + " " + StringUtils.join(i18nParams, ':'), i18nKey, i18nParams, status, th);
+		super(message, i18nKey, i18nParams, status, th);
 	}
 }

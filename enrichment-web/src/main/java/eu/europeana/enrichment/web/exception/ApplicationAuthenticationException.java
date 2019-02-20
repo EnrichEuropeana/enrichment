@@ -13,22 +13,6 @@ public class ApplicationAuthenticationException extends HttpException {
 	 * 
 	 */
 	private static final long serialVersionUID = -6790143130321685425L;
-
-	@Resource
-	private I18nService i18nService;
-	
-	private String getMessage(String message, String i18nKey, String[] i18nParams) {
-		if(message != null && !message.isEmpty())
-			return message;
-		else if(i18nKey != null && !i18nKey.isEmpty()) {
-			if(i18nParams != null && i18nParams.length > 0) {
-				return i18nService.getMessage(i18nKey, i18nParams);
-			}
-			return i18nService.getMessage(i18nKey);
-		}
-		else
-			return "";
-	}
 	
 	public ApplicationAuthenticationException(String message) {
 		this(message, null, null, null);
