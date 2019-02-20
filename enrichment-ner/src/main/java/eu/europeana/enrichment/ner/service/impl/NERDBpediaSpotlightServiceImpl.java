@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.ner.service.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -39,9 +42,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	}
 
 	@Override
-	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
 		
-		TreeMap<String, TreeSet<String>> map = readJSON(createRequest(text));
+		TreeMap<String, List<List<String>>> map = readJSON(createRequest(text));
 		return map;
 	}
 	
@@ -53,8 +56,8 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * @return						a TreeMap of named entities which are separated
 	 * 								based on their classification type
 	 */
-	private TreeMap<String, TreeSet<String>> readJSON(String jsonString){
-		TreeMap<String, TreeSet<String>> map = new TreeMap<String, TreeSet<String>>();
+	private TreeMap<String, List<List<String>>> readJSON(String jsonString){
+		TreeMap<String, List<List<String>>> map = new TreeMap<String, List<List<String>>>();
 		JSONObject responseJson = new JSONObject(jsonString);
 		//TODO: exception handling 
 		JSONObject annotationObject = responseJson.getJSONObject(annotationKey);
@@ -84,7 +87,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * return						the map parameter will be extended by all findings of
 	 * 								the JSON response
 	 */
-	private void processFindings(JSONArray findings, TreeMap<String, TreeSet<String>> map){
+	private void processFindings(JSONArray findings, TreeMap<String, List<List<String>>> map){
 		for (int index = 0; index < findings.length(); index++) {
 			JSONObject entity = findings.getJSONObject(index);
 			String entityName = entity.getString(nameKey);
@@ -100,18 +103,18 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			boolean classificationFound = false;
 			if(NERDBpediaClassification.isAgent(entityTypes)) {
 				classificationFound = true;
-				setEntityToMap(NERDBpediaClassification.AGENT.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.AGENT.toString(), entityName, entityOffset, map);
 			}
 			if(NERDBpediaClassification.isPlace(entityTypes)) {
 				classificationFound = true;
-				setEntityToMap(NERDBpediaClassification.PLACE.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.PLACE.toString(), entityName, entityOffset, map);
 			}
 			if(NERDBpediaClassification.isOrganization(entityTypes)) {
 				classificationFound = true;
-				setEntityToMap(NERDBpediaClassification.ORGANIZATION.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.ORGANIZATION.toString(), entityName, entityOffset, map);
 			}
 			if(!classificationFound) {
-				setEntityToMap(NERDBpediaClassification.MISC.toString(), entityName, map);
+				setEntityToMap(NERDBpediaClassification.MISC.toString(), entityName, entityOffset, map);
 			}
 		}
 	}
@@ -123,18 +126,27 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * @param entityType			is the classification type of the new DBpedia spotlight named entity
 	 * 								(e.g. place for Vienna)
 	 * @param entityName			represents the label of the new DBpedia spotlight named entity
+	 * 
+	 * @param entityOffset			represents the offset (starting position in the text) of the new DBpedia spotlight named entity 
+	 * 
 	 * @param map					is a TreeMap which already contains some named entities and this
 	 * 								TreeMap will be extended by the new DBpedia spotlight named entity
 	 * return						the map parameter will be changed through this function
 	 */
-	private void setEntityToMap(String entityType, String entityName, TreeMap<String, TreeSet<String>> map) {
+	private void setEntityToMap(String entityType, String entityName, int entityOffset, TreeMap<String, List<List<String>>> map) {
+		
+		String[] wordWithPosition = new String[2];
+		wordWithPosition[0]=entityName;
+		wordWithPosition[1]=String.valueOf(entityOffset);
+		
 		if(map.containsKey(entityType)) {
-			map.get(entityType).add(entityName);
+			map.get(entityType).add(Arrays.asList(wordWithPosition));
 		}
 		else {
-			TreeSet<String> entitySet = new TreeSet<String>();
-			entitySet.add(entityName);
-			map.put(entityType, entitySet);
+			List<List<String>> temp = new ArrayList<List<String>>();					
+			temp.add(Arrays.asList(wordWithPosition));
+			map.put(entityType, temp);
+
 		}
 	}
 	

@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.PositionEntity;
 
 public class NERServiceReadDocument {
 
@@ -103,11 +104,11 @@ public class NERServiceReadDocument {
             	//writting positions where the entities are found in the text
             	writer.append("Positions: ");
             	
-            	Iterator<Integer> PositionsIterator = nextNEREntity.getPositionEntities().get(0).getOffsetPositions().iterator();
+            	Iterator<PositionEntity> PositionsIterator = nextNEREntity.getPositionEntities().iterator();
             	while(PositionsIterator.hasNext()) {
             		
-            		Integer nextPosition=PositionsIterator.next();
-            		writer.append(nextPosition.toString() + ", ");
+            		PositionEntity nextPosition=PositionsIterator.next();
+            		writer.append(nextPosition.getOffsetPositions().get(0).toString() + ", ");
             	}
             	
             	writer.newLine();

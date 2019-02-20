@@ -19,6 +19,7 @@ import com.itextpdf.text.pdf.CMYKColor;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.PositionEntity;
 
 // code is aken from: https://stackoverflow.com/questions/25166533/java-write-to-pdf-with-color
 
@@ -121,14 +122,14 @@ public class JavaPDFWriter
         		
         		NamedEntity nextNEREntity=NEREntitiesIterator.next();
         		
-        		Iterator<Integer> PositionsIterator = nextNEREntity.getPositionEntities().get(0).getOffsetPositions().iterator();
+        		Iterator<PositionEntity> PositionsIterator = nextNEREntity.getPositionEntities().iterator();
         		
             	while(PositionsIterator.hasNext()) {
             		
-            		Integer nextPosition=PositionsIterator.next();            		
+            		PositionEntity nextPosition=PositionsIterator.next();            		
             		
             		//here we have to update where to insert a symbol based on already inserted symbols
-        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.intValue());
+        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetPositions().get(0));
             		
         			if(key.equalsIgnoreCase("agent"))
         			{
@@ -145,7 +146,7 @@ public class JavaPDFWriter
         				sb.insert(positionToInsert, DIAMOND);
         			}
             		
-            		allAddedPositions.add(nextPosition);
+            		allAddedPositions.add(nextPosition.getOffsetPositions().get(0));
             		
             	}
         	}

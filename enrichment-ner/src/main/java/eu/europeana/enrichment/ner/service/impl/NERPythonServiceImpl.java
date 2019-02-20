@@ -17,8 +17,10 @@ import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
+import java.util.List;
 
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
@@ -51,8 +53,8 @@ public class NERPythonServiceImpl implements NERService{
 	 * @see eu.europeana.enrichment.ner.service.NERService#identifyNER(java.lang.String)
 	 */
 	@Override
-	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {
-		TreeMap<String, TreeSet<String>> map = new TreeMap<>();
+	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
+		TreeMap<String, List<List<String>>> map = new TreeMap<>();
 		Process process;
 		try {
 			process = Runtime.getRuntime().exec(pythonCommand);
@@ -110,15 +112,15 @@ public class NERPythonServiceImpl implements NERService{
 	 * @return							a TreeMap including all python named entities
 	 * 									separated by classification type
 	 */
-	private TreeMap<String, TreeSet<String>> readJSON(String jsonString){
-		TreeMap<String, TreeSet<String>> map = new TreeMap<String, TreeSet<String>>();
+	private TreeMap<String, List<List<String>>> readJSON(String jsonString){
+		TreeMap<String, List<List<String>>> map = new TreeMap<String, List<List<String>>>();
 		JSONObject responseJson = new JSONObject(jsonString);
 		//TODO: exception handling 
 		
 		Iterator<String> keys = responseJson.keys();
 		while(keys.hasNext()) {
 		    String key = keys.next();
-		    map.put(key, getSet(responseJson.getJSONArray(key)));
+		    map.put(key, getList(responseJson.getJSONArray(key)));
 		}
 		return map;
 	}
@@ -132,11 +134,16 @@ public class NERPythonServiceImpl implements NERService{
 	 * 									a classification type
 	 * @return 							a unique TreeSet of named entities
 	 */
-	private TreeSet<String> getSet(JSONArray jsonArray){
-		ArrayList<String> tmp = new ArrayList<String>();
+	private List<List<String>> getList(JSONArray jsonArray){
+		ArrayList<List<String>> tmp = new ArrayList<List<String>>();
 		for (int index = 0; index < jsonArray.length(); index++) {
-			tmp.add(jsonArray.getString(index));
+			//tmp.add(jsonArray.getString(index));
+			String[] wordWithPosition = new String[2];
+			wordWithPosition[0]=jsonArray.getString(index);
+			wordWithPosition[1]="-1";
+			tmp.add(Arrays.asList(wordWithPosition));
+
 		}
-		return new TreeSet<String>(tmp);
+		return tmp;
 	}
 }
