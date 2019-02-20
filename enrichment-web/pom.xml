@@ -50,6 +50,11 @@
   			<artifactId>enrichment-translation</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.api.commons</groupId>
+			<artifactId>commons-web</artifactId>
+			<version>${version.commonsApi}</version>
+		</dependency>
 		
 		
 		<!-- Other -->

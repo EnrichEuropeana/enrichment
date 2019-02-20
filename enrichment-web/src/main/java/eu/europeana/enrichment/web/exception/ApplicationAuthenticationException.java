@@ -1,0 +1,54 @@
+package eu.europeana.enrichment.web.exception;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpStatus;
+
+import eu.europeana.api.commons.config.i18n.I18nService;
+import eu.europeana.api.commons.web.exception.HttpException;
+
+public class ApplicationAuthenticationException extends HttpException {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6790143130321685425L;
+
+	@Resource
+	private I18nService i18nService;
+	
+	private String getMessage(String message, String i18nKey, String[] i18nParams) {
+		if(message != null && !message.isEmpty())
+			return message;
+		else if(i18nKey != null && !i18nKey.isEmpty()) {
+			if(i18nParams != null && i18nParams.length > 0) {
+				return i18nService.getMessage(i18nKey, i18nParams);
+			}
+			return i18nService.getMessage(i18nKey);
+		}
+		else
+			return "";
+	}
+	
+	public ApplicationAuthenticationException(String message) {
+		this(message, null, null, null);
+	}
+	
+	public ApplicationAuthenticationException(String message, String i18nKey) {
+		this(message, i18nKey, null, null);
+	}
+	
+	public ApplicationAuthenticationException(String message, String i18nKey, String[] i18nParams){
+		this(message, i18nKey, i18nParams, null);
+	}
+	
+	public ApplicationAuthenticationException(String message, String i18nKey, Throwable th){
+		this(message, i18nKey, null, th);
+	}
+	
+	public ApplicationAuthenticationException(String message, String i18nKey, String[] i18nParams, Throwable th) {
+		super(message, i18nKey, i18nParams, HttpStatus.UNAUTHORIZED, th);
+		// TODO Auto-generated constructor stub
+	}
+	
+}

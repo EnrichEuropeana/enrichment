@@ -97,9 +97,13 @@
     
     
     <!-- configurable error messages -->
-    <!--  beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
-    	<beans:property name="messageSource" ref="entity_i18n_messageSource"/>
-    </beans:bean-->
+    <beans:bean id="enrichment_i18n_messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<beans:property name="basename" value="classpath:messages"/>	
+		<beans:property name="defaultEncoding" value="utf-8"/>	 	
+    </beans:bean>
+    <beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
+    	<beans:property name="messageSource" ref="enrichment_i18n_messageSource"/>
+    </beans:bean>
     	
    
 </beans:beans>
