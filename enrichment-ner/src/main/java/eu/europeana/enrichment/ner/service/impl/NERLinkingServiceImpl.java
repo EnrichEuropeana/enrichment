@@ -22,8 +22,6 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	/*
 	 * Tool names for named entity linking defined 
 	 */
-	private String wikidataName = "Wikidata";
-	private String europeanaName = "Europeana";
 	
 	@Override
 	public void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage) {
@@ -34,9 +32,9 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		boolean europeana = false;
 		
 		for(String linkingTool : linkingTools) {
-			if(linkingTool.equals(wikidataName))
+			if(linkingTool.equals(NERLinkingService.TOOL_WIKIDATA))
 				wikidata = true;
-			else if(linkingTool.equals(europeanaName))
+			else if(linkingTool.equals(NERLinkingService.TOOL_EUROPEANA))
 				europeana = true;
 		}
 

@@ -7,6 +7,14 @@ package eu.europeana.enrichment.web.model;
  */
 public class EnrichmentTranslationRequest {
 
+	public static final String PARAM_STORY_ID = "storyId";
+	public static final String PARAM_STORY_ITEM_ID = "storyItemId";
+	public static final String PARAM_TEXT = "text";
+	public static final String PARAM_TYPE = "type";
+	public static final String PARAM_TRANSLATION_TOOL = "translationTools";
+	public static final String PARAM_SOURCE_LANGUAGE = "sourceLanguage";
+	public static final String PARAM_SEND_REQUEST = "sendRequest";
+	
 	public String storyId;
 	public String storyItemId;
 	public String text;

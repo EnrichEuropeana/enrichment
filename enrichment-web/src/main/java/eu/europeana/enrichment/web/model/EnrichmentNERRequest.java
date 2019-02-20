@@ -9,9 +9,16 @@ import java.util.List;
  */
 public class EnrichmentNERRequest {
 
+	public static final String PARAM_STORY_ID = "storyId";
+	public static final String PARAM_STORY_ITEM_IDS = "storyItemIds";
+	public static final String PARAM_NER_TOOL = "nerTool";
+	public static final String PARAM_LINKING = "linking";
+	public static final String PARAM_TRANSLATION_TOOL = "translationTool";
+	public static final String PARAM_TRANSLATION_LANGUAGE = "translationLanguage";
+	
 	public String storyId;
 	public List<String> storyItemIds;
-	public String tool;
+	public String nerTool;
 	public List<String> linking;
 	public String translationTool;
 	public String translationLanguage;
@@ -28,11 +35,11 @@ public class EnrichmentNERRequest {
 	public void setStoryItemIds(List<String> storyItemIds) {
 		this.storyItemIds = storyItemIds;
 	}
-	public String getTool() {
-		return tool;
+	public String getNERTool() {
+		return nerTool;
 	}
-	public void setTool(String tool) {
-		this.tool = tool;
+	public void setNERTool(String tool) {
+		this.nerTool = tool;
 	}
 	public List<String> getLinking(){
 		return linking;

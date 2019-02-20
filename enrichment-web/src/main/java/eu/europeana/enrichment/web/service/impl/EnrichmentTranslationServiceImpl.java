@@ -8,6 +8,9 @@ import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.Cacheable;
 
+import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.api.commons.web.exception.InternalServerException;
+import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.StoryItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -19,6 +22,7 @@ import eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
@@ -51,7 +55,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
 	//@Cacheable("translationResults")
 	@Override
-	public String translate(EnrichmentTranslationRequest requestParam) {
+	public String translate(EnrichmentTranslationRequest requestParam) throws HttpException{
 		try {
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
@@ -61,7 +65,19 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String textType = requestParam.getType();
 			String translationTool = requestParam.getTranslationTool();
 			String sourceLanguage = requestParam.getSourceLanguage();
-			Boolean sendRequest = requestParam.getSendRequest();
+			Boolean sendRequest = requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
+			
+			/*
+			 * Parameter check
+			 */
+			if(storyId == null || storyId.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+			else if(storyItemId == null || storyItemId.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
+			else if(translationTool == null || translationTool.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
+			else if(sourceLanguage == null || sourceLanguage.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, null);
 			
 			/*
 			 * Check if story / storyItem already exist and
@@ -90,6 +106,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				}
 			}
 			
+			if(originalText == null || originalText.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
+			
 			if(tmpStoryEntity == null) {
 				tmpStoryEntity = new StoryEntityImpl();
 				tmpStoryEntity.setStoryId(storyId);
@@ -105,10 +124,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				tmpStoryItemEntity.setType(textType);
 				persistentStoryItemEntityService.saveStoryItemEntity(tmpStoryItemEntity);
 			}
-			
-			//TODO: throw exveption
-			if(originalText.isEmpty())
-				return "";
 			
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
 			tmpTranslationEntity.setStoryItemEntity(tmpStoryItemEntity);
@@ -131,16 +146,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				tmpTranslationEntity.setKey(returnValue);
 				break;
 			default:
-				//TODO: Exception handling
-				returnValue = "";
-				break;
+				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
 			}
 			
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
-			
-			//TODO: throw exception
-			if(returnValue.equals(""))
-				return returnValue;
 			
 			/*
 			 * Check English word ratio based on sentences
@@ -155,14 +164,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			
 			return returnValue;
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return "";
+			throw new InternalServerException(e);
 		}
 	}
 
 	@Override
-	public String uploadTranslation(EnrichmentTranslationRequest requestParam) {
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException{
 		String storyId = requestParam.getStoryId();
 		String storyItemId = requestParam.getStoryItemId();
 		String translatedText = requestParam.getText();
