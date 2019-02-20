@@ -71,13 +71,13 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 * Parameter check
 			 */
 			if(storyId == null || storyId.isEmpty())
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_STORY_ID, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
 			else if(storyItemId == null || storyItemId.isEmpty())
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
 			else if(translationTool == null || translationTool.isEmpty())
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
 			else if(sourceLanguage == null || sourceLanguage.isEmpty())
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, null);
 			
 			/*
 			 * Check if story / storyItem already exist and
@@ -107,7 +107,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 			
 			if(originalText == null || originalText.isEmpty())
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_TEXT, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 			
 			if(tmpStoryEntity == null) {
 				tmpStoryEntity = new StoryEntityImpl();
@@ -146,7 +146,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				tmpTranslationEntity.setKey(returnValue);
 				break;
 			default:
-				throw new ParamValidationException(EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
 			}
 			
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);

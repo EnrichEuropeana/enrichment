@@ -109,7 +109,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		if((storyId == null || storyId.isEmpty()) && (storyItemIds == null || storyItemIds.size() == 0))
 		{
 			String params = String.join(",", EnrichmentNERRequest.PARAM_STORY_ID, EnrichmentNERRequest.PARAM_STORY_ITEM_IDS);
-			throw new ParamValidationException(params, I18nConstants.INVALID_PARAM_VALUE);
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, params, null);
 		}
 		else if(storyItemIds.size() == 0) {
 			tmpStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntitiesFromStory(storyId);
@@ -119,6 +119,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				tmpStoryItemEntity.add(persistentStoryItemEntityService.findStoryItemEntity(storyItemId));
 			}
 		}
+		
+		/*
+		 * Check parameters
+		 */
+		if(tool == null || tool.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_NER_TOOL, null);
+		if(translationTool == null || translationTool.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_TOOL, null);
+		if(translationLanguage == null || translationLanguage.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_LANGUAGE, null);
+		List<String> invalidLinkinParams = new ArrayList<>();
+		for(String newLinkingTool : linking) {
+			switch (newLinkingTool) {
+			case NERLinkingService.TOOL_EUROPEANA:
+			case NERLinkingService.TOOL_WIKIDATA:
+				continue;
+			default:
+				invalidLinkinParams.add(newLinkingTool);
+				break;
+			}
+		}
+		if(invalidLinkinParams.size() > 0)
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		//check if named entities already exists
@@ -166,7 +189,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				tmpTool = pythonService;
 				break;
 			default:
-				throw new ParamValidationException(EnrichmentNERRequest.PARAM_NER_TOOL, I18nConstants.INVALID_PARAM_VALUE);
+				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_NER_TOOL, tool);
 		}			
 		
 		
