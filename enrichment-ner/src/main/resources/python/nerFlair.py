@@ -22,6 +22,7 @@ class MyFlair:
     def prepare_ner_results(self, sentence):
         named_entities = {}
         for entity in sentence.get_spans('ner'):
+            #entity.start_pos -> offset
             entity_type = entity.tag
             if entity_type == "LOC":
                 entity_type = "place"
