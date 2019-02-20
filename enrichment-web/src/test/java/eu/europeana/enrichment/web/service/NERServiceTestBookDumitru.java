@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -24,6 +25,7 @@ import eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -99,10 +101,11 @@ public class NERServiceTestBookDumitru {
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
 		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTranslate");
 		europeanaEnrichmentNERRequest.setStoryItemIds(Arrays.asList("bookDumitruTest2"));
-		europeanaEnrichmentNERRequest.setTool("Stanford_NER_model_3");
+		europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
 		
-		TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
+		try {
+			TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
 
 		
 		//TreeMap<String, TreeSet<String>> NERStringEntities = stanfordNerModel3Service.identifyNER(bookText);
@@ -110,9 +113,9 @@ public class NERServiceTestBookDumitru {
 		//TreeMap<String, List<NamedEntity>> NERNamedEntities = stanfordNerModel3Service.getPositions(NERStringEntities, bookText);
 
 		
-		try {
+		
 			europeanaEntityServiceBookDumitru.writeToFile(NERNamedEntities);
-		} catch (IOException e) {
+		} catch (IOException | HttpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

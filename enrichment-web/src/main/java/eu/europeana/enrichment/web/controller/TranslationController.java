@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
@@ -45,12 +46,18 @@ public class TranslationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest translationRequest) {
-
-		String translation = enrichmentTranslationService.translate(translationRequest);
-		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
-		
-		return response;
+			@RequestBody EnrichmentTranslationRequest translationRequest) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String translation = enrichmentTranslationService.translate(translationRequest);
+			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}
 	}
 	
 	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation")
@@ -58,12 +65,18 @@ public class TranslationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest translationRequest) {
-
-		String translation = enrichmentTranslationService.uploadTranslation(translationRequest);
-		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			@RequestBody EnrichmentTranslationRequest translationRequest) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String translation = enrichmentTranslationService.uploadTranslation(translationRequest);
+			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
-		return response;
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}	
 	}
 	
 }

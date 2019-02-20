@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
@@ -45,12 +46,18 @@ public class NERController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest nerRequest) {
-
-		String jsonLd = enrichmentNerService.getEntities(nerRequest);
-		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-		
-		return response;
+			@RequestBody EnrichmentNERRequest nerRequest) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String jsonLd = enrichmentNerService.getEntities(nerRequest);
+			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}
 	}
 	
 }
