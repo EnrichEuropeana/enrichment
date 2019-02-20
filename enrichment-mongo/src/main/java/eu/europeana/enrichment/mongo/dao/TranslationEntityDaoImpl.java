@@ -22,6 +22,11 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 		this.datastore = datastore;
 	}
 	
+	private void addStoryItemEntity(TranslationEntityImpl dbEntity) {
+		StoryItemEntity dbStoryItemEntity = storyItemEntityDao.findStoryItemEntity(dbEntity.getStoryItemId());
+		dbEntity.setStoryItemEntity(dbStoryItemEntity);
+	}
+	
 	@Override
 	public TranslationEntity findTranslationEntity(String key) {
 		Query<TranslationEntityImpl> persistentNamedEntities = datastore.createQuery(TranslationEntityImpl.class);
@@ -31,8 +36,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			return null;
 		else {
 			TranslationEntityImpl dbEntity = result.get(0);
-			StoryItemEntity dbStoryItemEntity = storyItemEntityDao.findStoryItemEntity(dbEntity.getStoryItemId());
-			dbEntity.setStoryItemEntity(dbStoryItemEntity);
+			addStoryItemEntity(dbEntity);
 			return dbEntity;
 		}
 	}
@@ -47,8 +51,11 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 		List<TranslationEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
-		else
-			return result.get(0);
+		else{
+			TranslationEntityImpl dbEntity = result.get(0);
+			addStoryItemEntity(dbEntity);
+			return dbEntity;
+		}
 	}
 
 	@Override
