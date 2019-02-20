@@ -4,7 +4,7 @@ import sys
 import json
 import base64
 from argparse import ArgumentParser
-from nerSpaCy import MySpacy
+#from nerSpaCy import MySpacy
 from nerNLTK import MyNLTK
 from nerFlair import MyFlair
 
@@ -17,7 +17,7 @@ def base64ToString(b):
 def main(spaCyModel):
     # tool definition
     nameSpaCy = "spaCy"
-    mySpaCy = MySpacy(spaCyModel)
+#    mySpaCy = MySpacy(spaCyModel)
     nameNLTK = "nltk"
     myNltk = MyNLTK()
     nameFlair = "flair"

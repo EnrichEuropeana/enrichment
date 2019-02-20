@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
+
 
 class MyNLTK:
     def apply_ner(self, text_string):
@@ -16,7 +21,7 @@ class MyNLTK:
         named_entities = {}
         #GPE: Geo-political entity
         #GSP: Generalised Schema of Preference ?
-
+        
         for tagged_tree in ne_chunked_sents:
             if hasattr(tagged_tree, 'label'):
                 entity_name = ' '.join(c[0] for c in tagged_tree.leaves())

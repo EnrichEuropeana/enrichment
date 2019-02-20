@@ -183,7 +183,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				jsonRequest.put("text", text);
 				text = jsonRequest.toString();
 			}
-			TreeMap<String, TreeSet<String>> tmpResult = tmpTool.identifyNER(text);
+			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
 
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationTreeSet = new ArrayList<>();
@@ -195,18 +195,18 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				else
 					resultMap.put(classificationType, tmpClassificationTreeSet);
 				
-				for (String entityLabel : tmpResult.get(classificationType)) {
+				for (List<String> entityLabel : tmpResult.get(classificationType)) {
 					NamedEntity dbEntity;
 					/*
 					 * Check if named entity with the same label was found in the
 					 * previous story item or in the database
 					 */
 					List<NamedEntity> tmpResultNamedEntityList = tmpClassificationTreeSet.stream().
-							filter(x -> x.getKey().equals(entityLabel)).collect(Collectors.toList());
+							filter(x -> x.getKey().equals(entityLabel.get(0))).collect(Collectors.toList());
 					if(tmpResultNamedEntityList.size() > 0)
 						dbEntity = tmpResultNamedEntityList.get(0);
 					else
-						dbEntity = persistentNamedEntityService.findNamedEntity(entityLabel);
+						dbEntity = persistentNamedEntityService.findNamedEntity(entityLabel.get(0));
 					/*
 					 * Create default position
 					 */
@@ -214,6 +214,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					//defaultPosition.addOfssetPosition(-1);
 					defaultPosition.setStoryItemEntity(dbStoryItemEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
+					defaultPosition.addOfssetPosition(Integer.parseInt(entityLabel.get(1)));
+					
 					if(dbEntity != null) {
 						dbEntity.addPositionEntity(defaultPosition);
 						/*
@@ -223,7 +225,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 							tmpClassificationTreeSet.add(dbEntity);
 					}
 					else {
-						dbEntity = new NamedEntityImpl(entityLabel);
+						dbEntity = new NamedEntityImpl(entityLabel.get(0));
 						dbEntity.setType(classificationType);
 						dbEntity.addPositionEntity(defaultPosition);
 						tmpClassificationTreeSet.add(dbEntity);
@@ -232,7 +234,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					/*
 					 * Add positions to named entity
 					 */
-					tmpTool.getPositions(dbEntity, dbStoryItemEntity, dbTranslationEntity);
+					//tmpTool.getPositions(dbEntity, dbStoryItemEntity, dbTranslationEntity);
+					
 					/*
 					 * Add linking information to named entity
 					 */

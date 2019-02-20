@@ -26,7 +26,7 @@ public interface NERService {
 	 * 								including all named entities findings
 	 * @throws NERAnnotateException	
 	 */
-	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException;
+	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException;
 	
 	/*
 	 * This methods is the default implementation for getting the positions of the NER entities

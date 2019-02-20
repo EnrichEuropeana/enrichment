@@ -99,6 +99,8 @@ public class NERServiceTestBookDumitru {
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
 		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTranslate");
 		europeanaEnrichmentNERRequest.setStoryItemIds(Arrays.asList("bookDumitruTest2"));
+		//europeanaEnrichmentNERRequest.setTool("flair");
+		//europeanaEnrichmentNERRequest.setTool("DBpedia_Spotlight");
 		europeanaEnrichmentNERRequest.setTool("Stanford_NER_model_3");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
 		

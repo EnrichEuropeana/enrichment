@@ -1,6 +1,8 @@
 package eu.europeana.enrichment.ner.service.impl;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -33,7 +35,7 @@ public class NERStanfordServiceImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, TreeSet<String>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
 		List<List<CoreLabel>> classify = classifier.classify(text);
 		return processClassifiedResult(classify);
 	}
@@ -46,13 +48,18 @@ public class NERStanfordServiceImpl implements NERService{
 	 * @throws 							NERAnnotateException
 	 */
 	//TODO: check where exception could appear
-	private TreeMap<String, TreeSet<String>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
-		TreeMap<String, TreeSet<String>> map = new TreeMap<String, TreeSet<String>>();
+	private TreeMap<String, List<List<String>>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
+		TreeMap<String, List<List<String>>> map = new TreeMap<String, List<List<String>>>();
 		
 		String previousWord = "";
 		String previousCategory = "";
+		int previousOffset=-1;
+		
 		for (List<CoreLabel> coreLabels : classify) {
-			for (CoreLabel coreLabel : coreLabels) {
+			for (CoreLabel coreLabel : coreLabels) {	
+				
+				int wordOffset=coreLabel.beginPosition();
+				
 				String word = coreLabel.word();
 				String category = coreLabel.get(CoreAnnotations.AnswerAnnotation.class);
 				// Check if previous word is from the same category
@@ -71,19 +78,36 @@ public class NERStanfordServiceImpl implements NERService{
 						NERStanfordClassification.isOrganization(originalCategory) ||
 						NERStanfordClassification.isMisc(originalCategory))) {
 					word = previousWord + " " + word;
-					map.get(category).remove(previousWord);
+					wordOffset=previousOffset;
+					
+					String[] wordWithPositionPrevious = new String[2];
+					wordWithPositionPrevious[0]=previousWord;
+					wordWithPositionPrevious[1]=String.valueOf(previousOffset);
+					map.get(category).remove(Arrays.asList(wordWithPositionPrevious));
 				}
 				
 				previousWord = word;
 				previousCategory = category;
+				previousOffset = wordOffset;
 				
 				if (!"O".equals(category)) {
+					
+					String[] wordWithPosition = new String[2];
+					wordWithPosition[0]=word;
+					wordWithPosition[1]=String.valueOf(wordOffset);
+					
+					if(word.equals("Pola"))
+					{
+						String dsds="111";
+						String aa=dsds+"q";
+					}
+					
 					if (map.containsKey(category)) {
-						// key is already their just insert in arraylist
-						map.get(category).add(word);
+						// key is already their just insert in the list {word,position}
+						map.get(category).add(Arrays.asList(wordWithPosition));
 					} else {
-						TreeSet<String> temp = new TreeSet<String>();
-						temp.add(word);
+						List<List<String>> temp = new ArrayList<List<String>>();					
+						temp.add(Arrays.asList(wordWithPosition));
 						map.put(category, temp);
 					}
 					//System.out.println(word + ":" + category);
