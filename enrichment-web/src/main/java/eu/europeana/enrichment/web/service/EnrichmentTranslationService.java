@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.service;
 
+import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 
 public interface EnrichmentTranslationService {
@@ -16,7 +17,7 @@ public interface EnrichmentTranslationService {
 	 * 									a ID will be returned
 	 * @throws
 	 */
-	public String translate(EnrichmentTranslationRequest requestParam);  
+	public String translate(EnrichmentTranslationRequest requestParam) throws HttpException;  
 	
 	/*
 	 * This method uploads the translation to a story item/translation entity.
@@ -27,5 +28,5 @@ public interface EnrichmentTranslationService {
 	 * 									the upload is complete
 	 * @throws
 	 */
-	public String uploadTranslation(EnrichmentTranslationRequest requestParam);  
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException;  
 }

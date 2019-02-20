@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryItemEntity;
@@ -21,6 +23,7 @@ import eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
@@ -71,7 +74,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	//@Cacheable("nerResults")
 	@Override
-	public String getEntities(EnrichmentNERRequest requestParam) {
+	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException {
 		
 		List<String> storyItemIds = requestParam.getStoryItemIds();
 		
@@ -90,23 +93,23 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 	
 	@Override
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) {
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException {
 		
 		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
 		List<String> storyItemIds = requestParam.getStoryItemIds();
-		String tool = requestParam.getTool();
+		String tool = requestParam.getNERTool();
 		List<String> linking = requestParam.getLinking();
 		String translationTool = requestParam.getTranslationTool();
 		String translationLanguage = requestParam.getTranslationLanguage();
 		
 		List<StoryItemEntity> tmpStoryItemEntity = new ArrayList<>();
-		if(storyItemIds.size() == 0 && storyId.isEmpty())
+		if((storyId == null || storyId.isEmpty()) && (storyItemIds == null || storyItemIds.size() == 0))
 		{
-			//TODO: throw exception
-			return resultMap;
+			String params = String.join(",", EnrichmentNERRequest.PARAM_STORY_ID, EnrichmentNERRequest.PARAM_STORY_ITEM_IDS);
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, params, null);
 		}
 		else if(storyItemIds.size() == 0) {
 			tmpStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntitiesFromStory(storyId);
@@ -116,6 +119,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				tmpStoryItemEntity.add(persistentStoryItemEntityService.findStoryItemEntity(storyItemId));
 			}
 		}
+		
+		/*
+		 * Check parameters
+		 */
+		if(tool == null || tool.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_NER_TOOL, null);
+		if(translationTool == null || translationTool.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_TOOL, null);
+		if(translationLanguage == null || translationLanguage.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_LANGUAGE, null);
+		List<String> invalidLinkinParams = new ArrayList<>();
+		for(String newLinkingTool : linking) {
+			switch (newLinkingTool) {
+			case NERLinkingService.TOOL_EUROPEANA:
+			case NERLinkingService.TOOL_WIKIDATA:
+				continue;
+			default:
+				invalidLinkinParams.add(newLinkingTool);
+				break;
+			}
+		}
+		if(invalidLinkinParams.size() > 0)
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		//check if named entities already exists
@@ -136,8 +162,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				}
 			}
 			return resultMap;
-			//prepareOutput(resultMap, storyItemIds);
-			//return new JSONObject(resultMap).toString();
 		}
 		
 		boolean python = false;
@@ -165,8 +189,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				tmpTool = pythonService;
 				break;
 			default:
-				//TODO:Return tool is not supported
-				return null;
+				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_NER_TOOL, tool);
 		}			
 		
 		

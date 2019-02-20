@@ -3,7 +3,9 @@ package eu.europeana.enrichment.web.service;
 import java.util.List;
 import java.util.TreeMap;
 
+import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -19,14 +21,15 @@ public interface EnrichmentNERService {
 	 * @return 							all named entities which were found on the 
 	 * 									translated text including their positions
 	 * 									at the original text
-	 * @throws
+	 * @throws 							ParamValidationException if one of the 
+	 * 									required requestParam is null or empty
 	 */
-	public String getEntities(EnrichmentNERRequest requestParam);  
+	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException;  
 	
 	/*
 	 * This method does the same as {@link eu.europeana.enrichment.web.service.EnrichmentNERService#getEntities(EnrichmentNERRequest)
 	 * but returns the list of NamedEntity instead of a JSON String  
 	 */
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam);
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException;
 	
 }

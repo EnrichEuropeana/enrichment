@@ -15,8 +15,8 @@ class MySpacy:
         named_entities = {}
         for ent in ner_result.ents:
             if hasattr(ent, 'label') and ent.label_ != 'NORP':
+                #ent.start_char -> offset
                 entity_name = ent.text
-
                 if ent.label_ == 'GPE' or ent.label_ == 'LOC':
                     entity_type = "place"
                 elif ent.label_ == "ORG":
