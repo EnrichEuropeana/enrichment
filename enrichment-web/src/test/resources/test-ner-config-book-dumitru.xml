@@ -31,6 +31,7 @@
 		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.pdf}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.original}"/>
 	</bean>
 	
 	

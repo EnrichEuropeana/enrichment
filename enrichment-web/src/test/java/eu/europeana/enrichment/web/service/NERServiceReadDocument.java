@@ -26,6 +26,12 @@ public class NERServiceReadDocument {
 	JavaPDFWriter europeanaJavaPDFWriter;
 
 	private String bookText;
+	private String originalText;
+	
+	public String getOriginalText() {
+		return originalText;
+	}
+
 	private String outputFile;
 	private String outputFormatedPDF;
 	Logger logger = LogManager.getLogger(getClass());
@@ -34,7 +40,7 @@ public class NERServiceReadDocument {
 		return bookText;
 	}
 
-	public NERServiceReadDocument (String fileURL, String outputFileURL, String outputFileFormatedPDF)
+	public NERServiceReadDocument (String fileURL, String outputFileURL, String outputFileFormatedPDF, String originalTextFileURL)
 	{
 		outputFile=outputFileURL;
 		outputFormatedPDF=outputFileFormatedPDF;
@@ -46,6 +52,7 @@ public class NERServiceReadDocument {
 		{
 			try {
 				this.bookText=readFileAsString(fileURL);
+				this.originalText=readFileAsString(originalTextFileURL);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -136,13 +136,13 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			switch (translationTool) {
 			case googleToolName:
 				if(sendRequest)
-					returnValue = googleTranslationService.translateText(originalText, sourceLanguage);
+					returnValue = googleTranslationService.translateText(originalText, sourceLanguage, defaultTargetLanguage);
 				tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			case eTranslationToolName:
 				if(sendRequest)
-					returnValue = eTranslationService.translateText(originalText, sourceLanguage);
+					returnValue = eTranslationService.translateText(originalText, sourceLanguage, defaultTargetLanguage);
 				tmpTranslationEntity.setKey(returnValue);
 				break;
 			default:

@@ -5,6 +5,7 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 
 public interface TranslationService {
 	
+	
 	/**
 	 * This method translate the original transcribed text into English
 	 * 
@@ -14,5 +15,5 @@ public interface TranslationService {
 	 * 									original transcribed text
 	 * @throws TranslationException	
 	 */
-	public String translateText(String text, String sourceLanguage) throws TranslationException;
+	public String translateText(String text, String sourceLanguage, String targetLanguage) throws TranslationException;
 }
