@@ -103,6 +103,7 @@ public class NERServiceTestBookDumitru {
 		europeanaEnrichmentNERRequest.setStoryItemIds(Arrays.asList("bookDumitruTest2"));
 		europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
+		europeanaEnrichmentNERRequest.setTranslationlanguage("en");
 		
 		try {
 			TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
