@@ -39,18 +39,19 @@ public class TranslationServiceTest {
 	
 	private static final String testText = "Die Tagebücher stammen aus dem Nachlass von Eduard Scheer, der Staatsbaumeister in Göppingen war.";
 	private static final String testLanguage = "de";
+	private static final String targetLanguage = "en";
 	private static final String expectedTranslation = "The diaries are from the estate of Eduard Scheer, who was state master builder in Göppingen.";
 	
 	@Test
 	public void googleTranslationServiceTest() {
-		String serviceResult = googleTranslationService.translateText(testText, testLanguage);
+		String serviceResult = googleTranslationService.translateText(testText, testLanguage, targetLanguage);
 		if(!serviceResult.equals(expectedTranslation))
 			fail("Google translation result not equal to expected result!");
 	}
 	
 	@Test
 	public void eTranslationServiceTest() {
-		String serviceResult = eTranslationService.translateText(testText, testLanguage);
+		String serviceResult = eTranslationService.translateText(testText, testLanguage, targetLanguage);
 		if(!serviceResult.equals(expectedTranslation))
 			fail("eTranslation result not equal to expected result!");
 	}

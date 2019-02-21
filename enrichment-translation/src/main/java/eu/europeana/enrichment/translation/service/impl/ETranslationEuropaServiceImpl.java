@@ -30,6 +30,15 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	private String emailDestination;
 	private String fileFormat = "txt";
 	private String targetLanguage = "en";
+	
+	public String getTargetLanguage() {
+		return targetLanguage;
+	}
+
+	public void setTargetLanguage(String targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+
 	private String credentialUsername;
 	private String credentialPwd;
 
@@ -64,8 +73,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 
 	@Override
-	public String translateText(String text, String sourceLanguage) throws TranslationException {
+	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
 		// TODO: check if credential != null
+		targetLanguage=targetLang;
 		String contentBody = createTranslationBody(text, sourceLanguage);
 		String reponse = createHttpRequest(contentBody);
 		return reponse;

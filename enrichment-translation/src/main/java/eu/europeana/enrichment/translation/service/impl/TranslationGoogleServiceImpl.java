@@ -49,7 +49,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     }
     
 	@Override
-	public String translateText(String text, String sourceLanguage) throws TranslationException {
+	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
 		
 		if(translate == null) {
 			//TODO: throws exception
@@ -58,7 +58,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 		
 	    Translation translation = translate.translate(text, 
 	    		TranslateOption.sourceLanguage(sourceLanguage), 
-	    		TranslateOption.targetLanguage("en"));
+	    		TranslateOption.targetLanguage(targetLang));
 
 		return translation.getTranslatedText();
 	}
