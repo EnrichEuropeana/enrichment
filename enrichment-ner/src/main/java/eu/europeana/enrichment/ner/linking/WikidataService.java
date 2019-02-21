@@ -36,6 +36,17 @@ public interface WikidataService {
 	public List<String> getWikidataPlaceIdWithLabel(String label, String language);
 	
 	/*
+	 * This method sends a Wikidata place label and altlabel sparql search query including
+	 * language tags (en and original) and returns a list of Wikidata entity urls
+	 * 
+	 * @param label					named entity label (e.g. Vienna, Adriatic Sea, ..)
+	 * @param language				language tag which excludes all other language
+	 * 								labels for comparison
+	 * @return						a list of Wikidata places entity urls
+	 */
+	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language);
+	
+	/*
 	 * This method sends a Wikidata agent label sparql search query including
 	 * language tag and returns a list of Wikidata entity urls
 	 * 

@@ -40,10 +40,17 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 
 		// TODO: change classification and language from all to specific
 		if(europeana) {
-			List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getKey(), "all", "en");//classification);
-			if(europeanaIDs != null && europeanaIDs.size() > 0) {
-				for(String europeanaID : europeanaIDs) {
-					namedEntity.addEuopeanaId(europeanaID);
+			/*
+			 * Agents with only first name or last name will not be searched
+			 */
+			if((namedEntity.getType() == NERClassification.AGENT.toString() && namedEntity.getKey().split(" ").length > 1) ||
+					namedEntity.getType() != NERClassification.AGENT.toString())
+			{
+				List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getKey(), "all", "en");//classification);
+				if(europeanaIDs != null && europeanaIDs.size() > 0) {
+					for(String europeanaID : europeanaIDs) {
+						namedEntity.addEuopeanaId(europeanaID);
+					}
 				}
 			}
 			//TODO: else block if no entry was found then with sourceLanguage flag
@@ -51,10 +58,16 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		if(wikidata) {
 			//TODO: implement information retrieval from Wikidata
 			List<String> wikidataIDs = new ArrayList<>();
-			if(namedEntity.getType() == NERClassification.AGENT.toString())
-				wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getKey(), "en");
+			if(namedEntity.getType() == NERClassification.AGENT.toString()) {
+				String namedEntityKey = namedEntity.getKey();
+				/*
+				 * Agents with only first name or last name will not be searched
+				 */
+				if(namedEntityKey.split(" ").length > 1)
+					wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getKey(), "en");
+			}
 			else if(namedEntity.getType() == NERClassification.PLACE.toString())
-				wikidataIDs = wikidataService.getWikidataPlaceIdWithLabel(namedEntity.getKey(), "en");
+				wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getKey(), sourceLanguage);
 			if(wikidataIDs != null && wikidataIDs.size() > 0) {
 				for(String wikidataID : wikidataIDs) {
 					namedEntity.addWikidataId(wikidataID);
