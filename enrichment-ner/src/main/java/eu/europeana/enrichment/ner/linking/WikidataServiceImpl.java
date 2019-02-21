@@ -46,6 +46,15 @@ public class WikidataServiceImpl implements WikidataService {
 			+ "  FILTER((LANG(?description)) = \"en\") }";
 
 	/*
+	 * Defines multilingual Wikidata query including alternative label and 
+	 */
+	private String placeLabelAltLabelQueryString = "SELECT distinct ?item ?type ?rank WHERE {\r\n"
+			+ "  hint:Query hint:optimizer \"None\".\r\n" 
+			+ "  values ?labels {\"%s\"@%s \"%s\"@%s}\r\n"
+			+ "  ?item (rdfs:label|skos:altLabel) ?labels;\r\n"
+			+ "  p:P31/ps:P31/wdt:P279* ?type. #;\r\n"
+			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q12371824,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568))}";
+	/*
 	 * Wikidata agent search query
 	 */
 	private String agentlabelQueryString = "SELECT ?item ?description WHERE {\r\n" 
@@ -81,6 +90,12 @@ public class WikidataServiceImpl implements WikidataService {
 	@Override
 	public List<String> getWikidataPlaceIdWithLabel(String label, String language) {
 		String query = String.format(placeLabelQueryString, label, language);
+		return processResponse(createRequest(query));
+	}
+	
+	@Override
+	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) {
+		String query = String.format(placeLabelAltLabelQueryString, label, language, label, "en");
 		return processResponse(createRequest(query));
 	}
 	
