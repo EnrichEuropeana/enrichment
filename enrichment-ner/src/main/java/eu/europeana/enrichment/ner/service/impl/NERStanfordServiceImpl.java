@@ -95,12 +95,7 @@ public class NERStanfordServiceImpl implements NERService{
 					String[] wordWithPosition = new String[2];
 					wordWithPosition[0]=word;
 					wordWithPosition[1]=String.valueOf(wordOffset);
-					
-					if(word.equals("Pola"))
-					{
-						String dsds="111";
-						String aa=dsds+"q";
-					}
+							
 					
 					if (map.containsKey(category)) {
 						// key is already their just insert in the list {word,position}
