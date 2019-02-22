@@ -15,6 +15,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMYKColor;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -29,10 +30,14 @@ public class JavaPDFWriter
 	private String HEART="\u2665";
 	private String DIAMOND="\u2666";
 	
-	private Font blueFont = FontFactory.getFont(FontFactory.COURIER, 12, Font.BOLD, new CMYKColor(255, 0, 0, 0));
-	private Font redFont = FontFactory.getFont(FontFactory.COURIER, 12, Font.BOLD, new CMYKColor(0, 255, 0, 0));
-	private Font yellowFont = FontFactory.getFont(FontFactory.COURIER, 12, Font.BOLD, new CMYKColor(0, 0, 255, 0));
-
+	private final String FONT = "C:/git/EnrichEuropeana-enrichment-project/enrichment/enrichment-web/src/test/java/eu/europeana/enrichment/web/service/Cardo-Regular.ttf";
+	
+	//private Font blueFont = FontFactory.getFont(FontFactory.COURIER,BaseFont.IDENTITY_H, 12, Font.BOLD, new CMYKColor(255, 0, 0, 0));
+	private Font blueFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H, 12, Font.BOLD, new CMYKColor(255, 0, 0, 0));
+	private Font redFont = FontFactory.getFont(FONT, BaseFont.IDENTITY_H, 12, Font.BOLD, new CMYKColor(0, 255, 0, 0));
+	private Font yellowFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H,12, Font.BOLD, new CMYKColor(0, 0, 255, 0));
+	private Font normalFont = FontFactory.getFont(FONT, BaseFont.IDENTITY_H,  12);
+	
 	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities)
 	{
 		outputText=addSpecialCharactersToString(outputText, NERNamedEntities);
@@ -72,7 +77,7 @@ public class JavaPDFWriter
 		    		}
 		    		else
 		    		{
-		    			paragraph.add(new Chunk (word+" "));
+		    			paragraph.add(new Chunk (word+" ", normalFont));
 		    		}
 		    				    			
 		    	}

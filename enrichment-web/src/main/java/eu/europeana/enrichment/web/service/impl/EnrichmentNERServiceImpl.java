@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +36,8 @@ import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
@@ -74,6 +79,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private static final String spaCyName = "spaCy";
 	private static final String nltkName = "nltk";
 	private static final String flairName = "flair";
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	@Resource(name = "persistentNamedEntityService")
 	PersistentNamedEntityService persistentNamedEntityService;
@@ -366,39 +373,71 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		entitiesText.deleteCharAt(entitiesText.length()-1);//delete the last comma
 		
-		String serviceResult = eTranslationService.translateText(entitiesText.toString(),originalLanguage,targetLanguage);
+		logger.info(this.getClass().getSimpleName() + entitiesText.toString());
+		
+		
+		String filePath = "C:/java/entitiesRomanian.txt";
+		String serviceResult="";
+		try
+        {
+			serviceResult = new String (Files.readAllBytes( Paths.get(filePath) ) );
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+		//String serviceResult = eTranslationService.translateText(entitiesText.toString(),targetLanguage,originalLanguage);
 			
 		/*
 		 * finding the translated entities in the original text
 		 */
 		String [] serviceResultWords = serviceResult.split(","); //splitting into words		
 		String [] originalTextWords = originalText.split("\\s+"); //splitting into words by one/more spaces
-		Map<String, Integer> entityLastFoundIndexes = new HashMap<String, Integer>();
-		List<Integer> positionsOriginalText = new ArrayList<Integer> ();
+		int wordToStartFrom = 0;//word index from which we start looking for the next matching set of words for the given named entity in the original text
+		int indexToStartFrom = 0;//index from which we start next round of search for the found match in the original text
 		
 		for(int i=0; i<serviceResultWords.length ; i++) {
 			
 			String [] translatedEntities = serviceResultWords[i].split("\\s+", 2); //splitting the classifier from the entity name
-						
-			for(int j=0; j<originalTextWords.length ; j++){
-			
-				String nWords="";				
-				for(int m=0; j<translatedEntities[1].split("\\s+").length ; m++) {				
-					
-					nWords = nWords + " " + originalTextWords[j+m] ;    
-            
+									
+			/*
+			 * passing through the list of words in the original text 
+			 * and when the match is found remember the index and than go for the next word
+			 */
+			for(int j=wordToStartFrom; j<originalTextWords.length ; j++){
+				
+				//do not search for the positions of persons with only one name, because they might be wrongly translated at all
+			    if(translatedEntities[1].split("\\s+").length<=1 && translatedEntities[0].compareToIgnoreCase("agent")==0) {
+			    	resultMap.put(sortedListAllEntities.get(i), "-1");
+			    	break;
+			    }
+			    
+				//end of the array of words in the original text
+				if(j + translatedEntities[1].split("\\s+").length>=originalTextWords.length) {
+					resultMap.put(sortedListAllEntities.get(i), "-1");
+					break;
 				}
 				
+				
+				
+				String nWords="";		
+				//take as many words as there is in the found NamedEntitiy to match in the original text
+				for(int m=0; m<translatedEntities[1].split("\\s+").length ; m++) {		
+															
+						nWords = nWords + " " + originalTextWords[j+m] ;					
+				}				
 				nWords=nWords.substring(1); //exclude the first space added during concatenation
-				
-				if(calculateLevenshteinDistance(nWords,translatedEntities[1]) >  0.8) {
-					
-					int startIndex = !entityLastFoundIndexes.containsKey(translatedEntities[1]) ? 0 : entityLastFoundIndexes.get(translatedEntities[1]);
-					int foundPosition = originalText.indexOf(translatedEntities[1], startIndex);
-					positionsOriginalText.add(foundPosition);				
-					entityLastFoundIndexes.put(translatedEntities[1], foundPosition+translatedEntities[1].length());
-					
+					    
+				if(calculateLevenshteinDistance(nWords,translatedEntities[1])) {							
+						
+					int foundPosition = originalText.indexOf(nWords, indexToStartFrom);					
+					indexToStartFrom = foundPosition+nWords.length();
+					wordToStartFrom = j + nWords.split("\\s+").length;
+					resultMap.put(sortedListAllEntities.get(i), String.valueOf(foundPosition));						
+					break;				
 				}
+				
+					
 			}
 		}
 			
@@ -419,7 +458,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 * Normalized similaity between 2 strings based on Levenshtein's distance.
 	 * Value: 0-1. 0 - totally different, 1 - the same 
 	 */
-	private int calculateLevenshteinDistance (String x, String y) {
+	private boolean calculateLevenshteinDistance (String x, String y) {
+		
+		if (x.length()<2 || y.length()<2)
+		{
+			return false;
+		}
 		
 	    int[][] dp = new int[x.length() + 1][y.length() + 1];
 	    
@@ -439,9 +483,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	        }
 	    }
 	 
-	    int levenshteinDistance = dp[x.length()][y.length()];
+	    double levenshteinDistance = dp[x.length()][y.length()];
 	    
-	    return 1-levenshteinDistance/(x.length()+y.length());
+	    /*
+	     * add an additional constraint for the matching words and it is that the word in the original text cannot be shorter than the one we are looking for (e.g. Tigan -> Tiganilor)
+	     */
+	    int minStringLength = min(x.length(),y.length());
+	    int stringsContainEachOther = x.substring(0, minStringLength).compareToIgnoreCase(y.substring(0, minStringLength));
+	    int stringsHalfStartSame = x.substring(0, 2).compareToIgnoreCase(y.substring(0, 2));
+	  	    
+	    		
+	    return ((1-levenshteinDistance/(x.length()+y.length())>=0.7 || stringsContainEachOther==0) && x.length()>=y.length() && stringsHalfStartSame==0);
 	}
 		
 	private void findStoryItemEntitiesFromIds(String storyId, List<String> storyItemIds, List<StoryItemEntity> result) throws HttpException {
