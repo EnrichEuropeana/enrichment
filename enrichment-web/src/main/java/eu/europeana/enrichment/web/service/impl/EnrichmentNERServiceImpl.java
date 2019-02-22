@@ -272,7 +272,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					/*
 					 * Add linking information to named entity
 					 */
-					nerLinkingService.addLinkingInformation(dbEntity, linking, "en");
+					nerLinkingService.addLinkingInformation(dbEntity, linking, dbStoryItemEntity.getLanguage());
 				}
 			}
 		}
