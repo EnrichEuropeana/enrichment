@@ -217,8 +217,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				text = jsonRequest.toString();
 			}
 			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
-
-			findEntitiyOffsetsInOriginalText(tmpStoryItemEntity.get(0).getLanguage(),dbTranslationEntity.getLanguage(),tmpStoryItemEntity.get(0).getText(),tmpResult);
 			
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationList = new ArrayList<>();
