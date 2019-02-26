@@ -85,7 +85,8 @@
 		<module>enrichment-web</module>
     <module>enrichment-mongo</module>
     <module>enrichment-definition</module>
-	</modules>
+    <module>enrichment-solr</module>
+  </modules>
 
 	<build>
 		<!-- configure source and output locations -->
