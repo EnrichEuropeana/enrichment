@@ -7,38 +7,38 @@ import org.apache.solr.client.solrj.beans.Field;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
-import eu.europeana.enrichment.solr.model.vocabulary.ConceptSolrFields;
+import eu.europeana.enrichment.solr.model.vocabulary.NamedEntitySolrFields;
 
 public class SolrNamedEntityImpl extends NamedEntityImpl implements NamedEntity {
 
 	@Override
-	@Field(ConceptSolrFields.RDF_ABOUT)
+	@Field(NamedEntitySolrFields.TYPE)
 	public void setType(String classificationtype) {
-		this.type = classificationtype;
+		super.setType(classificationtype);
 	}
 
 	@Override
-	@Field(ConceptSolrFields.RDF_ABOUT)
+	@Field(NamedEntitySolrFields.KEY)
 	public void setKey(String key) {
-		this.key = key;
+		super.setKey(key);
 	}
 
 	@Override
-	@Field(ConceptSolrFields.RDF_ABOUT)
+	//@Field(NamedEntitySolrFields.EUROPEANA_IDS)
 	public void setEuropeanaIds(List<String> ids) {
-		this.europeanaIds = ids;
+		super.setEuropeanaIds(ids);
 	}
 
 	@Override
-	@Field(ConceptSolrFields.RDF_ABOUT)
+	//@Field(NamedEntitySolrFields.WIKIPEDIA_IDS)
 	public void setWikidataIds(List<String> ids) {
-		this.wikidataIds = ids;
+		super.setWikidataIds(ids);
 	}
 
 	@Override
-	@Field(ConceptSolrFields.RDF_ABOUT)
+	//@Field(NamedEntitySolrFields.POSITION_ENTITIES)
 	public void setPositionEntities(List<PositionEntity> positions) {
-		positionEntities = positions;
+		super.setPositionEntities(positions);
 	}
 
 
