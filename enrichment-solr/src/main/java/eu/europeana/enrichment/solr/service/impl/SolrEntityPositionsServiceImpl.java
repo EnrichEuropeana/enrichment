@@ -16,6 +16,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 
 import eu.europeana.enrichment.model.StoryItemEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.model.SolrStoryItemEntityImpl;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 
 
@@ -69,7 +70,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 			log.debug("store: " + storyItemEntity.toString());
 			
-			UpdateResponse rsp = solrServer.addBean(storyItemEntity);
+			SolrStoryItemEntityImpl solrStoryItem = null;
+			if(storyItemEntity instanceof SolrStoryItemEntityImpl) {
+				solrStoryItem=(SolrStoryItemEntityImpl) storyItemEntity;
+			}
+			else {
+				solrStoryItem=new SolrStoryItemEntityImpl(storyItemEntity);
+			}
+			
+			UpdateResponse rsp = solrServer.addBean(solrStoryItem);
 			log.info("store response: " + rsp.toString());
 			if(doCommit)
 				solrServer.commit();
