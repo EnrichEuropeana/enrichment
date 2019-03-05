@@ -37,6 +37,14 @@ public interface SolrEntityPositionsService {
 		public void store(StoryItemEntity storyItemEntity, boolean doCommit) throws SolrNamedEntityServiceException ;	
 		
 		/**
+		 * This method searches for a term in SOLR.
+		 * @param term
+		 * @throws SolrNamedEntityServiceException 
+		 */
+		
+		public void search (String term) throws SolrNamedEntityServiceException ;
+		
+		/**
 		 * This method updates a StoryItemEntity object in SOLR.
 		 * @param storyItemEntity
 		 * @throws SolrNamedEntityServiceException 

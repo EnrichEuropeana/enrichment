@@ -92,6 +92,32 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		
 	}
+	
+	@Override
+	public void search (String term) throws SolrNamedEntityServiceException {
+
+		log.info("search Annotation by term: " + term);
+
+		/**
+		 * Construct a SolrQuery
+		 */
+		SolrQuery query = new SolrQuery(term);
+		log.info("query: " + query.toString());
+
+		/**
+		 * Query the server
+		 */
+		try {
+			QueryResponse rsp = solrServer.query(query);
+			log.info("query response: " + rsp.toString());
+			
+		} catch (IOException | SolrServerException e) {
+			throw new SolrNamedEntityServiceException("Unexpected exception occured when searching annotations for: " + term,
+					e);
+		}
+
+	}
+
 
 	@Override
 	public void update(StoryItemEntity storyItemEntity) throws SolrNamedEntityServiceException {
