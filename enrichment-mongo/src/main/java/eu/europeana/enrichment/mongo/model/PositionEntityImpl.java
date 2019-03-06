@@ -7,7 +7,7 @@ import org.mongodb.morphia.annotations.NotSaved;
 import org.mongodb.morphia.annotations.Transient;
 
 import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 public class PositionEntityImpl implements PositionEntity{
@@ -17,7 +17,7 @@ public class PositionEntityImpl implements PositionEntity{
 	public String translationKey;
 	@Transient
 	@NotSaved
-	StoryItemEntity storyItemEntity;
+	ItemEntity ItemEntity;
 	@Transient
 	@NotSaved
 	TranslationEntity translationEntity;
@@ -43,15 +43,15 @@ public class PositionEntityImpl implements PositionEntity{
 	}
 	
 	@Override
-	public StoryItemEntity getStoryItemEntity() {
-		return storyItemEntity;
+	public ItemEntity getItemEntity() {
+		return ItemEntity;
 	}
 
 	@Override
-	public void setStoryItemEntity(StoryItemEntity storyItemEntity) {
-		this.storyItemEntity = storyItemEntity;
-		if(storyItemEntity != null)
-			setStoryItemId(storyItemEntity.getStoryItemId());
+	public void setItemEntity(ItemEntity ItemEntity) {
+		this.ItemEntity = ItemEntity;
+		if(ItemEntity != null)
+			setStoryItemId(ItemEntity.getStoryItemId());
 		else
 			setStoryItemId(null);
 	}

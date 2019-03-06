@@ -5,14 +5,39 @@ import java.util.TreeMap;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
 
 	/*
+	 * This method uploads an array of items to the Mongo database
+	 * 
+	 * @param items						contains information about items
+	 * 
+	 * @return 							"Done" if all stories are uploaded
+	 * 
+	 * @throws 							ParamValidationException if one of the 
+	 * 									required item parameters are null or empty
+	 */	
+	public String uploadItems (ItemEntityImpl [] items) throws HttpException;  
+
+	/*
+	 * This method uploads an array of stories to the Mongo database
+	 * 
+	 * @param stories					contains information about stories
+	 * 
+	 * @return 							"Done" if all stories are uploaded
+	 * 
+	 * @throws 							ParamValidationException if one of the 
+	 * 									required story parameters are null or empty
+	 */	
+	public String uploadStories (StoryEntityImpl [] stories) throws HttpException;  
+	/*
 	 * This method applies named entity recognition and classification based
-	 * on the translated text.
+	 * on the translated text. It also saves the found named entities in the Mongo database
 	 * 
 	 * @param requestParam				contains information about story, story item,
 	 * 									translation and linking tools which are

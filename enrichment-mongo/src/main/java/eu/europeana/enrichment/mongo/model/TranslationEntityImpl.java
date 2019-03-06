@@ -11,7 +11,8 @@ import org.mongodb.morphia.annotations.Transient;
 import org.springframework.data.annotation.Id;
 
 
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 public class TranslationEntityImpl implements TranslationEntity{
@@ -23,10 +24,10 @@ public class TranslationEntityImpl implements TranslationEntity{
 	public String translatedText;
 	public String tool;
 	public String eTranslationId;
-	public String storyItemId;
+	public String storyId;
 	@Transient
 	@NotSaved
-	private StoryItemEntity storyItemEntity;
+	private StoryEntity storyEntity;
 	
 	public String getETranslationId() {
 		return eTranslationId;
@@ -84,24 +85,26 @@ public class TranslationEntityImpl implements TranslationEntity{
 	}
 
 	@Override
-	public StoryItemEntity getStoryItemEntity() {
-		return this.storyItemEntity;
+	public StoryEntity getStoryEntity() {
+		return this.storyEntity;
 	}
 
 	@Override
-	public void setStoryItemEntity(StoryItemEntity storyItemEntity) {
-		this.storyItemEntity = storyItemEntity;
-		if(storyItemEntity != null)
-			setStoryItemId(storyItemEntity.getStoryItemId());
+	public void setStoryEntity(StoryEntity storyEntity) {
+		this.storyEntity = storyEntity;
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
 		else
-			setStoryItemId(null);
+			setStoryId(null);
 	}
 	
-	public String getStoryItemId() {
-		return storyItemId;
+	@Override
+	public String getStoryId() {
+		return storyId;
 	}
 
-	public void setStoryItemId(String storyItemId) {
-		this.storyItemId = storyItemId;
+	@Override
+	public void setStoryId(String storyId) {
+		this.storyId = storyId;
 	}
 }

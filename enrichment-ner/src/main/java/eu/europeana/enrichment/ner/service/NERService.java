@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
@@ -39,12 +39,12 @@ public interface NERService {
 	 * @return 						all findings including their original 
 	 * 								position at the transcribed text
 	 */
-	default void getPositions(NamedEntity namedEntity, StoryItemEntity storyItemEntity, TranslationEntity translationEntity){
+	default void getPositions(NamedEntity namedEntity, ItemEntity ItemEntity, TranslationEntity translationEntity){
 		//TODO: report named entities which we could not find in the original text
 		
 		String text;
-		if(storyItemEntity != null)
-			text = storyItemEntity.getText();
+		if(ItemEntity != null)
+			text = ItemEntity.getTranscription();
 		else if(translationEntity != null)
 			text = translationEntity.getTranslatedText();
 		else {
@@ -53,12 +53,12 @@ public interface NERService {
 		}
 
 		PositionEntity posEntity;
-		if(storyItemEntity != null) {
+		if(ItemEntity != null) {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getStoryItemId()
-					.equals(storyItemEntity.getStoryItemId())).collect(Collectors.toList());
+					.equals(ItemEntity.getStoryItemId())).collect(Collectors.toList());
 			if(positions.size() == 0) {
 				posEntity = new PositionEntityImpl();
-				posEntity.setStoryItemEntity(storyItemEntity);
+				posEntity.setItemEntity(ItemEntity);
 				positions.add(posEntity);
 			}
 			else {

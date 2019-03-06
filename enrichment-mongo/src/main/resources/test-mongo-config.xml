@@ -41,7 +41,7 @@
 		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
 	</bean>
 	
-	<bean id="storyItemEntityDao" class="eu.europeana.enrichment.mongo.dao.StoryItemEntityDaoImpl">
+	<bean id="ItemEntityDao" class="eu.europeana.enrichment.mongo.dao.ItemEntityDaoImpl">
 		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
 	</bean>
 
@@ -54,7 +54,7 @@
 	</bean>
 	
     <bean id="persistentStoryEntityService" class="eu.europeana.enrichment.mongo.service.PersistentStoryEntityServiceImpl"/>
-	<bean id="persistentStoryItemEntityService" class="eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityServiceImpl"/>
+	<bean id="persistentItemEntityService" class="eu.europeana.enrichment.mongo.service.PersistentItemEntityServiceImpl"/>
 	<bean id="persistentNamedEntityService" class="eu.europeana.enrichment.mongo.service.PersistentNamedEntityServiceImpl"/>
 	<bean id="persistentTranslationEntityService" class="eu.europeana.enrichment.mongo.service.PersistentTranslationEntityServiceImpl"/>
 </beans>

@@ -7,7 +7,8 @@ public interface EnrichmentTranslationService {
 
 	/*
 	 * This method uses a transcribed text and translates it into
-	 * English with a specific translation tool.
+	 * English with a specific translation tool. 
+	 * The transcribed text is retrieved from the StoryEntity that already has to exist in the database.	 * 
 	 * 
 	 * @param requestParam				contains information about story, story item,
 	 * 									text like language, type (description, summary, ..)
@@ -15,18 +16,18 @@ public interface EnrichmentTranslationService {
 	 * @return 							the English translated text of the 
 	 * 									original text. In the case of eTranslation
 	 * 									a ID will be returned
-	 * @throws
+	 * @throws							HttpException
 	 */
 	public String translate(EnrichmentTranslationRequest requestParam) throws HttpException;  
 	
 	/*
-	 * This method uploads the translation to a story item/translation entity.
+	 * This method uploads the translation text to a TranslationEntity.
 	 * 
 	 * @param requestParam				contains information about story, story item and
 	 * 									text which are used to find and upload translation
 	 * @return 							Done string will be returned when 
 	 * 									the upload is complete
-	 * @throws
+	 * @throws							HttpException
 	 */
 	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException;  
 }

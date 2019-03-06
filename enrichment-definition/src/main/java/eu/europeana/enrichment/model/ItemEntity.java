@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-public interface StoryItemEntity {
+public interface ItemEntity {
 	
 	/*
 	 * Database ID
@@ -27,8 +27,12 @@ public interface StoryItemEntity {
 	void setLanguage(String language);
 	String getType();
 	void setType(String textType);
-	String getText();
-	void setText(String text);
+	String getTranscription();
+	void setTranscription(String transcriptionText);
+	
+	String getTitle();
+	void setTitle(String storyItemTitle);
+	
 	/*
 	 * Generates a string hash without whitespace which is used for comparison
 	 */

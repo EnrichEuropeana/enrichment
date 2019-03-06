@@ -32,6 +32,8 @@ public interface TranslationEntity {
 	/*
 	 * Transcribathon and Europeana StoryItem
 	 */
-	StoryItemEntity getStoryItemEntity();
-	void setStoryItemEntity(StoryItemEntity storyItemEntity);
+	StoryEntity getStoryEntity();
+	void setStoryEntity(StoryEntity ItemEntity);
+	String getStoryId();
+	void setStoryId(String storyId);
 }

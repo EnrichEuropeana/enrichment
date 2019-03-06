@@ -21,13 +21,15 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
+import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
@@ -88,8 +90,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
-	@Resource(name = "persistentStoryItemEntityService")
-	PersistentStoryItemEntityService persistentStoryItemEntityService;
+	@Resource(name = "persistentItemEntityService")
+	PersistentItemEntityService persistentItemEntityService;
 	
 	//@Cacheable("nerResults")
 	@Override
@@ -124,11 +126,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		String translationTool = requestParam.getTranslationTool();
 		String translationLanguage = requestParam.getTranslationLanguage();
 		
-		List<StoryItemEntity> tmpStoryItemEntity = new ArrayList<>();
+		List<ItemEntity> tmpItemEntity = new ArrayList<>();
 		/*
-		 * Retrieve the List<storyItemEntity> from the DB
+		 * Retrieve the List<ItemEntity> from the DB
 		 */
-		findStoryItemEntitiesFromIds(storyId,storyItemIds,tmpStoryItemEntity);
+		findStoryItemEntitiesFromIds(storyId,storyItemIds,tmpItemEntity);
 				
 		/*
 		 * Check parameters
@@ -155,8 +157,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		//check if named entities already exists
-		for(StoryItemEntity dbStoryItemEntity : tmpStoryItemEntity) {
-			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryItemEntity.getStoryItemId(), false));
+		for(ItemEntity dbItemEntity : tmpItemEntity) {
+			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbItemEntity.getStoryItemId(), false));
 		}
 		//TODO: check if update is need (e.g.: linking tools)
 		if(tmpNamedEntities.size() > 0) {
@@ -206,9 +208,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		/*
 		 * Apply named entity recognition on all story item translations
 		 */
-		for(StoryItemEntity dbStoryItemEntity : tmpStoryItemEntity) {
+		for(ItemEntity dbItemEntity : tmpItemEntity) {
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbStoryItemEntity.getStoryItemId(), translationTool, "en");
+					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), translationTool, "en");
 			String text = dbTranslationEntity.getTranslatedText();
 			if(python) {
 				JSONObject jsonRequest = new JSONObject();
@@ -245,7 +247,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					 */
 					PositionEntity defaultPosition = new PositionEntityImpl();
 					//defaultPosition.addOfssetPosition(-1);
-					defaultPosition.setStoryItemEntity(dbStoryItemEntity);
+					defaultPosition.setItemEntity(dbItemEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					defaultPosition.addOfssetPosition(Integer.parseInt(entityLabel.get(1)));
 					
@@ -267,12 +269,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					/*
 					 * Add positions to named entity
 					 */
-					//tmpTool.getPositions(dbEntity, dbStoryItemEntity, dbTranslationEntity);
+					//tmpTool.getPositions(dbEntity, dbItemEntity, dbTranslationEntity);
 					
 					/*
 					 * Add linking information to named entity
 					 */
-					nerLinkingService.addLinkingInformation(dbEntity, linking, dbStoryItemEntity.getLanguage());
+					nerLinkingService.addLinkingInformation(dbEntity, linking, dbItemEntity.getLanguage());
 				}
 			}
 		}
@@ -302,7 +304,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					if(!storyItemIds.contains(tmpStoryItemId))
 						tmpPositions.remove(posIndex);
 					else {
-						tmpPositionEntity.setStoryItemEntity(null);
+						tmpPositionEntity.setItemEntity(null);
 						tmpPositionEntity.setStoryItemId(tmpStoryItemId);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
@@ -494,7 +496,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	    return ((1-levenshteinDistance/(x.length()+y.length())>=0.7 || stringsContainEachOther==0) && x.length()>=y.length() && stringsHalfStartSame==0);
 	}
 		
-	private void findStoryItemEntitiesFromIds(String storyId, List<String> storyItemIds, List<StoryItemEntity> result) throws HttpException {
+	private void findStoryItemEntitiesFromIds(String storyId, List<String> storyItemIds, List<ItemEntity> result) throws HttpException {
 				
 		if((storyId == null || storyId.isEmpty()) && (storyItemIds == null || storyItemIds.size() == 0))
 		{
@@ -502,13 +504,57 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, params, null);
 		}
 		else if(storyItemIds.size() == 0) {
-			result = persistentStoryItemEntityService.findStoryItemEntitiesFromStory(storyId);
+			result = persistentItemEntityService.findStoryItemEntitiesFromStory(storyId);
 		}
 		else {
 			for(String storyItemId : storyItemIds) {
-				result.add(persistentStoryItemEntityService.findStoryItemEntity(storyItemId));
+				result.add(persistentItemEntityService.findItemEntity(storyItemId));
 			}
 		}
 		
+	}
+
+	@Override
+	public String uploadStories(StoryEntityImpl[] stories) throws HttpException {
+		
+		for (StoryEntityImpl story : stories) {
+			if(story.getStoryId() == null || story.getStoryId().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
+			if(story.getStoryDescription() == null || story.getStoryDescription().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_DESCRIPTION, null);
+			if(story.getStoryLanguage() == null || story.getStoryLanguage().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_LANGUAGE, null);
+			if(story.getStorySource() == null || story.getStorySource().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SOURCE, null);
+			if(story.getStorySummary() == null || story.getStorySummary().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SUMMARY, null);
+			if(story.getStoryTitle() == null || story.getStoryTitle().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TITLE, null);
+			if(story.getStoryTranscription() == null || story.getStoryTranscription().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TRANSCRIPTION, null);
+
+			persistentStoryEntityService.saveStoryEntity(story);
+			
+		}
+		return "Done!";
+	}
+
+	@Override
+	public String uploadItems(ItemEntityImpl[] items) throws HttpException {
+		
+		for (ItemEntityImpl item : items) {
+			if(item.getStoryId() == null || item.getStoryId().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
+			if(item.getLanguage() == null || item.getLanguage().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_LANGUAGE, null);
+			if(item.getTitle() == null || item.getTitle().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TITLE, null);
+			if(item.getTranscription() == null || item.getTranscription().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TRANSCRIPTION, null);
+
+			persistentItemEntityService.saveItemEntity(item);
+			
+		}
+		return "Done!";
 	}
 }

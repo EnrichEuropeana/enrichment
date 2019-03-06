@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.solr.model.vocabulary;
 
-public interface StoryItemEntitySolrFields {
+public interface ItemEntitySolrFields {
 		
 	public static final String STORY_ID = "sie_story_id";//si_story_id - story item entity story id
 	public static final String STORY_ITEM_ID = "sie_si_id";
