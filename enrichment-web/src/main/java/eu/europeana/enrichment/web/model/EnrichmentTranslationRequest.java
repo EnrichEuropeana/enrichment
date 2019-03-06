@@ -7,6 +7,7 @@ package eu.europeana.enrichment.web.model;
  */
 public class EnrichmentTranslationRequest {
 
+	public static final String PARAM_STORY_OR_ITEM_ID = "storyId or itemId";
 	public static final String PARAM_STORY_ID = "storyId";
 	public static final String PARAM_STORY_ITEM_ID = "storyItemId";
 	public static final String PARAM_TEXT = "text";
@@ -16,7 +17,6 @@ public class EnrichmentTranslationRequest {
 	public static final String PARAM_SEND_REQUEST = "sendRequest";
 	
 	public String storyId;
-	public String storyItemId;
 	public String text;
 	public String type;
 	public String translationTool;
@@ -35,13 +35,7 @@ public class EnrichmentTranslationRequest {
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}
-	public String getStoryItemId() {
-		return storyItemId;
-	}
-	public void setStoryItemId(String storyItemId) {
-		this.storyItemId = storyItemId;
-	}
-	
+		
 	public String getText() {
 		return text;
 	}

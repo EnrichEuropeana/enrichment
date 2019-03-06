@@ -12,10 +12,10 @@ import org.mongodb.morphia.annotations.NotSaved;
 import org.mongodb.morphia.annotations.Transient;
 
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
-public class StoryItemEntityImpl implements StoryItemEntity{
+public class ItemEntityImpl implements ItemEntity{
 
 	//id will be used for storing MongoDB _id
 	@Id
@@ -23,9 +23,10 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 	public String storyItemId;
 	public String language;
 	public String type;
-	public String text;
+	public String transcriptionText;
 	public String hashKey;
 	public String storyId;
+	public String storyItemTitle;
 	@Transient
 	@NotSaved
 	private StoryEntity storyEntity;
@@ -87,13 +88,13 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 	}
 
 	@Override
-	public String getText() {
-		return text;
+	public String getTranscription() {
+		return transcriptionText;
 	}
 
 	@Override
-	public void setText(String text) {
-		this.text = text;
+	public void setTranscription(String transcriptionText) {
+		this.transcriptionText = transcriptionText;
 	}
 	@Override
 	public String getKey() {
@@ -105,6 +106,14 @@ public class StoryItemEntityImpl implements StoryItemEntity{
 		String textWithoutWithespace = text.replaceAll("\\s+","");
 		byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
 		hashKey = new String(hash, "UTF-8");
+	}
+	@Override
+	public String getTitle() {
+		return storyItemTitle;
+	}
+	@Override
+	public void setTitle(String storyItemTitle) {
+		this.storyItemTitle=storyItemTitle;		
 	}
 	
 }

@@ -15,12 +15,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
 import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
-import eu.europeana.enrichment.mongo.model.StoryItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.TranslationEntityImpl;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -29,8 +29,8 @@ public class PersistentServiceTest {
 
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
-	@Resource(name = "persistentStoryItemEntityService")
-	PersistentStoryItemEntityService persistentStoryItemEntityService;
+	@Resource(name = "persistentItemEntityService")
+	PersistentItemEntityService persistentItemEntityService;
 	@Resource(name = "persistentNamedEntityService")
 	PersistentNamedEntityService persistentNamedEntityService;
 	@Resource(name = "persistentTranslationEntityService")
@@ -52,22 +52,22 @@ public class PersistentServiceTest {
 			
 			String testText = "Das ist ein Übungstext für die Übersetzung";
 			
-			StoryItemEntity tmpStoryItemEntity = new StoryItemEntityImpl();
-			tmpStoryItemEntity.setStoryItemId("testStoryItem");
-			tmpStoryItemEntity.setStoryEntity(dbStoryEntity);
-			tmpStoryItemEntity.setLanguage("de");
-			tmpStoryItemEntity.setType("test");
-			tmpStoryItemEntity.setKey("test");
-			tmpStoryItemEntity.setText("test");
-			persistentStoryItemEntityService.saveStoryItemEntity(tmpStoryItemEntity);
+			ItemEntity tmpItemEntity = new ItemEntityImpl();
+			tmpItemEntity.setStoryItemId("testStoryItem");
+			tmpItemEntity.setStoryEntity(dbStoryEntity);
+			tmpItemEntity.setLanguage("de");
+			tmpItemEntity.setType("test");
+			tmpItemEntity.setKey("test");
+			tmpItemEntity.setTranscription("test");
+			persistentItemEntityService.saveItemEntity(tmpItemEntity);
 			
-			StoryItemEntity dbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity("testStoryItem");
-			if(dbStoryItemEntity == null)
+			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("testStoryItem");
+			if(dbItemEntity == null)
 				fail("No database story item entity found!");
 			else {
-				if(!dbStoryItemEntity.getKey().equals(tmpStoryItemEntity.getKey()))
+				if(!dbItemEntity.getKey().equals(tmpItemEntity.getKey()))
 					fail("Database story item entity key is not the same!");
-				if(!dbStoryItemEntity.getStoryEntity().getStoryId().equals(tmpStoryItemEntity.getStoryEntity().getStoryId()))
+				if(!dbItemEntity.getStoryEntity().getStoryId().equals(tmpItemEntity.getStoryEntity().getStoryId()))
 					fail("Story entity of the story item entity is not the same!");
 			}
 			
@@ -75,7 +75,7 @@ public class PersistentServiceTest {
 			entity.addEuopeanaId("europeana_url_test");
 			entity.addWikidataId("wikidata_url_test");
 			PositionEntity positionEntity = new PositionEntityImpl();
-			positionEntity.setStoryItemEntity(dbStoryItemEntity);
+			positionEntity.setItemEntity(dbItemEntity);
 			positionEntity.addOfssetPosition(10);
 			entity.addPositionEntity(positionEntity);
 			persistentNamedEntityService.saveNamedEntity(entity);
@@ -99,10 +99,10 @@ public class PersistentServiceTest {
 			if(newDatabaseEntity != null)
 				fail("Named entity could not be deleted!");
 			
-			String storyItemId = dbStoryItemEntity.getStoryItemId();
-			persistentStoryItemEntityService.deleteStoryItemEntity(dbStoryItemEntity);
-			StoryItemEntity newDbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity(storyItemId);
-			if(newDbStoryItemEntity != null)
+			String storyItemId = dbItemEntity.getStoryItemId();
+			persistentItemEntityService.deleteItemEntity(dbItemEntity);
+			ItemEntity newDbItemEntity = persistentItemEntityService.findItemEntity(storyItemId);
+			if(newDbItemEntity != null)
 				fail("Story item entity could not be deleted!");
 			
 			String storyId = dbStoryEntity.getStoryId();
@@ -132,28 +132,28 @@ public class PersistentServiceTest {
 			
 			String testText = "Das ist ein Übungstext für die Übersetzung";
 			
-			StoryItemEntity tmpStoryItemEntity = new StoryItemEntityImpl();
-			tmpStoryItemEntity.setStoryItemId("testStoryItem2");
-			tmpStoryItemEntity.setStoryEntity(dbStoryEntity);
-			tmpStoryItemEntity.setLanguage("de");
-			tmpStoryItemEntity.setType("test");
-			tmpStoryItemEntity.setKey(testText);
-			tmpStoryItemEntity.setText(testText);
-			persistentStoryItemEntityService.saveStoryItemEntity(tmpStoryItemEntity);
+			ItemEntity tmpItemEntity = new ItemEntityImpl();
+			tmpItemEntity.setStoryItemId("testStoryItem2");
+			tmpItemEntity.setStoryEntity(dbStoryEntity);
+			tmpItemEntity.setLanguage("de");
+			tmpItemEntity.setType("test");
+			tmpItemEntity.setKey(testText);
+			tmpItemEntity.setTranscription(testText);
+			persistentItemEntityService.saveItemEntity(tmpItemEntity);
 			
-			StoryItemEntity dbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity("testStoryItem2");
-			if(dbStoryItemEntity == null)
+			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("testStoryItem2");
+			if(dbItemEntity == null)
 				fail("No database story item entity found!");
 			else {
-				if(!dbStoryItemEntity.getKey().equals(tmpStoryItemEntity.getKey()))
+				if(!dbItemEntity.getKey().equals(tmpItemEntity.getKey()))
 					fail("Database story item entity key is not the same!");
-				if(!dbStoryItemEntity.getStoryEntity().getStoryId().equals(tmpStoryItemEntity.getStoryEntity().getStoryId()))
+				if(!dbItemEntity.getStoryEntity().getStoryId().equals(tmpItemEntity.getStoryEntity().getStoryId()))
 					fail("Story entity of the story item entity is not the same!");
 			}
 			
 			String translatedText = "This is a practice text for the translation";
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
-			tmpTranslationEntity.setStoryItemEntity(dbStoryItemEntity);
+			tmpTranslationEntity.setStoryEntity(dbStoryEntity);
 			tmpTranslationEntity.setLanguage("en");
 			tmpTranslationEntity.setTool("eTranslation");
 			tmpTranslationEntity.setKey(translatedText);;
@@ -161,14 +161,14 @@ public class PersistentServiceTest {
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
 			
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbStoryItemEntity.getStoryItemId(), "eTranslation", "en");
+					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), "eTranslation", "en");
 			if(dbTranslationEntity == null)
 				fail("No database translation entity found!");
 			else {
 				if(!dbTranslationEntity.getKey().equals(tmpTranslationEntity.getKey()))
 					fail("Database translation entity key is not the same!");
-				if(!dbTranslationEntity.getStoryItemEntity().getStoryItemId().equals(tmpTranslationEntity.getStoryItemEntity().getStoryItemId()))
-					fail("Story item entity of the translation entity is not the same!");
+				if(!dbTranslationEntity.getStoryEntity().getStoryId().equals(tmpTranslationEntity.getStoryEntity().getStoryId()))
+					fail("StoryEntity of the translation entity is not the same!");
 			}
 			
 			/*
@@ -177,14 +177,14 @@ public class PersistentServiceTest {
 			
 			persistentTranslationEntityService.deleteTranslationEntity(dbTranslationEntity);
 			TranslationEntity newDbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbStoryItemEntity.getStoryItemId(), "eTranslation", "en");
+					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), "eTranslation", "en");
 			if(newDbTranslationEntity != null)
 				fail("Translation entity could not be deleted!");
 			
-			String storyItemId = dbStoryItemEntity.getStoryItemId();
-			persistentStoryItemEntityService.deleteStoryItemEntity(dbStoryItemEntity);
-			StoryItemEntity newDbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity(storyItemId);
-			if(newDbStoryItemEntity != null)
+			String storyItemId = dbItemEntity.getStoryItemId();
+			persistentItemEntityService.deleteItemEntity(dbItemEntity);
+			ItemEntity newDbItemEntity = persistentItemEntityService.findItemEntity(storyItemId);
+			if(newDbItemEntity != null)
 				fail("Story item entity could not be deleted!");
 			
 			String storyId = dbStoryEntity.getStoryId();

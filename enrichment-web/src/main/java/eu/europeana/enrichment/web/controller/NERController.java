@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
+import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,4 +63,68 @@ public class NERController extends BaseRest {
 		}
 	}
 	
+	
+	/*
+	 * This method represents the /enrichment/uploadStories end point,
+	 * where a request with an array of StoryEntity to be saved to the database is sent
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey						is the application key which is required
+	 * 
+	 * @param stories				    an array of StoryEntity to be uploaded to the database (each StoryEntity represents a list of ItemEntity)
+	 * 
+	 * @return							"Done" if everything ok
+	 */
+	@ApiOperation(value = "Upload StoryEntities to the database", nickname = "uploadStories")
+	@RequestMapping(value = "/enrichment/uploadStories", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadStories(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody StoryEntityImpl [] stories) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String uploadStoriesStatus = enrichmentNerService.uploadStories(stories);
+			
+			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
+		
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}	
+	}
+	
+	/*
+	 * This method represents the /enrichment/uploadItems end point,
+	 * where a request with a ItemEntity information to be saved in the database is sent
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey						is the application key which is required
+	 * 
+	 * @param items				         an array of ItemEntity to be uploaded to the database (each StoryEntity represents a list of ItemEntity)
+	 * 
+	 * @return							"Done" if everything ok
+	 */
+	
+	@ApiOperation(value = "Upload ItemEntities to the database", nickname = "uploadItems")
+	@RequestMapping(value = "/enrichment/uploadItems", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadItems(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody ItemEntityImpl [] items) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String uploadItemsStatus = enrichmentNerService.uploadItems(items);
+			
+			ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
+		
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}	
+	}
+
 }

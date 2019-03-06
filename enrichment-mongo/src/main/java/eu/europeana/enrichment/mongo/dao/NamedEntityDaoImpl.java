@@ -10,15 +10,15 @@ import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
 
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
-	@Resource(name = "storyItemEntityDao")
-	StoryItemEntityDao storyItemEntityDao;
+	@Resource(name = "ItemEntityDao")
+	ItemEntityDao ItemEntityDao;
 	@Resource(name = "translationEntityDao")
 	TranslationEntityDao translationEntityDao;
 	private Datastore datastore; 
@@ -34,8 +34,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			String storyItemId = dbPositionEntity.getStoryItemId();
 			String translationKey = dbPositionEntity.getTranslationKey();
 			if(storyItemId != null && !storyItemId.isEmpty()) {
-				StoryItemEntity dbStoryItemEntity = storyItemEntityDao.findStoryItemEntity(storyItemId);
-				dbPositionEntity.setStoryItemEntity(dbStoryItemEntity);
+				ItemEntity dbItemEntity = ItemEntityDao.findItemEntity(storyItemId);
+				dbPositionEntity.setItemEntity(dbItemEntity);
 			}
 			if(translationKey != null && !translationKey.isEmpty()) {
 				TranslationEntity dbTranslationEntity = translationEntityDao.findTranslationEntity(translationKey);

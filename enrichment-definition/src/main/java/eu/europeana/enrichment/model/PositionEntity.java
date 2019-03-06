@@ -7,8 +7,8 @@ public interface PositionEntity {
 	/*
 	 * Transcribathon and Europeana information
 	 */
-	StoryItemEntity getStoryItemEntity();
-	void setStoryItemEntity(StoryItemEntity storyItemEntity);
+	ItemEntity getItemEntity();
+	void setItemEntity(ItemEntity ItemEntity);
 	public String getStoryItemId();
 	public void setStoryItemId(String storyItemId);
 	

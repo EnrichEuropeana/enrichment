@@ -10,6 +10,18 @@ import java.util.List;
 public class EnrichmentNERRequest {
 
 	public static final String PARAM_STORY_ID = "storyId";
+	public static final String PARAM_STORY_TITLE = "storyTitle";
+	public static final String PARAM_STORY_SOURCE = "storySource";
+	public static final String PARAM_STORY_DESCRIPTION = "storyDescription";
+	public static final String PARAM_STORY_SUMMARY = "storySummary";
+	public static final String PARAM_STORY_LANGUAGE = "storyLanguage";
+	public static final String PARAM_STORY_TRANSCRIPTION = "storyTranscription";
+
+	public static final String PARAM_ITEM_TITLE = "itemTitle";
+	public static final String PARAM_ITEM_LANGUAGE = "itemLanguage";
+	public static final String PARAM_ITEM_TRANSCRIPTION = "itemTranscription";
+
+	
 	public static final String PARAM_STORY_ITEM_IDS = "storyItemIds";
 	public static final String PARAM_NER_TOOL = "nerTool";
 	public static final String PARAM_LINKING = "linking";

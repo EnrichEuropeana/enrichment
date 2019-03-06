@@ -12,10 +12,10 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.model.StoryItemEntity;
-import eu.europeana.enrichment.mongo.service.PersistentStoryItemEntityService;
+import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrStoryItemEntityImpl;
+import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 
 
 
@@ -28,17 +28,17 @@ public class SolrEntityPositionsServiceTest {
 	@Resource
 	SolrEntityPositionsService solrEntityService;
 	
-	@Resource(name = "persistentStoryItemEntityService")
-	PersistentStoryItemEntityService persistentStoryItemEntityService;
+	@Resource(name = "persistentItemEntityService")
+	PersistentItemEntityService persistentItemEntityService;
 
 	private final Logger log = LogManager.getLogger(getClass());
 	
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		StoryItemEntity dbStoryItemEntity = persistentStoryItemEntityService.findStoryItemEntity("bookDumitruTest2");				
+		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("bookDumitruTest2");				
 		
-		solrEntityService.store(dbStoryItemEntity, true);
+		solrEntityService.store(dbItemEntity, true);
 		
 		
 	}

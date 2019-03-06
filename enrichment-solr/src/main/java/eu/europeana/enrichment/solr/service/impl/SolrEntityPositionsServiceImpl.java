@@ -14,9 +14,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
 
-import eu.europeana.enrichment.model.StoryItemEntity;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrStoryItemEntityImpl;
+import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 
 
@@ -40,15 +40,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 
 	@Override
-	public boolean store(StoryItemEntity storyItemEntity) throws SolrNamedEntityServiceException {
+	public boolean store(ItemEntity ItemEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void store(List<? extends StoryItemEntity> storyItemEntities) throws SolrNamedEntityServiceException {
+	public void store(List<? extends ItemEntity> storyItemEntities) throws SolrNamedEntityServiceException {
 		
-		for(StoryItemEntity ent : storyItemEntities) {
+		for(ItemEntity ent : storyItemEntities) {
 			store(ent, false);
 		}
 		
@@ -56,7 +56,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			solrServer.commit();
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing a list of storyItemEntity.", ex);			
+					"Unexpected Solr server exception occured when storing a list of ItemEntity.", ex);			
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
 					"Unexpected IO exception occured when storing a list of storyItemEntit", ex);
@@ -65,17 +65,17 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public void store(StoryItemEntity storyItemEntity, boolean doCommit) throws SolrNamedEntityServiceException {
+	public void store(ItemEntity ItemEntity, boolean doCommit) throws SolrNamedEntityServiceException {
 		try {
 			
-			log.debug("store: " + storyItemEntity.toString());
+			log.debug("store: " + ItemEntity.toString());
 			
-			SolrStoryItemEntityImpl solrStoryItem = null;
-			if(storyItemEntity instanceof SolrStoryItemEntityImpl) {
-				solrStoryItem=(SolrStoryItemEntityImpl) storyItemEntity;
+			SolrItemEntityImpl solrStoryItem = null;
+			if(ItemEntity instanceof SolrItemEntityImpl) {
+				solrStoryItem=(SolrItemEntityImpl) ItemEntity;
 			}
 			else {
-				solrStoryItem=new SolrStoryItemEntityImpl(storyItemEntity);
+				solrStoryItem=new SolrItemEntityImpl(ItemEntity);
 			}
 			
 			UpdateResponse rsp = solrServer.addBean(solrStoryItem);
@@ -84,11 +84,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				solrServer.commit();
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing storyItemEntity with storyItemId: " + storyItemEntity.getStoryItemId(),
+					"Unexpected Solr server exception occured when storing ItemEntity with storyItemId: " + ItemEntity.getStoryItemId(),
 					ex);
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing storyItemEntity with storyItemId: " + storyItemEntity.getStoryItemId(), ex);
+					"Unexpected IO exception occured when storing ItemEntity with storyItemId: " + ItemEntity.getStoryItemId(), ex);
 		}
 		
 	}
@@ -120,7 +120,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 
 	@Override
-	public void update(StoryItemEntity storyItemEntity) throws SolrNamedEntityServiceException {
+	public void update(ItemEntity ItemEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
 		
 	}
