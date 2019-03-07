@@ -13,12 +13,12 @@ public class StoryEntityImpl implements StoryEntity {
     public String _id = new ObjectId().toString();
 	//public String language;
 	public String storyId;
-	public String storyTitle;
-	public String storySource;
-	public String storyDescription;
-	public String storySummary;
-	public String storyLanguage;
-	public String storyTranscription;
+	public String title;
+	public String source;
+	public String description;
+	public String summary;
+	public String language;
+	public String transcriptionText;
 	
 	
 	@Override
@@ -38,64 +38,64 @@ public class StoryEntityImpl implements StoryEntity {
 
 	@Override
 	public String getStoryTitle() {
-		return storyTitle;
+		return title;
 	}
 
 	@Override
 	public void setStoryTitle(String storyTitle) {
-		this.storyTitle=storyTitle;
+		this.title=storyTitle;
 		
 	}
 
 	@Override
 	public String getStorySource() {
-		return storySource;
+		return source;
 	}
 
 	@Override
 	public void setStorySource(String storySource) {
-		this.storySource=storySource;		
+		this.source=storySource;		
 	}
 
 	@Override
 	public String getStoryDescription() {
-		return storyDescription;
+		return description;
 	}
 
 	@Override
 	public void setStoryDescription(String storyDescription) {
-		this.storyDescription=storyDescription;
+		this.description=storyDescription;
 	}
 
 	@Override
 	public String getStorySummary() {
-		return storySummary;
+		return summary;
 	}
 
 	@Override
 	public void setStorySummary(String storySummary) {
-		this.storySummary=storySummary;
+		this.summary=storySummary;
 		
 	}
 
 	@Override
 	public String getStoryLanguage() {
-		return storyLanguage;
+		return language;
 	}
 
 	@Override
 	public void setStoryLanguage(String storyLanguage) {
-		this.storyLanguage=storyLanguage;
+		this.language=storyLanguage;
 	}
 
 	@Override
 	public String getStoryTranscription() {
-		return storyTranscription;
+		return transcriptionText;
 	}
 
 	@Override
 	public void setStoryTranscription(String storyTranscription) {
-		this.storyTranscription=storyTranscription;
+		this.transcriptionText=storyTranscription;
 	}
 
 }

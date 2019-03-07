@@ -31,7 +31,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	@Override
 	public ItemEntity findItemEntity(String key) {
 		Query<ItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(ItemEntityImpl.class);
-		persistentStoryItemEntities.field("storyItemId").equal(key);
+		persistentStoryItemEntities.field("itemId").equal(key);
 		List<ItemEntityImpl> result = persistentStoryItemEntities.asList();
 		if(result.size() == 0)
 			return null;
@@ -58,17 +58,30 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Override
 	public void saveItemEntity(ItemEntity entity) {
-		this.datastore.save(entity);
+		ItemEntity dbItemEntity = findItemEntity(entity.getItemId());
+		if(dbItemEntity!=null)
+		{
+			dbItemEntity.setLanguage(entity.getLanguage());
+			dbItemEntity.setTitle(entity.getTitle());
+			dbItemEntity.setTranscription(entity.getTranscription());
+			dbItemEntity.setType(entity.getType());
+			dbItemEntity.setStoryId(entity.getStoryId());
+			this.datastore.save(dbItemEntity);
+		}
+		else
+		{
+			this.datastore.save(entity);
+		}
 	}
 
 	@Override
 	public void deleteItemEntity(ItemEntity entity) {
-		deleteItemEntityByStoryItemId(entity.getStoryItemId());
+		deleteItemEntityByStoryItemId(entity.getItemId());
 	}
 
 	@Override
 	public void deleteItemEntityByStoryItemId(String key) {
-		datastore.delete(datastore.find(ItemEntityImpl.class).filter("storyItemId", key));
+		datastore.delete(datastore.find(ItemEntityImpl.class).filter("itemId", key));
 	}
 
 }

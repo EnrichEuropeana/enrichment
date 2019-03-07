@@ -84,11 +84,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				solrServer.commit();
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing ItemEntity with storyItemId: " + ItemEntity.getStoryItemId(),
+					"Unexpected Solr server exception occured when storing ItemEntity with itemId: " + ItemEntity.getItemId(),
 					ex);
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing ItemEntity with storyItemId: " + ItemEntity.getStoryItemId(), ex);
+					"Unexpected IO exception occured when storing ItemEntity with itemId: " + ItemEntity.getItemId(), ex);
 		}
 		
 	}

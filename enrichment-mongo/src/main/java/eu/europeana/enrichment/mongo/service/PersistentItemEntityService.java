@@ -10,7 +10,7 @@ public interface PersistentItemEntityService {
 	 * This method retrieves a story item entity from the Mongo 
 	 * database based on their key
 	 * 
-	 * @param storyItemId				story item id of the story item entity
+	 * @param itemId				story item id of the story item entity
 	 * @return							a database story item entity 
 	 */
 	public ItemEntity findItemEntity(String storyItemId);

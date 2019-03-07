@@ -16,8 +16,8 @@ public interface ItemEntity {
 	 */
 	StoryEntity getStoryEntity();
 	void setStoryEntity(StoryEntity storyEntity);
-	String getStoryItemId();
-	void setStoryItemId(String storyItemId);
+	String getItemId();
+	void setItemId(String storyItemId);
 	
 	/*
 	 * Text information original language, type (Title, Description, 
@@ -38,5 +38,9 @@ public interface ItemEntity {
 	 */
 	String getKey();
 	void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException;
+
+	String getStoryId();
+
+	void setStoryId(String storyId);
 
 }

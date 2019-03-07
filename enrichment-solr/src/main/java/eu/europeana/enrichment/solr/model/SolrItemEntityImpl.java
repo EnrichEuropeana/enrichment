@@ -11,7 +11,7 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 	
 	public SolrItemEntityImpl (ItemEntity copy) {
 		this.setStoryId(copy.getStoryEntity().getStoryId());
-		this.setStoryItemId(copy.getStoryItemId());
+		this.setItemId(copy.getItemId());
 		this.setLanguage(copy.getLanguage());
 		this.setTranscription(copy.getTranscription());
 	}
@@ -24,8 +24,8 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 
 	@Override
 	@Field(ItemEntitySolrFields.STORY_ITEM_ID)
-	public void setStoryItemId(String storyItemId) {
-		super.setStoryItemId(storyItemId);
+	public void setItemId(String storyItemId) {
+		super.setItemId(storyItemId);
 	}
 
 
