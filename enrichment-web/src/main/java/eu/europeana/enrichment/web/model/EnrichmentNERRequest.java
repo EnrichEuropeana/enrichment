@@ -18,6 +18,8 @@ public class EnrichmentNERRequest {
 	public static final String PARAM_STORY_TRANSCRIPTION = "storyTranscription";
 
 	public static final String PARAM_ITEM_TITLE = "itemTitle";
+	public static final String PARAM_ITEM_TYPE = "itemType";
+	public static final String PARAM_ITEM_ID = "itemId";
 	public static final String PARAM_ITEM_LANGUAGE = "itemLanguage";
 	public static final String PARAM_ITEM_TRANSCRIPTION = "itemTranscription";
 

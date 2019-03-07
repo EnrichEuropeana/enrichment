@@ -20,20 +20,23 @@ public class ItemEntityImpl implements ItemEntity{
 	//id will be used for storing MongoDB _id
 	@Id
     public String _id = new ObjectId().toString();
-	public String storyItemId;
+	public String itemId;
 	public String language;
 	public String type;
 	public String transcriptionText;
 	public String hashKey;
 	public String storyId;
-	public String storyItemTitle;
+	public String title;
 	@Transient
 	@NotSaved
 	private StoryEntity storyEntity;
 	
+	@Override
 	public String getStoryId() {
 		return storyId;
 	}
+	
+	@Override
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}
@@ -58,13 +61,13 @@ public class ItemEntityImpl implements ItemEntity{
 	}
 
 	@Override
-	public String getStoryItemId() {
-		return storyItemId;
+	public String getItemId() {
+		return itemId;
 	}
 
 	@Override
-	public void setStoryItemId(String storyItemId) {
-		this.storyItemId = storyItemId;
+	public void setItemId(String storyItemId) {
+		this.itemId = storyItemId;
 	}
 
 	@Override
@@ -109,11 +112,11 @@ public class ItemEntityImpl implements ItemEntity{
 	}
 	@Override
 	public String getTitle() {
-		return storyItemTitle;
+		return title;
 	}
 	@Override
-	public void setTitle(String storyItemTitle) {
-		this.storyItemTitle=storyItemTitle;		
+	public void setTitle(String itemTitle) {
+		this.title=itemTitle;		
 	}
 	
 }

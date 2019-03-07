@@ -10,6 +10,7 @@ import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
@@ -17,8 +18,8 @@ import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
 
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
-	@Resource(name = "ItemEntityDao")
-	ItemEntityDao ItemEntityDao;
+	@Resource(name = "storyEntityDao")
+	StoryEntityDao storyEntityDao;
 	@Resource(name = "translationEntityDao")
 	TranslationEntityDao translationEntityDao;
 	private Datastore datastore; 
@@ -31,11 +32,11 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		List<PositionEntity> positions = dbEntity.getPositionEntities();
 		for(int index = positions.size()-1; index >= 0; index--) {
 			PositionEntity dbPositionEntity = positions.get(index);
-			String storyItemId = dbPositionEntity.getStoryItemId();
+			String storyId = dbPositionEntity.getStoryId();
 			String translationKey = dbPositionEntity.getTranslationKey();
-			if(storyItemId != null && !storyItemId.isEmpty()) {
-				ItemEntity dbItemEntity = ItemEntityDao.findItemEntity(storyItemId);
-				dbPositionEntity.setItemEntity(dbItemEntity);
+			if(storyId != null && !storyId.isEmpty()) {
+				StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(storyId);
+				dbPositionEntity.setStoryEntity(dbStoryEntity);
 			}
 			if(translationKey != null && !translationKey.isEmpty()) {
 				TranslationEntity dbTranslationEntity = translationEntityDao.findTranslationEntity(translationKey);
@@ -79,12 +80,12 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 
 	@Override
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, boolean translation) {
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, boolean translation) {
 		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);
 		if(translation)
-			persistentNamedEntities.disableValidation().field("positionEntities.translationKey").equal(itemId);
+			persistentNamedEntities.disableValidation().field("positionEntities.translationKey").equal(storyId);
 		else
-			persistentNamedEntities.disableValidation().field("positionEntities.storyItemId").equal(itemId);
+			persistentNamedEntities.disableValidation().field("positionEntities.storyId").equal(storyId);
 		List<NamedEntityImpl> result = persistentNamedEntities.asList();
 		List<NamedEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {

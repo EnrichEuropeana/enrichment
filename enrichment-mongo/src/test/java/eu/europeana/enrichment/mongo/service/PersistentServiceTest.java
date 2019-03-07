@@ -53,7 +53,7 @@ public class PersistentServiceTest {
 			String testText = "Das ist ein Übungstext für die Übersetzung";
 			
 			ItemEntity tmpItemEntity = new ItemEntityImpl();
-			tmpItemEntity.setStoryItemId("testStoryItem");
+			tmpItemEntity.setItemId("testStoryItem");
 			tmpItemEntity.setStoryEntity(dbStoryEntity);
 			tmpItemEntity.setLanguage("de");
 			tmpItemEntity.setType("test");
@@ -75,7 +75,7 @@ public class PersistentServiceTest {
 			entity.addEuopeanaId("europeana_url_test");
 			entity.addWikidataId("wikidata_url_test");
 			PositionEntity positionEntity = new PositionEntityImpl();
-			positionEntity.setItemEntity(dbItemEntity);
+			positionEntity.setStoryEntity(dbStoryEntity);
 			positionEntity.addOfssetPosition(10);
 			entity.addPositionEntity(positionEntity);
 			persistentNamedEntityService.saveNamedEntity(entity);
@@ -99,7 +99,7 @@ public class PersistentServiceTest {
 			if(newDatabaseEntity != null)
 				fail("Named entity could not be deleted!");
 			
-			String storyItemId = dbItemEntity.getStoryItemId();
+			String storyItemId = dbItemEntity.getItemId();
 			persistentItemEntityService.deleteItemEntity(dbItemEntity);
 			ItemEntity newDbItemEntity = persistentItemEntityService.findItemEntity(storyItemId);
 			if(newDbItemEntity != null)
@@ -133,7 +133,7 @@ public class PersistentServiceTest {
 			String testText = "Das ist ein Übungstext für die Übersetzung";
 			
 			ItemEntity tmpItemEntity = new ItemEntityImpl();
-			tmpItemEntity.setStoryItemId("testStoryItem2");
+			tmpItemEntity.setItemId("testStoryItem2");
 			tmpItemEntity.setStoryEntity(dbStoryEntity);
 			tmpItemEntity.setLanguage("de");
 			tmpItemEntity.setType("test");
@@ -161,7 +161,7 @@ public class PersistentServiceTest {
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
 			
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), "eTranslation", "en");
+					findTranslationEntityWithStoryInformation(dbItemEntity.getItemId(), "eTranslation", "en");
 			if(dbTranslationEntity == null)
 				fail("No database translation entity found!");
 			else {
@@ -177,11 +177,11 @@ public class PersistentServiceTest {
 			
 			persistentTranslationEntityService.deleteTranslationEntity(dbTranslationEntity);
 			TranslationEntity newDbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), "eTranslation", "en");
+					findTranslationEntityWithStoryInformation(dbItemEntity.getItemId(), "eTranslation", "en");
 			if(newDbTranslationEntity != null)
 				fail("Translation entity could not be deleted!");
 			
-			String storyItemId = dbItemEntity.getStoryItemId();
+			String storyItemId = dbItemEntity.getItemId();
 			persistentItemEntityService.deleteItemEntity(dbItemEntity);
 			ItemEntity newDbItemEntity = persistentItemEntityService.findItemEntity(storyItemId);
 			if(newDbItemEntity != null)

@@ -30,7 +30,21 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 
 	@Override
 	public void saveStoryEntity(StoryEntity entity) {
-		this.datastore.save(entity);
+		StoryEntity dbStoryEntity = findStoryEntity(entity.getStoryId());
+		if(dbStoryEntity!=null)
+		{
+			dbStoryEntity.setStoryDescription(entity.getStoryDescription());
+			dbStoryEntity.setStoryLanguage(entity.getStoryLanguage());
+			dbStoryEntity.setStorySource(entity.getStorySource());
+			dbStoryEntity.setStorySummary(entity.getStorySummary());
+			dbStoryEntity.setStoryTitle(entity.getStoryTitle());
+			dbStoryEntity.setStoryTranscription(entity.getStoryTranscription());
+			this.datastore.save(dbStoryEntity);
+		}
+		else
+		{
+			this.datastore.save(entity);
+		}
 	}
 
 	@Override

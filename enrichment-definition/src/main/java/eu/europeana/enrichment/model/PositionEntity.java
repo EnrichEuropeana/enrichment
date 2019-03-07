@@ -7,10 +7,10 @@ public interface PositionEntity {
 	/*
 	 * Transcribathon and Europeana information
 	 */
-	ItemEntity getItemEntity();
-	void setItemEntity(ItemEntity ItemEntity);
-	public String getStoryItemId();
-	public void setStoryItemId(String storyItemId);
+	StoryEntity getStoryEntity();
+	void setStoryEntity(StoryEntity ItemEntity);
+	public String getStoryId();
+	public void setStoryId(String storyId);
 	
 	/*
 	 * 

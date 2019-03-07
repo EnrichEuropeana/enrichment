@@ -7,17 +7,18 @@ import org.mongodb.morphia.annotations.NotSaved;
 import org.mongodb.morphia.annotations.Transient;
 
 import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 public class PositionEntityImpl implements PositionEntity{
 
 	public List<Integer> offsets;
-	public String storyItemId;
+	public String storyId;
 	public String translationKey;
 	@Transient
 	@NotSaved
-	ItemEntity ItemEntity;
+	StoryEntity storyEntity;
 	@Transient
 	@NotSaved
 	TranslationEntity translationEntity;
@@ -26,12 +27,12 @@ public class PositionEntityImpl implements PositionEntity{
 		offsets = new ArrayList<>();
 	}
 	
-	public String getStoryItemId() {
-		return storyItemId;
+	public String getStoryId() {
+		return storyId;
 	}
 	
-	public void setStoryItemId(String storyItemId) {
-		this.storyItemId = storyItemId;
+	public void setStoryId(String storyItemId) {
+		this.storyId = storyItemId;
 	}
 	
 	public String getTranslationKey() {
@@ -43,17 +44,17 @@ public class PositionEntityImpl implements PositionEntity{
 	}
 	
 	@Override
-	public ItemEntity getItemEntity() {
-		return ItemEntity;
+	public StoryEntity getStoryEntity() {
+		return storyEntity;
 	}
 
 	@Override
-	public void setItemEntity(ItemEntity ItemEntity) {
-		this.ItemEntity = ItemEntity;
-		if(ItemEntity != null)
-			setStoryItemId(ItemEntity.getStoryItemId());
+	public void setStoryEntity(StoryEntity storyEntity) {
+		this.storyEntity=storyEntity;
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
 		else
-			setStoryItemId(null);
+			setStoryId(null);
 	}
 
 	@Override

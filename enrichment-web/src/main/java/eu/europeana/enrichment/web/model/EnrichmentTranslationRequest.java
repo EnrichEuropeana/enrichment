@@ -9,7 +9,7 @@ public class EnrichmentTranslationRequest {
 
 	public static final String PARAM_STORY_OR_ITEM_ID = "storyId or itemId";
 	public static final String PARAM_STORY_ID = "storyId";
-	public static final String PARAM_STORY_ITEM_ID = "storyItemId";
+	public static final String PARAM_STORY_ITEM_ID = "itemId";
 	public static final String PARAM_TEXT = "text";
 	public static final String PARAM_TYPE = "type";
 	public static final String PARAM_TRANSLATION_TOOL = "translationTools";

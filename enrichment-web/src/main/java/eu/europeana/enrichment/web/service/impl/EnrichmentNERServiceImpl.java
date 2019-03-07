@@ -21,6 +21,7 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
@@ -120,17 +121,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
-		List<String> storyItemIds = requestParam.getStoryItemIds();
 		String tool = requestParam.getNERTool();
 		List<String> linking = requestParam.getLinking();
 		String translationTool = requestParam.getTranslationTool();
 		String translationLanguage = requestParam.getTranslationLanguage();
 		
-		List<ItemEntity> tmpItemEntity = new ArrayList<>();
+		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
 		/*
-		 * Retrieve the List<ItemEntity> from the DB
+		 * Retrieve the List<StoryEntity> from the DB
 		 */
-		findStoryItemEntitiesFromIds(storyId,storyItemIds,tmpItemEntity);
+		findStoryEntitiesFromIds(storyId,tmpStoryEntity);
 				
 		/*
 		 * Check parameters
@@ -157,8 +157,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		//check if named entities already exists
-		for(ItemEntity dbItemEntity : tmpItemEntity) {
-			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbItemEntity.getStoryItemId(), false));
+		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
+			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryEntity.getStoryId(), false));
 		}
 		//TODO: check if update is need (e.g.: linking tools)
 		if(tmpNamedEntities.size() > 0) {
@@ -206,11 +206,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		
 		/*
-		 * Apply named entity recognition on all story item translations
+		 * Apply named entity recognition on all story translations
 		 */
-		for(ItemEntity dbItemEntity : tmpItemEntity) {
+		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbItemEntity.getStoryItemId(), translationTool, "en");
+					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, "en");
 			String text = dbTranslationEntity.getTranslatedText();
 			if(python) {
 				JSONObject jsonRequest = new JSONObject();
@@ -247,7 +247,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					 */
 					PositionEntity defaultPosition = new PositionEntityImpl();
 					//defaultPosition.addOfssetPosition(-1);
-					defaultPosition.setItemEntity(dbItemEntity);
+					defaultPosition.setStoryEntity(dbStoryEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					defaultPosition.addOfssetPosition(Integer.parseInt(entityLabel.get(1)));
 					
@@ -274,7 +274,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					/*
 					 * Add linking information to named entity
 					 */
-					nerLinkingService.addLinkingInformation(dbEntity, linking, dbItemEntity.getLanguage());
+					nerLinkingService.addLinkingInformation(dbEntity, linking, dbStoryEntity.getStoryLanguage());
 				}
 			}
 		}
@@ -300,12 +300,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				List<PositionEntity> tmpPositions = tmpNamedEntity.getPositionEntities();
 				for(int posIndex = tmpPositions.size()-1; posIndex >= 0; posIndex--) {
 					PositionEntity tmpPositionEntity = tmpPositions.get(posIndex);
-					String tmpStoryItemId = tmpPositionEntity.getStoryItemId();
+					String tmpStoryItemId = tmpPositionEntity.getStoryId();
 					if(!storyItemIds.contains(tmpStoryItemId))
 						tmpPositions.remove(posIndex);
 					else {
-						tmpPositionEntity.setItemEntity(null);
-						tmpPositionEntity.setStoryItemId(tmpStoryItemId);
+						tmpPositionEntity.setStoryEntity(null);
+						tmpPositionEntity.setStoryId(tmpStoryItemId);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
@@ -496,20 +496,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	    return ((1-levenshteinDistance/(x.length()+y.length())>=0.7 || stringsContainEachOther==0) && x.length()>=y.length() && stringsHalfStartSame==0);
 	}
 		
-	private void findStoryItemEntitiesFromIds(String storyId, List<String> storyItemIds, List<ItemEntity> result) throws HttpException {
+	private void findStoryEntitiesFromIds(String storyId, List<StoryEntity> result) throws HttpException {
 				
-		if((storyId == null || storyId.isEmpty()) && (storyItemIds == null || storyItemIds.size() == 0))
+		if((storyId == null || storyId.isEmpty()))
 		{
 			String params = String.join(",", EnrichmentNERRequest.PARAM_STORY_ID, EnrichmentNERRequest.PARAM_STORY_ITEM_IDS);
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, params, null);
 		}
-		else if(storyItemIds.size() == 0) {
-			result = persistentItemEntityService.findStoryItemEntitiesFromStory(storyId);
-		}
 		else {
-			for(String storyItemId : storyItemIds) {
-				result.add(persistentItemEntityService.findItemEntity(storyItemId));
-			}
+			
+			result.add(persistentStoryEntityService.findStoryEntity(storyId));
+			
 		}
 		
 	}
@@ -551,6 +548,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TITLE, null);
 			if(item.getTranscription() == null || item.getTranscription().isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TRANSCRIPTION, null);
+			if(item.getItemId() == null || item.getItemId().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_ID, null);
+			if(item.getType() == null || item.getType().isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TYPE, null);
+
 
 			persistentItemEntityService.saveItemEntity(item);
 			
