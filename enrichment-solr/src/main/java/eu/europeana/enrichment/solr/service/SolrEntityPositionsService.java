@@ -68,6 +68,17 @@ public interface SolrEntityPositionsService {
 		 */
 		public List<Integer> searchByEntityName(String entityName) throws SolrNamedEntityServiceException;
 
+		/**
+		 * This method finds the positions of the terms in the given field using the adapted version of Solr-Highlighter
+		 * 
+		 * @param field
+		 * @param term
+		 * @return a list of positions List<Integer>
+		 * @throws SolrNamedEntityServiceException 
+		 */
+		public List<Integer> findTermPositions(String solrField, String term) throws SolrNamedEntityServiceException;
+
+		
 		
 
 }
