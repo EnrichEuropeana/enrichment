@@ -1,0 +1,8 @@
+
+*Integrated new Solr highlighter that can return the positions/offsets of the terms in the text:
+
+- based on this: https://issues.apache.org/jira/browse/SOLR-4722, the given .jar file returns only offsets in terms of where the given term is with regard to the number of 
+words before the term. I have slightly changed the java file and used another provided function from the file that can return the positions in terms of characters and then 
+repackaged the java file into another jar using eclipse (project: PositionsSolrHighlighter). The PositionsSolrHighlighter.java file is included in the enrichment-solr project 
+and can be changed additionally with regard to the requirements. 
+
