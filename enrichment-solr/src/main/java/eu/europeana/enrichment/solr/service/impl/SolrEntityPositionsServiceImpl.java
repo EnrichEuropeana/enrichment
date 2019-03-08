@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 
 
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
@@ -24,6 +25,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	@Resource
 	SolrClient solrServer;
+	
+	@Resource(name = "solrHTTPRequest")
+	SolrHTTPRequest solrHTTPRequest;
 	
 	private final Logger log = LogManager.getLogger(getClass());
 
@@ -118,7 +122,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	}
 
-
 	@Override
 	public void update(ItemEntity ItemEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
@@ -128,6 +131,13 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Override
 	public void delete(String storyItemID) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Integer> findTermPositions(String solrField, String term) throws SolrNamedEntityServiceException {
+		
+		return null;
 		
 	}
 

@@ -36,7 +36,7 @@ public class SolrEntityPositionsServiceTest {
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("bookDumitruTest2");				
+		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("item1");				
 		
 		solrEntityService.store(dbItemEntity, true);
 		
