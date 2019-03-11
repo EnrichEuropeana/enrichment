@@ -5,68 +5,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+
 public class JavaJSONParser {
 
-	@SuppressWarnings("unchecked")
-	public Map<String, List<Integer>> getPositionsFromJSON(String jsonContent, String storyIdFieldName, String fieldName) throws ParseException {
+	@SuppressWarnings({ "unchecked", "serial" })
+	public Map<String, List<Integer>> getPositionsFromJSON(QueryResponse response, String storyIdFieldName, String fieldName) throws ParseException {
 		
-		/*
-		 * key - storyId/itemId, value - list of positions
-		 */
-		Map<String, List<Integer>> results = new HashMap<String, List<Integer>>();
+		Gson gson = new Gson(); 
+		String jsonResponse = gson.toJson(response.getResponse()); 
 		
-		/*
-		 * Parsing the JSON data from the string format
-		 */
-		JSONParser parse = new JSONParser();
+		Map<String, Object> retMap = new Gson().fromJson(
+				jsonResponse, new TypeToken<HashMap<String, Object>>() {}.getType()
+			);
 		
-		/*
-		 * Type caste the parsed json data in json object
-		 */
-		JSONObject jobj = (JSONObject)parse.parse(jsonContent);
+		List<Object> topObjects = (List<Object>) retMap.get("nvPairs");
+		Map<String, Object> stories= (Map<String, Object>) topObjects.get(5);
+		List<Object> fields = (List<Object>) stories.get("nvPairs");
+		Map<String, Object> fields2 = (Map<String, Object>) fields.get(1);
+		List<Object> fields3 = (List<Object>) fields2.get("nvPairs");
 		
-		JSONObject jsonResponse = (JSONObject) jobj.get("response");
+		Map<String, Object> field4 = (Map<String, Object>) fields3.get(1);
+		List<Object> field5 = (List<Object>) field4.get("nvPairs");
+		List<String> terms = (List<String>) field5.get(1);
+		List<Double> positions = (List<Double>) field5.get(3);
+		List<Double> offsets = (List<Double>) field5.get(5);
 
-		JSONObject jsontHighlihgting = (JSONObject) jobj.get("highlighting");
-
-		/*
-		 * Store the JSON object in JSON array as objects
-		 */
-		JSONArray jsonResponseDocs = (JSONArray) jsonResponse.get("docs");
-		
-		for(int j=0;j<jsonResponseDocs.size();j++)
-		{
-			JSONObject jsonDoc = (JSONObject) jsonResponseDocs.get(j);
-			String storyId = (String) jsonDoc.get(storyIdFieldName);
-			
-			JSONObject jsonHighlightingItem = (JSONObject) jsontHighlihgting.get(storyId);
-						
-			List<Integer> jsonHighlightingPositions = (List<Integer>) jsonHighlightingItem.get("positions");
-			List<Integer> listOfOffsets = new ArrayList<Integer>();
-			if(jsonHighlightingPositions.size()>1)
-			{
-				List<List<Integer>> jsonHighlightingOffsets = (List<List<Integer>>) jsonHighlightingItem.get("offsets");
-				for (List<Integer> offsetItem  : jsonHighlightingOffsets)
-				{
-					listOfOffsets.add(offsetItem.get(0));
-				}
-			}
-			else
-			{
-				List<Integer> jsonHighlightingOffsets = (List<Integer>) jsonHighlightingItem.get("offsets");
-				listOfOffsets.add(jsonHighlightingOffsets.get(0));
-			}
-			
-			
-			results.put(storyId, listOfOffsets);
-		}
 
 		
-		return results;
+		return null;
 	}
 }

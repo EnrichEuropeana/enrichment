@@ -34,5 +34,8 @@
 	<bean id="solrEntityService" name="entity_solr_entity_service"
 		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
 		p:solrServer-ref="entity_solr_server" />
+		
+	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
+		
 
 </beans>

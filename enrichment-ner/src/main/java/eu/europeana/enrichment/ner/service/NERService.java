@@ -81,7 +81,7 @@ public interface NERService {
 		String entityKey = namedEntity.getKey();
 		int index = text.indexOf(entityKey);
 		while(index >= 0) {
-			posEntity.addOfssetPosition(index);
+			posEntity.addOfssetsTranslatedText(index);
 			index = text.indexOf(entityKey, index+entityKey.length());
 		}
 

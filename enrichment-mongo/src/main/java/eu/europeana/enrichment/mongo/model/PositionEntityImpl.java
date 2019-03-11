@@ -13,7 +13,8 @@ import eu.europeana.enrichment.model.TranslationEntity;
 
 public class PositionEntityImpl implements PositionEntity{
 
-	public List<Integer> offsets;
+	public List<Integer> offsetsTranslatedText;
+	public List<Integer> offsetsOriginalText;
 	public String storyId;
 	public String translationKey;
 	@Transient
@@ -24,7 +25,7 @@ public class PositionEntityImpl implements PositionEntity{
 	TranslationEntity translationEntity;
 	
 	public PositionEntityImpl() {
-		offsets = new ArrayList<>();
+		offsetsTranslatedText = new ArrayList<>();
 	}
 	
 	public String getStoryId() {
@@ -72,18 +73,35 @@ public class PositionEntityImpl implements PositionEntity{
 	}
 	
 	@Override
-	public List<Integer> getOffsetPositions() {
-		return offsets;
+	public List<Integer> getOffsetsTranslatedText() {
+		return offsetsTranslatedText;
 	}
 
 	@Override
-	public void setOffsetPositions(List<Integer> offsetPositions) {
-		this.offsets = offsetPositions;
+	public void setOffsetsTranslatedText(List<Integer> offsetPositions) {
+		this.offsetsTranslatedText = offsetPositions;
 	}
 
 	@Override
-	public void addOfssetPosition(int offsetPosition) {
-		offsets.add(offsetPosition);
+	public void addOfssetsTranslatedText(int offsetPosition) {
+		offsetsTranslatedText.add(offsetPosition);
+	}
+
+	@Override
+	public List<Integer> getOffsetsOriginalText() {
+		return offsetsOriginalText;
+	}
+
+	@Override
+	public void setOffsetsOriginalText(List<Integer> offsetPositions) {
+		this.offsetsOriginalText=offsetPositions;
+		
+	}
+
+	@Override
+	public void addOfssetsOriginalText(int offsetPosition) {
+		offsetsOriginalText.add(offsetPosition);
+		
 	}
 
 }

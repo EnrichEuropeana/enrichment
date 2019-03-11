@@ -134,7 +134,7 @@ public class JavaPDFWriter
             		PositionEntity nextPosition=PositionsIterator.next();            		
             		
             		//here we have to update where to insert a symbol based on already inserted symbols
-        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetPositions().get(0));
+        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
             		
         			if(key.equalsIgnoreCase("agent"))
         			{
@@ -151,7 +151,7 @@ public class JavaPDFWriter
         				sb.insert(positionToInsert, DIAMOND);
         			}
             		
-            		allAddedPositions.add(nextPosition.getOffsetPositions().get(0));
+            		allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
             		
             	}
         	}

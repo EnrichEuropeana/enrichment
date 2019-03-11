@@ -10,10 +10,12 @@ public class HTTPParameterStringBuilder {
         StringBuilder result = new StringBuilder();
  
         for (Map.Entry<String, String> entry : params.entrySet()) {
-          result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
-          result.append("=");
-          result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
-          result.append("&");
+        	
+        	
+        	result.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+        	result.append("=");
+        	result.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+        	result.append("&");
         }
  
         String resultString = result.toString();

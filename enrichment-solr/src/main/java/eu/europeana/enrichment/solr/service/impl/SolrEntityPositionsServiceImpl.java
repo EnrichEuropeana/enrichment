@@ -1,7 +1,12 @@
 package eu.europeana.enrichment.solr.service.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -12,12 +17,20 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocumentList;
+import org.json.simple.parser.ParseException;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
+import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
+import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 
 
@@ -26,8 +39,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Resource
 	SolrClient solrServer;
 	
-	@Resource(name = "solrHTTPRequest")
-	SolrHTTPRequest solrHTTPRequest;
+	@Resource(name = "javaJSONParser")
+	JavaJSONParser javaJSONParser;
+
+	
 	
 	private final Logger log = LogManager.getLogger(getClass());
 
@@ -96,6 +111,36 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		
 	}
+
+	@Override
+	public void store(StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException {
+		try {
+			
+			log.debug("store: " + storyEntity.toString());
+			
+			SolrStoryEntityImpl solrStory = null;
+			if(solrStory instanceof SolrStoryEntityImpl) {
+				solrStory=(SolrStoryEntityImpl) solrStory;
+			}
+			else {
+				solrStory=new SolrStoryEntityImpl(storyEntity);
+			}
+			
+			UpdateResponse rsp = solrServer.addBean(solrStory);
+			log.info("store response: " + rsp.toString());
+			if(doCommit)
+				solrServer.commit();
+		} catch (SolrServerException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected Solr server exception occured when storing StoryEntity with storyId: " + storyEntity.getStoryId(),
+					ex);
+		} catch (IOException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected IO exception occured when storing StoryEntity with storyId: " + storyEntity.getStoryId(), ex);
+		}
+		
+	}
+
 	
 	@Override
 	public void search (String term) throws SolrNamedEntityServiceException {
@@ -134,10 +179,44 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Integer> findTermPositions(String solrField, String term) throws SolrNamedEntityServiceException {
+	public List<Integer> findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
+	
+		SolrQuery query = new SolrQuery();
+	
+		query.setRequestHandler("/select");
 		
+		query.set("hl.fl","sie_text");
+		query.set("hl","on");		
+		query.set("indent","on");		
+
+		query.set("q", "sie_text:"+ "\"" + term + "\"");
+	
+		query.set("wt","json");	
+		
+		QueryResponse response=null;
+		
+		try {
+			response = solrServer.query(query);
+		} catch (SolrServerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		Map<String, List<Integer>> results;
+		try {
+			results=javaJSONParser.getPositionsFromJSON(response, "sie_story_id", "sie_text");
+		} catch (ParseException e) {
+			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + term,e);
+		}
+	
 		return null;
+	
 		
 	}
 
