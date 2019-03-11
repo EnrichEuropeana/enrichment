@@ -21,9 +21,17 @@ public interface PositionEntity {
 	public void setTranslationKey(String translationKey);
 	
 	/*
-	 * offset positions
+	 * offset positions (the positions of the named entities) in the translated text
 	 */
-	List<Integer> getOffsetPositions();
-	void setOffsetPositions(List<Integer> offsetPositions);
-	void addOfssetPosition(int offsetPosition);
+	List<Integer> getOffsetsTranslatedText();
+	void setOffsetsTranslatedText(List<Integer> offsetPositions);
+	void addOfssetsTranslatedText(int offsetPosition);
+	
+	/*
+	 * offset positions (the positions of the named entities) in the original text
+	 */
+	List<Integer> getOffsetsOriginalText();
+	void setOffsetsOriginalText(List<Integer> offsetPositions);
+	void addOfssetsOriginalText(int offsetPosition);
+
 }

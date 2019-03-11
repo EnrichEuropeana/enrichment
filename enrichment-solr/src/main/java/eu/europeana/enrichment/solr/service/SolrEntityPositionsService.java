@@ -1,8 +1,10 @@
 package eu.europeana.enrichment.solr.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 
@@ -35,7 +37,15 @@ public interface SolrEntityPositionsService {
 		 * @throws SolrNamedEntityServiceException 
 		 */
 		public void store(ItemEntity ItemEntity, boolean doCommit) throws SolrNamedEntityServiceException ;	
-		
+
+		/**
+		 * This method stores a StoryEntity object in SOLR.
+		 * @param storyEntity
+		 * @param doCommit commit
+		 * @throws SolrNamedEntityServiceException 
+		 */
+		public void store(StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException ;	
+
 		/**
 		 * This method searches for a term in SOLR.
 		 * @param term
@@ -71,14 +81,14 @@ public interface SolrEntityPositionsService {
 		/**
 		 * This method finds the positions of the terms in the given field using the adapted version of Solr-Highlighter
 		 * 
-		 * @param field
+		 * @param storyId
 		 * @param term
 		 * @return a list of positions List<Integer>
 		 * @throws SolrNamedEntityServiceException 
+		 * @throws IOException 
 		 */
-		public List<Integer> findTermPositions(String solrField, String term) throws SolrNamedEntityServiceException;
+		
+		public List<Integer> findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException;
 
-		
-		
 
 }

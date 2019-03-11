@@ -115,7 +115,7 @@ public class NERServiceReadDocument {
             	while(PositionsIterator.hasNext()) {
             		
             		PositionEntity nextPosition=PositionsIterator.next();
-            		writer.append(nextPosition.getOffsetPositions().get(0).toString() + ", ");
+            		writer.append(nextPosition.getOffsetsTranslatedText().get(0).toString() + ", ");
             	}
             	
             	writer.newLine();

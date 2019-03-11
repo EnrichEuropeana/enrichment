@@ -249,7 +249,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					//defaultPosition.addOfssetPosition(-1);
 					defaultPosition.setStoryEntity(dbStoryEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
-					defaultPosition.addOfssetPosition(Integer.parseInt(entityLabel.get(1)));
+					defaultPosition.addOfssetsTranslatedText(Integer.parseInt(entityLabel.get(1)));
 					
 					if(dbEntity != null) {
 						dbEntity.addPositionEntity(defaultPosition);
@@ -278,6 +278,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				}
 			}
 		}
+		
 		
 		
 		/*

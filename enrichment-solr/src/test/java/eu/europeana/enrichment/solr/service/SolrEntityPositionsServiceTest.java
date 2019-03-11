@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.solr.service;
 
+import java.io.IOException;
+
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,9 +38,18 @@ public class SolrEntityPositionsServiceTest {
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("item1");				
+		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("item1");	
+		
+		dbItemEntity.getId();
 		
 		solrEntityService.store(dbItemEntity, true);
+		
+		try {
+			solrEntityService.findTermPositionsInStory("1", "dumitru nistor",0);//Năsăud
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 	}

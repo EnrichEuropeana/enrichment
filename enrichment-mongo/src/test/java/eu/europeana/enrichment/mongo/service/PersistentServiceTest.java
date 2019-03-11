@@ -76,14 +76,14 @@ public class PersistentServiceTest {
 			entity.addWikidataId("wikidata_url_test");
 			PositionEntity positionEntity = new PositionEntityImpl();
 			positionEntity.setStoryEntity(dbStoryEntity);
-			positionEntity.addOfssetPosition(10);
+			positionEntity.addOfssetsTranslatedText(10);
 			entity.addPositionEntity(positionEntity);
 			persistentNamedEntityService.saveNamedEntity(entity);
 			
 			NamedEntity databaseEntity = persistentNamedEntityService.findNamedEntity(entity.getKey());
 			if(databaseEntity == null)
 				fail("No database Entity found!");
-			if(!databaseEntity.getPositionEntities().get(0).getOffsetPositions().contains(10)) {
+			if(!databaseEntity.getPositionEntities().get(0).getOffsetsTranslatedText().contains(10)) {
 				fail("Positions of the named entities are not the same!");
 			}
 			if(!databaseEntity.getEuropeanaIds().contains("europeana_url_test")) {

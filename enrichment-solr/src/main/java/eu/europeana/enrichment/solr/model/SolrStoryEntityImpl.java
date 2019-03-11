@@ -8,10 +8,22 @@ import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 
 public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity {
 
+	public SolrStoryEntityImpl (StoryEntity copy) {
+		this.setStoryId(copy.getStoryId());
+		this.setStoryTranscription(copy.getStoryTranscription());
+	}
+
 	@Override
 	@Field(StoryEntitySolrFields.STORY_ID)
 	public void setStoryId(String storyId) {
 		super.setStoryId(storyId);
 	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.TEXT)
+	public void setStoryTranscription(String text) {
+		super.setStoryTranscription(text);
+	}
+
 
 }
