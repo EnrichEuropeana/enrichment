@@ -14,12 +14,9 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
-
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:entity-solr-context.xml")
@@ -30,27 +27,30 @@ public class SolrEntityPositionsServiceTest {
 	@Resource
 	SolrEntityPositionsService solrEntityService;
 	
-	@Resource(name = "persistentItemEntityService")
-	PersistentItemEntityService persistentItemEntityService;
+	@Resource(name = "persistentStoryEntityService")
+	PersistentStoryEntityService persistentStoryEntityService;
 
 	private final Logger log = LogManager.getLogger(getClass());
 	
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("item1");	
+		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");	
+			
+		//delete all documents first
+		//solrEntityService.deleteByQuery("*");
 		
-		dbItemEntity.getId();
+		//solrEntityService.store(dbStoryEntity, true);
 		
-		solrEntityService.store(dbItemEntity, true);
-		
+		double termOffset = 0;
 		try {
-			solrEntityService.findTermPositionsInStory("1", "dumitru nistor",0);//Năsăud
+			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru nistor",0,2);//Năsăud
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+		log.info("The found term offset using Solr HIghlighter is: " + Double.toString(termOffset));
 		
 	}
 	

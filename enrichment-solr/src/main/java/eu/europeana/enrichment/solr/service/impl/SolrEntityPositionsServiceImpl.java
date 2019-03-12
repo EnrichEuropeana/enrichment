@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Resource;
 
@@ -59,15 +64,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 
 	@Override
-	public boolean store(ItemEntity ItemEntity) throws SolrNamedEntityServiceException {
+	public boolean store(StoryEntity storyEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void store(List<? extends ItemEntity> storyItemEntities) throws SolrNamedEntityServiceException {
+	public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException {
 		
-		for(ItemEntity ent : storyItemEntities) {
+		for(StoryEntity ent : storyEntities) {
 			store(ent, false);
 		}
 		
@@ -75,39 +80,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			solrServer.commit();
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing a list of ItemEntity.", ex);			
+					"Unexpected Solr server exception occured when storing a list of StoryEntity.", ex);			
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing a list of storyItemEntit", ex);
-		}
-		
-	}
-
-	@Override
-	public void store(ItemEntity ItemEntity, boolean doCommit) throws SolrNamedEntityServiceException {
-		try {
-			
-			log.debug("store: " + ItemEntity.toString());
-			
-			SolrItemEntityImpl solrStoryItem = null;
-			if(ItemEntity instanceof SolrItemEntityImpl) {
-				solrStoryItem=(SolrItemEntityImpl) ItemEntity;
-			}
-			else {
-				solrStoryItem=new SolrItemEntityImpl(ItemEntity);
-			}
-			
-			UpdateResponse rsp = solrServer.addBean(solrStoryItem);
-			log.info("store response: " + rsp.toString());
-			if(doCommit)
-				solrServer.commit();
-		} catch (SolrServerException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing ItemEntity with itemId: " + ItemEntity.getItemId(),
-					ex);
-		} catch (IOException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing ItemEntity with itemId: " + ItemEntity.getItemId(), ex);
+					"Unexpected IO exception occured when storing a list of StoryEntity", ex);
 		}
 		
 	}
@@ -118,15 +94,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 			log.debug("store: " + storyEntity.toString());
 			
-			SolrStoryEntityImpl solrStory = null;
-			if(solrStory instanceof SolrStoryEntityImpl) {
-				solrStory=(SolrStoryEntityImpl) solrStory;
+			SolrStoryEntityImpl solrStoryEntity = null;
+			if(storyEntity instanceof SolrStoryEntityImpl) {
+				solrStoryEntity=(SolrStoryEntityImpl) storyEntity;
 			}
 			else {
-				solrStory=new SolrStoryEntityImpl(storyEntity);
+				solrStoryEntity=new SolrStoryEntityImpl(storyEntity);
 			}
 			
-			UpdateResponse rsp = solrServer.addBean(solrStory);
+			UpdateResponse rsp = solrServer.addBean(solrStoryEntity);
 			log.info("store response: " + rsp.toString());
 			if(doCommit)
 				solrServer.commit();
@@ -145,7 +121,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Override
 	public void search (String term) throws SolrNamedEntityServiceException {
 
-		log.info("search Annotation by term: " + term);
+		log.info("search StoryEntity by term: " + term);
 
 		/**
 		 * Construct a SolrQuery
@@ -161,64 +137,118 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			log.info("query response: " + rsp.toString());
 			
 		} catch (IOException | SolrServerException e) {
-			throw new SolrNamedEntityServiceException("Unexpected exception occured when searching annotations for: " + term,
+			throw new SolrNamedEntityServiceException("Unexpected exception occured when searching StoryEntity in Solr for the term: " + term,
 					e);
 		}
 
 	}
 
 	@Override
-	public void update(ItemEntity ItemEntity) throws SolrNamedEntityServiceException {
+	public void update(StoryEntity stryEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void delete(String storyItemID) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
-		
+	public void deleteByQuery(String query) throws SolrNamedEntityServiceException {
+		try {
+			log.info("Solr deleteByQuery call: " + query);
+			UpdateResponse rsp = solrServer.deleteByQuery(query);
+			log.info("Solr deleteByQuery response: " + rsp.toString());
+			solrServer.commit();
+		} catch (IOException | SolrServerException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected solr server or IO exception occured when deleting StoryEntity with query: " + query, ex);
+		}		
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<Integer> findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
+	public double findTermPositionsInStory(String storyId, String term, int startAfterOffset, int numberWordsInTerm) throws SolrNamedEntityServiceException {
 	
 		SolrQuery query = new SolrQuery();
 	
-		query.setRequestHandler("/select");
-		
-		query.set("hl.fl","sie_text");
+		query.setRequestHandler("/select");		
+		query.set("hl.fl",StoryEntitySolrFields.TEXT);
 		query.set("hl","on");		
-		query.set("indent","on");		
-
-		query.set("q", "sie_text:"+ "\"" + term + "\"");
-	
+		query.set("indent","on");
+//		query.set("hl.usePhraseHighlighter", true);
+//		query.set("hl.highlightMultiTerm", true);
+//		query.set("hl.qparser","complexphrase");
+		query.set("q", StoryEntitySolrFields.TEXT+":"+ "\"" + term + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId);	
 		query.set("wt","json");	
 		
 		QueryResponse response=null;
 		
 		try {
 			response = solrServer.query(query);
-		} catch (SolrServerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (IOException | SolrServerException e) {
+			throw new SolrNamedEntityServiceException("Unexpected exception occured when executing Solr query.", e);
 		}
 		
 		
-		Map<String, List<Integer>> results;
+		List<String> terms = new ArrayList<String>();
+		List<Double> positions = new ArrayList<Double>();
+		List<List<Double>> offsets = new ArrayList<List<Double>>();
+		
 		try {
-			results=javaJSONParser.getPositionsFromJSON(response, "sie_story_id", "sie_text");
+			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + term,e);
 		}
 	
-		return null;
+		//finding the exact offset of the term from the list of all offsets
+		double exactOffset = findNextOffset(offsets, startAfterOffset, numberWordsInTerm);
+		return exactOffset;
 	
 		
 	}
 
+	/**
+	 * This method performs a binary search in the array of offsets to find the first one greater than the given number
+	 * 
+	 * @param offsets
+	 * @param target
+	 * @return
+	 */
+	
+	private double findNextOffset (List<List<Double>> offsets, int lastOffset, int numberWordsInTerm) 
+    { 
+		/*
+		 * taking just the first number in the list because the "arr" list returns offsets 
+		 * for each word in the term: e.g. for the term "dumitru nistor" it will return [[0,7],[8,14]]
+		 */
+
+		int skip = numberWordsInTerm;
+		int size = offsets.size();
+		// Limit to carefully avoid IndexOutOfBoundsException
+		int limit = size / skip + Math.min(size % skip, 1);
+
+		List<Double> adaptedOffsets = Stream.iterate(offsets, l -> l.subList(skip, l.size()))
+		    .limit(limit)
+		    .map(l -> l.get(0).get(0))
+		    .collect(Collectors.toList());
+
+		//sorting in ascending order (1,5,7,13,...)
+		Collections.sort(adaptedOffsets);
+		
+        int start = 0, end = adaptedOffsets.size() - 1; 
+  
+        int ans = -1; 
+        while (start <= end) { 
+            int mid = (start + end) / 2; 
+  
+            // Move to right side if target is greater. 
+            if (adaptedOffsets.get(mid) <= lastOffset) { 
+                start = mid + 1; 
+            } 
+  
+            // Move left side. 
+            else { 
+                ans = mid; 
+                end = mid - 1; 
+            } 
+        } 
+        return adaptedOffsets.get(ans); 
+    } 
 
 }
