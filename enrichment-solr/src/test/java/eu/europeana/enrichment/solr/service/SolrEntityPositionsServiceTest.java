@@ -35,16 +35,16 @@ public class SolrEntityPositionsServiceTest {
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");	
+		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");	
 			
 		//delete all documents first
 		//solrEntityService.deleteByQuery("*");
 		
-		//solrEntityService.store(dbStoryEntity, true);
+		solrEntityService.store(dbStoryEntity, true);
 		
 		double termOffset = 0;
 		try {
-			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru nistor",0,2);//Năsăud
+			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru nistor",0);//Năsăud
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

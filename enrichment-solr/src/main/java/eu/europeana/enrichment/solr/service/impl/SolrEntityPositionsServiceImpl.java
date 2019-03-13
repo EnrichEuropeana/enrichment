@@ -32,6 +32,7 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
@@ -47,8 +48,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Resource(name = "javaJSONParser")
 	JavaJSONParser javaJSONParser;
 
+	@Resource(name = "levenschteinDistance")
+	LevenschteinDistance levenschteinDistance;
+
 	
-	
+	private final int LevenschteinDistanceThreshold = 2;
 	private final Logger log = LogManager.getLogger(getClass());
 
 	public void setSolrServer(SolrClient solrServer) {
@@ -163,18 +167,39 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public double findTermPositionsInStory(String storyId, String term, int startAfterOffset, int numberWordsInTerm) throws SolrNamedEntityServiceException {
+	public double findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
 	
 		SolrQuery query = new SolrQuery();
 	
+		/*
+		 * this part creates query parameters for the Solr Highlighter using complexphrase query highlighter. An example of the query 
+		 * to search for the name: "Dumitru Nistor" in the StoryEntity:
+		 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru" AND story_text:"nistor" AND story_id:"bookDumitruTest2"&wt=json
+		 */
 		query.setRequestHandler("/select");		
 		query.set("hl.fl",StoryEntitySolrFields.TEXT);
 		query.set("hl","on");		
 		query.set("indent","on");
-//		query.set("hl.usePhraseHighlighter", true);
-//		query.set("hl.highlightMultiTerm", true);
-//		query.set("hl.qparser","complexphrase");
-		query.set("q", StoryEntitySolrFields.TEXT+":"+ "\"" + term + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId);	
+		query.set("defType","complexphrase");
+		
+		String [] searchTermWords = term.split("\\s+");
+		String adaptedTerm = "";
+		if(searchTermWords.length>1)
+		{
+			
+			for (String termWord : searchTermWords)
+			{
+				adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + termWord + "~" + "\"";
+				adaptedTerm += " AND ";
+			}
+			adaptedTerm += StoryEntitySolrFields.STORY_ID+":"+storyId;
+		}
+		else
+		{
+			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + term + "~" + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
+			
+		}
+		query.set("q", adaptedTerm);
 		query.set("wt","json");	
 		
 		QueryResponse response=null;
@@ -196,8 +221,14 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + term,e);
 		}
 	
+		List<String> termsAdapted = new ArrayList<String>();
+		List<Double> positionsAdapted = new ArrayList<Double>();
+		List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
+		
+		adaptTermsPositionsOffsets(term,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
+
 		//finding the exact offset of the term from the list of all offsets
-		double exactOffset = findNextOffset(offsets, startAfterOffset, numberWordsInTerm);
+		double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length);
 		return exactOffset;
 	
 		
@@ -233,7 +264,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
         int start = 0, end = adaptedOffsets.size() - 1; 
   
-        int ans = -1; 
+        int ans = 0; 
         while (start <= end) { 
             int mid = (start + end) / 2; 
   
@@ -250,5 +281,62 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
         } 
         return adaptedOffsets.get(ans); 
     } 
+	/**
+	 * This function adapts the terms, positions (in terms of words), and offsets (in terms of characters) obtained
+	 * from the Solr HIghlighter query using "complexphrase" query parser. This parser is used in order to find the 
+	 * NamedEntities that contain several words, e.g. "Dumitru Nistor". In the original text the name can be a bit 
+	 * different like "Dumitrua Nistora" where we have to use fuzzy search in order to find both parts of the name. 
+	 * contain 
+	 * 
+	 * @param searchTerm
+	 * @param terms
+	 * @param positions
+	 * @param offsets
+	 * @param termsAdapted
+	 * @param positionsAdapted
+	 * @param offsetsAdapted
+	 */
+	
+	private void adaptTermsPositionsOffsets (String searchTerm, List<String> terms, List<Double> positions, List<List<Double>> offsets, List<String> termsAdapted, List<Double> positionsAdapted, List<List<Double>> offsetsAdapted)
+	{
+		String [] searchTermWords = searchTerm.split("\\s+");
+		
+		for (int i=0;i<terms.size()-searchTermWords.length+1;i++)
+		{
+			boolean consecutivePositions = true;
+			for (int l=0;l<searchTermWords.length-1;l++)
+			{
+				if((positions.get(i+l+1)-positions.get(i+l))!=1.0)
+				{
+					consecutivePositions=false;
+					break;
+				}
+			}
+			if(consecutivePositions)
+			{
+				boolean found = true;
+				for (int j=0;j<searchTermWords.length;j++)
+				{
+					if(levenschteinDistance.calculateLevenshteinDistance(terms.get(i+j), searchTermWords[j]) > LevenschteinDistanceThreshold)
+					{
+						found=false;
+						break;
+					}
+				}
+					
+				if(found)
+				{
+					for (int j=0;j<searchTermWords.length;j++)
+					{
+						termsAdapted.add(terms.get(i+j));
+						positionsAdapted.add(positions.get(i+j));
+						offsetsAdapted.add(offsets.get(i+j));					
+					}
+					i += searchTermWords.length-1;
+				}
+			}
+			
+		}
+	}
 
 }
