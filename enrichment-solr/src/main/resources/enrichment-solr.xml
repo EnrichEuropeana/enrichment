@@ -47,6 +47,7 @@
 	<!--  https://docs.spring.io/spring/docs/2.5.3/reference/beans.html#beans-factory-collaborators -->
 	
 	<beans:bean id="solrHTTPRequest" class="eu.europeana.enrichment.solr.service.impl.SolrHTTPRequest" />
+	
 
    
 </beans:beans>
