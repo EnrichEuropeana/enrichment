@@ -167,9 +167,13 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public double findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
+	public int findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
 	
 		SolrQuery query = new SolrQuery();
+		/*
+		 * convert to lower case since in Solt we use the filter for lower case solr.LowerCaseFilterFactory" 
+		 */
+		String termLowerCase=term.toLowerCase();
 	
 		/*
 		 * this part creates query parameters for the Solr Highlighter using complexphrase query highlighter. An example of the query 
@@ -182,7 +186,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		query.set("indent","on");
 		query.set("defType","complexphrase");
 		
-		String [] searchTermWords = term.split("\\s+");
+		String [] searchTermWords = termLowerCase.split("\\s+");
 		String adaptedTerm = "";
 		if(searchTermWords.length>1)
 		{
@@ -196,7 +200,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		else
 		{
-			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + term + "~" + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
+			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCase + "~" + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
 			
 		}
 		query.set("q", adaptedTerm);
@@ -215,21 +219,30 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		List<Double> positions = new ArrayList<Double>();
 		List<List<Double>> offsets = new ArrayList<List<Double>>();
 		
+		log.info("Solr response: " + response.toString());
+		
 		try {
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
-			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + term,e);
+			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCase,e);
 		}
 	
-		List<String> termsAdapted = new ArrayList<String>();
-		List<Double> positionsAdapted = new ArrayList<Double>();
-		List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
-		
-		adaptTermsPositionsOffsets(term,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
-
-		//finding the exact offset of the term from the list of all offsets
-		double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length);
-		return exactOffset;
+		if(!terms.isEmpty())
+		{
+			List<String> termsAdapted = new ArrayList<String>();
+			List<Double> positionsAdapted = new ArrayList<Double>();
+			List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
+			
+			adaptTermsPositionsOffsets(termLowerCase,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
+	
+			//finding the exact offset of the term from the list of all offsets
+			double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length);
+			return (int) exactOffset;
+		}
+		else
+		{
+			return -1;
+		}
 	
 		
 	}

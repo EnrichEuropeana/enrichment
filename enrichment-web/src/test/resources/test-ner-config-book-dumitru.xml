@@ -29,9 +29,27 @@
 	
 	<bean id="europeanaEntityServiceBookDumitru" class="eu.europeana.enrichment.web.service.NERServiceReadDocument">
 		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
-		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
-		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.pdf}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.original}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.translatedText.pdf}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.originalText.pdf}"/>
+	</bean>
+	
+		<bean id="solrEntityService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
+		p:solrServer-ref="entity_solr_server" />
+		
+	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
+	
+	<bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
+	
+	<!-- LAZY INIT: the next beans has lazy init, to prevent them from being started when not used... -->
+	<bean id="entity_solr_server" class="org.apache.solr.client.solrj.impl.HttpSolrClient" lazy-init="true">
+		<constructor-arg value="${solr.entity-positions.url}"/>
+		<property name="followRedirects" value="false"/>
+		<property name="connectionTimeout" value="${solr.entity-positions.timeout}"/>
+		<property name="defaultMaxConnectionsPerHost" value="64"/>
+		<property name="maxTotalConnections" value="125"/>
 	</bean>
 	
 	

@@ -74,36 +74,7 @@
 		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
         <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
 	</beans:bean>
-	
-	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl">
-    </beans:bean>
-    
-    
-	<!-- Translation service beans -->
-	<beans:bean id="googleTranslationService" class="eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl">
-		<beans:constructor-arg type="String" value="enrich.translation.google.credentials"/>
-	</beans:bean>
-	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
-		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.domain}"/>
-		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.requesterCallback}"/>
-		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.errorCallback}"/>
-		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.emailDestination}"/>
-	</beans:bean>
-	<beans:bean id="translationLanguageTool" class="eu.europeana.enrichment.translation.internal.TranslationLanguageTool" />
-    
-    <beans:bean id="enrichmentTranslationService" class="eu.europeana.enrichment.web.service.impl.EnrichmentTranslationServiceImpl">
-    </beans:bean>
-    
-    
-    <!-- configurable error messages -->
-    <beans:bean id="enrichment_i18n_messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
-		<beans:property name="basename" value="classpath:messages"/>	
-		<beans:property name="defaultEncoding" value="utf-8"/>	 	
-    </beans:bean>
-    <beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
-    	<beans:property name="messageSource" ref="enrichment_i18n_messageSource"/>
-    </beans:bean>
+   
     	
    	<beans:bean id="solrEntityPositionsService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl">
     </beans:bean>

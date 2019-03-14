@@ -27,6 +27,8 @@ import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
@@ -71,6 +73,8 @@ public class NERServiceTestBookDumitru {
 	@Resource(name = "persistentTranslationEntityService")
 	PersistentTranslationEntityService persistentTranslationEntityService;
 
+	@Resource(name = "solrEntityService")
+	SolrEntityPositionsService solrEntityService;
 
 	
 	@Test
@@ -100,6 +104,14 @@ public class NERServiceTestBookDumitru {
 		dbTranslationEntity.setTranslatedText(bookText);
 		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		
+		//saving the story to Solr for finding the positions of NE in the original text
+		try {
+			solrEntityService.store(dbStoryEntity, true);
+		} catch (SolrNamedEntityServiceException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		List<String> linkingTools = Arrays.asList("Wikidata");
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
 		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTest2");
@@ -118,7 +130,7 @@ public class NERServiceTestBookDumitru {
 		
 		
 			europeanaEntityServiceBookDumitru.writeToFile(NERNamedEntities);
-		} catch (IOException | HttpException e) {
+		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

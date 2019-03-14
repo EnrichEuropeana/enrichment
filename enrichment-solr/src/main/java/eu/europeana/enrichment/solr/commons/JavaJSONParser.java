@@ -27,18 +27,21 @@ public class JavaJSONParser {
 		//the part of the json that contains "highlighting" text
 		Map<String, Object> highlighting = (Map<String, Object>) topObjects.get(5);
 		List<Object> highlightingObjects = (List<Object>) highlighting.get("nvPairs");
-		Map<String, Object> highlightingField = (Map<String, Object>) highlightingObjects.get(1);
-		List<Object> highlightingFieldObjects = (List<Object>) highlightingField.get("nvPairs");
+		if(!(highlightingObjects.isEmpty() || highlightingObjects==null))
+		{
+			Map<String, Object> highlightingField = (Map<String, Object>) highlightingObjects.get(1);
+			List<Object> highlightingFieldObjects = (List<Object>) highlightingField.get("nvPairs");
+			
+			Map<String, Object> highlightingFieldOffsets = (Map<String, Object>) highlightingFieldObjects.get(1);
+			List<Object> highlightingFieldOffsetsObjects = (List<Object>) highlightingFieldOffsets.get("nvPairs");
+			List<String> termsJson = (List<String>) highlightingFieldOffsetsObjects.get(1);
+			List<Double> positionsJson = (List<Double>) highlightingFieldOffsetsObjects.get(3);
+			List<List<Double>> offsetsJson = (List<List<Double>>) highlightingFieldOffsetsObjects.get(5);
 		
-		Map<String, Object> highlightingFieldOffsets = (Map<String, Object>) highlightingFieldObjects.get(1);
-		List<Object> highlightingFieldOffsetsObjects = (List<Object>) highlightingFieldOffsets.get("nvPairs");
-		List<String> termsJson = (List<String>) highlightingFieldOffsetsObjects.get(1);
-		List<Double> positionsJson = (List<Double>) highlightingFieldOffsetsObjects.get(3);
-		List<List<Double>> offsetsJson = (List<List<Double>>) highlightingFieldOffsetsObjects.get(5);
-	
-		terms.addAll(termsJson);
-		positions.addAll(positionsJson);
-		offsets.addAll(offsetsJson);
+			terms.addAll(termsJson);
+			positions.addAll(positionsJson);
+			offsets.addAll(offsetsJson);
+		}
 		
 	}
 
