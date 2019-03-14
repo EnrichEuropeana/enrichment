@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -49,7 +50,7 @@ public class NERController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest nerRequest) throws HttpException {
+			@RequestBody EnrichmentNERRequest nerRequest) throws HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -59,6 +60,9 @@ public class NERController extends BaseRest {
 			
 			return response;
 		} catch (HttpException e) {
+			throw e;
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
 			throw e;
 		}
 	}

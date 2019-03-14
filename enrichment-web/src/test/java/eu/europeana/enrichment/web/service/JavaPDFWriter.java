@@ -38,9 +38,12 @@ public class JavaPDFWriter
 	private Font yellowFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H,12, Font.BOLD, new CMYKColor(0, 0, 255, 0));
 	private Font normalFont = FontFactory.getFont(FONT, BaseFont.IDENTITY_H,  12);
 	
-	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities)
+	/*
+	 * translationOrOriginalText=0 -> write translated text in a pdf; translationOrOriginalText=1 -> write original text to pdf
+	 */
+	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText)
 	{
-		outputText=addSpecialCharactersToString(outputText, NERNamedEntities);
+		outputText=addSpecialCharactersToString(outputText, NERNamedEntities, translationOrOriginalText);
 		
 		Document document = new Document();
 		
@@ -110,7 +113,7 @@ public class JavaPDFWriter
 	}
 	
 	
-	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntity>> NERNamedEntities)
+	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText)
 	{
 		StringBuilder sb = new StringBuilder(textString);	 
 		
@@ -134,7 +137,13 @@ public class JavaPDFWriter
             		PositionEntity nextPosition=PositionsIterator.next();            		
             		
             		//here we have to update where to insert a symbol based on already inserted symbols
-        			int positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
+        			int positionToInsert;
+        			if (translationOrOriginalText==0) {
+        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
+        			}
+        			else {
+        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
+        			}
             		
         			if(key.equalsIgnoreCase("agent"))
         			{
@@ -151,7 +160,13 @@ public class JavaPDFWriter
         				sb.insert(positionToInsert, DIAMOND);
         			}
             		
-            		allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+        			if (translationOrOriginalText==0) {
+        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+        			}
+        			else
+        			{
+        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+        			}
             		
             	}
         	}

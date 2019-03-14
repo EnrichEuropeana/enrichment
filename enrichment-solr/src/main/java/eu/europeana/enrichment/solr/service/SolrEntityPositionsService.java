@@ -80,7 +80,7 @@ public interface SolrEntityPositionsService {
 		 * @return 
 		 * @throws SolrNamedEntityServiceException
 		 */
-		public double findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException;
+		public int findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException;
 
 
 }

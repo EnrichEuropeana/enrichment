@@ -34,6 +34,8 @@ import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -46,6 +48,12 @@ import org.json.JSONObject;
 import org.springframework.cache.annotation.Cacheable;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
+	
+	/*
+	 * Loading Solr service for finding the positions of Entities in the original text
+	 */
+	@Resource(name = "solrEntityPositionsService")
+	SolrEntityPositionsService solrEntityPositionsService;
 	
 	/*
 	 * Loading all translation services
@@ -96,7 +104,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	//@Cacheable("nerResults")
 	@Override
-	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException {
+	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException {
 		
 		List<String> storyItemIds = requestParam.getStoryItemIds();
 		
@@ -115,7 +123,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 	
 	@Override
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException {
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException {
 		
 		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		
@@ -156,7 +164,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
-		//check if named entities already exists
+		//check if named entities already exist
 		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
 			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryEntity.getStoryId(), false));
 		}
@@ -230,6 +238,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				else
 					resultMap.put(classificationType, tmpClassificationList);
 				
+				int offsetsOriginalText = -1;
+				
 				for (List<String> entityLabel : tmpResult.get(classificationType)) {
 					NamedEntity dbEntity;
 					/*
@@ -250,6 +260,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					defaultPosition.setStoryEntity(dbStoryEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					defaultPosition.addOfssetsTranslatedText(Integer.parseInt(entityLabel.get(1)));
+					//finding offset for NamedEntity in the original text using Solr Highlighter					
+					int entityPositionOriginalText = solrEntityPositionsService.findTermPositionsInStory(dbStoryEntity.getStoryId(), entityLabel.get(0), offsetsOriginalText);
+					offsetsOriginalText = entityPositionOriginalText;
+					defaultPosition.addOfssetsOriginalText(entityPositionOriginalText);
+				
 					
 					if(dbEntity != null) {
 						dbEntity.addPositionEntity(defaultPosition);

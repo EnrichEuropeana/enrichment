@@ -25,7 +25,8 @@ public class PositionEntityImpl implements PositionEntity{
 	TranslationEntity translationEntity;
 	
 	public PositionEntityImpl() {
-		offsetsTranslatedText = new ArrayList<>();
+		offsetsTranslatedText = new ArrayList<Integer>();
+		offsetsOriginalText = new ArrayList<Integer>();
 	}
 	
 	public String getStoryId() {

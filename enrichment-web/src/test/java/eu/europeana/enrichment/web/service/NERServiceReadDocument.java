@@ -25,33 +25,35 @@ public class NERServiceReadDocument {
 	@Resource(name= "europeanaJavaPDFWriter")
 	JavaPDFWriter europeanaJavaPDFWriter;
 
-	private String bookText;
+	private String translatedText;
 	private String originalText;
 	
 	public String getOriginalText() {
 		return originalText;
 	}
 
-	private String outputFile;
-	private String outputFormatedPDF;
+	private String resultsFile;
+	private String outputFormatedPDFTranslated;
+	private String outputFormatedPDFOriginal;
 	Logger logger = LogManager.getLogger(getClass());
 	
 	public String getBookText() {
-		return bookText;
+		return translatedText;
 	}
 
-	public NERServiceReadDocument (String fileURL, String outputFileURL, String outputFileFormatedPDF, String originalTextFileURL)
+	public NERServiceReadDocument (String translatedTextFileURL, String originalTextFileURL, String resultsFileURL, String outputFileFormatedPDFTranslation, String outputFileFormatedPDFOriginal)
 	{
-		outputFile=outputFileURL;
-		outputFormatedPDF=outputFileFormatedPDF;
+		resultsFile=resultsFileURL;
+		outputFormatedPDFTranslated=outputFileFormatedPDFTranslation;
+		outputFormatedPDFOriginal=outputFileFormatedPDFOriginal;
 		
-		if(fileURL.isEmpty()) {
+		if(translatedTextFileURL.isEmpty()) {
 			System.err.println("NERServiceReadDocument: No text to be analysed provided.");
 		}
 		else
 		{
 			try {
-				this.bookText=readFileAsString(fileURL);
+				this.translatedText=readFileAsString(translatedTextFileURL);
 				this.originalText=readFileAsString(originalTextFileURL);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -70,7 +72,7 @@ public class NERServiceReadDocument {
 	//writting results to an output file
 	public void writeToFile (TreeMap<String, List<NamedEntity>> NERNamedEntities) throws IOException {
 
-        File file = new File(outputFile);        
+        File file = new File(resultsFile);        
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.close();
         fileWriter = new FileWriter(file,true);
@@ -109,15 +111,22 @@ public class NERServiceReadDocument {
             	writer.newLine();
             	            	
             	//writting positions where the entities are found in the text
-            	writer.append("Positions: ");
-            	
+            	writer.append("Positions (translated text): ");            	
             	Iterator<PositionEntity> PositionsIterator = nextNEREntity.getPositionEntities().iterator();
             	while(PositionsIterator.hasNext()) {
             		
             		PositionEntity nextPosition=PositionsIterator.next();
             		writer.append(nextPosition.getOffsetsTranslatedText().get(0).toString() + ", ");
             	}
-            	
+
+            	writer.append("Positions (original text): ");            	
+            	PositionsIterator = nextNEREntity.getPositionEntities().iterator();
+            	while(PositionsIterator.hasNext()) {
+            		
+            		PositionEntity nextPosition=PositionsIterator.next();
+            		writer.append(nextPosition.getOffsetsOriginalText().get(0).toString() + ", ");
+            	}
+
             	writer.newLine();
             	writer.newLine();
             	writer.newLine();
@@ -129,7 +138,8 @@ public class NERServiceReadDocument {
 	    writer.close();
 	    
 	    //writting a formatted text to a pdf file for checking the results
-	    europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDF, bookText, NERNamedEntities);
+	    europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFTranslated, translatedText, NERNamedEntities, 0);
+	    europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFOriginal, originalText, NERNamedEntities, 1);
 	}
 	
 }

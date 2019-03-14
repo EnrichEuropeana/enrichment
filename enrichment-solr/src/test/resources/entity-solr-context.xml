@@ -38,6 +38,6 @@
 	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	
 	<bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
-		
+			
 
 </beans>

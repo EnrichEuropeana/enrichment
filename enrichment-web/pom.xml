@@ -55,6 +55,11 @@
 			<artifactId>commons-web</artifactId>
 			<version>${version.commonsApi}</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-solr</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
 		
 		
 		<!-- Other -->
@@ -273,6 +278,13 @@
     		<artifactId>itextpdf</artifactId>
     		<version>5.5.13</version>
 		</dependency>
+		
+	<dependency>
+	  	<groupId>org.apache.solr</groupId>
+	  	<artifactId>solr-solrj</artifactId>
+	  	<version>6.6.5</version>	  	
+	</dependency>
+		
 		
 	</dependencies>
 	
