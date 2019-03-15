@@ -52,8 +52,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	/*
 	 * Loading Solr service for finding the positions of Entities in the original text
 	 */
-	@Resource(name = "solrEntityPositionsService")
-	SolrEntityPositionsService solrEntityPositionsService;
+	@Resource(name = "solrEntityService")
+	SolrEntityPositionsService solrEntityService;
 	
 	/*
 	 * Loading all translation services
@@ -228,6 +228,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
 			
+			solrEntityService.findEntitiyOffsetsInOriginalText("en", dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryId(), tmpResult);
+			
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationList = new ArrayList<>();
 				/*
@@ -237,8 +239,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					tmpClassificationList = resultMap.get(classificationType);
 				else
 					resultMap.put(classificationType, tmpClassificationList);
-				
-				int offsetsOriginalText = -1;
 				
 				for (List<String> entityLabel : tmpResult.get(classificationType)) {
 					NamedEntity dbEntity;
@@ -260,10 +260,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					defaultPosition.setStoryEntity(dbStoryEntity);
 					defaultPosition.setTranslationEntity(dbTranslationEntity);
 					defaultPosition.addOfssetsTranslatedText(Integer.parseInt(entityLabel.get(1)));
-					//finding offset for NamedEntity in the original text using Solr Highlighter					
-					int entityPositionOriginalText = solrEntityPositionsService.findTermPositionsInStory(dbStoryEntity.getStoryId(), entityLabel.get(0), offsetsOriginalText);
-					offsetsOriginalText = entityPositionOriginalText;
-					defaultPosition.addOfssetsOriginalText(entityPositionOriginalText);
+					defaultPosition.addOfssetsOriginalText(Integer.parseInt(entityLabel.get(2)));
 				
 					
 					if(dbEntity != null) {

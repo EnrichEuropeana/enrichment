@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 public class LevenschteinDistance {
 
-	private int costOfSubstitution(char a, char b) {
+	public int costOfSubstitution(char a, char b) {
         return a == b ? 0 : 1;
     }
 	
-	private int min(int... numbers) {
+	public int min(int... numbers) {
         return Arrays.stream(numbers).min().orElse(Integer.MAX_VALUE);
     }
 	

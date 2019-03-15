@@ -46,37 +46,15 @@
 	
 	<!-- NER service beans -->
 	<!--  https://docs.spring.io/spring/docs/2.5.3/reference/beans.html#beans-factory-collaborators -->
-	
-	<beans:bean id="europeanaApiClient" class="eu.europeana.entity.client.web.WebEntityProtocolApiImpl" />
-	<beans:bean id="europeanaEntityService" class="eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.linking.europeana.apikey}"/>
+    
+  	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.domain}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.requesterCallback}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.errorCallback}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.emailDestination}"/>
 	</beans:bean>
-	<beans:bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
-	<beans:bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
-	
-	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
-	</beans:bean>
-	<beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
-	</beans:bean>
-	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model7}"/>
-	</beans:bean>
-	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
-	</beans:bean>
-	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
-	</beans:bean>
-	<beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
-		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
-        <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
-	</beans:bean>
-   
-    	
-   	<beans:bean id="solrEntityPositionsService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl">
-    </beans:bean>
+	<beans:bean id="translationLanguageTool" class="eu.europeana.enrichment.translation.internal.TranslationLanguageTool" />
+    
  
 </beans:beans>
