@@ -2,6 +2,7 @@ package eu.europeana.enrichment.solr.service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.TreeMap;
 
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -72,7 +73,7 @@ public interface SolrEntityPositionsService {
 
 		/**
 		 * 	
-		 * This method finds the positions of the terms in the given field using the adapted version of Solr-Highlighter
+		 * This method finds the positions of the NamedEntity terms in the original text using the adapted version of Solr-Highlighter
 		 * 
 		 * @param storyId
 		 * @param term
@@ -81,6 +82,18 @@ public interface SolrEntityPositionsService {
 		 * @throws SolrNamedEntityServiceException
 		 */
 		public int findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException;
+
+		/**
+		 * This function implements finding the positions of the identified entities (using the given NER tool) 
+		 * in the original text 
+		 * 
+		 * @param originalLanguage
+		 * @param targetLanguage
+		 * @param storyId
+		 * @param identifiedNER
+		 * @throws SolrNamedEntityServiceException
+		 */
+		public void findEntitiyOffsetsInOriginalText(String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException;
 
 
 }

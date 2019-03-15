@@ -134,40 +134,56 @@ public class JavaPDFWriter
         		
             	while(PositionsIterator.hasNext()) {
             		
-            		PositionEntity nextPosition=PositionsIterator.next();            		
+            		PositionEntity nextPosition=PositionsIterator.next();   
             		
-            		//here we have to update where to insert a symbol based on already inserted symbols
-        			int positionToInsert;
-        			if (translationOrOriginalText==0) {
-        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
+            		/*
+            		 * check if the position is valid, if the value is <0 it is not valid meaning the NamedEntity is not found
+            		 */
+            		
+            		int checkIfPositionIsValid;
+            		if (translationOrOriginalText==0) {
+            			checkIfPositionIsValid = nextPosition.getOffsetsTranslatedText().get(0);
         			}
         			else {
-        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
+        				checkIfPositionIsValid = nextPosition.getOffsetsOriginalText().get(0);
         			}
             		
-        			if(key.equalsIgnoreCase("agent"))
-        			{
-            			sb.insert(positionToInsert, SPADE);
-        			}
-        			else if(key.equalsIgnoreCase("organization"))
-        			{
-        				//this symbol is a HEART character
-        				sb.insert(positionToInsert, HEART);
-        			}
-        			else if(key.equalsIgnoreCase("place"))
-        			{
-        				//this symbol is a DIAMOND character
-        				sb.insert(positionToInsert, DIAMOND);
-        			}
-            		
-        			if (translationOrOriginalText==0) {
-        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
-        			}
-        			else
-        			{
-        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
-        			}
-            		
+            		if(checkIfPositionIsValid>=0)
+            		{
+	            		/* 
+	            		 * here we have to update where to insert a symbol based on already inserted symbols
+	            		 */
+	        			int positionToInsert;
+	        			if (translationOrOriginalText==0) {
+	        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
+	        			}
+	        			else {
+	        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
+	        			}
+	            		
+	        			if(key.equalsIgnoreCase("agent"))
+	        			{
+	            			sb.insert(positionToInsert, SPADE);
+	        			}
+	        			else if(key.equalsIgnoreCase("organization"))
+	        			{
+	        				//this symbol is a HEART character
+	        				sb.insert(positionToInsert, HEART);
+	        			}
+	        			else if(key.equalsIgnoreCase("place"))
+	        			{
+	        				//this symbol is a DIAMOND character
+	        				sb.insert(positionToInsert, DIAMOND);
+	        			}
+	            		
+	        			if (translationOrOriginalText==0) {
+	        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+	        			}
+	        			else
+	        			{
+	        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+	        			}
+            		}
             	}
         	}
 		

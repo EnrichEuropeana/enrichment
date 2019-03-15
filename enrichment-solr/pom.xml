@@ -29,12 +29,12 @@
  			<artifactId>enrichment-mongo</artifactId>
 		<version>${version.enrichmentAPI}</version>
 	</dependency>
-	
 	<dependency>
 		<groupId>eu.europeana.enrich</groupId>
- 			<artifactId>enrichment-ner</artifactId>
+ 			<artifactId>enrichment-translation</artifactId>
 		<version>${version.enrichmentAPI}</version>
 	</dependency>
+	
 	
 	<!-- dependency>
 		<groupId>eu.europeana.enrich</groupId>

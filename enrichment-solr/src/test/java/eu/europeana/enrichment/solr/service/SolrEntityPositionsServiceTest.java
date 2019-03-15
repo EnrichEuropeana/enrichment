@@ -22,7 +22,6 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 @ContextConfiguration(locations = "classpath:entity-solr-context.xml")
 
 public class SolrEntityPositionsServiceTest {
-
 	
 	@Resource
 	SolrEntityPositionsService solrEntityService;

@@ -104,8 +104,5 @@
     <beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
     	<beans:property name="messageSource" ref="enrichment_i18n_messageSource"/>
     </beans:bean>
-    	
-   	<beans:bean id="solrEntityPositionsService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl">
-    </beans:bean>
- 
+    	 
 </beans:beans>

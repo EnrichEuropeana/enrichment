@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import javax.annotation.Resource;
+
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -14,6 +16,8 @@ import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 
 
 public class NERStanfordServiceImpl implements NERService{
@@ -80,10 +84,10 @@ public class NERStanfordServiceImpl implements NERService{
 					word = previousWord + " " + word;
 					wordOffset=previousOffset;
 					
-					String[] wordWithPositionPrevious = new String[2];
-					wordWithPositionPrevious[0]=previousWord;
-					wordWithPositionPrevious[1]=String.valueOf(previousOffset);
-					map.get(category).remove(Arrays.asList(wordWithPositionPrevious));
+					List<String> wordWithPositionPrevious = new ArrayList<String>();
+					wordWithPositionPrevious.add(previousWord);
+					wordWithPositionPrevious.add(String.valueOf(previousOffset));
+					map.get(category).remove(wordWithPositionPrevious);
 				}
 				
 				previousWord = word;
@@ -92,17 +96,18 @@ public class NERStanfordServiceImpl implements NERService{
 				
 				if (!"O".equals(category)) {
 					
-					String[] wordWithPosition = new String[2];
-					wordWithPosition[0]=word;
-					wordWithPosition[1]=String.valueOf(wordOffset);
+					
+					List<String> wordWithPosition = new ArrayList<String>();
+					wordWithPosition.add(word);
+					wordWithPosition.add(String.valueOf(wordOffset));
 							
 					
 					if (map.containsKey(category)) {
 						// key is already their just insert in the list {word,position}
-						map.get(category).add(Arrays.asList(wordWithPosition));
+						map.get(category).add(wordWithPosition);
 					} else {
 						List<List<String>> temp = new ArrayList<List<String>>();					
-						temp.add(Arrays.asList(wordWithPosition));
+						temp.add(wordWithPosition);
 						map.put(category, temp);
 					}
 					//System.out.println(word + ":" + category);
