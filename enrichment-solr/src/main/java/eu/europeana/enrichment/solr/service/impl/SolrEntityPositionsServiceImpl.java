@@ -36,6 +36,7 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
+import eu.europeana.enrichment.solr.commons.Stemmer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
@@ -60,6 +61,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	
 	private final int LevenschteinDistanceThreshold = 2;
+	private final int minRangeOfCharsToObserve = 2000;
+	private final double scaleFactorRangeOfCharsToObserve = 1.5;
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String> ();
 	
@@ -200,13 +203,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public int findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException {
+	public int findTermPositionsInStory(String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException {
 	
 		SolrQuery query = new SolrQuery();
 		/*
-		 * convert to lower case and from UTF-8 to ASCII since in Solt we use the filter for lower case solr.LowerCaseFilterFactory" 
+		 * convert to lower case and from UTF-8 to ASCII since in Solr we use the filter for lower case solr.LowerCaseFilterFactory" 
 		 */
-		String termLowerCase=term.toLowerCase();	
+		
+		String termLowerCase=term.toLowerCase();
+		//String termLowerCase=term;
 		
 		termLowerCase = termLowerCase.replace("ă", "a");
 		termLowerCase = termLowerCase.replace("â", "a");
@@ -223,9 +228,16 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 	
 		/*
+		Stemmer stemmerTerm = new Stemmer();
+		stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
+		stemmerTerm.stem();
+		String termLowerCaseStemmed = stemmerTerm.toString();
+		*/
+		
+		/*
 		 * this part creates query parameters for the Solr Highlighter using complexphrase query highlighter. An example of the query 
 		 * to search for the name: "Dumitru Nistor" in the StoryEntity:
-		 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru" AND story_text:"nistor" AND story_id:"bookDumitruTest2"&wt=json
+		 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru~" AND story_text:"nistor~" AND story_id:"bookDumitruTest2"&wt=json
 		 */
 		query.setRequestHandler("/select");		
 		query.set("hl.fl",StoryEntitySolrFields.TEXT);
@@ -240,14 +252,14 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 			for (String termWord : searchTermWords)
 			{
-				adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + termWord + "~" + "\"";
+				adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + termWord + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
 				adaptedTerm += " AND ";
 			}
 			adaptedTerm += StoryEntitySolrFields.STORY_ID+":"+storyId;
 		}
 		else
 		{
-			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCaseAndASCII + "~" + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
+			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCaseAndASCII + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
 			
 		}
 		query.set("q", adaptedTerm);
@@ -268,6 +280,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		log.info("Solr response: " + response.toString());
 		
+		/*
+		 * parsing the obtained json response to extract the offsets, terms and positions
+		 */
 		try {
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
@@ -284,7 +299,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 			if(termsAdapted.isEmpty()) return -1;
 			//finding the exact offset of the term from the list of all offsets
-			double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length);
+			double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length, rangeToObserve);
 			return (int) exactOffset;
 		}
 		else
@@ -296,14 +311,18 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	/**
-	 * This method performs a binary search in the array of offsets to find the first one greater than the given number
+	 * This method performs a binary search in the array of offsets to find the first one greater than the given number,
+	 * taking into account that it is in the given searching range, i.e. lastOffset+rangeToObserve, otherwise the function 
+	 * returns -1 if the offset is not found
 	 * 
 	 * @param offsets
-	 * @param target
+	 * @param lastOffset
+	 * @param numberWordsInTerm
+	 * @param rangeToObserve
 	 * @return
 	 */
 	
-	private double findNextOffset (List<List<Double>> offsets, int lastOffset, int numberWordsInTerm) 
+	private double findNextOffset (List<List<Double>> offsets, int lastOffset, int numberWordsInTerm, int rangeToObserve) 
     { 
 		/*
 		 * taking just the first number in the list because the "arr" list returns offsets 
@@ -322,8 +341,13 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 		//sorting in ascending order (1,5,7,13,...)
 		Collections.sort(adaptedOffsets);
-		
-        int start = 0, end = adaptedOffsets.size() - 1; 
+			
+        int start = 0, end = adaptedOffsets.size() - 1;
+        
+        if(adaptedOffsets.get(end) <= lastOffset) 
+        {
+        	return -1;
+        }
   
         int ans = 0; 
         while (start <= end) { 
@@ -340,6 +364,12 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
                 end = mid - 1; 
             } 
         } 
+        
+        if(adaptedOffsets.get(ans) > lastOffset + rangeToObserve) 
+        {
+        	return -1;
+        }
+        
         return adaptedOffsets.get(ans); 
     } 
 
@@ -348,7 +378,18 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	 * This function adapts the terms, positions (in terms of words), and offsets (in terms of characters) obtained
 	 * from the Solr HIghlighter query using "complexphrase" query parser. This parser is used in order to find the 
 	 * NamedEntities that contain several words, e.g. "Dumitru Nistor". In the original text the name can be a bit 
-	 * different like "Dumitrua Nistora" where we have to use fuzzy search in order to find both parts of the name. 
+	 * different like "Dumitrua Nistora" where we have to use fuzzy search in order to find both parts of the name.
+	 * So, since there can be very different words found for the query, this function removes the ones that definitely
+	 * do not belong there. For example, if we search for the complex phrase "Dumitru Nistor":
+	 * 1) two separate searches are done in the query: "dumitru~" AND "nistor~", which also finds the 2 words that are not exactly one after another
+	 * and we just keep those combinations that are one after another by checking the "positions" list (the position of the word in terms of how many words are in front of it) 
+	 * to be 2 consecutive numbers. The reason why we used 2 separate phrases for the search in that the new adapted Solr Highlighter cannot deal with one complex phrase search
+	 * like "dumitru~ nistor~".
+	 * 2) another check is done so that the words that are found correspond to the words in the term (so that we do not have two the same words one after another like "dumitru" "dumitru")
+	 * but like ("dumitru" "nistor")
+	 * 3) additional logic for the word matching is added: the search and found words must start with the same chars (the number of checked chars is the half of the searched string).
+	 * This is done to avoid matching like this: for "Pola" the match can be "ol, oa, oli", etc. 
+	 *  
 	 * contain 
 	 * 
 	 * @param searchTerm
@@ -389,7 +430,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 					//int lengthToCheck = searchTermWords[j].length()/2;
 					if(terms.get(i+j).length()>=lengthToCheck)
 					{
-						int compareStart = terms.get(i+j).substring(0, lengthToCheck).compareToIgnoreCase(searchTermWords[j].substring(0, lengthToCheck));
+						int compareStart = terms.get(i+j).substring(0, lengthToCheck).compareTo(searchTermWords[j].substring(0, lengthToCheck));
 						if((levenschteinDistance.calculateLevenshteinDistance(terms.get(i+j), searchTermWords[j]) > LevenschteinDistanceThreshold) || compareStart!=0)
 						{
 							found=false;
@@ -467,9 +508,14 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		//finding offset in the original text using Solr Highlighter	
 		int offsetsOriginalText = -1;
+		int rangeToObserve = 0;
+		
 		for(int i=0;i<entitiesOriginalText.size();i++)
-		{
-			int wordOffsetOriginalText = findTermPositionsInStory(storyId, entitiesOriginalText.get(i), offsetsOriginalText);
+		{	
+			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
+			rangeToObserve = (int) Math.ceil((charRangeTranslatedText * scaleFactorRangeOfCharsToObserve < minRangeOfCharsToObserve) ? minRangeOfCharsToObserve : charRangeTranslatedText * scaleFactorRangeOfCharsToObserve);
+						  
+			int wordOffsetOriginalText = findTermPositionsInStory(storyId, entitiesOriginalText.get(i), offsetsOriginalText, rangeToObserve);
 			if(wordOffsetOriginalText!=-1)
 			{
 				offsetsOriginalText = wordOffsetOriginalText;
