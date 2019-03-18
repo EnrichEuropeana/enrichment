@@ -72,16 +72,17 @@ public interface SolrEntityPositionsService {
 		public List<Integer> searchByEntityName(String entityName) throws SolrNamedEntityServiceException;
 
 		/**
-		 * 	
 		 * This method finds the positions of the NamedEntity terms in the original text using the adapted version of Solr-Highlighter
+		 * The found offset is the first one greater than startAfterOffset and smaller than startAfterOffset+rangeToObserve
 		 * 
 		 * @param storyId
 		 * @param term
 		 * @param startAfterOffset
-		 * @return 
+		 * @param rangeToObserve
+		 * @return
 		 * @throws SolrNamedEntityServiceException
 		 */
-		public int findTermPositionsInStory(String storyId, String term, int startAfterOffset) throws SolrNamedEntityServiceException;
+		public int findTermPositionsInStory(String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException;
 
 		/**
 		 * This function implements finding the positions of the identified entities (using the given NER tool) 

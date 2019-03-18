@@ -1,0 +1,11 @@
+This folder solr-config contains the config files that Solr server needs in order to work properly.
+So for the concrete solr configuration for the Enrichment-Europeana project the following is necessary:
+
+1) in the installed Solr directory, e.g. C:\install\solr-6.6.5\server create a new directory called e.g. solr-enrichment
+2) copy the file solr.xml from this folder to the created directory solr-enrichment
+3) create a Solr core named "enrichment" using the solr.cmd in C:\install\solr-6.6.5\bin (please see help options for that)
+4) copy the rest 2 files from this directory: solrconfig.xml and schema.xml, to the folder C:\install\solr-6.6.5\server\solr-enrichment\enrichment\conf
+5) start solr server: solr.cmd start -s  C:/install/solr-6.6.5/server/solr-enrichment
+
+Now the Solr server can be used from the Enrich-Europeana code. Happy search!
+ 
