@@ -11,8 +11,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -28,6 +30,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.apache.solr.common.SolrDocumentList;
 import org.json.simple.parser.ParseException;
+import org.tartarus.snowball.SnowballStemmer;
+import org.tartarus.snowball.ext.englishStemmer;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -61,10 +65,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private final int minRangeOfCharsToObserve = 2000;
+	private final int minRangeOfCharsToObserve = 5000;
 	private final double scaleFactorRangeOfCharsToObserve = 1.5;
 	private final Logger log = LogManager.getLogger(getClass());
-	private List<String> entitiesOriginalText = new ArrayList<String> ();
+	private Map<String, String> entitiesOriginalText = new HashMap<String, String>();
 	
 	public SolrEntityPositionsServiceImpl(String translatedEntities) {
 		
@@ -81,9 +85,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			for(int i=0;i<entities.length;i++)
 			{
 				String[] entityType = entities[i].split("\\s+",2);
-				entitiesOriginalText.add(entityType[1]); 
+				entitiesOriginalText.put(entityType[1], entityType[1]); 
 			}
-			
 			
 		}
 
@@ -213,6 +216,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		String termLowerCase=term.toLowerCase();
 		//String termLowerCase=term;
 		
+		
 		termLowerCase = termLowerCase.replace("ă", "a");
 		termLowerCase = termLowerCase.replace("â", "a");
 		termLowerCase = termLowerCase.replace("î", "i");
@@ -227,6 +231,23 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			e1.printStackTrace();
 		}
 	
+		SnowballStemmer snowballStemmer = new englishStemmer();
+		String [] termLowerCaseWords = termLowerCaseAndASCII.split("\\s+");
+		String termLowerCaseStemmed = "";
+		for (int i=0;i<termLowerCaseWords.length;i++)
+		{		
+			snowballStemmer.setCurrent(termLowerCaseWords[i]);
+		    snowballStemmer.stem();
+		    if(i==termLowerCaseWords.length-1)
+		    {
+		    	termLowerCaseStemmed += snowballStemmer.getCurrent();	
+		    }
+		    else
+		    {
+		    	termLowerCaseStemmed += snowballStemmer.getCurrent()+" ";	
+		    }
+		}
+
 		/*
 		Stemmer stemmerTerm = new Stemmer();
 		stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
@@ -245,7 +266,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		query.set("indent","on");
 		query.set("defType","complexphrase");
 		
-		String [] searchTermWords = termLowerCaseAndASCII.split("\\s+");
+		String [] searchTermWords = termLowerCaseStemmed.split("\\s+");
 		String adaptedTerm = "";
 		if(searchTermWords.length>1)
 		{
@@ -259,7 +280,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		else
 		{
-			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCaseAndASCII + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
+			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCaseStemmed + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
 			
 		}
 		query.set("q", adaptedTerm);
@@ -278,7 +299,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		List<Double> positions = new ArrayList<Double>();
 		List<List<Double>> offsets = new ArrayList<List<Double>>();
 		
-		log.info("Solr response: " + response.toString());
+		log.info("Solr query: " + query.toString());
+		log.info("Solr query response, terms: " + terms.toString());
+		log.info("Solr query response, offsets: " + offsets.toString());
+		
 		
 		/*
 		 * parsing the obtained json response to extract the offsets, terms and positions
@@ -286,7 +310,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		try {
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
-			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseAndASCII,e);
+			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
 		}
 	
 		if(!terms.isEmpty())
@@ -295,7 +319,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			List<Double> positionsAdapted = new ArrayList<Double>();
 			List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
 			
-			adaptTermsPositionsOffsets(termLowerCaseAndASCII,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
+			adaptTermsPositionsOffsets(termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
 	
 			if(termsAdapted.isEmpty()) return -1;
 			//finding the exact offset of the term from the list of all offsets
@@ -418,31 +442,34 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			}
 			if(consecutivePositions)
 			{
-				boolean found = true;
-				for (int j=0;j<searchTermWords.length;j++)
-				{
-					/*
-					 * here we check that the searching word and the one found start with the same characters in order to avoid 
-					 * some conditions where Levenschteins distance alone is not good, e.g. for the word Pola, words like: la, ol, oa, etc. 
-					 * will all be matched which is not desirable
-					 */
-					int lengthToCheck = (int) Math.ceil(searchTermWords[j].length()/2.0);
-					//int lengthToCheck = searchTermWords[j].length()/2;
-					if(terms.get(i+j).length()>=lengthToCheck)
-					{
-						int compareStart = terms.get(i+j).substring(0, lengthToCheck).compareTo(searchTermWords[j].substring(0, lengthToCheck));
-						if((levenschteinDistance.calculateLevenshteinDistance(terms.get(i+j), searchTermWords[j]) > LevenschteinDistanceThreshold) || compareStart!=0)
-						{
-							found=false;
-							break;
-						}
-					}
-					else
-					{
-						found=false;
-						break;
-					}
-				}
+				
+//				boolean found = true;
+//				for (int j=0;j<searchTermWords.length;j++)
+//				{
+//					/*
+//					 * here we check that the searching word and the one found start with the same characters in order to avoid 
+//					 * some conditions where Levenschteins distance alone is not good, e.g. for the word Pola, words like: la, ol, oa, etc. 
+//					 * will all be matched which is not desirable
+//					 */
+//					int lengthToCheck = lengthToCheck(searchTermWords[j]);
+//										
+//					if(terms.get(i+j).length()>=lengthToCheck)
+//					{
+//						int compareStart = (lengthToCheck==0) ? 0 : terms.get(i+j).substring(0, lengthToCheck).compareTo(searchTermWords[j].substring(0, lengthToCheck));
+//						if((levenschteinDistance.calculateLevenshteinDistance(terms.get(i+j), searchTermWords[j]) > LevenschteinDistanceThreshold) || compareStart!=0)
+//						{
+//							found=false;
+//							break;
+//						}
+//					}
+//					else
+//					{
+//						found=false;
+//						break;
+//					}
+//				}
+				
+				boolean found = foundSearchPhrase(terms, searchTermWords, i);
 					
 				if(found)
 				{
@@ -458,7 +485,63 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 		}
 	}
+	
+	private boolean foundSearchPhrase (List<String> terms, String [] searchTermWords, int startIndex)
+	{
+		List<String> termsNew = new ArrayList<String>();
+		List<String> searchTermWordsNew = new ArrayList<String>();
+		
+		for (int i=0;i<searchTermWords.length;i++)
+		{
+			termsNew.add(terms.get(startIndex+i));	
+			searchTermWordsNew.add(searchTermWords[i]);
+		}
+		
+		for (int i=0;i<termsNew.size();i++)
+		{
+			int found=-1;
+			for(int j=0;j<searchTermWordsNew.size();j++)
+			{
+				int lengthToCheck = lengthToCheck(searchTermWordsNew.get(j));
+				
+				if(termsNew.get(i).length()>=lengthToCheck)
+				{
+					int compareStart = (lengthToCheck==0) ? 0 : termsNew.get(i).substring(0, lengthToCheck).compareTo(searchTermWordsNew.get(j).substring(0, lengthToCheck));
+					if((levenschteinDistance.calculateLevenshteinDistance(termsNew.get(i), searchTermWordsNew.get(j)) <= LevenschteinDistanceThreshold) && compareStart==0)
+					{
+						found=j;
+						break;
+					}
+				}				
+			}
+			
+			if(found!=-1)
+			{
+				termsNew.remove(i);
+				searchTermWordsNew.remove(found);
+				i-=1;
+			}
+			
+		}
+		
+		if (termsNew.size()==0) return true;
+		else return false;
+		
+	}
 
+	private int lengthToCheck(String word) {
+		
+		if(word.length()<5) {
+			return word.length();
+		}
+		else if(word.length()==5) {
+			return 4;
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 	@Override
 	public void findEntitiyOffsetsInOriginalText(String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException
@@ -515,7 +598,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
 			rangeToObserve = (int) Math.ceil((charRangeTranslatedText * scaleFactorRangeOfCharsToObserve < minRangeOfCharsToObserve) ? minRangeOfCharsToObserve : charRangeTranslatedText * scaleFactorRangeOfCharsToObserve);
 						  
-			int wordOffsetOriginalText = findTermPositionsInStory(storyId, entitiesOriginalText.get(i), offsetsOriginalText, rangeToObserve);
+			int wordOffsetOriginalText = findTermPositionsInStory(storyId, entitiesOriginalText, offsetsOriginalText, rangeToObserve);
 			if(wordOffsetOriginalText!=-1)
 			{
 				offsetsOriginalText = wordOffsetOriginalText;

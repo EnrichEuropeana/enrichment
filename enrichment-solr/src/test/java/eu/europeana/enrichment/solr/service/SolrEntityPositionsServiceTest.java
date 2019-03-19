@@ -43,7 +43,7 @@ public class SolrEntityPositionsServiceTest {
 		
 		double termOffset = 0;
 		try {
-			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru nistor",0,dbStoryEntity.getStoryTranscription().length());//Năsăud
+			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru peter",0,dbStoryEntity.getStoryTranscription().length());//Năsăud
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
