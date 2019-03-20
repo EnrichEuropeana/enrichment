@@ -228,7 +228,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
 			
-			solrEntityService.findEntitiyOffsetsInOriginalText("en", dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryId(), tmpResult);
+			solrEntityService.findEntitiyOffsetsInOriginalText(true, "en", dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryId(), tmpResult);
 			
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationList = new ArrayList<>();

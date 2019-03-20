@@ -42,12 +42,12 @@ public class SolrEntityPositionsServiceTest {
 		solrEntityService.store(dbStoryEntity, true);
 		
 		double termOffset = 0;
-		try {
-			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru peter",0,dbStoryEntity.getStoryTranscription().length());//Năsăud
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			termOffset = solrEntityService.findTermPositionsInStory("bookDumitruTest2", "dumitru peter",0,dbStoryEntity.getStoryTranscription().length());//Năsăud
+//		} catch (SolrNamedEntityServiceException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		log.info("The found term offset using Solr HIghlighter is: " + Double.toString(termOffset));
 		
