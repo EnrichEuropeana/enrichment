@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,6 +35,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.json.simple.parser.ParseException;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
+import org.tartarus.snowball.ext.romanianStemmer;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
@@ -65,10 +69,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private final int minRangeOfCharsToObserve = 5000;
+	private int minRangeOfCharsToObserve = 1000;
+	private int rangeOfCharsToObserve = 1000;
 	private final double scaleFactorRangeOfCharsToObserve = 1.5;
 	private final Logger log = LogManager.getLogger(getClass());
-	private Map<String, String> entitiesOriginalText = new HashMap<String, String>();
+	private List<String> entitiesOriginalText = new ArrayList<String>();
 	
 	public SolrEntityPositionsServiceImpl(String translatedEntities) {
 		
@@ -85,7 +90,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			for(int i=0;i<entities.length;i++)
 			{
 				String[] entityType = entities[i].split("\\s+",2);
-				entitiesOriginalText.put(entityType[1], entityType[1]); 
+				entitiesOriginalText.add(entityType[1]); 
 			}
 			
 		}
@@ -206,85 +211,19 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public int findTermPositionsInStory(String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException {
+	public int findTermPositionsInStory(String language, boolean fuzzyLogic, String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException {
 	
-		SolrQuery query = new SolrQuery();
 		/*
-		 * convert to lower case and from UTF-8 to ASCII since in Solr we use the filter for lower case solr.LowerCaseFilterFactory" 
+		 * filtering the searchTerm
 		 */
-		
-		String termLowerCase=term.toLowerCase();
-		//String termLowerCase=term;
-		
-		
-		termLowerCase = termLowerCase.replace("ă", "a");
-		termLowerCase = termLowerCase.replace("â", "a");
-		termLowerCase = termLowerCase.replace("î", "i");
-		termLowerCase = termLowerCase.replace("ş", "s");
-		termLowerCase = termLowerCase.replace("ţ", "t");
-
-		String termLowerCaseAndASCII="";
-		try {
-			termLowerCaseAndASCII = new String(termLowerCase.getBytes("ISO-8859-2"), "ASCII");
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-	
-		SnowballStemmer snowballStemmer = new englishStemmer();
-		String [] termLowerCaseWords = termLowerCaseAndASCII.split("\\s+");
-		String termLowerCaseStemmed = "";
-		for (int i=0;i<termLowerCaseWords.length;i++)
-		{		
-			snowballStemmer.setCurrent(termLowerCaseWords[i]);
-		    snowballStemmer.stem();
-		    if(i==termLowerCaseWords.length-1)
-		    {
-		    	termLowerCaseStemmed += snowballStemmer.getCurrent();	
-		    }
-		    else
-		    {
-		    	termLowerCaseStemmed += snowballStemmer.getCurrent()+" ";	
-		    }
-		}
-
+		String termLowerCaseStemmed = filterSearchTerms(language, term);
+				
 		/*
-		Stemmer stemmerTerm = new Stemmer();
-		stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
-		stemmerTerm.stem();
-		String termLowerCaseStemmed = stemmerTerm.toString();
-		*/
-		
-		/*
-		 * this part creates query parameters for the Solr Highlighter using complexphrase query highlighter. An example of the query 
-		 * to search for the name: "Dumitru Nistor" in the StoryEntity:
-		 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru~" AND story_text:"nistor~" AND story_id:"bookDumitruTest2"&wt=json
+		 * creating Solr query for finding offsets unsing Highlighter
 		 */
-		query.setRequestHandler("/select");		
-		query.set("hl.fl",StoryEntitySolrFields.TEXT);
-		query.set("hl","on");		
-		query.set("indent","on");
-		query.set("defType","complexphrase");
-		
-		String [] searchTermWords = termLowerCaseStemmed.split("\\s+");
-		String adaptedTerm = "";
-		if(searchTermWords.length>1)
-		{
-			
-			for (String termWord : searchTermWords)
-			{
-				adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + termWord + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
-				adaptedTerm += " AND ";
-			}
-			adaptedTerm += StoryEntitySolrFields.STORY_ID+":"+storyId;
-		}
-		else
-		{
-			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + termLowerCaseStemmed + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\""+" AND "+StoryEntitySolrFields.STORY_ID+":"+storyId;
-			
-		}
-		query.set("q", adaptedTerm);
-		query.set("wt","json");	
+		Map<String, String> querySearchParams = new HashMap<String, String>();
+		querySearchParams.put(StoryEntitySolrFields.STORY_ID, storyId);
+		SolrQuery query = createSolrQuery(fuzzyLogic,termLowerCaseStemmed,querySearchParams);
 		
 		QueryResponse response=null;
 		
@@ -299,11 +238,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		List<Double> positions = new ArrayList<Double>();
 		List<List<Double>> offsets = new ArrayList<List<Double>>();
 		
-		log.info("Solr query: " + query.toString());
-		log.info("Solr query response, terms: " + terms.toString());
-		log.info("Solr query response, offsets: " + offsets.toString());
-		
-		
 		/*
 		 * parsing the obtained json response to extract the offsets, terms and positions
 		 */
@@ -312,25 +246,175 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		} catch (ParseException e) {
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
 		}
+		
+		if(terms.isEmpty()) return -1;
 	
-		if(!terms.isEmpty())
+		if(fuzzyLogic)
 		{
 			List<String> termsAdapted = new ArrayList<String>();
 			List<Double> positionsAdapted = new ArrayList<Double>();
 			List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
 			
+			log.info("Solr query: " + query.toString());
+			log.info("Solr query response, terms adapted: " + termsAdapted.toString());
+			log.info("Solr query response, offsets adapted: " + offsetsAdapted.toString());
+			
 			adaptTermsPositionsOffsets(termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
 	
 			if(termsAdapted.isEmpty()) return -1;
 			//finding the exact offset of the term from the list of all offsets
-			double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,searchTermWords.length, rangeToObserve);
+			double exactOffset = findNextOffset(offsetsAdapted, startAfterOffset,termLowerCaseStemmed.split("\\s+").length, rangeToObserve);
 			return (int) exactOffset;
 		}
 		else
 		{
-			return -1;
+			double exactOffset = findNextOffset(offsets, startAfterOffset,termLowerCaseStemmed.split("\\s+").length, rangeToObserve);
+			return (int) exactOffset;
 		}
 	
+		
+	}
+	/**
+	 * This function filters the initial search term with additional analysis. It corresponds to the solr filter and analyzers 
+	 * used for indexing and searching. This function should exactly mimic the behavior of the solr configuration filters and 
+	 * analyzers in the solr configuration file schema.xml. However, it does not have to be that way. 
+	 * 
+	 * @param language
+	 * @param searchTerm
+	 * @return
+	 */
+	
+	private String filterSearchTerms(String language, String searchTerm)
+	{
+		/*
+		 * to lower case filter
+		 */
+		String termLowerCase=searchTerm.toLowerCase();
+		
+		Pattern ptn = Pattern.compile("[\\p{Punct}\\p{Digit}&&[^-]]");
+        Matcher mtch = ptn.matcher(termLowerCase);
+        String termRemovedSpecialChars = mtch.replaceAll("");
+		
+		/*
+		 * to ASCII code filter
+		 */
+
+		String termLowerCaseStemmed = "";
+		if(language.compareToIgnoreCase("ro")==0)
+		{
+//			termLowerCase = termLowerCase.replace("ă", "a");
+//			termLowerCase = termLowerCase.replace("â", "a");
+//			termLowerCase = termLowerCase.replace("î", "i");
+//			termLowerCase = termLowerCase.replace("ş", "s");
+//			termLowerCase = termLowerCase.replace("ţ", "t");
+					
+//			termLowerCase = Normalizer.normalize(termLowerCase, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+	        					
+//			try {
+//				/*
+//				 * please see here for the char standards for different languages: https://www.terena.org/activities/multiling/ml-docs/iso-8859.html
+//				 */
+//				termLowerCaseAndASCII = new String(termLowerCase.getBytes("ISO-8859-2"), "ASCII");
+//			} catch (UnsupportedEncodingException e1) {				
+//				e1.printStackTrace();
+//			}
+			
+			SnowballStemmer snowballStemmer = new romanianStemmer();
+			String [] termLowerCaseWords = termRemovedSpecialChars.split("\\s+");	
+			
+			for (int i=0;i<termLowerCaseWords.length;i++)
+			{		
+				snowballStemmer.setCurrent(termLowerCaseWords[i]);
+			    snowballStemmer.stem();
+			    if(i==termLowerCaseWords.length-1)
+			    {
+					/*
+					 * to ASCII replacement filter (e.g.ä->a, etc.) together with a stemmer
+					 */
+			    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+			    }
+			    else
+			    {
+			    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "") + " ";	
+			    }
+
+			}
+			
+			/*
+			//another stemmer
+			Stemmer stemmerTerm = new Stemmer();
+			stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
+			stemmerTerm.stem();
+			String termLowerCaseStemmed = stemmerTerm.toString();
+			*/
+
+
+		}
+		
+		return termLowerCaseStemmed;
+	
+	}
+	
+	
+	/**
+	 * This function creates solr query for the Solr Highlighter. It can use also complexphrase request handler. 
+	 * An example of the query to search for the name: "Dumitru Nistor" in the StoryEntity using "complexphrase" request handler is:
+	 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru~2" AND story_text:"nistor~2" AND story_id:"bookDumitruTest2"&wt=json
+	 * It uses fuzzy logic (sign ~) to match both words in the term with a constraint that they have maximal Editing distance 2 (Levenschteins distance).
+	 * 
+	 * @param fuzzySearch
+	 * @param searchTerm
+	 * @param params
+	 * @return
+	 */
+
+	private SolrQuery createSolrQuery (boolean fuzzySearch, String searchTerm, Map<String, String> params) {
+		
+		String [] searchTermWords = searchTerm.split("\\s+");
+		
+		SolrQuery query = new SolrQuery();
+
+		query.setRequestHandler("/select");		
+		query.set("hl.fl",StoryEntitySolrFields.TEXT);
+		query.set("hl","on");		
+		query.set("indent","on");
+		
+		String adaptedTerm = "";
+		if(fuzzySearch)
+		{
+			query.set("defType","complexphrase");
+			
+			if(searchTermWords.length>1)
+			{
+				
+				for (int i=0;i<searchTermWords.length;i++)
+				{
+					adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
+					if(i<searchTermWords.length-1)
+					{
+						adaptedTerm += " AND ";
+					}
+				}			
+			}
+			else
+			{
+				adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
+				
+			}
+		}
+		else
+		{
+			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTerm + "\"";
+		}
+		
+		for (String param : params.keySet()) {
+			adaptedTerm += " AND "+ param +":"+params.get(param);
+		}
+		
+		query.set("q", adaptedTerm);
+		query.set("wt","json");	
+
+		return query;
 		
 	}
 
@@ -442,33 +526,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			}
 			if(consecutivePositions)
 			{
-				
-//				boolean found = true;
-//				for (int j=0;j<searchTermWords.length;j++)
-//				{
-//					/*
-//					 * here we check that the searching word and the one found start with the same characters in order to avoid 
-//					 * some conditions where Levenschteins distance alone is not good, e.g. for the word Pola, words like: la, ol, oa, etc. 
-//					 * will all be matched which is not desirable
-//					 */
-//					int lengthToCheck = lengthToCheck(searchTermWords[j]);
-//										
-//					if(terms.get(i+j).length()>=lengthToCheck)
-//					{
-//						int compareStart = (lengthToCheck==0) ? 0 : terms.get(i+j).substring(0, lengthToCheck).compareTo(searchTermWords[j].substring(0, lengthToCheck));
-//						if((levenschteinDistance.calculateLevenshteinDistance(terms.get(i+j), searchTermWords[j]) > LevenschteinDistanceThreshold) || compareStart!=0)
-//						{
-//							found=false;
-//							break;
-//						}
-//					}
-//					else
-//					{
-//						found=false;
-//						break;
-//					}
-//				}
-				
+								
 				boolean found = foundSearchPhrase(terms, searchTermWords, i);
 					
 				if(found)
@@ -486,6 +544,17 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 	}
 	
+	/**
+	 * This function is the key function that determines when the term is found in Solr when fuzzy search is used.
+	 * Namely we try first to find all terms that are very similar to the one we are looking for. This
+	 * is done using Solr query with fuzzy search, and solr filters and analyzers that manipulate the words
+	 * we are searching for. From the solr response we have to select the exact found term and this is done in this function.
+	 *  
+	 * @param terms
+	 * @param searchTermWords
+	 * @param startIndex
+	 * @return
+	 */
 	private boolean foundSearchPhrase (List<String> terms, String [] searchTermWords, int startIndex)
 	{
 		List<String> termsNew = new ArrayList<String>();
@@ -502,17 +571,32 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			int found=-1;
 			for(int j=0;j<searchTermWordsNew.size();j++)
 			{
-				int lengthToCheck = lengthToCheck(searchTermWordsNew.get(j));
 				
-				if(termsNew.get(i).length()>=lengthToCheck)
+				/*
+				 * here we check both Levenschteins distance and that the words start with the same chars if they are
+				 * short words, to avoid matching whatever short word satisfies Levenschteins distance constraint 
+				 */
+				int lengthToCheckStrict = lengthToCheck(searchTermWordsNew.get(j),1);
+				int lengthToCheckNoStrict = lengthToCheck(searchTermWordsNew.get(j),0);
+				int compareStartStrict = -1;
+				int compareStartNoStrict = -1;
+				int levenschteinDistanceValue = levenschteinDistance.calculateLevenshteinDistance(termsNew.get(i), searchTermWordsNew.get(j));
+				if(termsNew.get(i).length()>=lengthToCheckStrict)
 				{
-					int compareStart = (lengthToCheck==0) ? 0 : termsNew.get(i).substring(0, lengthToCheck).compareTo(searchTermWordsNew.get(j).substring(0, lengthToCheck));
-					if((levenschteinDistance.calculateLevenshteinDistance(termsNew.get(i), searchTermWordsNew.get(j)) <= LevenschteinDistanceThreshold) && compareStart==0)
-					{
-						found=j;
-						break;
-					}
-				}				
+					compareStartStrict = (lengthToCheckStrict==0) ? 0 : termsNew.get(i).substring(0, lengthToCheckStrict).compareTo(searchTermWordsNew.get(j).substring(0, lengthToCheckStrict));
+				}
+				if(termsNew.get(i).length()>=lengthToCheckNoStrict)
+				{
+					compareStartNoStrict = (lengthToCheckNoStrict==0) ? 0 : termsNew.get(i).substring(0, lengthToCheckNoStrict).compareTo(searchTermWordsNew.get(j).substring(0, lengthToCheckNoStrict));
+				}
+				
+				if(((levenschteinDistanceValue <= LevenschteinDistanceThreshold) && compareStartStrict==0) || 
+						((levenschteinDistanceValue <= 1) && compareStartNoStrict==0))
+				{
+					found=j;
+					break;
+				}
+								
 			}
 			
 			if(found!=-1)
@@ -520,6 +604,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				termsNew.remove(i);
 				searchTermWordsNew.remove(found);
 				i-=1;
+			}
+			else
+			{
+				break;
 			}
 			
 		}
@@ -529,22 +617,67 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 	}
 
-	private int lengthToCheck(String word) {
+	private int lengthToCheck(String word, int strict) {
 		
-		if(word.length()<5) {
-			return word.length();
-		}
-		else if(word.length()==5) {
-			return 4;
+		if(strict==1)
+		{
+			if(word.length() < 5) {
+				return word.length();
+			}
+			else
+			{
+				return 4;
+			}
 		}
 		else
 		{
-			return 0;
+			if(word.length() < 4) {
+				return word.length();
+			}
+			else 
+			{
+				return 3;
+			}			
 		}
 	}
-
+    /**
+     * This function updates the range of characters to look for in the original text during searching the given term or phrase.
+     * Outside of that range no matches are searched, to avoid matching some other terms that are similar but lie in totally 
+     * different parts of the text.
+     * 
+     * @param rengeOfCharsTranslatedText
+     * @return
+     */
+	private int rangeOfCharsToObserve (int rengeOfCharsTranslatedText)
+	{
+		return (int) Math.ceil((rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve < rangeOfCharsToObserve) ? rangeOfCharsToObserve : rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve);
+	}
+	
+	/**
+	 * This function updates the current search index, staring from which we are looking for the first next found match.
+	 * 
+	 * @param currentOffset
+	 * @param searchTerm
+	 * @param wordOffsetOriginalText
+	 * @param rengeOfCharsTranslatedText
+	 * @return
+	 */
+	private int updateCurrentSearchIndex (int currentOffset, String searchTerm, int wordOffsetOriginalText, int rengeOfCharsTranslatedText)
+	{
+		if(wordOffsetOriginalText!=-1)
+		{
+			rangeOfCharsToObserve = minRangeOfCharsToObserve;
+			return wordOffsetOriginalText+searchTerm.length();			
+		}
+		else
+		{			
+			rangeOfCharsToObserve += rengeOfCharsTranslatedText * (scaleFactorRangeOfCharsToObserve-1.0);
+			return currentOffset + rengeOfCharsTranslatedText;
+		}
+	}
+	
 	@Override
-	public void findEntitiyOffsetsInOriginalText(String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException
+	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException
 	{		
 		/*
 		 * get all entities in one list in order to sort them
@@ -595,14 +728,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		for(int i=0;i<entitiesOriginalText.size();i++)
 		{	
+			
 			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
-			rangeToObserve = (int) Math.ceil((charRangeTranslatedText * scaleFactorRangeOfCharsToObserve < minRangeOfCharsToObserve) ? minRangeOfCharsToObserve : charRangeTranslatedText * scaleFactorRangeOfCharsToObserve);
+			
+			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText);
 						  
-			int wordOffsetOriginalText = findTermPositionsInStory(storyId, entitiesOriginalText, offsetsOriginalText, rangeToObserve);
-			if(wordOffsetOriginalText!=-1)
-			{
-				offsetsOriginalText = wordOffsetOriginalText;
-			}
+			int wordOffsetOriginalText = findTermPositionsInStory(targetLanguage, fuzzyLogic, storyId, entitiesOriginalText.get(i), offsetsOriginalText, rangeToObserve);
+			
+			offsetsOriginalText = updateCurrentSearchIndex(offsetsOriginalText, entitiesOriginalText.get(i), wordOffsetOriginalText, charRangeTranslatedText);
+			
 			//update the main NER map with the position of the entity in the original text
 			String [] entityType = sortedListAllEntities.get(i).get(0).split("\\s+",2);
 			List<List<String>> entities = identifiedNER.get(entityType[0]);
