@@ -50,7 +50,7 @@ public class NERController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest nerRequest) throws HttpException, SolrNamedEntityServiceException {
+			@RequestBody EnrichmentNERRequest nerRequest) throws Exception, HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -62,6 +62,9 @@ public class NERController extends BaseRest {
 		} catch (HttpException e) {
 			throw e;
 		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			throw e;
 		}

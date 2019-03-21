@@ -104,7 +104,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	//@Cacheable("nerResults")
 	@Override
-	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException {
+	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		List<String> storyItemIds = requestParam.getStoryItemIds();
 		
@@ -123,7 +123,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 	
 	@Override
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException {
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		
@@ -228,7 +228,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
 			
-			solrEntityService.findEntitiyOffsetsInOriginalText(true, "en", dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryId(), tmpResult);
+			solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity.getStoryLanguage(),"en",dbStoryEntity.getStoryTranscription(),text, dbStoryEntity.getStoryId(), tmpResult);
 			
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationList = new ArrayList<>();

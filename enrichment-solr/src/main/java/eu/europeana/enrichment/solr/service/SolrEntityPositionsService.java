@@ -75,16 +75,15 @@ public interface SolrEntityPositionsService {
 		 * This method finds the positions of the NamedEntity terms in the original text using the adapted version of Solr-Highlighter
 		 * The found offset is the first one greater than startAfterOffset and smaller than startAfterOffset+rangeToObserve
 		 * 
-		 * @param language
-		 * @param fuzzyLogic
-		 * @param storyId
 		 * @param term
 		 * @param startAfterOffset
+		 * @param offsetTranslatedText
 		 * @param rangeToObserve
 		 * @return
 		 * @throws SolrNamedEntityServiceException
+		 * @throws Exception 
 		 */
-		public int findTermPositionsInStory(String language, boolean fuzzyLogic, String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException;
+		public int findTermPositionsInStory(String term, int startAfterOffset,int offsetTranslatedText, int rangeToObserve) throws SolrNamedEntityServiceException, Exception;
 
 		/**
 		 * This function implements finding the positions of the identified entities (using the given NER tool) 
@@ -93,11 +92,14 @@ public interface SolrEntityPositionsService {
 		 * @param fuzzyLogic
 		 * @param originalLanguage
 		 * @param targetLanguage
+		 * @param originalText
+		 * @param translatedText
 		 * @param storyId
 		 * @param identifiedNER
 		 * @throws SolrNamedEntityServiceException
+		 * @throws Exception 
 		 */
-		public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException;
+		public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String originalText, String translatedText, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException, Exception;
 
 
 }

@@ -40,8 +40,11 @@ import org.tartarus.snowball.ext.romanianStemmer;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import co.aurasphere.jyandex.Jyandex;
+import co.aurasphere.jyandex.dto.Language;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
 import eu.europeana.enrichment.solr.commons.Stemmer;
@@ -64,18 +67,32 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Resource(name = "levenschteinDistance")
 	LevenschteinDistance levenschteinDistance;
 	
+	@Resource(name = "googleTranslator")
+	GoogleTranslator googleTranslator;
+
+	
 	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
 
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private int minRangeOfCharsToObserve = 1000;
-	private int rangeOfCharsToObserve = 1000;
+	private int minRangeOfCharsToObserve = 2000;
+	private int rangeOfCharsToObserve = 2000;
 	private final double scaleFactorRangeOfCharsToObserve = 1.5;
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String>();
+	private String storyOriginalText="";
+	private String storyTranslatedText="";
+	private String storyOriginalLanguage="";
+	private String storyTranslatedLanguage="";
+	private String storyIdSolr="";
+	private boolean fuzzyLogicSolr = false;
+	//private Jyandex clientJyandex;
+
 	
 	public SolrEntityPositionsServiceImpl(String translatedEntities) {
+		
+		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");
 		
 		if(!translatedEntities.isEmpty())
 		{
@@ -211,19 +228,19 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	@Override
-	public int findTermPositionsInStory(String language, boolean fuzzyLogic, String storyId, String term, int startAfterOffset, int rangeToObserve) throws SolrNamedEntityServiceException {
+	public int findTermPositionsInStory(String term, int startAfterOffset, int offsetTranslatedText, int rangeToObserve) throws Exception {
 	
 		/*
 		 * filtering the searchTerm
 		 */
-		String termLowerCaseStemmed = filterSearchTerms(language, term);
+		String termLowerCaseStemmed = filterSearchTerms(storyOriginalLanguage, term);
 				
 		/*
 		 * creating Solr query for finding offsets unsing Highlighter
 		 */
 		Map<String, String> querySearchParams = new HashMap<String, String>();
-		querySearchParams.put(StoryEntitySolrFields.STORY_ID, storyId);
-		SolrQuery query = createSolrQuery(fuzzyLogic,termLowerCaseStemmed,querySearchParams);
+		querySearchParams.put(StoryEntitySolrFields.STORY_ID, storyIdSolr);
+		SolrQuery query = createSolrQuery(fuzzyLogicSolr,termLowerCaseStemmed,querySearchParams);
 		
 		QueryResponse response=null;
 		
@@ -249,7 +266,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		if(terms.isEmpty()) return -1;
 	
-		if(fuzzyLogic)
+		if(fuzzyLogicSolr)
 		{
 			List<String> termsAdapted = new ArrayList<String>();
 			List<Double> positionsAdapted = new ArrayList<Double>();
@@ -259,7 +276,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			log.info("Solr query response, terms adapted: " + termsAdapted.toString());
 			log.info("Solr query response, offsets adapted: " + offsetsAdapted.toString());
 			
-			adaptTermsPositionsOffsets(termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
+			adaptTermsPositionsOffsets(offsetTranslatedText,termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
 	
 			if(termsAdapted.isEmpty()) return -1;
 			//finding the exact offset of the term from the list of all offsets
@@ -507,9 +524,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	 * @param termsAdapted
 	 * @param positionsAdapted
 	 * @param offsetsAdapted
+	 * @throws Exception 
 	 */
 	
-	private void adaptTermsPositionsOffsets (String searchTerm, List<String> terms, List<Double> positions, List<List<Double>> offsets, List<String> termsAdapted, List<Double> positionsAdapted, List<List<Double>> offsetsAdapted)
+	private void adaptTermsPositionsOffsets (int offsetTranslatedText, String searchTerm, List<String> terms, List<Double> positions, List<List<Double>> offsets, List<String> termsAdapted, List<Double> positionsAdapted, List<List<Double>> offsetsAdapted) throws Exception
 	{
 		String [] searchTermWords = searchTerm.split("\\s+");
 		
@@ -525,9 +543,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				}
 			}
 			if(consecutivePositions)
-			{
-								
-				boolean found = foundSearchPhrase(terms, searchTermWords, i);
+			{				
+				boolean found = foundSearchPhrase(terms, searchTermWords, i, offsets.get(i).get(0).intValue(), offsetTranslatedText);
 					
 				if(found)
 				{
@@ -553,9 +570,12 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	 * @param terms
 	 * @param searchTermWords
 	 * @param startIndex
+	 * @param offsetOriginalText
+	 * @param offsetTranslatedText
 	 * @return
+	 * @throws Exception
 	 */
-	private boolean foundSearchPhrase (List<String> terms, String [] searchTermWords, int startIndex)
+	private boolean foundSearchPhrase (List<String> terms, String [] searchTermWords, int startIndex,int offsetOriginalText, int offsetTranslatedText) throws Exception
 	{
 		List<String> termsNew = new ArrayList<String>();
 		List<String> searchTermWordsNew = new ArrayList<String>();
@@ -612,7 +632,19 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 		}
 		
-		if (termsNew.size()==0) return true;
+		if (termsNew.size()==0) 
+		{
+			/*
+			 * here an additional check is done, basically the sentence from the original text that contains the found term
+			 * is taken and translated to the target language ("en" here) and then the translated sentence is compared with
+			 * the one that is taken from the translated text and contains the term (i.e. NamedEntity) in the translated text
+			 */
+//			double checkSentenceLevenschteinDistance = checkSentenceSimilarityLevenschtein(offsetOriginalText, offsetTranslatedText);
+//			if(checkSentenceLevenschteinDistance>=0.8) return true;
+//			else return false;
+			
+			return true;
+		}		
 		else return false;
 		
 	}
@@ -639,6 +671,29 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				return 3;
 			}			
 		}
+	}
+	
+	private double checkSentenceSimilarityLevenschtein (int termIndexOriginal, int termIndexTranslated) throws Exception
+	{
+		int beginIndexOriginal = storyOriginalText.lastIndexOf(".", termIndexOriginal)+1;
+		int endIndexOriginal = storyOriginalText.indexOf(".", termIndexOriginal)+1;		
+		if(beginIndexOriginal==-1 || endIndexOriginal==-1) return 0.0;
+				
+		int beginIndexTranslated = storyTranslatedText.lastIndexOf(".", termIndexTranslated)+1;
+		int endIndexTranslated = storyTranslatedText.indexOf(".", termIndexTranslated)+1;
+		if(beginIndexTranslated==-1 || endIndexTranslated==-1) return 0.0;
+
+		String sentenceOriginalText = storyOriginalText.substring(beginIndexOriginal,endIndexOriginal);
+		String sentenceTranslatedText = storyTranslatedText.substring(beginIndexTranslated,endIndexTranslated);
+		
+		String newSentenceTranslated = googleTranslator.callUrlAndParseResult(storyOriginalLanguage, storyTranslatedLanguage, sentenceOriginalText);
+		
+		//String newSentenceTranslated = clientJyandex.translateText(sentenceOriginalText, Language.ROMANIAN, Language.ENGLISH).toString();
+		
+		int ldValue= levenschteinDistance.calculateLevenshteinDistance(newSentenceTranslated, sentenceTranslatedText);
+		  
+		return 1-1.0*ldValue/(newSentenceTranslated.length()+sentenceTranslatedText.length());
+
 	}
     /**
      * This function updates the range of characters to look for in the original text during searching the given term or phrase.
@@ -673,12 +728,19 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		{			
 			rangeOfCharsToObserve += rengeOfCharsTranslatedText * (scaleFactorRangeOfCharsToObserve-1.0);
 			return currentOffset + rengeOfCharsTranslatedText;
+			
 		}
 	}
 	
 	@Override
-	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException
+	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String originalText, String translatedText, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
 	{		
+		storyOriginalText=originalText;
+		storyTranslatedText=translatedText;
+		storyOriginalLanguage=originalLanguage;
+		storyTranslatedLanguage=targetLanguage;
+		storyIdSolr=storyId;
+		fuzzyLogicSolr=fuzzyLogic;
 		/*
 		 * get all entities in one list in order to sort them
 		 */
@@ -716,7 +778,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		entitiesText.deleteCharAt(entitiesText.length()-1);//delete the last comma
 		
-		//String serviceResult = eTranslationService.translateText(entitiesText.toString(),originalLanguage,targetLanguage);
+		//String serviceResult = eTranslationService.translateText(entitiesText.toString(),targetLanguage, originalLanguage);
 			
 		/*
 		 * finding the translated entities in the original text
@@ -733,7 +795,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText);
 						  
-			int wordOffsetOriginalText = findTermPositionsInStory(targetLanguage, fuzzyLogic, storyId, entitiesOriginalText.get(i), offsetsOriginalText, rangeToObserve);
+			int wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), offsetsOriginalText, Integer.valueOf(sortedListAllEntities.get(i).get(1)), rangeToObserve);
 			
 			offsetsOriginalText = updateCurrentSearchIndex(offsetsOriginalText, entitiesOriginalText.get(i), wordOffsetOriginalText, charRangeTranslatedText);
 			
