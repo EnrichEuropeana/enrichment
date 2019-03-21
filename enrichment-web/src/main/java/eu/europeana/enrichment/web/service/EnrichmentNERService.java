@@ -50,12 +50,12 @@ public interface EnrichmentNERService {
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required requestParam is null or empty
 	 */
-	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException;  
+	public String getEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException, Exception;  
 	
 	/*
 	 * This method does the same as {@link eu.europeana.enrichment.web.service.EnrichmentNERService#getEntities(EnrichmentNERRequest)
 	 * but returns the list of NamedEntity instead of a JSON String  
 	 */
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException;
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException, Exception;
 	
 }

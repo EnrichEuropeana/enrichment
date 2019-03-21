@@ -78,7 +78,7 @@ public class NERServiceTestBookDumitru {
 
 	
 	@Test
-	public void test() {
+	public void test() throws Exception {
 		
 		String bookText=europeanaEntityServiceBookDumitru.getBookText();
 		String originalBookText=europeanaEntityServiceBookDumitru.getOriginalText();
