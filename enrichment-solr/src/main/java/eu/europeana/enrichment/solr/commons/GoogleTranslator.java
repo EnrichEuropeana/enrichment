@@ -5,12 +5,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.BreakIterator;
+import java.util.Locale;
+
 import org.json.JSONArray;
 
 public class GoogleTranslator {
 
 	 public static void main(String[] args) throws Exception 
 	 {
+		 
+		 Locale currentLocale2 = new Locale ("ro","RO");
+		 BreakIterator iterator = BreakIterator.getSentenceInstance(currentLocale2);
+		 String source = "de la infanterie. 7. Smyrna (azi Izmir) este un vechi oraș";
+		 iterator.setText(source);
+		 int start = iterator.first();
+		 for (int end = iterator.next();
+		   end != BreakIterator.DONE;
+		   start = end, end = iterator.next()) {
+		  System.out.println(source.substring(start,end));
+		 }
+		 
+		 
 
 	  GoogleTranslator http = new GoogleTranslator();
 	  String word = http.callUrlAndParseResult("ro", "en", "Iară eu, sărmanul de mine, de acestea de toate am fost închis și părăsit, am fost silit în loc de acestea de toate să mă mulțămesc cu sbierătele sălbatece ale Arabilor și a Chinezilor, ce auzindu-le te înfiora până la oase, aceasta era muzica mea și a consoldaților mei de pe vapor");
