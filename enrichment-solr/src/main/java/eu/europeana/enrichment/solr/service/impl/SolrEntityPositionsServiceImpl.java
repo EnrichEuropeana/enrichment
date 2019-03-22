@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.BreakIterator;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -76,8 +78,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private int minRangeOfCharsToObserve = 2000;
-	private int rangeOfCharsToObserve = 2000;
+	private int minRangeOfCharsToObserve = 1500;
+	private int rangeOfCharsToObserve = 1500;
 	private final double scaleFactorRangeOfCharsToObserve = 1.5;
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String>();
@@ -87,6 +89,10 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	private String storyTranslatedLanguage="";
 	private String storyIdSolr="";
 	private boolean fuzzyLogicSolr = false;
+	
+	private int sentencesByNowTranslated=1;
+	private int sentencesByNowOriginal=1;
+	private int indexByNowOriginal=0;
 	//private Jyandex clientJyandex;
 
 	
@@ -732,6 +738,106 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 	}
 	
+	/**
+	 * This function needs to be tested but it is aimed to be used to optimize the fuzzy search based on the number of sentences
+	 * that are passed in order to find the term. It uses Java BreakIterator to distinguish among the sentences.
+	 * 
+	 * @param wordOffsetOriginalText
+	 * @param indexTranslatedTextPrevious
+	 * @param indexTranslatedTextCurrent
+	 * @param originalText
+	 * @param translatedText
+	 * @param indexOriginalTextStartEnd
+	 */
+	private void updateSearchIndexFromSentences(int wordOffsetOriginalText, int indexTranslatedTextPrevious, int indexTranslatedTextCurrent, String originalText, String translatedText, int [] indexOriginalTextStartEnd) {
+
+		Locale currentLocale1=null;
+		if(storyTranslatedLanguage.compareToIgnoreCase("en")==0)
+		{
+			currentLocale1 = new Locale ("en","US");
+		}
+		Locale currentLocale2=null;
+		if(storyOriginalLanguage.compareToIgnoreCase("ro")==0)
+		{
+			currentLocale2 = new Locale ("ro","RO");
+		}
+		
+		BreakIterator sentenceIteratorTranslated = BreakIterator.getSentenceInstance(currentLocale1);
+		sentenceIteratorTranslated.setText(translatedText.substring(indexTranslatedTextPrevious, indexTranslatedTextCurrent+1));
+		
+		//count the number of sentences from the last index
+		int numberSentencesTranslated=0;
+			
+		int start = sentenceIteratorTranslated.first();
+	    for (int end = sentenceIteratorTranslated.next();end != BreakIterator.DONE;start = end, end = sentenceIteratorTranslated.next()) {
+	    	numberSentencesTranslated++;
+	    }
+
+	   
+	    sentencesByNowTranslated+=numberSentencesTranslated-1;
+		
+	    
+		BreakIterator sentenceIteratorOriginal = BreakIterator.getSentenceInstance(currentLocale2);
+		
+		/*
+		 * update sentencesByNowOriginal and indexByNowOriginal values
+		 */
+		if(wordOffsetOriginalText!=-1)
+		{
+			int numberSentencesToAdd=0;
+			sentenceIteratorOriginal.setText(originalText.substring(indexByNowOriginal, wordOffsetOriginalText+1));
+			
+			start = sentenceIteratorOriginal.first();
+		    for (int end = sentenceIteratorOriginal.next();end != BreakIterator.DONE;start = end, end = sentenceIteratorOriginal.next()) {
+		    	numberSentencesToAdd++;
+		    }			
+			
+			sentencesByNowOriginal+=numberSentencesToAdd-1;
+			indexByNowOriginal=wordOffsetOriginalText;
+		}
+
+		
+		int charsToCheck=20000;
+		int numSentToCheckArround = 2;
+		
+		int endIndexOrigin = originalText.length()<=indexByNowOriginal+charsToCheck ? originalText.length() : indexByNowOriginal+charsToCheck;
+		sentenceIteratorOriginal.setText(originalText.substring(indexByNowOriginal, endIndexOrigin));
+		
+		//count the number of sentences from the last index
+		int firstSentenceOriginalToStart=sentencesByNowTranslated-numSentToCheckArround<0 ? 1 : sentencesByNowTranslated-numSentToCheckArround;
+		int lastSentenceOriginalToStart=sentencesByNowTranslated+numSentToCheckArround;
+		
+		
+		
+		int numSentCurrentOriginal=sentencesByNowOriginal;
+		
+		indexOriginalTextStartEnd[0] = indexByNowOriginal;
+		indexOriginalTextStartEnd[1] = indexByNowOriginal;
+		
+		start = sentenceIteratorOriginal.first();
+		for (int end = sentenceIteratorOriginal.next();end != BreakIterator.DONE;start = end, end = sentenceIteratorOriginal.next())
+		{
+			numSentCurrentOriginal+=1;
+			int addedFirst=0;
+			int addedLast=0;
+			
+	    	if(numSentCurrentOriginal < firstSentenceOriginalToStart) {
+	    		indexOriginalTextStartEnd[0] += originalText.substring(start,end).length();
+	    		addedFirst=1;
+	    	}
+	    	
+	    	if(numSentCurrentOriginal <= lastSentenceOriginalToStart) {
+	    		indexOriginalTextStartEnd[1] += originalText.substring(start,end).length();
+	    		addedLast=1;
+	    	}
+
+	    	if(addedFirst==0 && addedLast==0)
+	    	{
+	    		break;
+	    	}
+		}    
+
+	}
 	@Override
 	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String originalText, String translatedText, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
 	{		
@@ -786,18 +892,26 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		//finding offset in the original text using Solr Highlighter	
 		int offsetsOriginalText = -1;
+		//int wordOffsetOriginalText=-1;
 		int rangeToObserve = 0;
+		//int [] indexOriginalTextStartEnd = new int [2];
 		
 		for(int i=0;i<entitiesOriginalText.size();i++)
 		{	
 			
 			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
-			
 			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText);
-						  
+			
+//			int indexTranslatedTextPrevious = (i==0) ? 0 : Integer.valueOf(sortedListAllEntities.get(i-1).get(1));
+
 			int wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), offsetsOriginalText, Integer.valueOf(sortedListAllEntities.get(i).get(1)), rangeToObserve);
 			
 			offsetsOriginalText = updateCurrentSearchIndex(offsetsOriginalText, entitiesOriginalText.get(i), wordOffsetOriginalText, charRangeTranslatedText);
+			
+//			updateSearchIndexFromSentences(wordOffsetOriginalText, indexTranslatedTextPrevious, Integer.valueOf(sortedListAllEntities.get(i).get(1)), storyOriginalText, storyTranslatedText, indexOriginalTextStartEnd);
+//			wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), indexOriginalTextStartEnd[0], Integer.valueOf(sortedListAllEntities.get(i).get(1)), indexOriginalTextStartEnd[1]-indexOriginalTextStartEnd[0]);
+			
+			
 			
 			//update the main NER map with the position of the entity in the original text
 			String [] entityType = sortedListAllEntities.get(i).get(0).split("\\s+",2);
