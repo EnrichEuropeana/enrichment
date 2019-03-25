@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.solr.service.impl;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -76,11 +79,24 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
 
+	/*
+	 * for the fuzzy search set the params below to: minRangeOfCharsToObserve = 1500;rangeOfCharsToObserve = 1500;scaleFactorRangeOfCharsToObserve = 1.5;
+	 * for normal search (not fuzzy) set the params below to: minRangeOfCharsToObserve = 10000;rangeOfCharsToObserve = 10000;
+	*/
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private int minRangeOfCharsToObserve = 1500;
-	private int rangeOfCharsToObserve = 1500;
-	private final double scaleFactorRangeOfCharsToObserve = 1.5;
+	private int minRangeOfCharsToObserve = 3000;
+	private int rangeOfCharsToObserve = 3000;
+	private double scaleFactorRangeOfCharsToObserve = 1.0;
+	
+	/*
+	 * when the sentences are used to find the named entities in the original text, use the following 2 params:
+	 * charsToCheck->the number of characters to search for sentences and the term inside them, starting from the currently reached char-position in the original text
+	 * numSentToCheckArround->number of sentences to check around the one where the term in the translated text is found
+	 */
+	private int charsToCheck=20000;
+	private int numSentToCheckArround = 2;
+	
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String>();
 	private String storyOriginalText="";
@@ -312,7 +328,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		/*
 		 * to lower case filter
 		 */
-		String termLowerCase=searchTerm.toLowerCase();
+		//String termLowerCase=searchTerm.toLowerCase();
+		String termLowerCase=searchTerm;
 		
 		Pattern ptn = Pattern.compile("[\\p{Punct}\\p{Digit}&&[^-]]");
         Matcher mtch = ptn.matcher(termLowerCase);
@@ -384,6 +401,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	 * An example of the query to search for the name: "Dumitru Nistor" in the StoryEntity using "complexphrase" request handler is:
 	 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&defType=complexphrase&q=story_text:"dumitru~2" AND story_text:"nistor~2" AND story_id:"bookDumitruTest2"&wt=json
 	 * It uses fuzzy logic (sign ~) to match both words in the term with a constraint that they have maximal Editing distance 2 (Levenschteins distance).
+	 * We can also use search without complexphrase request handler and an example of that query is the following:
+	 * http://localhost:8983/solr/enrichment/select?hl.fl=story_text&hl=on&indent=on&q=story_text:Dum* AND story_text:Nistor~ AND story_id:"bookDumitruTest2"&wt=json
 	 * 
 	 * @param fuzzySearch
 	 * @param searchTerm
@@ -405,14 +424,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		String adaptedTerm = "";
 		if(fuzzySearch)
 		{
-			query.set("defType","complexphrase");
+			//query.set("defType","complexphrase");
 			
 			if(searchTermWords.length>1)
 			{
 				
 				for (int i=0;i<searchTermWords.length;i++)
-				{
-					adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
+				{				
+					adaptedTerm += StoryEntitySolrFields.TEXT+":"+ searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold);
+					//adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
 					if(i<searchTermWords.length-1)
 					{
 						adaptedTerm += " AND ";
@@ -421,7 +441,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			}
 			else
 			{
-				adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
+				adaptedTerm = StoryEntitySolrFields.TEXT+":"+ searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold);
+				//adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
 				
 			}
 		}
@@ -659,12 +680,16 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		if(strict==1)
 		{
-			if(word.length() < 5) {
+			if(word.length() < 4) {
 				return word.length();
+			}
+			else if(word.length() < 6)
+			{
+				return 3;
 			}
 			else
 			{
-				return 4;
+				return 0;
 			}
 		}
 		else
@@ -672,13 +697,29 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			if(word.length() < 4) {
 				return word.length();
 			}
-			else 
+			else if(word.length() < 5)
 			{
 				return 3;
-			}			
+			}	
+			else
+			{
+				return 0;
+			}
 		}
 	}
 	
+	/**
+	 * This function can be used for searching the term in the original text by translating the part of the sentence 
+	 * that contains the found term in original language to the translated language ("en") and comparing the translated part
+	 * with the one that is in the translated text (already translated before NER process) and contains the found term.
+	 * This logic can be used to check if the found term in the original text corresponds to the part of the text where the
+	 * term in the translated text is found.   
+	 * 
+	 * @param termIndexOriginal
+	 * @param termIndexTranslated
+	 * @return
+	 * @throws Exception
+	 */
 	private double checkSentenceSimilarityLevenschtein (int termIndexOriginal, int termIndexTranslated) throws Exception
 	{
 		int beginIndexOriginal = storyOriginalText.lastIndexOf(".", termIndexOriginal)+1;
@@ -715,7 +756,8 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 	
 	/**
-	 * This function updates the current search index, staring from which we are looking for the first next found match.
+	 * This function updates the current search offset (number of chars from the beginning of the text), 
+	 * staring from which we are looking for the first next found match.
 	 * 
 	 * @param currentOffset
 	 * @param searchTerm
@@ -732,15 +774,16 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 		else
 		{			
-			rangeOfCharsToObserve += rengeOfCharsTranslatedText * (scaleFactorRangeOfCharsToObserve-1.0);
+			rangeOfCharsToObserve += rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve;
 			return currentOffset + rengeOfCharsTranslatedText;
 			
 		}
 	}
 	
 	/**
-	 * This function needs to be tested but it is aimed to be used to optimize the fuzzy search based on the number of sentences
-	 * that are passed in order to find the term. It uses Java BreakIterator to distinguish among the sentences.
+	 * This function is to be used to optimize the fuzzy search based on the number of sentences
+	 * that are passed in order to find the range of characters in which the term need to be searched in the original text. 
+	 * It uses Java BreakIterator to break the text into sentences.
 	 * 
 	 * @param wordOffsetOriginalText
 	 * @param indexTranslatedTextPrevious
@@ -762,8 +805,82 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			currentLocale2 = new Locale ("ro","RO");
 		}
 		
+		
+		/*
+		 * this commed part is used to test if the translated and original text have the same number of sentences
+		 * for the search logic that deals with the sentences 
+		 */
+/*	    	    
+        BufferedWriter output_tr = null;
+        BufferedWriter output_or = null;
+        try {
+        	
+            File file_tr = new File("sentences-translated.txt");
+            output_tr = new BufferedWriter(new FileWriter(file_tr));
+
+            File file_or = new File("sentences-original.txt");
+            output_or = new BufferedWriter(new FileWriter(file_or));
+
+            
+    		BreakIterator sentenceIteratorTranslatedAll = BreakIterator.getSentenceInstance(currentLocale1);
+    		String translSentencesStringAll = translatedText.substring(0, translatedText.length());
+    		sentenceIteratorTranslatedAll.setText(translSentencesStringAll);
+    		
+    		//count the number of sentences from the last index
+    		int numberSentencesTranslatedAll=0;
+    			
+    		int start = sentenceIteratorTranslatedAll.first();
+    	    for (int end = sentenceIteratorTranslatedAll.next();end != BreakIterator.DONE;start = end, end = sentenceIteratorTranslatedAll.next()) {
+    	    	numberSentencesTranslatedAll++;
+    	    	output_tr.write(translSentencesStringAll.substring(start, end)+"\n\n");
+    	    }
+
+    		
+    		BreakIterator sentenceIteratorOrigindAll = BreakIterator.getSentenceInstance(currentLocale2);
+    		String originSentencesStringAll = originalText.substring(0, originalText.length());
+    		sentenceIteratorOrigindAll.setText(originSentencesStringAll);
+    		
+    		//count the number of sentences from the last index
+    		int numberSentencesOriginAll=0;
+    			
+    		start = sentenceIteratorOrigindAll.first();
+    	    for (int end = sentenceIteratorOrigindAll.next();end != BreakIterator.DONE;start = end, end = sentenceIteratorOrigindAll.next()) {
+    	    	numberSentencesOriginAll++;
+    	    	output_or.write(originSentencesStringAll.substring(start, end)+"\n\n");
+    	    }
+
+    	    
+            int hh=0;
+            int gg=hh;
+            
+            
+            
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        } finally {
+          if ( output_or != null ) {
+        	  try {
+				output_or.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+          }
+          if ( output_tr != null ) {
+        	  try {
+				output_tr.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+          }
+        }
+	    
+*/
+		
 		BreakIterator sentenceIteratorTranslated = BreakIterator.getSentenceInstance(currentLocale1);
-		sentenceIteratorTranslated.setText(translatedText.substring(indexTranslatedTextPrevious, indexTranslatedTextCurrent+1));
+		String translSentencesString = translatedText.substring(indexTranslatedTextPrevious, indexTranslatedTextCurrent+1);
+		sentenceIteratorTranslated.setText(translSentencesString);
 		
 		//count the number of sentences from the last index
 		int numberSentencesTranslated=0;
@@ -782,7 +899,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		/*
 		 * update sentencesByNowOriginal and indexByNowOriginal values
 		 */
-		if(wordOffsetOriginalText!=-1)
+		if(wordOffsetOriginalText!=-1)//if the term has been found in the original text
 		{
 			int numberSentencesToAdd=0;
 			sentenceIteratorOriginal.setText(originalText.substring(indexByNowOriginal, wordOffsetOriginalText+1));
@@ -795,16 +912,13 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			sentencesByNowOriginal+=numberSentencesToAdd-1;
 			indexByNowOriginal=wordOffsetOriginalText;
 		}
-
-		
-		int charsToCheck=20000;
-		int numSentToCheckArround = 2;
 		
 		int endIndexOrigin = originalText.length()<=indexByNowOriginal+charsToCheck ? originalText.length() : indexByNowOriginal+charsToCheck;
-		sentenceIteratorOriginal.setText(originalText.substring(indexByNowOriginal, endIndexOrigin));
+		String originalSentencesString = originalText.substring(indexByNowOriginal, endIndexOrigin);
+		sentenceIteratorOriginal.setText(originalSentencesString);
 		
 		//count the number of sentences from the last index
-		int firstSentenceOriginalToStart=sentencesByNowTranslated-numSentToCheckArround<0 ? 1 : sentencesByNowTranslated-numSentToCheckArround;
+		int firstSentenceOriginalToStart=sentencesByNowTranslated-numSentToCheckArround<=0 ? 1 : sentencesByNowTranslated-numSentToCheckArround;
 		int lastSentenceOriginalToStart=sentencesByNowTranslated+numSentToCheckArround;
 		
 		
@@ -822,12 +936,12 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			int addedLast=0;
 			
 	    	if(numSentCurrentOriginal < firstSentenceOriginalToStart) {
-	    		indexOriginalTextStartEnd[0] += originalText.substring(start,end).length();
+	    		indexOriginalTextStartEnd[0] += originalSentencesString.substring(start,end).length();
 	    		addedFirst=1;
 	    	}
 	    	
 	    	if(numSentCurrentOriginal <= lastSentenceOriginalToStart) {
-	    		indexOriginalTextStartEnd[1] += originalText.substring(start,end).length();
+	    		indexOriginalTextStartEnd[1] += originalSentencesString.substring(start,end).length();
 	    		addedLast=1;
 	    	}
 
@@ -847,6 +961,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		storyTranslatedLanguage=targetLanguage;
 		storyIdSolr=storyId;
 		fuzzyLogicSolr=fuzzyLogic;
+		scaleFactorRangeOfCharsToObserve = 1.5 * originalText.length()*1.0 / (translatedText.length()*1.0);
 		/*
 		 * get all entities in one list in order to sort them
 		 */
@@ -891,23 +1006,28 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 */
 		
 		//finding offset in the original text using Solr Highlighter	
-		int offsetsOriginalText = -1;
-		//int wordOffsetOriginalText=-1;
+		int offsetsOriginalText = -1;		
 		int rangeToObserve = 0;
-		//int [] indexOriginalTextStartEnd = new int [2];
+		
+		int [] indexOriginalTextStartEnd = new int [2];
+		int wordOffsetOriginalText=-1;
 		
 		for(int i=0;i<entitiesOriginalText.size();i++)
 		{	
-			
+
+			/*
+			 * use the 4 lines below when searching with the predefined logic for the range of characters to search the term in
+			 */
 			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
 			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText);
-			
-//			int indexTranslatedTextPrevious = (i==0) ? 0 : Integer.valueOf(sortedListAllEntities.get(i-1).get(1));
-
-			int wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), offsetsOriginalText, Integer.valueOf(sortedListAllEntities.get(i).get(1)), rangeToObserve);
-			
+			wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), offsetsOriginalText, Integer.valueOf(sortedListAllEntities.get(i).get(1)), rangeToObserve);
 			offsetsOriginalText = updateCurrentSearchIndex(offsetsOriginalText, entitiesOriginalText.get(i), wordOffsetOriginalText, charRangeTranslatedText);
-			
+	
+
+			/*
+			 * use the 3 lines below when searching with the sentences logic for the range of characters to search the term in
+			 */
+//			int indexTranslatedTextPrevious = (i==0) ? 0 : Integer.valueOf(sortedListAllEntities.get(i-1).get(1));
 //			updateSearchIndexFromSentences(wordOffsetOriginalText, indexTranslatedTextPrevious, Integer.valueOf(sortedListAllEntities.get(i).get(1)), storyOriginalText, storyTranslatedText, indexOriginalTextStartEnd);
 //			wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), indexOriginalTextStartEnd[0], Integer.valueOf(sortedListAllEntities.get(i).get(1)), indexOriginalTextStartEnd[1]-indexOriginalTextStartEnd[0]);
 			
