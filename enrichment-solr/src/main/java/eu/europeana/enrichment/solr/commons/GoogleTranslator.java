@@ -17,7 +17,7 @@ public class GoogleTranslator {
 		 
 		 Locale currentLocale2 = new Locale ("ro","RO");
 		 BreakIterator iterator = BreakIterator.getSentenceInstance(currentLocale2);
-		 String source = "de la infanterie. 7. Smyrna (azi Izmir) este un vechi oraș";
+		 String source = "o, do you guilty, daddy?\" \"I do not blame you,\" he";
 		 iterator.setText(source);
 		 int start = iterator.first();
 		 for (int end = iterator.next();
@@ -29,14 +29,16 @@ public class GoogleTranslator {
 		 
 
 	  GoogleTranslator http = new GoogleTranslator();
-	  String word = http.callUrlAndParseResult("ro", "en", "Iară eu, sărmanul de mine, de acestea de toate am fost închis și părăsit, am fost silit în loc de acestea de toate să mă mulțămesc cu sbierătele sălbatece ale Arabilor și a Chinezilor, ce auzindu-le te înfiora până la oase, aceasta era muzica mea și a consoldaților mei de pe vapor");
+	  //String word = http.callUrlAndParseResult("ro", "en", "Iară eu, sărmanul de mine, de acestea de toate am fost închis și părăsit, am fost silit în loc de acestea de toate să mă mulțămesc cu sbierătele sălbatece ale Arabilor și a Chinezilor, ce auzindu-le te înfiora până la oase, aceasta era muzica mea și a consoldaților mei de pe vapor");
+	  String word = "dumitr";
 	  
-	  String testExample = "And I, the poor of me, of all this, I have been shut up and left, I have been forced instead of all of this to please the savages of the Arabs and the Chinese, who heard them burying you to the bones, that was my music and my ship consorts";
+	  String testExample = "Dumitru";
 	 
 	  LevenschteinDistance ld = new LevenschteinDistance();
 	  
 	  int ldValue= ld.calculateLevenshteinDistance(word, testExample);
 			  
+	  System.out.println("Edit distance is: " + String.valueOf(ldValue));
 	  System.out.println("Levenschteins distance is: " + String.valueOf(1-1.0*ldValue/(word.length()+testExample.length())));
 	  
 	  System.out.println(word);
