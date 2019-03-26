@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.europeana.enrich</groupId>
+    <artifactId>enrichment-services</artifactId>
+    <version>${version.enrichmentAPI}</version>
+  </parent>
+  
+  <artifactId>enrichment-solr-positions-highlighter</artifactId>
+  <packaging>jar</packaging>
+  <name>enrichment-solr-positions-highlighter</name>
+ 
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    
+     <dependency>
+	  	<groupId>org.apache.solr</groupId>
+	  	<artifactId>solr-solrj</artifactId>
+	  	<version>6.6.5</version>	  	
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-highlighter -->
+	<dependency>
+    	<groupId>org.apache.lucene</groupId>
+    	<artifactId>lucene-highlighter</artifactId>
+    	<version>6.6.5</version>
+	</dependency>
+	
+	<!-- https://mvnrepository.com/artifact/org.apache.solr/solr-core -->
+	<dependency>
+    	<groupId>org.apache.solr</groupId>
+    	<artifactId>solr-core</artifactId>
+    	<version>6.6.5</version>
+	</dependency>
+ 
+  </dependencies>
+  
+  <build>
+    <pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>2.3.1</version>
+					<configuration>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/PositionsSolrHighlighter</outputDirectory>
+							<resources>
+								<resource>
+									<directory>resources</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/PositionsSolrHighlighter/lib</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>false</overWriteSnapshots>
+							<overWriteIfNewer>true</overWriteIfNewer>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+							<mainClass>org.apache.solr.highlight.PositionsSolrHighlighter</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+					</archive>
+ 
+					<finalName>PositionsSolrHighlighter/PositionsSolrHighlighter</finalName>
+				</configuration>
+			</plugin>
+		</plugins>
+  
+  
+  
+  </build>
+</project>

@@ -86,6 +86,7 @@
     <module>enrichment-mongo</module>
     <module>enrichment-definition</module>
     <module>enrichment-solr</module>
+    <module>enrichment-solr-positions-highlighter</module>
   </modules>
 
 	<build>

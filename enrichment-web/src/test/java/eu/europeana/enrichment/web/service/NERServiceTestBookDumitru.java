@@ -80,6 +80,8 @@ public class NERServiceTestBookDumitru {
 	@Test
 	public void test() throws Exception {
 		
+		europeanaEntityServiceBookDumitru.readStoriesFromJson();
+		
 		String bookText=europeanaEntityServiceBookDumitru.getBookText();
 		String originalBookText=europeanaEntityServiceBookDumitru.getOriginalText();
 		

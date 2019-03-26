@@ -33,6 +33,8 @@
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.translatedText.pdf}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.originalText.pdf}"/>
+		<constructor-arg type="String" value="${enrich.stories.import}"/>
+		<constructor-arg type="String" value="${enrich.items.import}"/>
 	</bean>
 	
 	<bean id="solrEntityService" name="entity_solr_entity_service"
