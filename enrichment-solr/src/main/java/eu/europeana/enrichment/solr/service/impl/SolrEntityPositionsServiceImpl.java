@@ -80,14 +80,16 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	TranslationService eTranslationService;
 
 	/*
+	 * The "scaleFactorRangeOfCharsToObserve" param below is introduced to make sure we are searching in a range that is big enough to with the matching term
 	 * for the fuzzy search set the params below to: minRangeOfCharsToObserve = 1500;rangeOfCharsToObserve = 1500;scaleFactorRangeOfCharsToObserve = 1.5;
 	 * for normal search (not fuzzy) set the params below to: minRangeOfCharsToObserve = 10000;rangeOfCharsToObserve = 10000;
 	*/
 	
 	private final int LevenschteinDistanceThreshold = 2;
-	private int minRangeOfCharsToObserve = 3000;
-	private int rangeOfCharsToObserve = 3000;
-	private double scaleFactorRangeOfCharsToObserve = 1.0;
+	private int minRangeOfCharsToObserve = 1000;
+	private int rangeOfCharsToObserve = 0;
+	private double scaleFactorRangeOfCharsToObserve = 1.5;
+	private double averageWordLeghtDifference = 1.0;
 	
 	/*
 	 * when the sentences are used to find the named entities in the original text, use the following 2 params:
@@ -266,25 +268,24 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		QueryResponse response=null;
 		
-		try {
-			response = solrServer.query(query);
-		} catch (IOException | SolrServerException e) {
-			throw new SolrNamedEntityServiceException("Unexpected exception occured when executing Solr query.", e);
-		}
-		
-		
 		List<String> terms = new ArrayList<String>();
 		List<Double> positions = new ArrayList<Double>();
 		List<List<Double>> offsets = new ArrayList<List<Double>>();
-		
+
+	
 		/*
-		 * parsing the obtained json response to extract the offsets, terms and positions
+		 * quering Solr server and parsing the obtained json response to extract the offsets, terms and positions
 		 */
 		try {
+			response = solrServer.query(query);
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
 		}
+		catch (IOException | SolrServerException e) {
+			throw new SolrNamedEntityServiceException("Unexpected exception occured when executing Solr query.", e);
+		}
+
 		
 		if(terms.isEmpty()) return -1;
 	
@@ -676,6 +677,16 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 	}
 
+	/**
+	 * This function defines the logic for finding a match for the searched term.
+	 * Basically it says that for the short words, in order to find a match the words should start with same letters.
+	 * The parameter  @param strict in this case is used to differentiate the case where Levenschteins distance is 2 (strict==1)
+	 * and the one where Levenschteins distance is 1, where some less strict constraint on the starting letters is applied.
+	 * 
+	 * @param word
+	 * @param strict
+	 * @return
+	 */
 	private int lengthToCheck(String word, int strict) {
 		
 		if(strict==1)
@@ -750,9 +761,23 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
      * @param rengeOfCharsTranslatedText
      * @return
      */
-	private int rangeOfCharsToObserve (int rengeOfCharsTranslatedText)
+	private int rangeOfCharsToObserve (int rengeOfCharsTranslatedText, int wordOffsetOriginalText)
 	{
-		return (int) Math.ceil((rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve < rangeOfCharsToObserve) ? rangeOfCharsToObserve : rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve);
+		
+		int newRangeOfCharsToObserve = (int) Math.ceil(rengeOfCharsTranslatedText * averageWordLeghtDifference * scaleFactorRangeOfCharsToObserve < minRangeOfCharsToObserve ? minRangeOfCharsToObserve : rengeOfCharsTranslatedText * averageWordLeghtDifference * scaleFactorRangeOfCharsToObserve);
+			
+		//the previous searched term is found
+		if(wordOffsetOriginalText!=-1)
+		{	
+			rangeOfCharsToObserve=newRangeOfCharsToObserve;
+		}
+		else
+		{			
+			rangeOfCharsToObserve += newRangeOfCharsToObserve;	
+		}	
+		
+		return rangeOfCharsToObserve;
+		
 	}
 	
 	/**
@@ -768,14 +793,15 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	private int updateCurrentSearchIndex (int currentOffset, String searchTerm, int wordOffsetOriginalText, int rengeOfCharsTranslatedText)
 	{
 		if(wordOffsetOriginalText!=-1)
-		{
-			rangeOfCharsToObserve = minRangeOfCharsToObserve;
+		{			
 			return wordOffsetOriginalText+searchTerm.length();			
 		}
 		else
-		{			
-			rangeOfCharsToObserve += rengeOfCharsTranslatedText * scaleFactorRangeOfCharsToObserve;
-			return currentOffset + rengeOfCharsTranslatedText;
+		{	
+			// here 0.8 scaling factor is used to make sure we do not jump over the word when we move forward
+			int rangeOfCharsNew = (int) Math.ceil(rengeOfCharsTranslatedText * averageWordLeghtDifference * 0.8);
+			rangeOfCharsToObserve -= rangeOfCharsNew;
+			return currentOffset + rangeOfCharsNew;  
 			
 		}
 	}
@@ -960,8 +986,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		storyOriginalLanguage=originalLanguage;
 		storyTranslatedLanguage=targetLanguage;
 		storyIdSolr=storyId;
-		fuzzyLogicSolr=fuzzyLogic;
-		scaleFactorRangeOfCharsToObserve = 1.5 * originalText.length()*1.0 / (translatedText.length()*1.0);
+		fuzzyLogicSolr=fuzzyLogic;		
+		averageWordLeghtDifference = originalText.length()*1.0 / (translatedText.length()*1.0);
+		
 		/*
 		 * get all entities in one list in order to sort them
 		 */
@@ -1019,10 +1046,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			 * use the 4 lines below when searching with the predefined logic for the range of characters to search the term in
 			 */
 			int charRangeTranslatedText = (i==0) ? Integer.valueOf(sortedListAllEntities.get(i).get(1)) : Math.abs((Integer.valueOf(sortedListAllEntities.get(i).get(1))-Integer.valueOf(sortedListAllEntities.get(i-1).get(1))));
-			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText);
+			rangeToObserve = rangeOfCharsToObserve(charRangeTranslatedText, wordOffsetOriginalText);
 			wordOffsetOriginalText = findTermPositionsInStory(entitiesOriginalText.get(i), offsetsOriginalText, Integer.valueOf(sortedListAllEntities.get(i).get(1)), rangeToObserve);
 			offsetsOriginalText = updateCurrentSearchIndex(offsetsOriginalText, entitiesOriginalText.get(i), wordOffsetOriginalText, charRangeTranslatedText);
-	
 
 			/*
 			 * use the 3 lines below when searching with the sentences logic for the range of characters to search the term in

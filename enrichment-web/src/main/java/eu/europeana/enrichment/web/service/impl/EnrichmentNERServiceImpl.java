@@ -349,19 +349,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	public String uploadStories(StoryEntityImpl[] stories) throws HttpException {
 		
 		for (StoryEntityImpl story : stories) {
-			if(story.getStoryId() == null || story.getStoryId().isEmpty())
+			if(story.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
-			if(story.getStoryDescription() == null || story.getStoryDescription().isEmpty())
+			if(story.getStoryDescription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_DESCRIPTION, null);
-			if(story.getStoryLanguage() == null || story.getStoryLanguage().isEmpty())
+			if(story.getStoryLanguage() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_LANGUAGE, null);
-			if(story.getStorySource() == null || story.getStorySource().isEmpty())
+			if(story.getStorySource() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SOURCE, null);
-			if(story.getStorySummary() == null || story.getStorySummary().isEmpty())
+			if(story.getStorySummary() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SUMMARY, null);
-			if(story.getStoryTitle() == null || story.getStoryTitle().isEmpty())
+			if(story.getStoryTitle() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TITLE, null);
-			if(story.getStoryTranscription() == null || story.getStoryTranscription().isEmpty())
+			if(story.getStoryTranscription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TRANSCRIPTION, null);
 
 			persistentStoryEntityService.saveStoryEntity(story);
