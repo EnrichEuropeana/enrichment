@@ -26,10 +26,17 @@ import com.google.common.reflect.TypeToken;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 
-public class NERServiceReadDocument {
+public class ReadWriteFiles {
+
+	@Resource(name = "persistentStoryEntityService")
+	PersistentStoryEntityService persistentStoryEntityService;
 
 	@Resource
 	EnrichmentNERService enrichmentNerService;
@@ -60,7 +67,7 @@ public class NERServiceReadDocument {
 		return translatedText;
 	}
 
-	public NERServiceReadDocument (String translatedTextFileURL, String originalTextFileURL, String resultsFileURL, String outputFileFormatedPDFTranslation, String outputFileFormatedPDFOriginal, String jsonStoriesImport, String jsonItemsImport)
+	public ReadWriteFiles (String translatedTextFileURL, String originalTextFileURL, String resultsFileURL, String outputFileFormatedPDFTranslation, String outputFileFormatedPDFOriginal, String jsonStoriesImport, String jsonItemsImport)
 	{
 		resultsFile=resultsFileURL;
 		outputFormatedPDFTranslated=outputFileFormatedPDFTranslation;
@@ -69,7 +76,7 @@ public class NERServiceReadDocument {
 		jsonItems=jsonItemsImport;
 		
 		if(translatedTextFileURL.isEmpty()) {
-			System.err.println("NERServiceReadDocument: No text to be analysed provided.");
+			System.err.println("ReadWriteFiles: No text to be analysed provided.");
 		}
 		else
 		{
@@ -166,7 +173,7 @@ public class NERServiceReadDocument {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void readStoriesFromJson () {
+	public void readStoriesAndItemsFromJson () {
 		
 		/*
 		 * reading stories and items from json
@@ -192,29 +199,37 @@ public class NERServiceReadDocument {
 				
 			}
 			
-			StoryEntityImpl [] storyEntities = new StoryEntityImpl [stories.size()];
+			List<StoryEntityImpl> storyEntities = new ArrayList<StoryEntityImpl>();
+			
+			
 			for (int i=0;i<stories.size();i++)
 			{
-				storyEntities[i]=new StoryEntityImpl();
-				storyEntities[i].setStoryTitle("");
-				storyEntities[i].setStoryDescription("");
-				storyEntities[i].setStoryId("");
-				storyEntities[i].setStoryLanguage("");
-				storyEntities[i].setStorySummary("");
-				storyEntities[i].setStoryTranscription("");				
-
+				String storyLanguage = (String)stories.get(i).get("language");
+				if(storyLanguage==null) storyLanguage="";
+				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
+				{
+					StoryEntityImpl newStoryEntity = new StoryEntityImpl();
+					newStoryEntity.setStoryTitle("");
+					newStoryEntity.setStoryDescription("");
+					newStoryEntity.setStoryId("");
+					newStoryEntity.setStoryLanguage("");
+					newStoryEntity.setStorySummary("");
+					newStoryEntity.setStoryTranscription("");				
+	
+					
+					if(stories.get(i).get("source")!=null) newStoryEntity.setStorySource((String) stories.get(i).get("source"));
+					if(stories.get(i).get("title")!=null) newStoryEntity.setStoryTitle((String) stories.get(i).get("title"));
+					if(stories.get(i).get("description")!=null) newStoryEntity.setStoryDescription((String) stories.get(i).get("description"));
+					if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
+					if(stories.get(i).get("language")!=null) newStoryEntity.setStoryLanguage((String) stories.get(i).get("language"));	
+					if(stories.get(i).get("summary")!=null)	newStoryEntity.setStorySummary((String) stories.get(i).get("summary"));
 				
-				if(stories.get(i).get("source")!=null) storyEntities[i].setStorySource((String) stories.get(i).get("source"));
-				if(stories.get(i).get("title")!=null) storyEntities[i].setStoryTitle((String) stories.get(i).get("title"));
-				if(stories.get(i).get("description")!=null) storyEntities[i].setStoryDescription((String) stories.get(i).get("description"));
-				if(stories.get(i).get("story_id")!=null) storyEntities[i].setStoryId((String) stories.get(i).get("story_id"));
-				if(stories.get(i).get("language")!=null) storyEntities[i].setStoryLanguage((String) stories.get(i).get("language"));	
-				if(stories.get(i).get("summary")!=null)	storyEntities[i].setStorySummary((String) stories.get(i).get("summary"));
-										
+					storyEntities.add(newStoryEntity);
+				}				
 				
 			}
 			
-			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities);
+			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
 			
 			/*
 			 * reading items
@@ -229,6 +244,57 @@ public class NERServiceReadDocument {
 				}
 				
 			}
+			
+			List<ItemEntityImpl> itemEntities = new ArrayList<ItemEntityImpl>();
+			for (int i=0;i<items.size();i++)
+			{
+				String itemLanguage = (String)items.get(i).get("language");
+				if(itemLanguage==null) itemLanguage="";
+				String itemTranscription = (String)items.get(i).get("transcription");				
+
+				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+				{
+					
+					ItemEntityImpl newItemEntity=new ItemEntityImpl();
+					newItemEntity.setTitle("");
+					newItemEntity.setStoryId("");
+					newItemEntity.setLanguage("");
+					newItemEntity.setTranscription("");	
+					newItemEntity.setType("");	
+					newItemEntity.setItemId("");
+	
+					
+					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
+					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
+					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
+					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
+					if(items.get(i).get("item_id")!=null) newItemEntity.setItemId((String) items.get(i).get("item_id"));
+	
+					if(items.get(i).get("story_id")!=null && items.get(i).get("transcription")!=null)
+					{		
+						String itemStoryId = (String) items.get(i).get("story_id");
+						String transcription = (String) items.get(i).get("transcription");
+						/*
+						 * adding item transcription to the story transcription
+						 */
+						StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(itemStoryId);
+						if(dbStoryEntity!=null)
+						{
+							String storyTranscription = dbStoryEntity.getStoryTranscription();
+							storyTranscription += " " + transcription;
+							dbStoryEntity.setStoryTranscription(storyTranscription);
+							persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
+						}
+					}
+					
+					itemEntities.add(newItemEntity);
+				}
+				
+			}
+			
+			String uploadItemsStatus = enrichmentNerService.uploadItems(itemEntities.toArray(new ItemEntityImpl[0]));
+			
+			logger.info("Stories and Items are saved to the database from the JSON file!");
 						
 		}
 		catch (FileNotFoundException e) {

@@ -27,7 +27,7 @@
 	
 	<import resource="../../src/main/resources/enrichment-web-context.xml" />
 	
-	<bean id="europeanaEntityServiceBookDumitru" class="eu.europeana.enrichment.web.service.NERServiceReadDocument">
+	<bean id="europeanaReadWriteFiles" class="eu.europeana.enrichment.web.service.ReadWriteFiles">
 		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.original}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
