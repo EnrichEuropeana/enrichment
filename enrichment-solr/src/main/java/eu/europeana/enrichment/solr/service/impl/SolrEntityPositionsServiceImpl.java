@@ -979,15 +979,33 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 
 	}
 	@Override
-	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String originalText, String translatedText, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
+	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
 	{		
-		storyOriginalText=originalText;
+		/*
+		 * if the original language is the same as the target language, add positions in the original text
+		 * to be the same as in the translated text
+		 */
+		if(dbStoryEntity.getStoryLanguage().compareTo(targetLanguage)==0)
+		{			
+			for (String classificationType : identifiedNER.keySet()) {
+				for (List<String> entityList : identifiedNER.get(classificationType)) {
+					entityList.add(entityList.get(1));
+				}
+			}
+			return;
+		}		
+		/*
+		 * store the entity in Solr (indexing of the story)
+		 */
+		store(dbStoryEntity,true);
+		
+		storyOriginalText=dbStoryEntity.getStoryTranscription();
 		storyTranslatedText=translatedText;
-		storyOriginalLanguage=originalLanguage;
+		storyOriginalLanguage=dbStoryEntity.getStoryLanguage();
 		storyTranslatedLanguage=targetLanguage;
-		storyIdSolr=storyId;
+		storyIdSolr=dbStoryEntity.getStoryId();
 		fuzzyLogicSolr=fuzzyLogic;		
-		averageWordLeghtDifference = originalText.length()*1.0 / (translatedText.length()*1.0);
+		averageWordLeghtDifference = storyOriginalText.length()*1.0 / (storyTranslatedText.length()*1.0);
 		
 		/*
 		 * get all entities in one list in order to sort them

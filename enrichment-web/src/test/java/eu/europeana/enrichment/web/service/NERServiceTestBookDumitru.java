@@ -49,8 +49,8 @@ import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public class NERServiceTestBookDumitru {
 	
-	@Resource(name= "europeanaEntityServiceBookDumitru")
-	NERServiceReadDocument europeanaEntityServiceBookDumitru;
+	@Resource(name= "europeanaReadWriteFiles")
+	ReadWriteFiles europeanaReadWriteFiles;
 	
 //	@Resource(name= "stanfordNerModel3Service")
 //	NERService stanfordNerModel3Service;
@@ -80,10 +80,8 @@ public class NERServiceTestBookDumitru {
 	@Test
 	public void test() throws Exception {
 		
-		europeanaEntityServiceBookDumitru.readStoriesFromJson();
-		
-		String bookText=europeanaEntityServiceBookDumitru.getBookText();
-		String originalBookText=europeanaEntityServiceBookDumitru.getOriginalText();
+		String bookText=europeanaReadWriteFiles.getBookText();
+		String originalBookText=europeanaReadWriteFiles.getOriginalText();
 		
 		//deleting all NamedEntities in the db so that we do not get the saved one if we update the input .txt file
 		List<NamedEntity> all_named_entities= persistentNamedEntityService.getAllNamedEntities();
@@ -131,7 +129,7 @@ public class NERServiceTestBookDumitru {
 
 		
 		
-			europeanaEntityServiceBookDumitru.writeToFile(NERNamedEntities);
+			europeanaReadWriteFiles.writeToFile(NERNamedEntities);
 		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

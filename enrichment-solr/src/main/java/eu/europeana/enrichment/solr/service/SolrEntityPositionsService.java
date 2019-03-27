@@ -90,16 +90,14 @@ public interface SolrEntityPositionsService {
 		 * in the original text 
 		 * 
 		 * @param fuzzyLogic
-		 * @param originalLanguage
+		 * @param dbStoryEntity
 		 * @param targetLanguage
-		 * @param originalText
 		 * @param translatedText
-		 * @param storyId
 		 * @param identifiedNER
 		 * @throws SolrNamedEntityServiceException
-		 * @throws Exception 
+		 * @throws Exception
 		 */
-		public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, String originalLanguage, String targetLanguage, String originalText, String translatedText, String storyId, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException, Exception;
+		public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException, Exception;
 
 
 }

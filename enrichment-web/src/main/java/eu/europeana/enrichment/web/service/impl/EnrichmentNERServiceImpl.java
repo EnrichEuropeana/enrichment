@@ -218,17 +218,25 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 */
 		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, "en");
-			String text = dbTranslationEntity.getTranslatedText();
+					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage);
+			
+			String text = "";
+			if(dbTranslationEntity!=null) text = dbTranslationEntity.getTranslatedText();
+			else text = dbStoryEntity.getStoryTranscription();
+				
 			if(python) {
 				JSONObject jsonRequest = new JSONObject();
 				jsonRequest.put("tool", tool);
 				jsonRequest.put("text", text);
 				text = jsonRequest.toString();
 			}
+			
 			TreeMap<String, List<List<String>>> tmpResult = tmpTool.identifyNER(text);
 			
-			solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity.getStoryLanguage(),"en",dbStoryEntity.getStoryTranscription(),text, dbStoryEntity.getStoryId(), tmpResult);
+			/*
+			 * finding the positions of the entities in the original text using Solr 
+			 */			
+			solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity,translationLanguage,text, tmpResult);
 			
 			for (String classificationType : tmpResult.keySet()) {
 				List<NamedEntity> tmpClassificationList = new ArrayList<>();
@@ -374,17 +382,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	public String uploadItems(ItemEntityImpl[] items) throws HttpException {
 		
 		for (ItemEntityImpl item : items) {
-			if(item.getStoryId() == null || item.getStoryId().isEmpty())
+			if(item.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
-			if(item.getLanguage() == null || item.getLanguage().isEmpty())
+			if(item.getLanguage() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_LANGUAGE, null);
-			if(item.getTitle() == null || item.getTitle().isEmpty())
+			if(item.getTitle() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TITLE, null);
-			if(item.getTranscription() == null || item.getTranscription().isEmpty())
+			if(item.getTranscription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TRANSCRIPTION, null);
-			if(item.getItemId() == null || item.getItemId().isEmpty())
+			if(item.getItemId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_ID, null);
-			if(item.getType() == null || item.getType().isEmpty())
+			if(item.getType() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TYPE, null);
 
 
