@@ -50,6 +50,10 @@ public class ReadWriteFiles {
 	private String translatedText;
 	private String originalText;
 	
+	private String translatedLanguage;
+	private String originalLanguage;
+
+	
 	public String getOriginalText() {
 		return originalText;
 	}
@@ -92,6 +96,25 @@ public class ReadWriteFiles {
 		
 	}
 	
+	public void setOriginalAndTranslatedText(String origText, String transText)
+	{
+		originalText = origText;
+		translatedText = transText;
+	}
+	
+	public void setLanguages (String translatedLang, String originalLang)
+	{
+		translatedLanguage=translatedLang;
+		originalLanguage=originalLang;
+	}
+	
+	public void setOutputFileNames (String newResultsFile, String newOutputFormatedPDFTranslated, String newOutputFormatedPDFOriginal)
+	{
+		resultsFile = newResultsFile;
+		outputFormatedPDFTranslated = newOutputFormatedPDFTranslated;
+		outputFormatedPDFOriginal = newOutputFormatedPDFOriginal;		
+	}
+	
 	private static String readFileAsString(String fileName) throws Exception 
 	{
 		String data = ""; 
@@ -102,6 +125,8 @@ public class ReadWriteFiles {
 	//writting results to an output file
 	public void writeToFile (TreeMap<String, List<NamedEntity>> NERNamedEntities) throws IOException {
 
+		if(NERNamedEntities==null || NERNamedEntities.isEmpty()) return;
+		
         File file = new File(resultsFile);        
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.close();
@@ -168,8 +193,15 @@ public class ReadWriteFiles {
 	    writer.close();
 	    
 	    //writting a formatted text to a pdf file for checking the results
-	    europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFTranslated, translatedText, NERNamedEntities, 0);
-	    europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFOriginal, originalText, NERNamedEntities, 1);
+	    if(translatedLanguage.compareTo(originalLanguage)==0)
+	    {
+	    	europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFOriginal, originalText, NERNamedEntities, 1);
+	    }
+	    else
+	    {
+	    	europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFTranslated, translatedText, NERNamedEntities, 0);
+	    	europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFOriginal, originalText, NERNamedEntities, 1);
+	    }
 	}
 	
 	@SuppressWarnings("unchecked")

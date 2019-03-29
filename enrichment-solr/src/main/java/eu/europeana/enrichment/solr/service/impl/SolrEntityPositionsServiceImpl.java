@@ -40,6 +40,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.json.simple.parser.ParseException;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
+import org.tartarus.snowball.ext.germanStemmer;
 import org.tartarus.snowball.ext.romanianStemmer;
 
 import com.google.common.reflect.TypeToken;
@@ -341,56 +342,66 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 */
 
 		String termLowerCaseStemmed = "";
-		if(language.compareToIgnoreCase("ro")==0)
+		
+//		termLowerCase = termLowerCase.replace("ă", "a");
+//		termLowerCase = termLowerCase.replace("â", "a");
+//		termLowerCase = termLowerCase.replace("î", "i");
+//		termLowerCase = termLowerCase.replace("ş", "s");
+//		termLowerCase = termLowerCase.replace("ţ", "t");
+//				
+//		termLowerCase = Normalizer.normalize(termLowerCase, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+//        					
+//		try {
+//			/*
+//			 * please see here for the char standards for different languages: https://www.terena.org/activities/multiling/ml-docs/iso-8859.html
+//			 */
+//			termLowerCaseAndASCII = new String(termLowerCase.getBytes("ISO-8859-2"), "ASCII");
+//		} catch (UnsupportedEncodingException e1) {				
+//			e1.printStackTrace();
+//		}
+		
+		SnowballStemmer snowballStemmer = null;
+		//TODO: this is hardcoded language - needs to be improved
+		if(language.compareTo("Romanian")==0)
 		{
-//			termLowerCase = termLowerCase.replace("ă", "a");
-//			termLowerCase = termLowerCase.replace("â", "a");
-//			termLowerCase = termLowerCase.replace("î", "i");
-//			termLowerCase = termLowerCase.replace("ş", "s");
-//			termLowerCase = termLowerCase.replace("ţ", "t");
-					
-//			termLowerCase = Normalizer.normalize(termLowerCase, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-	        					
-//			try {
-//				/*
-//				 * please see here for the char standards for different languages: https://www.terena.org/activities/multiling/ml-docs/iso-8859.html
-//				 */
-//				termLowerCaseAndASCII = new String(termLowerCase.getBytes("ISO-8859-2"), "ASCII");
-//			} catch (UnsupportedEncodingException e1) {				
-//				e1.printStackTrace();
-//			}
-			
-			SnowballStemmer snowballStemmer = new romanianStemmer();
-			String [] termLowerCaseWords = termRemovedSpecialChars.split("\\s+");	
-			
-			for (int i=0;i<termLowerCaseWords.length;i++)
-			{		
-				snowballStemmer.setCurrent(termLowerCaseWords[i]);
-			    snowballStemmer.stem();
-			    if(i==termLowerCaseWords.length-1)
-			    {
-					/*
-					 * to ASCII replacement filter (e.g.ä->a, etc.) together with a stemmer
-					 */
-			    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
-			    }
-			    else
-			    {
-			    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "") + " ";	
-			    }
-
-			}
-			
-			/*
-			//another stemmer
-			Stemmer stemmerTerm = new Stemmer();
-			stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
-			stemmerTerm.stem();
-			String termLowerCaseStemmed = stemmerTerm.toString();
-			*/
-
+			snowballStemmer = new romanianStemmer();
+		}
+		else if (language.compareTo("English")==0)
+		{
+			snowballStemmer = new englishStemmer();
+		}
+		else if (language.compareTo("German")==0)
+		{
+			snowballStemmer = new germanStemmer();
+		}
+		
+		String [] termLowerCaseWords = termRemovedSpecialChars.split("\\s+");	
+		
+		for (int i=0;i<termLowerCaseWords.length;i++)
+		{		
+			snowballStemmer.setCurrent(termLowerCaseWords[i]);
+		    snowballStemmer.stem();
+		    if(i==termLowerCaseWords.length-1)
+		    {
+				/*
+				 * to ASCII replacement filter (e.g.ä->a, etc.) together with a stemmer
+				 */
+		    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+		    }
+		    else
+		    {
+		    	termLowerCaseStemmed += Normalizer.normalize(snowballStemmer.getCurrent(), Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "") + " ";	
+		    }
 
 		}
+		
+		/*
+		//another stemmer
+		Stemmer stemmerTerm = new Stemmer();
+		stemmerTerm.add(termLowerCaseAndASCII.toCharArray(), termLowerCaseAndASCII.length());
+		stemmerTerm.stem();
+		String termLowerCaseStemmed = stemmerTerm.toString();
+		*/
 		
 		return termLowerCaseStemmed;
 	
@@ -821,12 +832,12 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	private void updateSearchIndexFromSentences(int wordOffsetOriginalText, int indexTranslatedTextPrevious, int indexTranslatedTextCurrent, String originalText, String translatedText, int [] indexOriginalTextStartEnd) {
 
 		Locale currentLocale1=null;
-		if(storyTranslatedLanguage.compareToIgnoreCase("en")==0)
+		if(storyTranslatedLanguage.compareTo("English")==0)
 		{
 			currentLocale1 = new Locale ("en","US");
 		}
 		Locale currentLocale2=null;
-		if(storyOriginalLanguage.compareToIgnoreCase("ro")==0)
+		if(storyOriginalLanguage.compareTo("Romanian")==0)
 		{
 			currentLocale2 = new Locale ("ro","RO");
 		}

@@ -1,11 +1,14 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
 
 public class StoryEntityDaoImpl implements StoryEntityDao{
@@ -55,6 +58,23 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	@Override
 	public void deleteStoryEntityByStoryId(String key) {
 		datastore.delete(datastore.find(StoryEntityImpl.class).filter("storyId", key));
+	}
+
+	@Override
+	public List<StoryEntity> findAllStoryEntities() {
+		Query<StoryEntityImpl> persistentStoryEntities = datastore.createQuery(StoryEntityImpl.class);		
+		List<StoryEntityImpl> result = persistentStoryEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else
+		{
+			List<StoryEntity> tmpResult = new ArrayList<>();
+			for(int index = result.size()-1; index >= 0; index--) {
+				StoryEntity dbEntity = result.get(index);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
 	}
 
 }

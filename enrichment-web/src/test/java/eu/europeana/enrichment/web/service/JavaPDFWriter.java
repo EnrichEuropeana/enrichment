@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chapter;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -26,9 +30,13 @@ import eu.europeana.enrichment.model.PositionEntity;
 
 public class JavaPDFWriter
 {
+	
+	Logger logger = LogManager.getLogger(getClass());
+	
 	private String SPADE="\u2660";
 	private String HEART="\u2665";
 	private String DIAMOND="\u2666";
+	private String CLUB="\u2663";
 	
 	private final String FONT = "C:/git/EnrichEuropeana-enrichment-project/enrichment/enrichment-web/src/test/java/eu/europeana/enrichment/web/service/Cardo-Regular.ttf";
 	
@@ -36,8 +44,9 @@ public class JavaPDFWriter
 	private Font blueFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H, 12, Font.BOLD, new CMYKColor(255, 0, 0, 0));
 	private Font redFont = FontFactory.getFont(FONT, BaseFont.IDENTITY_H, 12, Font.BOLD, new CMYKColor(0, 255, 0, 0));
 	private Font yellowFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H,12, Font.BOLD, new CMYKColor(0, 0, 255, 0));
+	private Font greenFont = FontFactory.getFont(FONT,BaseFont.IDENTITY_H,12, Font.BOLD, BaseColor.GREEN);
 	private Font normalFont = FontFactory.getFont(FONT, BaseFont.IDENTITY_H,  12);
-	
+
 	/*
 	 * translationOrOriginalText=0 -> write translated text in a pdf; translationOrOriginalText=1 -> write original text to pdf
 	 */
@@ -77,6 +86,10 @@ public class JavaPDFWriter
 		    		else if(word.contains(DIAMOND))
 		    		{
 		    			paragraph.add(new Chunk (word.substring(1)+" ", yellowFont));
+		    		}
+		    		else if(word.contains(CLUB))
+		    		{
+		    			paragraph.add(new Chunk (word.substring(1)+" ", greenFont));
 		    		}
 		    		else
 		    		{
@@ -148,7 +161,7 @@ public class JavaPDFWriter
         				checkIfPositionIsValid = nextPosition.getOffsetsOriginalText().get(0);
         			}
             		
-            		if(checkIfPositionIsValid>=0)
+            		if(checkIfPositionIsValid>=0 && checkIfPositionIsValid<=textString.length())
             		{
 	            		/* 
 	            		 * here we have to update where to insert a symbol based on already inserted symbols
@@ -161,28 +174,46 @@ public class JavaPDFWriter
 	        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
 	        			}
 	            		
+	        			boolean addedSymbol = false;
 	        			if(key.equalsIgnoreCase("agent"))
 	        			{
 	            			sb.insert(positionToInsert, SPADE);
+	            			addedSymbol=true;
 	        			}
 	        			else if(key.equalsIgnoreCase("organization"))
 	        			{
 	        				//this symbol is a HEART character
 	        				sb.insert(positionToInsert, HEART);
+	        				addedSymbol=true;
 	        			}
 	        			else if(key.equalsIgnoreCase("place"))
 	        			{
 	        				//this symbol is a DIAMOND character
 	        				sb.insert(positionToInsert, DIAMOND);
+	        				addedSymbol=true;
+	        			}
+	        			else if(key.equalsIgnoreCase("misc"))
+	        			{
+	        				//this symbol is a CLUB character
+	        				sb.insert(positionToInsert, CLUB);
+	        				addedSymbol=true;
 	        			}
 	            		
-	        			if (translationOrOriginalText==0) {
-	        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
-	        			}
-	        			else
+	        			if(addedSymbol)
 	        			{
-	        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+		        			if (translationOrOriginalText==0) {
+		        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+		        			}
+		        			else
+		        			{
+		        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+		        			}
 	        			}
+            		}
+            		else
+            		{
+            			logger.info("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
+            		
             		}
             	}
         	}
