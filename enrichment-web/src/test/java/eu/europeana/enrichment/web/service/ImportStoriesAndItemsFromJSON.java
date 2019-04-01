@@ -48,6 +48,7 @@ public class ImportStoriesAndItemsFromJSON {
 	@Test
 	public void test() throws Exception {
 		
+/*
 		//deleting all StoryEntities in the db for testing the input from a json file
 		List<StoryEntity> all_story_entities = persistentStoryEntityService.getAllStoryEntities();
 		if(all_story_entities!=null)
@@ -69,7 +70,7 @@ public class ImportStoriesAndItemsFromJSON {
 				persistentItemEntityService.deleteItemEntity(item_entity);				
 			}
 		}
-
+*/
 
 		/*
 		 * import stories and items from a json file to the mongo db
