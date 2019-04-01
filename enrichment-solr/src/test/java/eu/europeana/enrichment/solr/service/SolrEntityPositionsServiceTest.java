@@ -34,7 +34,8 @@ public class SolrEntityPositionsServiceTest {
 	@Test
 	public void test() throws SolrNamedEntityServiceException {
 		
-		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");	
+		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");
+		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("1495");
 			
 		//delete all documents first
 		//solrEntityService.deleteByQuery("*");

@@ -238,8 +238,8 @@ public class ReadWriteFiles {
 			{
 				String storyLanguage = (String)stories.get(i).get("language");
 				if(storyLanguage==null) storyLanguage="";
-				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
-				{
+//				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
+//				{
 					StoryEntityImpl newStoryEntity = new StoryEntityImpl();
 					newStoryEntity.setStoryTitle("");
 					newStoryEntity.setStoryDescription("");
@@ -257,7 +257,7 @@ public class ReadWriteFiles {
 					if(stories.get(i).get("summary")!=null)	newStoryEntity.setStorySummary((String) stories.get(i).get("summary"));
 				
 					storyEntities.add(newStoryEntity);
-				}				
+//				}				
 				
 			}
 			
@@ -284,8 +284,8 @@ public class ReadWriteFiles {
 				if(itemLanguage==null) itemLanguage="";
 				String itemTranscription = (String)items.get(i).get("transcription");				
 
-				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
-				{
+//				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+//				{
 					
 					ItemEntityImpl newItemEntity=new ItemEntityImpl();
 					newItemEntity.setTitle("");
@@ -320,7 +320,7 @@ public class ReadWriteFiles {
 					}
 					
 					itemEntities.add(newItemEntity);
-				}
+//				}
 				
 			}
 			

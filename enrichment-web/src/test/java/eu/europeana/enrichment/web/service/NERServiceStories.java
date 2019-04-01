@@ -81,64 +81,69 @@ public class NERServiceStories {
 		if(dbStoryEntities!=null)
 		{
 			for(StoryEntity story : dbStoryEntities) {
-				
-				/*
-				 * delete all named entities for the previous story
-				 */
-				all_named_entities= persistentNamedEntityService.getAllNamedEntities();
-				if(all_named_entities!=null)
+
+				String storyLanguage = story.getStoryLanguage();
+				if(storyLanguage==null) storyLanguage="";
+				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
 				{
-					for(NamedEntity named_entity : all_named_entities) {
-						persistentNamedEntityService.deleteNamedEntity(named_entity);
+
+					/*
+					 * delete all named entities for the previous story
+					 */
+					all_named_entities= persistentNamedEntityService.getAllNamedEntities();
+					if(all_named_entities!=null)
+					{
+						for(NamedEntity named_entity : all_named_entities) {
+							persistentNamedEntityService.deleteNamedEntity(named_entity);
+						}
 					}
-				}
-
-				
-				List<String> linkingTools = Arrays.asList("Wikidata");
-				europeanaEnrichmentNERRequest.setLinking(linkingTools);
-				europeanaEnrichmentNERRequest.setStoryId(story.getStoryId());
-				if(story.getStoryLanguage().compareTo("English")==0)
-				{
-					europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
-				}
-				else if(story.getStoryLanguage().compareTo("German")==0) 
-				{
-					europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_German");
-				}
-				String transTool = "eTranslation";
-				europeanaEnrichmentNERRequest.setTranslationTool(transTool);
-				String translationLanguage = story.getStoryLanguage();
-				europeanaEnrichmentNERRequest.setTranslationlanguage(translationLanguage);	
-				
-				try {
-					/*
-					 * identify NE in the text
-					 */
-					TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);		
-							
-					/*
-					 * write results to the output files
-					 */
-					TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryInformation(story.getStoryId(), transTool, translationLanguage);					
-					String transText = "";
-					if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
-					else transText  = story.getStoryTranscription();
-
-					europeanaReadWriteFiles.setLanguages(translationLanguage, story.getStoryLanguage());
-					europeanaReadWriteFiles.setOriginalAndTranslatedText(story.getStoryTranscription(), transText);
-					String outputFileResults = "results-"+story.getStoryId()+".txt";
-					String outputFilePDFTranslated = "translatedText-"+story.getStoryId()+".pdf";
-					String outputFilePDFOriginal = "originalText-"+story.getStoryId()+".pdf";
-					europeanaReadWriteFiles.setOutputFileNames(outputFileResults, outputFilePDFTranslated, outputFilePDFOriginal);
-					europeanaReadWriteFiles.writeToFile(NERNamedEntities);
+	
 					
-				} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-
-				}	
-		
+					List<String> linkingTools = Arrays.asList("Wikidata");
+					europeanaEnrichmentNERRequest.setLinking(linkingTools);
+					europeanaEnrichmentNERRequest.setStoryId(story.getStoryId());
+					if(story.getStoryLanguage().compareTo("English")==0)
+					{
+						europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
+					}
+					else if(story.getStoryLanguage().compareTo("German")==0) 
+					{
+						europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_German");
+					}
+					String transTool = "eTranslation";
+					europeanaEnrichmentNERRequest.setTranslationTool(transTool);
+					String translationLanguage = story.getStoryLanguage();
+					europeanaEnrichmentNERRequest.setTranslationlanguage(translationLanguage);	
+					
+					try {
+						/*
+						 * identify NE in the text
+						 */
+						TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);		
+								
+						/*
+						 * write results to the output files
+						 */
+						TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
+								findTranslationEntityWithStoryInformation(story.getStoryId(), transTool, translationLanguage);					
+						String transText = "";
+						if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
+						else transText  = story.getStoryTranscription();
+	
+						europeanaReadWriteFiles.setLanguages(translationLanguage, story.getStoryLanguage());
+						europeanaReadWriteFiles.setOriginalAndTranslatedText(story.getStoryTranscription(), transText);
+						String outputFileResults = "results-"+story.getStoryId()+".txt";
+						String outputFilePDFTranslated = "translatedText-"+story.getStoryId()+".pdf";
+						String outputFilePDFOriginal = "originalText-"+story.getStoryId()+".pdf";
+						europeanaReadWriteFiles.setOutputFileNames(outputFileResults, outputFilePDFTranslated, outputFilePDFOriginal);
+						europeanaReadWriteFiles.writeToFile(NERNamedEntities);
+						
+					} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+	
+					}	
+				}
 		}
 		
 		
