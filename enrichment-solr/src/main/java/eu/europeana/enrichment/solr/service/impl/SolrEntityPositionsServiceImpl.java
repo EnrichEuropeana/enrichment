@@ -60,6 +60,7 @@ import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.TranslationService;
+import javassist.expr.Instanceof;
 
 
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
@@ -1000,7 +1001,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		{			
 			for (String classificationType : identifiedNER.keySet()) {
 				for (List<String> entityList : identifiedNER.get(classificationType)) {
+					
 					entityList.add(entityList.get(1));
+					
 				}
 			}
 			return;
