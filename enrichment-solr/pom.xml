@@ -5,7 +5,9 @@
   <parent>
     <groupId>eu.europeana.enrich</groupId>
     <artifactId>enrichment-services</artifactId>
-    <version>${version.enrichmentAPI}</version>
+    <!-- version>${version.enrichmentAPI}</version-->
+	<version>0.0.1-SNAPSHOT</version>
+
   </parent>
 
   <artifactId>enrichment-solr</artifactId>

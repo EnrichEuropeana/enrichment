@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.ner.service.impl;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -135,16 +136,16 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 */
 	private void setEntityToMap(String entityType, String entityName, int entityOffset, TreeMap<String, List<List<String>>> map) {
 		
-		String[] wordWithPosition = new String[2];
-		wordWithPosition[0]=entityName;
-		wordWithPosition[1]=String.valueOf(entityOffset);
+		List<String> wordWithPosition = new ArrayList<String>();
+		wordWithPosition.add(entityName);
+		wordWithPosition.add(String.valueOf(entityOffset));
 		
 		if(map.containsKey(entityType)) {
-			map.get(entityType).add(Arrays.asList(wordWithPosition));
+			map.get(entityType).add(wordWithPosition);
 		}
 		else {
 			List<List<String>> temp = new ArrayList<List<String>>();					
-			temp.add(Arrays.asList(wordWithPosition));
+			temp.add(wordWithPosition);
 			map.put(entityType, temp);
 
 		}
@@ -166,7 +167,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			//builder.setParameter("text", text);
 			
 			HttpPost request = new HttpPost(baseUrl);
-			String requestString = String.format("text=%s", text);
+			String requestString = String.format("text=%s", URLEncoder.encode(text, "UTF-8"));
 			StringEntity params = new StringEntity(requestString, "UTF-8");
 			request.addHeader("Accept", "application/json");
 			request.addHeader("Content-Type", "application/x-www-form-urlencoded");
