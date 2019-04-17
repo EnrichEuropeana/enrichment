@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-definition</artifactId>
-			<version>${version.enrichmentAPI}</version>
+			<version>${version.enrichmentAPI}</version>			
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
@@ -47,7 +47,8 @@
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
   			<artifactId>entity-client</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 	
 		<dependency>
@@ -75,13 +76,16 @@
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
 			<artifactId>entity-definitions</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
 			<artifactId>entity-utils</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
+			
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-jdk14</artifactId>
