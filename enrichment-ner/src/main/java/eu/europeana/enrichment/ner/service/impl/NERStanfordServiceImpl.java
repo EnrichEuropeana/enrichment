@@ -35,6 +35,7 @@ public class NERStanfordServiceImpl implements NERService{
 		else {
 			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
 			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+			//classifier = CRFClassifier.getClassifierNoExceptions(model);
 		}
 	}
 		
