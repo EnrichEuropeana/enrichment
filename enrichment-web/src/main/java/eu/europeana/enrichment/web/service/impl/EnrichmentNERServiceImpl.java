@@ -74,6 +74,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERService stanfordNerModel7Service;
 	@Resource(name = "stanfordNerGermanModelService")
 	NERService stanfordNerGermanModelService;
+	@Resource(name = "stanfordNerItalianModelService")
+	NERService stanfordNerItalianModelService;
 	@Resource(name = "dbpediaSpotlightService")
 	NERService dbpediaSpotlightService;
 	@Resource(name = "pythonService")
@@ -86,6 +88,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private static final String stanfordNerModel4 = "Stanford_NER_model_4";
 	private static final String stanfordNerModel7 = "Stanford_NER_model_7";
 	private static final String stanfordNerModelGerman = "Stanford_NER_model_German";
+	private static final String stanfordNerModelItalian = "Stanford_NER_model_Italian";
 	private static final String dbpediaSpotlightName = "DBpedia_Spotlight";
 	private static final String spaCyName = "spaCy";
 	private static final String nltkName = "nltk";
@@ -198,6 +201,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				break;
 			case stanfordNerModelGerman:
 				tmpTool = stanfordNerGermanModelService;
+				break;
+			case stanfordNerModelItalian:
+				tmpTool = stanfordNerItalianModelService;
 				break;
 			case dbpediaSpotlightName:
 				tmpTool = dbpediaSpotlightService;
