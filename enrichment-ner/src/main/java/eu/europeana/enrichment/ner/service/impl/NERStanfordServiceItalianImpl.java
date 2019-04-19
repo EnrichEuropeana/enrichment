@@ -26,7 +26,9 @@ import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.fbk.dh.tint.runner.TintPipeline;
 import eu.fbk.dh.tint.runner.TintRunner;
 
-
+/*
+ * TODO: improve the code to have one same class for all Stanford models 
+ */
 public class NERStanfordServiceItalianImpl implements NERService{
 
 	private CRFClassifier<CoreLabel> classifier;
@@ -51,8 +53,8 @@ public class NERStanfordServiceItalianImpl implements NERService{
 				
 		// Add a custom property
 		// pipeline.setProperty("my_property", "my_value");
-		//pipeline.setProperty("ner.applyFineGrained", "0");
-		pipeline.setProperty("annotators", "ner");
+		pipeline.setProperty("ner.applyFineGrained", "0");
+		pipeline.setProperty("annotators", "tokenize,ssplit,pos,lemma,ner");
 
 		// Load the models
 		pipeline.load();
@@ -64,7 +66,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		TreeMap<String, List<List<String>>> map = new TreeMap<String, List<List<String>>>();
 
 		// Use for example a text in a String
-		text = "I topi non avevano nipoti. Il mio nome è Nicolo Rossi.";
+		text = "I topi non avevano nipoti. Il mio nome è Nicolo Rossi. Il mio nome è Massimo Pietro.";
 
 		// Get the original Annotation (Stanford CoreNLP)
 		Annotation stanfordAnnotation = pipeline.runRaw(text);

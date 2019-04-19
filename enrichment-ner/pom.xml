@@ -138,14 +138,13 @@
     		<version>3.9.2</version>
     		<classifier>models</classifier>
 		</dependency>
-		
+			 
 		<dependency>
     		<groupId>eu.fbk.dh</groupId>
     		<artifactId>tint-runner</artifactId>
     		<version>0.2</version>
 		</dependency>
-		
-		
+			
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>
