@@ -2,7 +2,9 @@ package eu.europeana.enrichment.web.service;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import edu.stanford.nlp.io.IOUtils;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -79,7 +82,7 @@ public class NERServiceTestBookDumitru {
 	
 	@Test
 	public void test() throws Exception {
-		
+			
 		String bookText=europeanaReadWriteFiles.getBookText();
 		String originalBookText=europeanaReadWriteFiles.getOriginalText();
 		
