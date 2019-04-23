@@ -23,17 +23,17 @@ public enum NERStanfordClassification {
 	};
 
 	public static boolean isAgent(String classificationString) {
-		if(classificationString.equals("PERSON"))
+		if(classificationString.equals("PERSON") || classificationString.equals("PER"))
 			return true;
 		return false;
 	}
 	public static boolean isPlace(String classificationString) {
-		if(classificationString.equals("LOCATION"))
+		if(classificationString.equals("LOCATION") || classificationString.equals("LOC"))
 			return true;
 		return false;
 	}
 	public static boolean isOrganization(String classificationString) {
-		if(classificationString.equals("ORGANIZATION"))
+		if(classificationString.equals("ORGANIZATION") || classificationString.equals("ORG"))
 			return true;
 		return false;
 	}
