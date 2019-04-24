@@ -26,6 +26,7 @@
         xmlns:util="http://www.springframework.org/schema/util"
         xmlns:context="http://www.springframework.org/schema/context"
 		xmlns:mvc="http://www.springframework.org/schema/mvc"
+		xmlns:p="http://www.springframework.org/schema/p"
     	xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
@@ -44,6 +45,28 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
+	<beans:bean id="solrEntityService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
+		p:solrServer-ref="entity_solr_server" >
+		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
+	</beans:bean>
+		
+	<beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
+	
+	<beans:bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
+	
+	<beans:bean id="googleTranslator" class="eu.europeana.enrichment.solr.commons.GoogleTranslator" />
+	
+	
+	<!-- LAZY INIT: the next beans has lazy init, to prevent them from being started when not used... -->
+	<beans:bean id="entity_solr_server" class="org.apache.solr.client.solrj.impl.HttpSolrClient" lazy-init="true">
+		<beans:constructor-arg value="${solr.entity-positions.url}"/>
+		<beans:property name="followRedirects" value="false"/>
+		<beans:property name="connectionTimeout" value="${solr.entity-positions.timeout}"/>
+		<beans:property name="defaultMaxConnectionsPerHost" value="64"/>
+		<beans:property name="maxTotalConnections" value="125"/>
+	</beans:bean>
+	
 	<!-- NER service beans -->
 	<!--  https://docs.spring.io/spring/docs/2.5.3/reference/beans.html#beans-factory-collaborators -->
 	
@@ -57,7 +80,7 @@
 	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
 	</beans:bean>
-	<beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+	<!-- beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
 	</beans:bean>
 	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
@@ -65,7 +88,7 @@
 	</beans:bean>
 	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
-	</beans:bean>
+	</beans:bean-->
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>

@@ -33,8 +33,8 @@ public class NERStanfordServiceImpl implements NERService{
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {
-			URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
-			classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
+			//URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
+			classifier = CRFClassifier.getClassifierNoExceptions(model);//url.getPath());
 		}
 	}
 		
