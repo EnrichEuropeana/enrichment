@@ -2,7 +2,9 @@ package eu.europeana.enrichment.web.service;
 
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import edu.stanford.nlp.io.IOUtils;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -79,7 +82,7 @@ public class NERServiceTestBookDumitru {
 	
 	@Test
 	public void test() throws Exception {
-		
+			
 		String bookText=europeanaReadWriteFiles.getBookText();
 		String originalBookText=europeanaReadWriteFiles.getOriginalText();
 		
@@ -95,15 +98,17 @@ public class NERServiceTestBookDumitru {
 		
 		//update the text field of the StoryEntity and the TranslationEntity in the mongodb 
 		//because from the .txt file because if we upload it over REST call, the positions of the found entities in the text from the json request and from the .txt file are different which confuses the PDF writer to write it to the pdf file in a right way
-		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");				
-		dbStoryEntity.setStoryTranscription(originalBookText);
-		persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
+		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");
+		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("6426");
+//		dbStoryEntity.setStoryTranscription(originalBookText);
+//		persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
 		
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
 				findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), "eTranslation", "en");
-		dbTranslationEntity.setTranslatedText(bookText);
-		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+//		dbTranslationEntity.setTranslatedText(bookText);
+//		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		
+		/*
 		//saving the story to Solr for finding the positions of NE in the original text
 		try {
 			solrEntityService.store(dbStoryEntity, true);
@@ -111,13 +116,17 @@ public class NERServiceTestBookDumitru {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		*/
 		
 		List<String> linkingTools = Arrays.asList("Wikidata");
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
-		europeanaEnrichmentNERRequest.setStoryId("bookDumitruTest2");
-		europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
+		//europeanaEnrichmentNERRequest.setStoryId("bookDumitruTest2");
+		europeanaEnrichmentNERRequest.setStoryId("6426");
+		//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
+		//europeanaEnrichmentNERRequest.setNERTool("DBpedia_Spotlight");
+		europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_Italian");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
-		europeanaEnrichmentNERRequest.setTranslationlanguage("en");
+		europeanaEnrichmentNERRequest.setTranslationlanguage("German");
 		
 		try {
 			TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
@@ -127,9 +136,23 @@ public class NERServiceTestBookDumitru {
 		
 		//TreeMap<String, List<NamedEntity>> NERNamedEntities = stanfordNerModel3Service.getPositions(NERStringEntities, bookText);
 
-		
+			/*
+			 * write results to the output files
+			 */
+			String transText = "";
+			if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
+			else transText  = dbStoryEntity.getStoryTranscription();
+
+			europeanaReadWriteFiles.setLanguages(dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryLanguage());
+			europeanaReadWriteFiles.setOriginalAndTranslatedText(dbStoryEntity.getStoryTranscription(), transText);
+			String outputFileResults = "results-"+dbStoryEntity.getStoryId()+".txt";
+			String outputFilePDFTranslated = "translatedText-"+dbStoryEntity.getStoryId()+".pdf";
+			String outputFilePDFOriginal = "originalText-"+dbStoryEntity.getStoryId()+".pdf";
+			europeanaReadWriteFiles.setOutputFileNames(outputFileResults, outputFilePDFTranslated, outputFilePDFOriginal);
+
 		
 			europeanaReadWriteFiles.writeToFile(NERNamedEntities);
+			
 		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

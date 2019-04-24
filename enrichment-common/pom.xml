@@ -16,7 +16,10 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
-		<version>0.0.1-SNAPSHOT</version>
+		<!-- version>${version.enrichmentAPI}</version-->
+	    <version>0.0.1-SNAPSHOT</version>
+		
+		<!-- version>0.0.1-SNAPSHOT</version -->
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 
