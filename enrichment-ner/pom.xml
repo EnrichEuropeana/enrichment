@@ -16,7 +16,9 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
-		<version>${version.enrichmentAPI}</version>
+		<!-- version>${version.enrichmentAPI}</version-->
+		<version>0.0.1-SNAPSHOT</version>
+		
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 
@@ -28,7 +30,7 @@
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-definition</artifactId>
-			<version>${version.enrichmentAPI}</version>
+			<version>${version.enrichmentAPI}</version>			
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
@@ -45,7 +47,8 @@
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
   			<artifactId>entity-client</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 	
 		<dependency>
@@ -73,13 +76,16 @@
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
 			<artifactId>entity-definitions</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
 			<artifactId>entity-utils</artifactId>
-			<version>${version.entityApi}</version>
+			<!-- version>${version.entityApi}</version-->
+			<version>0.0.5-SNAPSHOT</version>
+			
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-jdk14</artifactId>
@@ -124,10 +130,21 @@
 		<dependency>
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-corenlp</artifactId>
-			<version>${version.stanfordCoreNLP}</version>
-			
+			<version>3.9.2</version>			
 		</dependency>
-		
+		<dependency>
+    		<groupId>edu.stanford.nlp</groupId>
+    		<artifactId>stanford-corenlp</artifactId>
+    		<version>3.9.2</version>
+    		<classifier>models</classifier>
+		</dependency>
+			 
+		<dependency>
+    		<groupId>eu.fbk.dh</groupId>
+    		<artifactId>tint-runner</artifactId>
+    		<version>0.2</version>
+		</dependency>
+			
 		<!-- Test dependencies -->
 		<dependency>
 			<scope>test</scope>

@@ -21,12 +21,12 @@
   -->
 <beans:beans
         xmlns="http://www.springframework.org/schema/security"
+        xmlns:p="http://www.springframework.org/schema/p"
         xmlns:beans="http://www.springframework.org/schema/beans"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:util="http://www.springframework.org/schema/util"
         xmlns:context="http://www.springframework.org/schema/context"
 		xmlns:mvc="http://www.springframework.org/schema/mvc"
-		xmlns:p="http://www.springframework.org/schema/p"
     	xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
@@ -88,7 +88,11 @@
 	</beans:bean>
 	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
+	</beans:bean>
+	
+	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
 	</beans:bean-->
+	
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>
