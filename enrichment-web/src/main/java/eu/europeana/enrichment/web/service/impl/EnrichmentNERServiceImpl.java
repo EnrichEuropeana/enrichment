@@ -68,11 +68,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERLinkingService nerLinkingService;
 	@Resource(name = "stanfordNerModel3Service")
 	NERService stanfordNerModel3Service;
-	@Resource(name = "stanfordNerModel4Service")
+//	@Resource(name = "stanfordNerModel4Service")
 	NERService stanfordNerModel4Service;
-	@Resource(name = "stanfordNerModel7Service")
+//	@Resource(name = "stanfordNerModel7Service")
 	NERService stanfordNerModel7Service;
-	@Resource(name = "stanfordNerGermanModelService")
+//	@Resource(name = "stanfordNerGermanModelService")
 	NERService stanfordNerGermanModelService;
 	@Resource(name = "dbpediaSpotlightService")
 	NERService dbpediaSpotlightService;
