@@ -3,7 +3,9 @@ package eu.europeana.enrichment.ner.linking;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.http.HttpResponse;
@@ -20,11 +22,14 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import net.arnx.jsonic.JSONException;
+
 public class WikidataServiceImpl implements WikidataService {
 	
 	Logger logger = LogManager.getLogger(getClass());
 
-	private static final String baseUrl = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
+	private static final String baseUrlSparql = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
+	
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
@@ -78,31 +83,31 @@ public class WikidataServiceImpl implements WikidataService {
 	@Override
 	public List<String> getWikidataId(String geonameId) {
 		String query = String.format(geonamesIdQueryString, geonameId);
-		return processResponse(createRequest(query));
+		return processResponse(createRequest(baseUrlSparql, query));
 	}
 
 	@Override
 	public List<String> getWikidataIdWithLabel(String label, String language) {
 		String query = String.format(labelQueryString, label, language);
-		return processResponse(createRequest(query));
+		return processResponse(createRequest(baseUrlSparql, query));
 	}
 
 	@Override
 	public List<String> getWikidataPlaceIdWithLabel(String label, String language) {
 		String query = String.format(placeLabelQueryString, label, language);
-		return processResponse(createRequest(query));
+		return processResponse(createRequest(baseUrlSparql, query));
 	}
 	
 	@Override
 	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) {
 		String query = String.format(placeLabelAltLabelQueryString, label, language, label, "en");
-		return processResponse(createRequest(query));
+		return processResponse(createRequest(baseUrlSparql, query));
 	}
 	
 	@Override
 	public List<String> getWikidataAgentIdWithLabel(String label, String language){
 		String query = String.format(agentlabelQueryString, label, language);
-		return processResponse(createRequest(query));
+		return processResponse(createRequest(baseUrlSparql, query));
 	}
 
 	/*
@@ -155,14 +160,20 @@ public class WikidataServiceImpl implements WikidataService {
 	 * This method creates the Wikidata request, extracts the response body from the
 	 * rest and returns the response body
 	 * 
+	 * @param baseUrl is the base URL to which the query is to be added
+	 * 
 	 * @param query is the Wikidata sparql Geonames ID or label search query
 	 * 
 	 * @return response body or null
 	 */
-	private String createRequest(String query) {
+	private String createRequest(String baseUrl, String query) {
 		try {
 			URIBuilder builder = new URIBuilder(baseUrl);
-			builder.addParameter("query", query);
+			//in case of calling a REST service for Wikidata JSON, the query parameter should be null/empty
+			if(query!=null && !query.isEmpty())
+			{
+				builder.addParameter("query", query);
+			}
 
 			logger.info(this.getClass().getSimpleName() + ": " + query);
 			logger.info(this.getClass().getSimpleName() + builder.toString());
@@ -185,4 +196,62 @@ public class WikidataServiceImpl implements WikidataService {
 
 	}
 
+	@Override
+	public String getWikidataJSONFromWikidataID(String WikidataID) {
+		
+		String WikidataJSONResponse = createRequest(WikidataID, null);
+		return WikidataJSONResponse;
+		
+	}
+
+	@Override
+	public List<String> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
+		
+		List<String> result = new ArrayList<String>();
+		JSONObject responseJson = new JSONObject(WikidataJSON);
+		JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
+		Iterator<String> entitiesIterator = responseJsonEntities.keys();
+		while(entitiesIterator.hasNext())
+		{
+			String entityKey = entitiesIterator.next();
+			JSONObject entity = responseJsonEntities.getJSONObject(entityKey);
+						
+			analyseJSONFieldFromWikidataJSON(entity,field,result);
+		}
+		
+		return result;
+		
+	}
+
+	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<String> result)
+	{
+		String[] fieldParts = field.split("\\.");
+		
+		if(fieldParts.length==1)
+		{
+			JSONObject obj = (JSONObject) jsonElement;
+			result.add(obj.getString(fieldParts[0]));
+			return;
+		}
+		
+		if(jsonElement instanceof JSONObject)
+		{
+			JSONObject obj = (JSONObject) jsonElement;
+			if(obj.has(fieldParts[0]))
+			{
+				String [] newField = field.split("\\.",2);
+				analyseJSONFieldFromWikidataJSON(obj.get(fieldParts[0]),newField[1], result);
+			}
+			
+		}
+		else if(jsonElement instanceof JSONArray)
+		{
+			JSONArray array = (JSONArray) jsonElement;
+			for(int i=0;i<array.length();i++)
+			{
+				analyseJSONFieldFromWikidataJSON(array.get(i),field, result);
+			}
+		}
+			
+	}
 }
