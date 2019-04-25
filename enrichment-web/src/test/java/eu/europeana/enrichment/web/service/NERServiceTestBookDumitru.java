@@ -28,6 +28,7 @@ import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
+import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
@@ -60,6 +61,9 @@ public class NERServiceTestBookDumitru {
 //
 //	@Resource(name= "nerLinkingService")
 //	NERLinkingService nerLinkingService;
+
+	@Resource(name = "wikidataService")
+	WikidataService wikidataService;
 
 	@Resource(name= "enrichmentNerService")
 	EnrichmentNERService enrichmentNerService;
@@ -152,6 +156,10 @@ public class NERServiceTestBookDumitru {
 
 		
 			europeanaReadWriteFiles.writeToFile(NERNamedEntities);
+			
+			String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID("http://www.wikidata.org/entity/Q762");
+			//wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P569.mainsnak.datavalue.value.time");
+			wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P106.mainsnak.datavalue.value.id");
 			
 		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
