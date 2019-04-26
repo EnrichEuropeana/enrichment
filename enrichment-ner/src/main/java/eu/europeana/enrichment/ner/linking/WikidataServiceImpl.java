@@ -223,6 +223,16 @@ public class WikidataServiceImpl implements WikidataService {
 		
 	}
 
+	/**
+	 * This function is a recursive implementation that enables taking a specific JSON field
+	 * from the obtained Wikidata json response, containing both plain JSONObject but also 
+	 * JSONArray json elements.
+	 * 
+	 * @param jsonElement
+	 * @param field
+	 * @param result
+	 */
+	
 	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<String> result)
 	{
 		String[] fieldParts = field.split("\\.");
