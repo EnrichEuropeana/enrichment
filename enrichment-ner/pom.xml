@@ -48,7 +48,7 @@
 			<groupId>eu.europeana.entity</groupId>
   			<artifactId>entity-client</artifactId>
 			<!-- version>${version.entityApi}</version-->
-			<version>0.0.5-SNAPSHOT</version>
+			<version>0.6-SNAPSHOT</version>
 		</dependency>
 	
 		<dependency>
@@ -72,20 +72,12 @@
 			<artifactId>json</artifactId>
 			<version>${version.json}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>eu.europeana.entity</groupId>
-			<artifactId>entity-definitions</artifactId>
-			<!-- version>${version.entityApi}</version-->
-			<version>0.0.5-SNAPSHOT</version>
-		</dependency>
-		
+			
 		<dependency>
 			<groupId>eu.europeana.entity</groupId>
 			<artifactId>entity-utils</artifactId>
 			<!-- version>${version.entityApi}</version-->
-			<version>0.0.5-SNAPSHOT</version>
-			
+			<version>0.6-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>slf4j-jdk14</artifactId>
@@ -106,11 +98,6 @@
 			</exclusions>
 		</dependency>
 		
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>

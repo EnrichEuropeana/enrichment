@@ -96,11 +96,11 @@
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>
-	<beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
+	<!--beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
 		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
         <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
-	</beans:bean>
+	</beans:bean-->
 	
 	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl">
     </beans:bean>
