@@ -57,7 +57,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 		Entity entity = europeanaApiClient.retrieveEntityWithUrl(idUrl);
 		if(entity == null)
 			return "";
-		Map<String, String> prefLabelMap = entity.getPrefLabel();
+		/*Map<String, String> prefLabelMap = entity.getPrefLabel();
 		if(prefLabelMap.containsKey(""))
 			return prefLabelMap.get("");
 		else if(prefLabelMap.containsKey("en"))
@@ -65,7 +65,8 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 		else if(prefLabelMap.containsKey(language))
 			return prefLabelMap.get(language);
 		
-		return entity.getInternalType();
+		return entity.getInternalType();*/
+		return "";
 	}
 
 }
