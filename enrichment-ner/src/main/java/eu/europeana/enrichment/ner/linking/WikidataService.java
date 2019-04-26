@@ -4,6 +4,43 @@ import java.util.List;
 
 public interface WikidataService {
 
+	/**
+	 * This method sends a REST request to Wikidata to get
+	 * the json for the given Wikidata ID. 
+	 * 
+	 * @param WikidataID			(e.g. http://www.wikidata.org/entity/Q762)
+	 * @return
+	 */
+	public String getWikidataJSONFromWikidataID(String WikidataID);
+	
+	/**
+	 * This method returns a value of the specific JSON field 
+	 * from the Wikidata JSON file. The format for the field is
+	 * given in the point separated way, e.g. claims.P569.mainsnak.datavalue.value.time
+	 * which means that each name after the dot is a json element within a
+	 * a given json element before the dot
+	 * 
+	 * @param WikidataJSON			(e.g. entities: {
+													Q762: {
+													pageid: 1069,
+													ns: 0,
+													title: "Q762",
+													lastrevid: 922891204,
+													modified: "2019-04-23T15:49:45Z",
+													type: "item",
+													id: "Q762",
+													labels: {},
+													descriptions: {},
+													aliases: {},
+													claims: {},
+													sitelinks: {}
+													}
+													})		
+	 * @param field					(e.g. claims.P569.mainsnak.datavalue.value.time)
+	 * @return
+	 */
+	public List<String> getJSONFieldFromWikidataJSON (String WikidataJSON, String field);
+	
 	/*
 	 * This method sends a Wikidata Geonames ID sparql search query
 	 * and returns a list of Wikidata entity urls
