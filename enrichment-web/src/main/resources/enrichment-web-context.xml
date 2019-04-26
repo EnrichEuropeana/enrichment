@@ -45,6 +45,28 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
+	<beans:bean id="solrEntityService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
+		p:solrServer-ref="entity_solr_server" >
+		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
+	</beans:bean>
+		
+	<beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
+	
+	<beans:bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
+	
+	<beans:bean id="googleTranslator" class="eu.europeana.enrichment.solr.commons.GoogleTranslator" />
+	
+	
+	<!-- LAZY INIT: the next beans has lazy init, to prevent them from being started when not used... -->
+	<beans:bean id="entity_solr_server" class="org.apache.solr.client.solrj.impl.HttpSolrClient" lazy-init="true">
+		<beans:constructor-arg value="${solr.entity-positions.url}"/>
+		<beans:property name="followRedirects" value="false"/>
+		<beans:property name="connectionTimeout" value="${solr.entity-positions.timeout}"/>
+		<beans:property name="defaultMaxConnectionsPerHost" value="64"/>
+		<beans:property name="maxTotalConnections" value="125"/>
+	</beans:bean>
+	
 	<!-- NER service beans -->
 	<!--  https://docs.spring.io/spring/docs/2.5.3/reference/beans.html#beans-factory-collaborators -->
 	
@@ -58,7 +80,7 @@
 	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
 	</beans:bean>
-	<beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+	<!-- beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
 	</beans:bean>
 	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
@@ -69,16 +91,16 @@
 	</beans:bean>
 	
 	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
-	</beans:bean>
+	</beans:bean-->
 	
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>
-	<beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
+	<!--beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
 		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
         <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
-	</beans:bean>
+	</beans:bean-->
 	
 	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl">
     </beans:bean>
@@ -109,31 +131,5 @@
     <beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
     	<beans:property name="messageSource" ref="enrichment_i18n_messageSource"/>
     </beans:bean>
-      
-    
-    
-    
-    
-    <beans:bean id="solrEntityService" name="entity_solr_entity_service"
-		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
-		p:solrServer-ref="entity_solr_server">
-		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
-	</beans:bean>
-	
-	<!-- LAZY INIT: the next beans has lazy init, to prevent them from being started when not used... -->
-	<beans:bean id="entity_solr_server" class="org.apache.solr.client.solrj.impl.HttpSolrClient" lazy-init="true">
-		<beans:constructor-arg value="${solr.entity-positions.url}"/>
-		<beans:property name="followRedirects" value="false"/>
-		<beans:property name="connectionTimeout" value="${solr.entity-positions.timeout}"/>
-		<beans:property name="defaultMaxConnectionsPerHost" value="64"/>
-		<beans:property name="maxTotalConnections" value="125"/>
-	</beans:bean>
-    
-    <beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
-	
-	<beans:bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
-		
-	<beans:bean id="googleTranslator" class="eu.europeana.enrichment.solr.commons.GoogleTranslator" />
-    
     	 
 </beans:beans>
