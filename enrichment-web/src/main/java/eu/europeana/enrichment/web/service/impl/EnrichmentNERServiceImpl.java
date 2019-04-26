@@ -1,51 +1,37 @@
 package eu.europeana.enrichment.web.service.impl;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
 import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.thrift.protocol.TMultiplexedProtocol;
-import org.json.JSONObject;
-import org.springframework.cache.annotation.Cacheable;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
@@ -78,7 +64,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERService stanfordNerItalianModelService;
 	@Resource(name = "dbpediaSpotlightService")
 	NERService dbpediaSpotlightService;
-	@Resource(name = "pythonService")
+	//@Resource(name = "pythonService")
 	NERService pythonService;
 	
 	/*

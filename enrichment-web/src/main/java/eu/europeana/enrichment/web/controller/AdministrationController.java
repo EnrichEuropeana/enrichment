@@ -29,7 +29,7 @@ import io.swagger.annotations.ApiOperation;
 @EnableCaching
 @SwaggerSelect
 @Api(tags = "Administrator service", description=" ")
-public class AdministratorController extends BaseRest {
+public class AdministrationController extends BaseRest {
 
 	@Resource
 	EnrichmentNERService enrichmentNerService;
@@ -37,7 +37,7 @@ public class AdministratorController extends BaseRest {
 	EnrichmentTranslationService enrichmentTranslationService;
 	
 	/*
-	 * This method represents the /enrichment/uploadStories end point,
+	 * This method represents the /administration/uploadStories end point,
 	 * where a request with an array of StoryEntity to be saved to the database is sent
 	 * All requests on this end point are processed here.
 	 * 
@@ -48,7 +48,7 @@ public class AdministratorController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	@ApiOperation(value = "Upload StoryEntities to the database", nickname = "uploadStories")
-	@RequestMapping(value = "/administrator/uploadStories", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/uploadStories", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -68,7 +68,7 @@ public class AdministratorController extends BaseRest {
 	}
 	
 	/*
-	 * This method represents the /enrichment/uploadItems end point,
+	 * This method represents the /administration/uploadItems end point,
 	 * where a request with a ItemEntity information to be saved in the database is sent
 	 * All requests on this end point are processed here.
 	 * 
@@ -80,7 +80,7 @@ public class AdministratorController extends BaseRest {
 	 */
 	
 	@ApiOperation(value = "Upload ItemEntities to the database", nickname = "uploadItems")
-	@RequestMapping(value = "/administrator/uploadItems", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/uploadItems", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -100,7 +100,7 @@ public class AdministratorController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation")
-	@RequestMapping(value = "/administrator/uploadTranslation", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/uploadTranslation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
