@@ -45,11 +45,21 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
-	<beans:bean id="solrEntityService" name="entity_solr_entity_service"
+	<!-- beans:bean id="solrEntityService" name="entity_solr_entity_service"
 		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
 		p:solrServer-ref="entity_solr_server" >
 		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
-	</beans:bean>
+	</beans:bean -->
+	
+	<beans:bean  id="solrBaseClientService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrBaseClientServiceImpl"
+		p:solrServer-ref="entity_solr_server" >		
+	</beans:bean >
+	
+	<beans:bean  id="solrEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl" >
+		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
+	</beans:bean >
+	
 		
 	<beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	

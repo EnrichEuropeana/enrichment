@@ -32,6 +32,7 @@ import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -112,15 +113,15 @@ public class NERServiceTestBookDumitru {
 //		dbTranslationEntity.setTranslatedText(bookText);
 //		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		
-		/*
+		
 		//saving the story to Solr for finding the positions of NE in the original text
 		try {
-			solrEntityService.store(dbStoryEntity, true);
+			solrEntityService.store("enrichment",dbStoryEntity, true);
 		} catch (SolrNamedEntityServiceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		*/
+		
 		
 		List<String> linkingTools = Arrays.asList("Wikidata");
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);

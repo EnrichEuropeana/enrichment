@@ -23,8 +23,11 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public class SolrEntityPositionsServiceTest {
 	
-	@Resource
+	@Resource(name = "solrEntityService")
 	SolrEntityPositionsService solrEntityService;
+
+	@Resource(name = "solrBaseClientService")
+	SolrBaseClientService solrBaseClientService;
 	
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
@@ -40,7 +43,7 @@ public class SolrEntityPositionsServiceTest {
 		//delete all documents first
 		//solrEntityService.deleteByQuery("*");
 		
-		solrEntityService.store(dbStoryEntity, true);
+		solrEntityService.store("enrichment",dbStoryEntity, true);
 		
 		double termOffset = 0;
 //		try {

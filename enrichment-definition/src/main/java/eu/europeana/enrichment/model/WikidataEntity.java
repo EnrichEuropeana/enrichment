@@ -11,7 +11,7 @@ import java.util.Map;
  * @author StevaneticS
  *
  */
-public interface Entity {
+public interface WikidataEntity {
 	
 	/**
 	 * Retrieves the Preferable Label for the Entity (language,value)
