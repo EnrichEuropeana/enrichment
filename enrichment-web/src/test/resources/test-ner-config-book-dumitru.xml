@@ -37,11 +37,15 @@
 		<constructor-arg type="String" value="${enrich.items.import}"/>
 	</bean>
 	
-	<bean id="solrEntityService" name="entity_solr_entity_service"
-		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
-		p:solrServer-ref="entity_solr_server" >
+	<bean id="solrBaseClientService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrBaseClientServiceImpl"
+		p:solrServer-ref="entity_solr_server" >		
+	</bean>
+	
+	<bean id="solrEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl" >
 		<constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
 	</bean>
+	
 		
 	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	

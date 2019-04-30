@@ -58,6 +58,7 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
+import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import javassist.expr.Instanceof;
@@ -65,8 +66,8 @@ import javassist.expr.Instanceof;
 
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
 
-	@Resource
-	SolrClient solrServer;
+	@Resource(name = "solrBaseClientService")
+	SolrBaseClientService solrBaseClientService;
 	
 	@Resource(name = "javaJSONParser")
 	JavaJSONParser javaJSONParser;
@@ -87,6 +88,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	 * for normal search (not fuzzy) set the params below to: minRangeOfCharsToObserve = 10000;rangeOfCharsToObserve = 10000;
 	*/
 	
+	private String solrCore = "enrichment";
 	private final int LevenschteinDistanceThreshold = 2;
 	private int minRangeOfCharsToObserve = 1000;
 	private int rangeOfCharsToObserve = 0;
@@ -115,6 +117,31 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	private int indexByNowOriginal=0;
 	//private Jyandex clientJyandex;
 
+	@Override
+	public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException {
+		
+		for(StoryEntity ent : storyEntities) {
+			store(solrCore, ent, true);
+		}
+	}
+
+	@Override
+	public void store(String solrCollection, StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException {
+
+		log.debug("store: " + storyEntity.toString());
+		
+		SolrStoryEntityImpl solrStoryEntity = null;
+		if(storyEntity instanceof SolrStoryEntityImpl) {
+			solrStoryEntity=(SolrStoryEntityImpl) storyEntity;
+		}
+		else {
+			solrStoryEntity=new SolrStoryEntityImpl(storyEntity);
+		}
+		
+		solrBaseClientService.store(solrCollection, solrStoryEntity,doCommit);
+		
+	}
+
 	
 	public SolrEntityPositionsServiceImpl(String translatedEntities) {
 		
@@ -138,119 +165,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			
 		}
 
-	}
-	
-
-
-	public void setSolrServer(SolrClient solrServer) {
-		this.solrServer = solrServer;
-	}
-
-	@Override
-	public List<Integer> searchByEntityName(String entityName) throws SolrNamedEntityServiceException {
-
-
-		return null;
-	}
-	
-
-	@Override
-	public boolean store(StoryEntity storyEntity) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException {
-		
-		for(StoryEntity ent : storyEntities) {
-			store(ent, false);
-		}
-		
-		try {
-			solrServer.commit();
-		} catch (SolrServerException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing a list of StoryEntity.", ex);			
-		} catch (IOException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing a list of StoryEntity", ex);
-		}
-		
-	}
-
-	@Override
-	public void store(StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException {
-		try {
-			
-			log.debug("store: " + storyEntity.toString());
-			
-			SolrStoryEntityImpl solrStoryEntity = null;
-			if(storyEntity instanceof SolrStoryEntityImpl) {
-				solrStoryEntity=(SolrStoryEntityImpl) storyEntity;
-			}
-			else {
-				solrStoryEntity=new SolrStoryEntityImpl(storyEntity);
-			}
-			
-			UpdateResponse rsp = solrServer.addBean(solrStoryEntity);
-			log.info("store response: " + rsp.toString());
-			if(doCommit)
-				solrServer.commit();
-		} catch (SolrServerException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing StoryEntity with storyId: " + storyEntity.getStoryId(),
-					ex);
-		} catch (IOException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing StoryEntity with storyId: " + storyEntity.getStoryId(), ex);
-		}
-		
-	}
-
-	
-	@Override
-	public void search (String term) throws SolrNamedEntityServiceException {
-
-		log.info("search StoryEntity by term: " + term);
-
-		/**
-		 * Construct a SolrQuery
-		 */
-		SolrQuery query = new SolrQuery(term);
-		log.info("query: " + query.toString());
-
-		/**
-		 * Query the server
-		 */
-		try {
-			QueryResponse rsp = solrServer.query(query);
-			log.info("query response: " + rsp.toString());
-			
-		} catch (IOException | SolrServerException e) {
-			throw new SolrNamedEntityServiceException("Unexpected exception occured when searching StoryEntity in Solr for the term: " + term,
-					e);
-		}
-
-	}
-
-	@Override
-	public void update(StoryEntity stryEntity) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void deleteByQuery(String query) throws SolrNamedEntityServiceException {
-		try {
-			log.info("Solr deleteByQuery call: " + query);
-			UpdateResponse rsp = solrServer.deleteByQuery(query);
-			log.info("Solr deleteByQuery response: " + rsp.toString());
-			solrServer.commit();
-		} catch (IOException | SolrServerException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected solr server or IO exception occured when deleting StoryEntity with query: " + query, ex);
-		}		
 	}
 
 	@Override
@@ -279,15 +193,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * quering Solr server and parsing the obtained json response to extract the offsets, terms and positions
 		 */
 		try {
-			response = solrServer.query(query);
+			response = solrBaseClientService.query(solrCore, query);
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
 		}
-		catch (IOException | SolrServerException e) {
-			throw new SolrNamedEntityServiceException("Unexpected exception occured when executing Solr query.", e);
-		}
-
 		
 		if(terms.isEmpty()) return -1;
 	
@@ -1011,7 +921,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		/*
 		 * store the entity in Solr (indexing of the story)
 		 */
-		store(dbStoryEntity,true);
+		store(solrCore, dbStoryEntity, true);
 		
 		storyOriginalText=dbStoryEntity.getStoryTranscription();
 		storyTranslatedText=translatedText;

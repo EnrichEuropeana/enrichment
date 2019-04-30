@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import eu.europeana.enrichment.model.Entity;
+import eu.europeana.enrichment.model.WikidataEntity;
 
-public class BaseEntity implements Entity {
+public class BaseEntity implements WikidataEntity {
 	
 	private String internalType;
 	private String entityId;

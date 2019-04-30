@@ -5,13 +5,26 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.Entity;
+import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.BaseEntity;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
 
-public class SolrEntityImpl extends BaseEntity implements Entity {
+public class SolrWikidataEntityImpl extends BaseEntity implements WikidataEntity {
 
+	public SolrWikidataEntityImpl (WikidataEntity copy) {
+		this.setAltLabel(copy.getAltLabel());
+		this.setCountry(copy.getCountry());
+		this.setDepiction(copy.getDepiction());
+		this.setDescription(copy.getDescription());
+		this.setEntityId(copy.getEntityId());
+		this.setInternalType(copy.getInternalType());
+		this.setModificationDate(copy.getModificationDate());
+		this.setPrefLabel(copy.getPrefLabel());
+		this.setSameAs(copy.getSameAs());
+	}
+	
 	@Override
 	@Field(EntitySolrFields.PREF_LABEL)
 	public void setPrefLabel(Map<String, String> prefLabel) {
