@@ -7,11 +7,11 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.model.impl.BaseEntity;
+import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
 
-public class SolrWikidataEntityImpl extends BaseEntity implements WikidataEntity {
+public class SolrWikidataEntityImpl extends WikidataEntityImpl implements WikidataEntity {
 
 	public SolrWikidataEntityImpl (WikidataEntity copy) {
 		this.setAltLabel(copy.getAltLabel());

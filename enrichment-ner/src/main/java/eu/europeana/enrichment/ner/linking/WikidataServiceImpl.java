@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.arnx.jsonic.JSONException;
+//import net.arnx.jsonic.JSONException;
 
 public class WikidataServiceImpl implements WikidataService {
 	

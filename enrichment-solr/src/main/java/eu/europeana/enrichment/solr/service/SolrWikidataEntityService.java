@@ -18,4 +18,13 @@ public interface SolrWikidataEntityService {
 	 */
 	public void store(String solrCollection, WikidataEntity wikidataEntity, boolean doCommit) throws SolrNamedEntityServiceException;
 
+	/**
+	 * This function aims at storing the Wikidata Entity obtained from its URL, i.e.
+	 * first the json response obtained from wikidata is parsed and a result
+	 * is saved into the Solr server
+	 *
+	 *  
+	 * @param wikidataURL			(e.g. http://www.wikidata.org/entity/Q762)
+	 */
+	public void storeWikidataFromURL (String wikidataURL);
 }

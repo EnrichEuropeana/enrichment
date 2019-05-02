@@ -9,7 +9,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
