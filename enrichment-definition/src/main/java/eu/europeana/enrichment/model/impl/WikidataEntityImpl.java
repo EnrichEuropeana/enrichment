@@ -6,7 +6,7 @@ import java.util.Map;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 
-public class BaseEntity implements WikidataEntity {
+public class WikidataEntityImpl implements WikidataEntity {
 	
 	private String internalType;
 	private String entityId;

@@ -16,8 +16,8 @@ import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
+//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+//import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 
 
 public class NERStanfordServiceImpl implements NERService{
