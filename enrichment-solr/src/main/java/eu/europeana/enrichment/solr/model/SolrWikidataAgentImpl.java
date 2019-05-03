@@ -1,20 +1,24 @@
 package eu.europeana.enrichment.solr.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
+import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
+public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{
+	
 
-public class SolrWikidataEntityImpl extends WikidataEntityImpl implements WikidataEntity {
-
-	public SolrWikidataEntityImpl (WikidataEntity copy) {
+	public SolrWikidataAgentImpl (WikidataAgent copy) {
 		this.setAltLabel(copy.getAltLabel());
+		this.setCountry(copy.getCountry());
 		this.setDepiction(copy.getDepiction());
 		this.setDescription(copy.getDescription());
 		this.setEntityId(copy.getEntityId());
@@ -22,6 +26,9 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		this.setModificationDate(copy.getModificationDate());
 		this.setPrefLabel(copy.getPrefLabel());
 		this.setSameAs(copy.getSameAs());
+		this.setDateOfBirth(copy.getDateOfBirth());
+		this.setDateOfDeath(copy.getDateOfDeath());
+		this.setOccupation(copy.getOccupation());
 	}
 	
 	@Override
@@ -67,7 +74,11 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		super.setDescription(description);
 	}
 
-	
+	@Override
+	@Field(EntitySolrFields.COUNTRY)
+	public void setCountry(String country) {
+		super.setCountry(country);		
+	}	
 
 	@Override
 	@Field(EntitySolrFields.SAME_AS)
@@ -75,5 +86,25 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		super.setSameAs(wikidataURLs);		
 	}
 
-	
+
+	@Override
+	@Field(EntitySolrFields.DATE_OF_BIRTH)
+	public void setDateOfBirth(String setDateOfBirth) {
+		super.setDateOfBirth(setDateOfBirth);
+		
+	}
+
+	@Override
+	@Field(EntitySolrFields.DATE_OF_DEATH)
+	public void setDateOfDeath(String setDateOfDeath) {
+		super.setDateOfDeath(setDateOfDeath);
+	}
+
+
+	@Override
+	@Field(EntitySolrFields.OCCUPATION)
+	public void setOccupation(String setOccupation) {
+		super.setOccupation(setOccupation);
+	}
+
 }

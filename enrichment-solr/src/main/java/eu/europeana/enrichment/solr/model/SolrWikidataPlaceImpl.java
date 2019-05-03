@@ -5,16 +5,15 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
+import eu.europeana.enrichment.model.WikidataPlace;
+import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
+public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {
 
-public class SolrWikidataEntityImpl extends WikidataEntityImpl implements WikidataEntity {
-
-	public SolrWikidataEntityImpl (WikidataEntity copy) {
+	public SolrWikidataPlaceImpl (WikidataPlace copy) {
 		this.setAltLabel(copy.getAltLabel());
+		this.setCountry(copy.getCountry());
 		this.setDepiction(copy.getDepiction());
 		this.setDescription(copy.getDescription());
 		this.setEntityId(copy.getEntityId());
@@ -22,6 +21,9 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		this.setModificationDate(copy.getModificationDate());
 		this.setPrefLabel(copy.getPrefLabel());
 		this.setSameAs(copy.getSameAs());
+		this.setLogo(copy.getLogo());
+		this.setLatitude(copy.getLatitude());
+		this.setLongitude(copy.getLongitude());
 	}
 	
 	@Override
@@ -67,7 +69,11 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		super.setDescription(description);
 	}
 
-	
+	@Override
+	@Field(EntitySolrFields.COUNTRY)
+	public void setCountry(String country) {
+		super.setCountry(country);		
+	}	
 
 	@Override
 	@Field(EntitySolrFields.SAME_AS)
@@ -75,5 +81,25 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 		super.setSameAs(wikidataURLs);		
 	}
 
+
+	@Override
+	@Field(EntitySolrFields.LOGO)
+	public void setLogo(String setLogo) {
+		super.setLogo(setLogo);		
+	}
+
+
+	@Override
+	@Field(EntitySolrFields.LATITUDE)
+	public void setLatitude(String setLatitude) {
+		super.setLatitude(setLatitude);
+	}
+
+
+	@Override
+	@Field(EntitySolrFields.LONGITUDE)
+	public void setLongitude(String setLongitude) {
+		super.setLongitude(setLongitude);		
+	}
 	
 }

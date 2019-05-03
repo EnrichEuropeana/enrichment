@@ -25,6 +25,8 @@ public interface SolrWikidataEntityService {
 	 *
 	 *  
 	 * @param wikidataURL			(e.g. http://www.wikidata.org/entity/Q762)
+	 * @param type					(e.g. agent, place, organization)
+	 * @throws SolrNamedEntityServiceException
 	 */
-	public void storeWikidataFromURL (String wikidataURL);
+	public void storeWikidataFromURL (String wikidataURL, String type) throws SolrNamedEntityServiceException;
 }

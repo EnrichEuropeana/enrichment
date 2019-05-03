@@ -46,6 +46,9 @@
 		<constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
 	</bean>
 	
+	<bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
+	</bean>
+	
 		
 	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	

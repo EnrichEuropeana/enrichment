@@ -23,4 +23,24 @@ public interface EntitySolrFields {
 	
 	public static final String MODIFIED = "modified";
 	
+	public static final String DATE_OF_BIRTH = "rdagr2_dateOfBirth";
+	public static final String DATE_OF_BIRTH_ALL = DATE_OF_BIRTH + ".*";
+
+	public static final String DATE_OF_DEATH = "rdagr2_dateOfDeath";
+	public static final String DATE_OF_DEATH_ALL = DATE_OF_DEATH + ".*";
+	
+	public static final String OCCUPATION = "rdagr2_professionOrOccupation";
+	public static final String OCCUPATION_ALL = OCCUPATION + ".*";
+	
+	public static final String LOGO = "foaf_logo";
+	public static final String LOGO_ALL = LOGO + ".*";
+
+	public static final String LATITUDE = "wgs84_pos_lat";
+	public static final String LATITUDE_ALL = LATITUDE + ".*";
+
+	public static final String LONGITUDE = "wgs84_pos_long";
+	public static final String LONGITUDE_ALL = LONGITUDE + ".*";
+
+
+
 }

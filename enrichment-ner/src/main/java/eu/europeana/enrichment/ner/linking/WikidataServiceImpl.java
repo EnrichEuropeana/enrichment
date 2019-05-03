@@ -205,9 +205,9 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
+	public List<List<String>> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
 		
-		List<String> result = new ArrayList<String>();
+		List<List<String>> result = new ArrayList<List<String>>();
 		JSONObject responseJson = new JSONObject(WikidataJSON);
 		JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
 		Iterator<String> entitiesIterator = responseJsonEntities.keys();
@@ -233,24 +233,58 @@ public class WikidataServiceImpl implements WikidataService {
 	 * @param result
 	 */
 	
-	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<String> result)
+	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<List<String>> result)
 	{
 		String[] fieldParts = field.split("\\.");
 		
 		if(fieldParts.length==1)
 		{
 			JSONObject obj = (JSONObject) jsonElement;
-			result.add(obj.getString(fieldParts[0]));
+			
+			if(fieldParts[0].compareTo("*")==0)
+			{
+				Iterator<String> allJsonElementsIterator = obj.keys();
+				List<String> toAddList = new ArrayList<String>();
+				while(allJsonElementsIterator.hasNext())
+				{
+					String jsonElementKey = allJsonElementsIterator.next();					
+					toAddList.add(obj.getString(jsonElementKey));
+				}
+				result.add(toAddList);
+			}
+			else
+			{
+				List<String> toAddList = new ArrayList<String>();
+				toAddList.add(obj.getString(fieldParts[0]));
+				result.add(toAddList);
+			}
+			
 			return;
 		}
 		
 		if(jsonElement instanceof JSONObject)
 		{
 			JSONObject obj = (JSONObject) jsonElement;
-			if(obj.has(fieldParts[0]))
+			String [] newField = field.split("\\.",2);
+			
+			//take all elements of the given json element
+			if(fieldParts[0].compareTo("*")==0)
 			{
-				String [] newField = field.split("\\.",2);
+				Iterator<String> allJsonElementsIterator = obj.keys();
+				while(allJsonElementsIterator.hasNext())
+				{
+					String jsonElementKey = allJsonElementsIterator.next();
+					analyseJSONFieldFromWikidataJSON(obj.get(jsonElementKey),newField[1],result);
+				}
+			}
+			else if(obj.has(fieldParts[0]))
+			{				
 				analyseJSONFieldFromWikidataJSON(obj.get(fieldParts[0]),newField[1], result);
+			}
+			else
+			{
+				logger.error("The analysed Wikidata JSON response does not contain the required JSON object: " + 
+						fieldParts[0] + " in the JSON field: " + field);
 			}
 			
 		}
