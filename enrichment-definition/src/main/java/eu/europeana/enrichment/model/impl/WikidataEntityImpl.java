@@ -10,33 +10,69 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	private String internalType;
 	private String entityId;
-	private Map<String, String> prefLabel;
-	private Map<String, List<String>> altLabel;
-	private Map<String, String> description;	
-	private String country;
-	private Map<String, String> sameAs;
+	private List<List<String>> prefLabel;
+	private List<List<String>> altLabel;
+	private List<List<String>> description;	
+	private List<List<String>> sameAs;
 	private String depiction;
 	private String modificationDate;
-
+	
+	private String modificationDate_jsonProp = "modified";
+	
+	@Override
+	public String getModificationDate_jsonProp() {
+		return modificationDate_jsonProp;
+	}
 
 	@Override
-	public Map<String, String> getPrefLabel() {
+	public String getPrefLabel_jsonProp() {
+		return prefLabel_jsonProp;
+	}
+
+	@Override
+	public String getAltLabel_jsonProp() {
+		return altLabel_jsonProp;
+	}
+
+	@Override
+	public String getDepiction_jsonProp() {
+		return depiction_jsonProp;
+	}
+
+	@Override
+	public String getDescription_jsonProp() {
+		return description_jsonProp;
+	}
+
+	@Override
+	public String getSameAs_jsonProp() {
+		return sameAs_jsonProp;
+	}
+
+	private String prefLabel_jsonProp = "labels.*.*";
+	private String altLabel_jsonProp = "aliases.*.*";
+	private String depiction_jsonProp = "claims.P18.mainsnak.datavalue.value";
+	private String description_jsonProp = "descriptions.*.*";
+	private String sameAs_jsonProp = "sitelinks.*.url";
+	
+	@Override
+	public List<List<String>> getPrefLabel() {
 		return prefLabel;
 	}
 
 	@Override
-	public void setPrefLabel(Map<String, String> prefLabelArg) {
+	public void setPrefLabel(List<List<String>> prefLabelArg) {
 		prefLabel = prefLabelArg;
 	}
 
 	@Override
-	public Map<String, List<String>> getAltLabel() {
+	public List<List<String>> getAltLabel() {
 		
 		return altLabel;
 	}
 
 	@Override
-	public void setAltLabel(Map<String, List<String>> altLabelArg) {
+	public void setAltLabel(List<List<String>> altLabelArg) {
 		
 		altLabel = altLabelArg;
 		
@@ -90,36 +126,25 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
-	public Map<String, String> getDescription() {
+	public List<List<String>> getDescription() {
 		
 		return description;
 	}
 
 	@Override
-	public void setDescription(Map<String, String> descriptionArg) {
+	public void setDescription(List<List<String>> descriptionArg) {
 		description = descriptionArg;
 		
 	}
 
 	@Override
-	public String getCountry() {
-		// TODO Auto-generated method stub
-		return country;
-	}
-
-	@Override
-	public void setCountry(String countryArg) {
-		country = countryArg;
-	}
-
-	@Override
-	public Map<String, String> getSameAs() {
+	public List<List<String>> getSameAs() {
 		
 		return sameAs;
 	}
 
 	@Override
-	public void setSameAs(Map<String, String> wikidataURLs) {
+	public void setSameAs(List<List<String>> wikidataURLs) {
 		sameAs = wikidataURLs;		
 	}
 
