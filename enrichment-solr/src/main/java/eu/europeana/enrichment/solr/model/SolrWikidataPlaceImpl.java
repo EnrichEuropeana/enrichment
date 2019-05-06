@@ -91,14 +91,14 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 
 	@Override
 	@Field(EntitySolrFields.LATITUDE)
-	public void setLatitude(String setLatitude) {
+	public void setLatitude(float setLatitude) {
 		super.setLatitude(setLatitude);
 	}
 
 
 	@Override
 	@Field(EntitySolrFields.LONGITUDE)
-	public void setLongitude(String setLongitude) {
+	public void setLongitude(float setLongitude) {
 		super.setLongitude(setLongitude);		
 	}
 	

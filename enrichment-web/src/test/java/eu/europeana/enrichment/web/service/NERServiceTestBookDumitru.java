@@ -165,7 +165,8 @@ public class NERServiceTestBookDumitru {
 			//wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P569.mainsnak.datavalue.value.time");
 			//wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P106.mainsnak.datavalue.value.id");
 			
-			solrWikidataEntityService.storeWikidataFromURL("https://www.wikidata.org/wiki/Q51056", "agent");
+			solrWikidataEntityService.storeWikidataFromURL("https://www.wikidata.org/entity/Q51056", "agent");
+			solrWikidataEntityService.storeWikidataFromURL("http://www.wikidata.org/entity/Q48320", "place");
 			
 		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block

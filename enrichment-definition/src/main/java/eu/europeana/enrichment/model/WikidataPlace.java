@@ -37,7 +37,7 @@ public interface WikidataPlace extends WikidataEntity{
 	 * 
 	 * @return
 	 */
-	public String getLatitude();
+	public float getLatitude();
 	 
 	/**
 	 * Sets Latitude for Place
@@ -45,14 +45,14 @@ public interface WikidataPlace extends WikidataEntity{
 	 * @param setLatitude
 	 * @return
 	 */
-	public void setLatitude(String setLatitude);
+	public void setLatitude(float setLatitude);
 	
 	/**
 	 * Retrieves Longitude for Place (i.e. json field: claims.P625.mainsnak.datavalue.value.longitude)
 	 * 
 	 * @return
 	 */
-	public String getLongitude();
+	public float getLongitude();
 	 
 	/**
 	 * Sets Longitude for Place
@@ -60,7 +60,7 @@ public interface WikidataPlace extends WikidataEntity{
 	 * @param setLongitude
 	 * @return
 	 */
-	public void setLongitude(String setLongitude);
+	public void setLongitude(float setLongitude);
 
 	String getCountry_jsonProp();
 

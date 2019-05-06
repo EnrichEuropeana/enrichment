@@ -239,28 +239,47 @@ public class WikidataServiceImpl implements WikidataService {
 		
 		if(fieldParts.length==1)
 		{
-			JSONObject obj = (JSONObject) jsonElement;
-			
-			if(fieldParts[0].compareTo("*")==0)
+			if(jsonElement instanceof JSONObject)
 			{
-				Iterator<String> allJsonElementsIterator = obj.keys();
-				List<String> toAddList = new ArrayList<String>();
-				while(allJsonElementsIterator.hasNext())
+				JSONObject obj = (JSONObject) jsonElement;			
+				if(fieldParts[0].compareTo("*")==0)
 				{
-					String jsonElementKey = allJsonElementsIterator.next();					
-					toAddList.add(obj.getString(jsonElementKey));
+					Iterator<String> allJsonElementsIterator = obj.keys();
+					List<String> toAddList = new ArrayList<String>();
+					while(allJsonElementsIterator.hasNext())
+					{
+						String jsonElementKey = allJsonElementsIterator.next();					
+						//toAddList.add(obj.getString(jsonElementKey));
+						toAddList.add(obj.get(jsonElementKey).toString());
+					}
+					result.add(toAddList);
 				}
-				result.add(toAddList);
+				else
+				{
+					List<String> toAddList = new ArrayList<String>();
+					//toAddList.add(obj.getString(fieldParts[0]));
+					toAddList.add(obj.get(fieldParts[0]).toString());
+					result.add(toAddList);
+				}
+				
+				return;
+				
 			}
+			else if(jsonElement instanceof JSONArray)
+			{
+				JSONArray array = (JSONArray) jsonElement;
+				for(int i=0;i<array.length();i++)
+				{
+					analyseJSONFieldFromWikidataJSON(array.get(i),field, result);
+				}
+			}	
 			else
 			{
-				List<String> toAddList = new ArrayList<String>();
-				toAddList.add(obj.getString(fieldParts[0]));
-				result.add(toAddList);
+				logger.error("The analysed Wikidata JSON element: " + fieldParts[0] + " in the JSON field: " + field  + " contains some element which is niether JSON object nor JSONArray!");
 			}
 			
-			return;
 		}
+		
 		
 		if(jsonElement instanceof JSONObject)
 		{
@@ -295,6 +314,10 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				analyseJSONFieldFromWikidataJSON(array.get(i),field, result);
 			}
+		}
+		else
+		{
+			logger.error("The analysed Wikidata JSON element: " + fieldParts[0] + " in the JSON field: " + field  + " contains some element which is niether JSON object nor JSONArray!");
 		}
 			
 	}

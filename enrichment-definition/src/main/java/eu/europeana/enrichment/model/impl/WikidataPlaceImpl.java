@@ -6,8 +6,8 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 
 	private String country;
 	private String logo;
-	private String latitude;
-	private String longitude;
+	private float latitude;
+	private float longitude;
 	
 	private String country_jsonProp = "claims.P17.mainsnak.datavalue.value.id";
 	
@@ -60,22 +60,22 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	}
 
 	@Override
-	public String getLatitude() {
+	public float getLatitude() {
 		return latitude;
 	}
 
 	@Override
-	public void setLatitude(String setLatitude) {
+	public void setLatitude(float setLatitude) {
 		latitude = setLatitude;
 	}
 
 	@Override
-	public String getLongitude() {
+	public float getLongitude() {
 		return longitude;
 	}
 
 	@Override
-	public void setLongitude(String setLongitude) {
+	public void setLongitude(float setLongitude) {
 		longitude = setLongitude;
 		
 	}

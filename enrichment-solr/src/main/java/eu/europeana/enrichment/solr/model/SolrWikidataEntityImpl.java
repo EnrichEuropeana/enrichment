@@ -27,7 +27,9 @@ public class SolrWikidataEntityImpl extends WikidataEntityImpl implements Wikida
 	@Override
 	@Field(EntitySolrFields.PREF_LABEL)
 	public void setPrefLabel(List<List<String>> prefLabel) {
+
 		super.setPrefLabel(prefLabel);
+
 	}
 
 	@Override
