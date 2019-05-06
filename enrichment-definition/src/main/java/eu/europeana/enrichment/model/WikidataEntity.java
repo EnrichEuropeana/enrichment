@@ -133,6 +133,16 @@ public interface WikidataEntity {
 	 * @param wikidataURLs
 	 */
 	public void setSameAs(List<List<String>> wikidataURLs);
+	
+	/**
+	 * This method returns the json field from the wikidata json response which stores Modification Date for Entity
+	 * This and all other get methods that return json fields work with the following syntax for specifying the 
+	 * json field to be taken: e.g. "claims.P18.mainsnak.datavalue.value" (the dot "." defines a json element within 
+	 * another json element). Also "*" as a sign can be provided to specify all elements within a given json element, 
+	 * e.g. "aliases.*.*" meaning all elements within an "aliases" element, and all of their elements  
+	 * 
+	 * @return
+	 */
 
 	String getModificationDate_jsonProp();
 

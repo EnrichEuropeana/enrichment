@@ -60,7 +60,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERService stanfordNerModel7Service;
 //	@Resource(name = "stanfordNerGermanModelService")
 	NERService stanfordNerGermanModelService;
-	//@Resource(name = "stanfordNerItalianModelService")
+	@Resource(name = "stanfordNerItalianModelService")
 	NERService stanfordNerItalianModelService;
 	@Resource(name = "dbpediaSpotlightService")
 	NERService dbpediaSpotlightService;

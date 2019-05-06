@@ -10,7 +10,7 @@ public interface EntitySolrFields {
 	public static final String DEFINITION = "skos_definition";
 	public static final String SAME_AS = "owl_sameAs";
 
-	public static final String ID = "id";
+	public static final String ID = "wikidata_id";
 		
 	public static final String INTERNAL_TYPE = "internal_type";
 		

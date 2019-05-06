@@ -98,10 +98,10 @@
 	</beans:bean>
 	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
-	</beans:bean>
+	</beans:bean-->
 	
 	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
-	</beans:bean-->
+	</beans:bean>
 	
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
