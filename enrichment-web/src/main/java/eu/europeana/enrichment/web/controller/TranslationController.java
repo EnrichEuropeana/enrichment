@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
@@ -29,6 +30,10 @@ public class TranslationController extends BaseRest {
 
 	@Resource
 	EnrichmentTranslationService enrichmentTranslationService;
+	
+	@Resource(name = "eTranslationService")
+	TranslationService eTranslationService;
+
 	
 	/*
 	 * This method represents the /enrichment/translation end point,
@@ -60,4 +65,33 @@ public class TranslationController extends BaseRest {
 		}
 	}
 	
+	
+	/*
+	 * This method represents the /enrichment/eTranslation end point,
+	 * where a translation response from eTranslation will be processed.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param translationRequest		is the Rest Post body with the original
+	 * 									text for translation into English
+	 * return 							the translated text or for eTranslation
+	 * 									only an ID
+	 */
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation")
+	@RequestMapping(value = "/enrichment/eTranslation", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> getETranslation(
+			@RequestParam(value = "target-language", required = false) String targetLanguage,
+			@RequestParam(value = "translated-text", required = false) String translatedText,
+			@RequestParam(value = "request-id", required = false) String requestId,
+			@RequestParam(value = "external-reference", required = false) String externalReference
+			) 
+	{
+		
+		eTranslationService.eTranslationResponse(targetLanguage,translatedText,requestId,externalReference);
+		
+		ResponseEntity<String> response = new ResponseEntity<String>("eTranslation callback has been executed!", HttpStatus.OK);
+		
+		return response;
+	}
+
 }
