@@ -94,10 +94,12 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
-		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
+		//String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
+		String externalReference = "123";
 		createdRequests.put(externalReference, null);
 		
-		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
+		//String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
+		String contentBody =  createTranslationBody (text, sourceLanguage);
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode);
 		
@@ -126,7 +128,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @return							a stringified JSON including the transcribed
 	 * 									text as a base64 string
 	 */
-	/*
+	
 	private String createTranslationBody(String text, String sourceLanguage) {
 		String base64content = "";
 		try {
@@ -149,7 +151,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 
 		return jsonBody.toString();
 	}
-	*/
+	
 
 	/**
 	 * This method creates the translation request body where the response is sent back
