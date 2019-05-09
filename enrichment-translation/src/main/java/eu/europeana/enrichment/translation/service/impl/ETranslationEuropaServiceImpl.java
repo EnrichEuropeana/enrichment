@@ -94,12 +94,12 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
-		//String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
-		String externalReference = "123";
+		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
+		//String externalReference = "123";
 		createdRequests.put(externalReference, null);
 		
-		//String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
-		String contentBody =  createTranslationBody (text, sourceLanguage);
+		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
+		//String contentBody =  createTranslationBody (text, sourceLanguage);
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode);
 		
