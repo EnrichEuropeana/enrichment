@@ -214,12 +214,15 @@ public class ReadWriteFiles {
 		BufferedReader brStories = null;
 		BufferedReader brItems = null;
 		try {
-			brStories = new BufferedReader(new FileReader(jsonStories));
+			//brStories = new BufferedReader(new FileReader(jsonStories));
 			brItems = new BufferedReader(new FileReader(jsonItems));
 			
 			/*
 			 * reading stories
 			 */
+			
+			/*
+			
 			List<Map<String, Object>> stories = null;			
 			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
 			for(int i=0;i<retMapStories.size();i++)				
@@ -263,6 +266,8 @@ public class ReadWriteFiles {
 			
 			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
 			
+			*/
+			
 			/*
 			 * reading items
 			 */
@@ -284,8 +289,8 @@ public class ReadWriteFiles {
 				if(itemLanguage==null) itemLanguage="";
 				String itemTranscription = (String)items.get(i).get("transcription");				
 
-//				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
-//				{
+				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+				{
 					
 					ItemEntityImpl newItemEntity=new ItemEntityImpl();
 					newItemEntity.setTitle("");
@@ -316,11 +321,12 @@ public class ReadWriteFiles {
 							storyTranscription += " " + transcription;
 							dbStoryEntity.setStoryTranscription(storyTranscription);
 							persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
+							logger.info("Item for the story_id: " + itemStoryId + "has beeen successfully uploaded to the mongo db.");
 						}
 					}
 					
 					itemEntities.add(newItemEntity);
-//				}
+				}
 				
 			}
 			
