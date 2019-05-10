@@ -38,14 +38,14 @@ public class ReadWriteFiles {
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
 
-	@Resource
-	EnrichmentNERService enrichmentNerService;
+//	@Resource
+//	EnrichmentNERService enrichmentNerService;
 
 	@Resource(name= "europeanaJavaPDFWriter")
 	JavaPDFWriter europeanaJavaPDFWriter;
 	
-	@Resource(name = "javaJSONParser")
-	JavaJSONParser javaJSONParser;
+//	@Resource(name = "javaJSONParser")
+//	JavaJSONParser javaJSONParser;
 
 	private String translatedText;
 	private String originalText;
@@ -63,6 +63,14 @@ public class ReadWriteFiles {
 	private String outputFormatedPDFOriginal;
 	
 	private String jsonStories;
+	public String getJsonStories() {
+		return jsonStories;
+	}
+
+	public String getJsonItems() {
+		return jsonItems;
+	}
+
 	private String jsonItems;
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -204,163 +212,6 @@ public class ReadWriteFiles {
 	    }
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void readStoriesAndItemsFromJson () {
-		
-		/*
-		 * reading stories and items from json
-		 */
-		
-		BufferedReader brStories = null;
-		BufferedReader brItems = null;
-		try {
-			//brStories = new BufferedReader(new FileReader(jsonStories));
-			brItems = new BufferedReader(new FileReader(jsonItems));
-			
-			/*
-			 * reading stories
-			 */
-			
-			/*
-			
-			List<Map<String, Object>> stories = null;			
-			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
-			for(int i=0;i<retMapStories.size();i++)				
-			{
-				String type = (String) retMapStories.get(i).get("type");
-				if(type.compareTo("table")==0) {
-					stories = (List<Map<String, Object>>) retMapStories.get(i).get("data");
-				}
-				
-			}
-			
-			List<StoryEntityImpl> storyEntities = new ArrayList<StoryEntityImpl>();
-			
-			
-			for (int i=0;i<stories.size();i++)
-			{
-				String storyLanguage = (String)stories.get(i).get("language");
-				if(storyLanguage==null) storyLanguage="";
-//				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
-//				{
-					StoryEntityImpl newStoryEntity = new StoryEntityImpl();
-					newStoryEntity.setStoryTitle("");
-					newStoryEntity.setStoryDescription("");
-					newStoryEntity.setStoryId("");
-					newStoryEntity.setStoryLanguage("");
-					newStoryEntity.setStorySummary("");
-					newStoryEntity.setStoryTranscription("");				
-	
-					
-					if(stories.get(i).get("source")!=null) newStoryEntity.setStorySource((String) stories.get(i).get("source"));
-					if(stories.get(i).get("title")!=null) newStoryEntity.setStoryTitle((String) stories.get(i).get("title"));
-					if(stories.get(i).get("description")!=null) newStoryEntity.setStoryDescription((String) stories.get(i).get("description"));
-					if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
-					if(stories.get(i).get("language")!=null) newStoryEntity.setStoryLanguage((String) stories.get(i).get("language"));	
-					if(stories.get(i).get("summary")!=null)	newStoryEntity.setStorySummary((String) stories.get(i).get("summary"));
-				
-					storyEntities.add(newStoryEntity);
-//				}				
-				
-			}
-			
-			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
-			
-			*/
-			
-			/*
-			 * reading items
-			 */
-			List<Map<String, Object>> items = null;
-			List<Map<String, Object>> retMapItems = javaJSONParser.getStoriesAndItemsFromJSON(brItems);
-			for(int i=0;i<retMapItems.size();i++)				
-			{
-				String type = (String) retMapItems.get(i).get("type");
-				if(type.compareTo("table")==0) {
-					items = (List<Map<String, Object>>) retMapItems.get(i).get("data");
-				}
-				
-			}
-			
-			List<ItemEntityImpl> itemEntities = new ArrayList<ItemEntityImpl>();
-			for (int i=0;i<items.size();i++)
-			{
-				String itemLanguage = (String)items.get(i).get("language");
-				if(itemLanguage==null) itemLanguage="";
-				String itemTranscription = (String)items.get(i).get("transcription");				
 
-				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
-				{
-					
-					ItemEntityImpl newItemEntity=new ItemEntityImpl();
-					newItemEntity.setTitle("");
-					newItemEntity.setStoryId("");
-					newItemEntity.setLanguage("");
-					newItemEntity.setTranscription("");	
-					newItemEntity.setType("");	
-					newItemEntity.setItemId("");
-	
-					
-					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
-					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
-					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
-					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
-					if(items.get(i).get("item_id")!=null) newItemEntity.setItemId((String) items.get(i).get("item_id"));
-	
-					if(items.get(i).get("story_id")!=null && items.get(i).get("transcription")!=null)
-					{		
-						String itemStoryId = (String) items.get(i).get("story_id");
-						String transcription = (String) items.get(i).get("transcription");
-						/*
-						 * adding item transcription to the story transcription
-						 */
-						StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(itemStoryId);
-						if(dbStoryEntity!=null)
-						{
-							String storyTranscription = dbStoryEntity.getStoryTranscription();
-							storyTranscription += " " + transcription;
-							dbStoryEntity.setStoryTranscription(storyTranscription);
-							persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
-							logger.info("Item for the story_id: " + itemStoryId + "has beeen successfully uploaded to the mongo db.");
-						}
-					}
-					
-					itemEntities.add(newItemEntity);
-				}
-				
-			}
-			
-			String uploadItemsStatus = enrichmentNerService.uploadItems(itemEntities.toArray(new ItemEntityImpl[0]));
-			
-			logger.info("Stories and Items are saved to the database from the JSON file!");
-						
-		}
-		catch (FileNotFoundException e) {
-		    e.printStackTrace();
-		} catch (HttpException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			  if (brStories != null) {
-				  try {
-					  brStories.close();
-				  } catch (IOException e) {
-		    		// TODO Auto-generated catch block
-		    		e.printStackTrace();
-				  }
-			  }
-			  if (brItems != null) {
-				  try {
-					  brItems.close();
-				  } catch (IOException e) {
-		    		// TODO Auto-generated catch block
-		    		e.printStackTrace();
-				  }
-			  }
-		}	
-		
-		
-		
-	}
 	
 }
