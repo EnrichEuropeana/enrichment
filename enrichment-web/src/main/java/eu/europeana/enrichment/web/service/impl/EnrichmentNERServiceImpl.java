@@ -423,13 +423,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		BufferedReader brStories = null;
 		BufferedReader brItems = null;
 		try {
-			//brStories = new BufferedReader(new FileReader(jsonStories));
+			brStories = new BufferedReader(new FileReader(jsonStoriesImportPath));
 			brItems = new BufferedReader(new FileReader(jsonItemsImportPath));
 			
 			/*
 			 * reading stories
 			 */		
-			/*
+			
 			List<Map<String, Object>> stories = null;			
 			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
 			for(int i=0;i<retMapStories.size();i++)				
@@ -473,7 +473,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
 						
-			*/
+			
 			
 			/*
 			 * reading items
@@ -587,6 +587,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * 2. all "\n\n...", "\n\n   \n...", etc.   replace with \n 
 		 */
 		
-		return transcriptionText.replaceAll("[\r\n]+", "\n");
+		String dummy1 = transcriptionText.replaceAll("(\\r)+", "");
+		logger.info(dummy1 + "\n\n\n\n\n\n\n\n");
+		//regex: \n 1+ times followed by space 1+ times and vice versa
+		String dummy2 = dummy1.replaceAll("(\\n)+( )+|( )+(\\n)+", "\n");
+		String dummy3 = dummy2.replaceAll("(\\n)+", "\n");
+		logger.info(dummy3);
+		return dummy3;
 	}
 }

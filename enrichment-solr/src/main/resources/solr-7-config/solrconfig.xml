@@ -84,6 +84,8 @@
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
   
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex=".*\.jar" />
+  
   <!--  SG add dataimporthandler -->
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-.*\.jar" />
   
