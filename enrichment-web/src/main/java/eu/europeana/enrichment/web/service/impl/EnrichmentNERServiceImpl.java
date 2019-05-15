@@ -34,6 +34,7 @@ import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
+import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -46,6 +47,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 */
 	@Resource(name = "solrEntityService")
 	SolrEntityPositionsService solrEntityService;
+	
+	@Resource(name = "solrWikidataEntityService")
+	SolrWikidataEntityService solrWikidataEntityService;
+
 	
 	/*
 	 * Loading all translation services
@@ -105,6 +110,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		List<String> storyItemIds = requestParam.getStoryItemIds();
+		
+		if(storyItemIds == null || storyItemIds.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ITEM_IDS, null);
+		
 		
 		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam);
 		/*
@@ -311,10 +320,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		
 		/*
-		 * Save and update all named entities
+		 * Save and update all named entities as well as save the Wikidata entities to Solr 
 		 */
 		for (String key : resultMap.keySet()) {
-			for (NamedEntity entity : resultMap.get(key)) {
+			for (NamedEntity entity : resultMap.get(key)) {				
+				//save the wikidata ids to solr
+				for(String wikidataId : entity.getWikidataIds())
+				{
+					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
+				}
+				//save the named entitiy to the mongo db
 				persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}

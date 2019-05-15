@@ -1,0 +1,16 @@
+This folders solr-config-enrichment and solr-config-wikidata contain the config files that Solr server needs in order to work properly. 
+The solr-config-enrichment is for the enrichment core and the solr-config-wikidata is for the wikidata core.
+So for the concrete solr configuration for the Enrichment-Europeana project in order to create 2 cores: enrichment
+and wikidate, the following is necessary:
+
+1) in the installed Solr directory, e.g. C:\install\solr-6.6.5\server create a new directory called e.g. solr-enrichment
+2) copy the file solr.xml from this folder to the created directory solr-enrichment
+3) create a Solr core named "enrichment" using the solr.cmd or (./bin/solr in Linux, do the call from the solr main directory, e.g. /opt/solr):
+./bin/solr create_core -c enrichment -d sample_techproducts_configs -p 8983 (the port is important when some other solr on some other port is running)
+./bin/solr create_core -c wikidata -d sample_techproducts_configs -p 8983 
+4) copy the rest 2 files from the corresponding directories (solr-7-config-enrichment and solr-7-config-wikidata): solrconfig.xml and schema.xml, to the folder C:\install\solr-6.6.5\server\solr-enrichment\enrichment\conf
+or C:\install\solr-6.6.5\server\solr-enrichment\wikidata\conf 
+5) start (or stop and start) solr server: solr.cmd start -s  C:/install/solr-6.6.5/server/solr-enrichment
+
+Now the Solr server can be used from the Enrich-Europeana code. Happy search!
+ 
