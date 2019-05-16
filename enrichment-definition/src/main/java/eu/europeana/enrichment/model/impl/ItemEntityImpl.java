@@ -1,35 +1,22 @@
-package eu.europeana.enrichment.mongo.model;
+package eu.europeana.enrichment.model.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.mongodb.morphia.annotations.NotSaved;
-import org.mongodb.morphia.annotations.Transient;
-
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 
 public class ItemEntityImpl implements ItemEntity{
 
-	//id will be used for storing MongoDB _id
-	@Id
-    public String _id = new ObjectId().toString();
-	public String itemId;
-	public String language;
-	public String type;
-	public String transcriptionText;
-	public String hashKey;
-	public String storyId;
-	public String title;
-	@Transient
-	@NotSaved
-	private StoryEntity storyEntity;
+	private String itemId;
+	private String language;
+	private String type;
+	private String transcriptionText;
+	private String hashKey;
+	private String storyId;
+	private String title;
 	
 	@Override
 	public String getStoryId() {
@@ -39,25 +26,6 @@ public class ItemEntityImpl implements ItemEntity{
 	@Override
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
-	}
-	
-	@Override
-	public String getId() {
-		return _id;
-	}
-
-	@Override
-	public StoryEntity getStoryEntity() {
-		return storyEntity;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity storyEntity) {
-		this.storyEntity = storyEntity;
-		if(storyEntity != null)
-			setStoryId(storyEntity.getStoryId());
-		else
-			setStoryId(null);
 	}
 
 	@Override
@@ -117,6 +85,24 @@ public class ItemEntityImpl implements ItemEntity{
 	@Override
 	public void setTitle(String itemTitle) {
 		this.title=itemTitle;		
+	}
+
+	@Override
+	public String getId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StoryEntity getStoryEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStoryEntity(StoryEntity storyEntity) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

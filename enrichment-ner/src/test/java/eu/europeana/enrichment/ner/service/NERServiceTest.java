@@ -23,7 +23,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
-import eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl;
 import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -76,6 +75,7 @@ public class NERServiceTest {
 		expectedMap.put(NERClassification.PLACE.toString(), location);
 	}
 		
+	/*
 	@Test
 	public void stanfordNERServiceTest() {
 		assertTrue("Stanford model 3 classifier failed in comparison!", 
@@ -120,5 +120,5 @@ public class NERServiceTest {
 			
 		}
 		return true;
-	}
+	}*/
 }

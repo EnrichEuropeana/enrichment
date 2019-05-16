@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.service.impl;
+package eu.europeana.enrichment.eval.ner.service.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -23,6 +23,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
@@ -67,7 +68,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
 		
 		
 		  // Use for example a text in a String text = "I topi non avevano nipoti. Il mio nome è Nicolo Rossi. Il mio nome è Massimo Pietro."; 
@@ -102,7 +103,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		 * e.printStackTrace(); }
 		 */	
 		
-		return map;
+		return null;
 	}
 	
 	/*

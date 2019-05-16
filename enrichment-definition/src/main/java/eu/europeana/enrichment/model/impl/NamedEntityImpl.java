@@ -1,11 +1,7 @@
-package eu.europeana.enrichment.mongo.model;
+package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
@@ -13,14 +9,14 @@ import eu.europeana.enrichment.model.PositionEntity;
 
 public class NamedEntityImpl implements NamedEntity{
 
-	//id will be used for storing MongoDB _id
-	@Id
-    public String _id = new ObjectId().toString();
-	public String type;
-	public String key;
-	public List<String> europeanaIds;
-	public List<String> wikidataIds;
-	public List<PositionEntity> positionEntities;
+	private String type;
+	private String key;
+	private List<String> europeanaIds;
+	private List<String> wikidataIds;
+	private List<String> dbpediaIds;
+	private List<String> dbpediaWikidataIds;
+	private List<String> preferedWikidataIds;
+	private List<PositionEntity> positionEntities;
 	
 	public NamedEntityImpl() {
 		init();
@@ -34,12 +30,17 @@ public class NamedEntityImpl implements NamedEntity{
 	void init() {
 		key = "";
 		positionEntities = new ArrayList<>();
-		europeanaIds = new ArrayList<String>();
-		wikidataIds = new ArrayList<String>();
+		europeanaIds = new ArrayList<>();
+		wikidataIds = new ArrayList<>();
+		dbpediaIds = new ArrayList<>();
+		preferedWikidataIds = new ArrayList<>();
+		dbpediaWikidataIds = new ArrayList<>();
 	}
 	
+	@Override
 	public String getId() {
-		return _id;
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	@Override
@@ -92,6 +93,36 @@ public class NamedEntityImpl implements NamedEntity{
 	public void addWikidataId(String id) {
 		wikidataIds.add(id);
 	}
+	
+	@Override
+	public List<String> getDbpediaWikidataIds(){
+		return dbpediaWikidataIds;
+	}
+	
+	@Override
+	public void setDbpediaWikidataIds(List<String> ids) {
+		dbpediaWikidataIds = ids;
+	}
+	
+	@Override
+	public void addDbpediaWikidataId(String id) {
+		dbpediaWikidataIds.add(id);
+	}
+	
+	@Override
+	public List<String> getPreferedWikidataIds(){
+		return preferedWikidataIds;
+	}
+	
+	@Override
+	public void setPreferedWikidataIds(List<String> ids) {
+		preferedWikidataIds = ids;
+	}
+	
+	@Override
+	public void addPreferedWikidataId(String id) {
+		preferedWikidataIds.add(id);
+	}
 
 	@Override
 	public void addPositionEntity(PositionEntity positionEntity) {
@@ -106,5 +137,20 @@ public class NamedEntityImpl implements NamedEntity{
 	@Override
 	public List<PositionEntity> getPositionEntities() {
 		return positionEntities;
+	}
+
+	@Override
+	public List<String> getDBpediaIds() {
+		return dbpediaIds;
+	}
+
+	@Override
+	public void setDBpediaIds(List<String> ids) {
+		dbpediaIds = ids;
+	}
+
+	@Override
+	public void addDBpediaId(String id) {
+		dbpediaIds.add(id);
 	}
 }

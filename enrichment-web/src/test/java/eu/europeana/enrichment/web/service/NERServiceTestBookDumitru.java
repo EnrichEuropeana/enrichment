@@ -128,7 +128,7 @@ public class NERServiceTestBookDumitru {
 		europeanaEnrichmentNERRequest.setStoryId("6426");
 		//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
 		//europeanaEnrichmentNERRequest.setNERTool("DBpedia_Spotlight");
-		europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_Italian");
+		//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_Italian");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
 		europeanaEnrichmentNERRequest.setTranslationlanguage("German");
 		

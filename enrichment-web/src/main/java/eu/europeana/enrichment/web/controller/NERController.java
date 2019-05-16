@@ -2,7 +2,6 @@ package eu.europeana.enrichment.web.controller;
 
 import javax.annotation.Resource;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,12 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
-import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -19,7 +19,7 @@ enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait
 # Additional: 
 #	Docker command: docker pull dbpedia/spotlight-english
 #	Docker command: docker run --name spotlight -p 2222:80 -it dbpedia/spotlight-english spotlight.sh
-enrich.ner.dbpedia.baseUrl=http://localhost:2222/rest/candidates
+enrich.ner.dbpedia.baseUrl=http://localhost:2222/rest/annotate
 
 # Named entity linking section
 enrich.ner.linking.europeana.apikey=apidemo

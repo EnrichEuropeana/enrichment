@@ -27,8 +27,8 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
@@ -231,7 +231,7 @@ public class ReadWriteFiles {
 				
 			}
 			
-			List<StoryEntityImpl> storyEntities = new ArrayList<StoryEntityImpl>();
+			List<DBStoryEntityImpl> storyEntities = new ArrayList<DBStoryEntityImpl>();
 			
 			
 			for (int i=0;i<stories.size();i++)
@@ -240,7 +240,7 @@ public class ReadWriteFiles {
 				if(storyLanguage==null) storyLanguage="";
 //				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
 //				{
-					StoryEntityImpl newStoryEntity = new StoryEntityImpl();
+					DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
 					newStoryEntity.setStoryTitle("");
 					newStoryEntity.setStoryDescription("");
 					newStoryEntity.setStoryId("");
@@ -261,7 +261,7 @@ public class ReadWriteFiles {
 				
 			}
 			
-			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
+			String uploadStoriesStatus = enrichmentNerService.uploadStories(storyEntities.toArray(new DBStoryEntityImpl[0]));
 			
 			/*
 			 * reading items
@@ -277,7 +277,7 @@ public class ReadWriteFiles {
 				
 			}
 			
-			List<ItemEntityImpl> itemEntities = new ArrayList<ItemEntityImpl>();
+			List<DBItemEntityImpl> itemEntities = new ArrayList<DBItemEntityImpl>();
 			for (int i=0;i<items.size();i++)
 			{
 				String itemLanguage = (String)items.get(i).get("language");
@@ -287,7 +287,7 @@ public class ReadWriteFiles {
 //				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
 //				{
 					
-					ItemEntityImpl newItemEntity=new ItemEntityImpl();
+					DBItemEntityImpl newItemEntity=new DBItemEntityImpl();
 					newItemEntity.setTitle("");
 					newItemEntity.setStoryId("");
 					newItemEntity.setLanguage("");
@@ -324,7 +324,7 @@ public class ReadWriteFiles {
 				
 			}
 			
-			String uploadItemsStatus = enrichmentNerService.uploadItems(itemEntities.toArray(new ItemEntityImpl[0]));
+			String uploadItemsStatus = enrichmentNerService.uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
 			
 			logger.info("Stories and Items are saved to the database from the JSON file!");
 						

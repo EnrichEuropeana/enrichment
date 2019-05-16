@@ -1,29 +1,23 @@
-package eu.europeana.enrichment.mongo.model;
-
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
+package eu.europeana.enrichment.model.impl;
 
 import eu.europeana.enrichment.model.StoryEntity;
 
 public class StoryEntityImpl implements StoryEntity {
 
-	//id will be used for storing MongoDB _id
-	@Id
-    public String _id = new ObjectId().toString();
 	//public String language;
-	public String storyId;
-	public String title;
-	public String source;
-	public String description;
-	public String summary;
-	public String language;
-	public String transcriptionText;
+	private String storyId;
+	private String title;
+	private String source;
+	private String description;
+	private String summary;
+	private String language;
+	private String transcriptionText;
 	
 	
 	@Override
 	public String getId() {
-		return _id;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override

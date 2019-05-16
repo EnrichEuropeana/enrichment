@@ -6,10 +6,8 @@ import java.util.List;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
-import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
-import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 
 public class StoryEntityDaoImpl implements StoryEntityDao{
 
@@ -21,9 +19,9 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	
 	@Override
 	public StoryEntity findStoryEntity(String key) {
-		Query<StoryEntityImpl> persistentStoryEntities = datastore.createQuery(StoryEntityImpl.class);
+		Query<DBStoryEntityImpl> persistentStoryEntities = datastore.createQuery(DBStoryEntityImpl.class);
 		persistentStoryEntities.field("storyId").equal(key);
-		List<StoryEntityImpl> result = persistentStoryEntities.asList();
+		List<DBStoryEntityImpl> result = persistentStoryEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else {
@@ -57,13 +55,13 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 
 	@Override
 	public void deleteStoryEntityByStoryId(String key) {
-		datastore.delete(datastore.find(StoryEntityImpl.class).filter("storyId", key));
+		datastore.delete(datastore.find(DBStoryEntityImpl.class).filter("storyId", key));
 	}
 
 	@Override
 	public List<StoryEntity> findAllStoryEntities() {
-		Query<StoryEntityImpl> persistentStoryEntities = datastore.createQuery(StoryEntityImpl.class);		
-		List<StoryEntityImpl> result = persistentStoryEntities.asList();
+		Query<DBStoryEntityImpl> persistentStoryEntities = datastore.createQuery(DBStoryEntityImpl.class);		
+		List<DBStoryEntityImpl> result = persistentStoryEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else

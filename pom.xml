@@ -90,7 +90,8 @@
     <module>enrichment-definition</module>
     <module>enrichment-solr</module>
     <module>enrichment-solr-positions-highlighter</module>
-    </modules>
+    <module>enrichment-eval</module>
+  </modules>
 
 	<build>
 		<!-- configure source and output locations -->

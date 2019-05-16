@@ -5,10 +5,9 @@ import java.util.TreeMap;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -23,7 +22,7 @@ public interface EnrichmentNERService {
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required item parameters are null or empty
 	 */	
-	public String uploadItems (ItemEntityImpl [] items) throws HttpException;  
+	public String uploadItems (DBItemEntityImpl [] items) throws HttpException;  
 
 	/*
 	 * This method uploads an array of stories to the Mongo database
@@ -35,7 +34,7 @@ public interface EnrichmentNERService {
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required story parameters are null or empty
 	 */	
-	public String uploadStories (StoryEntityImpl [] stories) throws HttpException;  
+	public String uploadStories (DBStoryEntityImpl [] stories) throws HttpException;  
 	/*
 	 * This method applies named entity recognition and classification based
 	 * on the translated text. It also saves the found named entities in the Mongo database
