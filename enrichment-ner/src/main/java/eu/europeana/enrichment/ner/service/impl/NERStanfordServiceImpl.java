@@ -12,6 +12,10 @@ import javax.annotation.Resource;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
@@ -33,14 +37,12 @@ public class NERStanfordServiceImpl implements NERService{
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {
-			//URL url = NERStanfordServiceImpl.class.getClassLoader().getResource(model);
-			//classifier = CRFClassifier.getClassifierNoExceptions(url.getPath());
 			classifier = CRFClassifier.getClassifierNoExceptions(model);
 		}
 	}
 		
 	@Override
-	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
 		List<List<CoreLabel>> classify = classifier.classify(text);
 		return processClassifiedResult(classify);
 	}
@@ -53,11 +55,12 @@ public class NERStanfordServiceImpl implements NERService{
 	 * @throws 							NERAnnotateException
 	 */
 	//TODO: check where exception could appear
-	private TreeMap<String, List<List<String>>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
-		TreeMap<String, List<List<String>>> map = new TreeMap<String, List<List<String>>>();
+	private TreeMap<String, List<NamedEntity>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
+		TreeMap<String, List<NamedEntity>> map = new TreeMap<>();
 		
 		String previousWord = "";
 		String previousCategory = "";
+		NamedEntity previousNamedEntity;
 		int previousOffset=-1;
 		
 		for (List<CoreLabel> coreLabels : classify) {
@@ -85,33 +88,44 @@ public class NERStanfordServiceImpl implements NERService{
 					word = previousWord + " " + word;
 					wordOffset=previousOffset;
 					
-					List<String> wordWithPositionPrevious = new ArrayList<String>();
-					wordWithPositionPrevious.add(previousWord);
-					wordWithPositionPrevious.add(String.valueOf(previousOffset));
-					map.get(category).remove(wordWithPositionPrevious);
+					map.get(category).remove(map.get(category).size()-1);
 				}
 				
 				previousWord = word;
 				previousCategory = category;
 				previousOffset = wordOffset;
 				
+				NamedEntity namedEntity = new NamedEntityImpl(word);
+				namedEntity.setType(category);
+				PositionEntity positionEntity = new PositionEntityImpl();
+				// default: Offset position will be added to the translated 
+				positionEntity.addOfssetsTranslatedText(wordOffset);
+				namedEntity.addPositionEntity(positionEntity);
+				previousNamedEntity = namedEntity;
+				
 				if (!"O".equals(category)) {
 					
-					
-					List<String> wordWithPosition = new ArrayList<String>();
-					wordWithPosition.add(word);
-					wordWithPosition.add(String.valueOf(wordOffset));
-							
+					List<NamedEntity> tmp;
 					
 					if (map.containsKey(category)) {
 						// key is already their just insert in the list {word,position}
-						map.get(category).add(wordWithPosition);
+						tmp = map.get(category);
 					} else {
-						List<List<String>> temp = new ArrayList<List<String>>();					
-						temp.add(wordWithPosition);
-						map.put(category, temp);
+						tmp = new ArrayList<>();
+						map.put(category, tmp);
 					}
-					//System.out.println(word + ":" + category);
+					
+					NamedEntity alreadyExistNamedEntity = null;
+					for(int index = 0; index < tmp.size(); index++) {
+						if(tmp.get(index).getKey().equals(namedEntity.getKey())) {
+							alreadyExistNamedEntity = tmp.get(index);
+							break;
+						}
+					}
+					if(alreadyExistNamedEntity == null)
+						tmp.add(namedEntity);
+					else 
+						alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(wordOffset);
 				}
 			}
 		}

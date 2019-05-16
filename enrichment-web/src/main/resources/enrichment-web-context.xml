@@ -77,7 +77,7 @@
 	<beans:bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
 	<beans:bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
 	
-	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+	<beans:bean id="stanfordNerService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
 	</beans:bean>
 	<!-- beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">

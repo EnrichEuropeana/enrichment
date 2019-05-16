@@ -1,28 +1,18 @@
-package eu.europeana.enrichment.mongo.model;
+package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mongodb.morphia.annotations.NotSaved;
-import org.mongodb.morphia.annotations.Transient;
-
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 public class PositionEntityImpl implements PositionEntity{
 
-	public List<Integer> offsetsTranslatedText;
-	public List<Integer> offsetsOriginalText;
-	public String storyId;
-	public String translationKey;
-	@Transient
-	@NotSaved
-	StoryEntity storyEntity;
-	@Transient
-	@NotSaved
-	TranslationEntity translationEntity;
+	private List<Integer> offsetsTranslatedText;
+	private List<Integer> offsetsOriginalText;
+	private String storyId;
+	private String translationKey;
 	
 	public PositionEntityImpl() {
 		offsetsTranslatedText = new ArrayList<Integer>();
@@ -43,34 +33,6 @@ public class PositionEntityImpl implements PositionEntity{
 	
 	public void setTranslationKey(String translationKey) {
 		this.translationKey = translationKey;
-	}
-	
-	@Override
-	public StoryEntity getStoryEntity() {
-		return storyEntity;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity storyEntity) {
-		this.storyEntity=storyEntity;
-		if(storyEntity != null)
-			setStoryId(storyEntity.getStoryId());
-		else
-			setStoryId(null);
-	}
-
-	@Override
-	public TranslationEntity getTranslationEntity() {
-		return translationEntity;
-	}
-
-	@Override
-	public void setTranslationEntity(TranslationEntity translationEntity) {
-		this.translationEntity = translationEntity;
-		if(translationEntity != null)
-			setTranslationKey(translationEntity.getKey());
-		else
-			setTranslationKey(null);
 	}
 	
 	@Override
@@ -102,6 +64,30 @@ public class PositionEntityImpl implements PositionEntity{
 	@Override
 	public void addOfssetsOriginalText(int offsetPosition) {
 		offsetsOriginalText.add(offsetPosition);
+		
+	}
+
+	@Override
+	public StoryEntity getStoryEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setStoryEntity(StoryEntity ItemEntity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public TranslationEntity getTranslationEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setTranslationEntity(TranslationEntity translationEntity) {
+		// TODO Auto-generated method stub
 		
 	}
 

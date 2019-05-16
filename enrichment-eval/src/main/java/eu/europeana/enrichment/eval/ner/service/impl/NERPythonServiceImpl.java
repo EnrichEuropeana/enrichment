@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.service.impl;
+package eu.europeana.enrichment.eval.ner.service.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import eu.europeana.enrichment.ner.service.NERService;
+import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 
 public class NERPythonServiceImpl implements NERService{
@@ -53,7 +54,7 @@ public class NERPythonServiceImpl implements NERService{
 	 * @see eu.europeana.enrichment.ner.service.NERService#identifyNER(java.lang.String)
 	 */
 	@Override
-	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
 		TreeMap<String, List<List<String>>> map = new TreeMap<>();
 		Process process;
 		try {
@@ -100,7 +101,7 @@ public class NERPythonServiceImpl implements NERService{
 			System.out.println("Exception Raised" + e.toString());
 		}
 		
-		return map;
+		return null;
 	}
 	
 	/*

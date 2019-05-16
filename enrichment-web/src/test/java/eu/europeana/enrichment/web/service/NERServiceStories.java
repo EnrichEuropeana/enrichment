@@ -104,11 +104,11 @@ public class NERServiceStories {
 					europeanaEnrichmentNERRequest.setStoryId(story.getStoryId());
 					if(story.getStoryLanguage().compareTo("English")==0)
 					{
-						europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
+						//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
 					}
 					else if(story.getStoryLanguage().compareTo("German")==0) 
 					{
-						europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_German");
+						//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_German");
 					}
 					String transTool = "eTranslation";
 					europeanaEnrichmentNERRequest.setTranslationTool(transTool);

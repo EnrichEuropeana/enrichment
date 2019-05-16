@@ -6,10 +6,10 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.NamedEntitySolrFields;
 
-public class SolrNamedEntityImpl extends NamedEntityImpl implements NamedEntity {
+public class SolrNamedEntityImpl extends DBNamedEntityImpl implements NamedEntity {
 
 	@Override
 	@Field(NamedEntitySolrFields.TYPE)

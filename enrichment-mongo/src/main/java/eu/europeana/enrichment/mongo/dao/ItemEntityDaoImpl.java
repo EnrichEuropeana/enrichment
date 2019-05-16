@@ -10,7 +10,7 @@ import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 
 public class ItemEntityDaoImpl implements ItemEntityDao{
 
@@ -23,20 +23,20 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		this.datastore = datastore;
 	}
 	
-	private void addAdditionalInformation(ItemEntityImpl dbEntity) {
+	private void addAdditionalInformation(DBItemEntityImpl dbEntity) {
 		StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
 		dbEntity.setStoryEntity(dbStoryEntity);
 	}
 	
 	@Override
 	public ItemEntity findItemEntity(String key) {
-		Query<ItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(ItemEntityImpl.class);
+		Query<DBItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(DBItemEntityImpl.class);
 		persistentStoryItemEntities.field("itemId").equal(key);
-		List<ItemEntityImpl> result = persistentStoryItemEntities.asList();
+		List<DBItemEntityImpl> result = persistentStoryItemEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else {
-			ItemEntityImpl dbEntity = result.get(0);
+			DBItemEntityImpl dbEntity = result.get(0);
 			addAdditionalInformation(dbEntity);
 			return dbEntity;
 		}
@@ -44,12 +44,12 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	
 	@Override
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId){
-		Query<ItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(ItemEntityImpl.class);
+		Query<DBItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(DBItemEntityImpl.class);
 		persistentStoryItemEntities.field("storyId").equal(storyId);
-		List<ItemEntityImpl> result = persistentStoryItemEntities.asList();
+		List<DBItemEntityImpl> result = persistentStoryItemEntities.asList();
 		List<ItemEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
-			ItemEntityImpl dbEntity = result.get(index);
+			DBItemEntityImpl dbEntity = result.get(index);
 			addAdditionalInformation(dbEntity);
 			tmpResult.add(dbEntity);
 		}
@@ -81,7 +81,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Override
 	public void deleteItemEntityByStoryItemId(String key) {
-		datastore.delete(datastore.find(ItemEntityImpl.class).filter("itemId", key));
+		datastore.delete(datastore.find(DBItemEntityImpl.class).filter("itemId", key));
 	}
 
 }
