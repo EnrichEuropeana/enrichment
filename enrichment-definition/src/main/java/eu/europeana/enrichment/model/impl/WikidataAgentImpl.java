@@ -1,13 +1,19 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import eu.europeana.enrichment.model.WikidataAgent;
 
 public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAgent {
 
+
+
 	private String country;
-	private String dateOfBirth;
-	private String dateOfDeath;
-	private String professionOrOccupation;
+	private String[] dateOfBirth;
+	private String[] dateOfDeath;
+	private Map<String, List<String>> professionOrOccupation;
 	
 	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";
 	@Override
@@ -28,11 +34,11 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	private String professionOrOccupation_jsonProp = "claims.P106.mainsnak.datavalue.value.id";
-
 	@Override
 	public String getProfessionOrOccupation_jsonProp() {
 		return professionOrOccupation_jsonProp;
 	}
+
 
 	@Override
 	public String getCountry() {
@@ -46,36 +52,34 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	@Override
-	public String getDateOfBirth() {
+	public String[] getDateOfBirth() {
 		return dateOfBirth;
 	}
 
 	@Override
-	public void setDateOfBirth(String setDateOfBirth) {
-		dateOfBirth = setDateOfBirth;
-		
+	public void setDateOfBirth(String[] dateOfBirth) {
+		this.dateOfBirth = dateOfBirth;
 	}
 
 	@Override
-	public String getDateOfDeath() {
+	public String[] getDateOfDeath() {
 		return dateOfDeath;
 	}
 
 	@Override
-	public void setDateOfDeath(String setDateOfDeath) {
-		dateOfDeath = setDateOfDeath;		
+	public void setDateOfDeath(String[] dateOfDeath) {
+		this.dateOfDeath = dateOfDeath;
 	}
 
 	@Override
-	public String getOccupation() {
-		
+	public Map<String, List<String>> getProfessionOrOccupation() {
 		return professionOrOccupation;
 	}
 
 	@Override
-	public void setOccupation(String setOccupation) {
-		professionOrOccupation = setOccupation;
-		
+	public void setProfessionOrOccupation(Map<String, List<String>> professionOrOccupation) {
+		this.professionOrOccupation = professionOrOccupation;
 	}
+
 
 }

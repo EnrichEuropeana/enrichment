@@ -1,13 +1,20 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import eu.europeana.enrichment.model.WikidataPlace;
 
 public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPlace {
 
+
+
 	private String country;
 	private String logo;
-	private float latitude;
-	private float longitude;
+	private Float latitude;
+	private Float longitude;
+
 	
 	private String country_jsonProp = "claims.P17.mainsnak.datavalue.value.id";
 	
@@ -35,6 +42,8 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	private String latitude_jsonProp = "claims.P625.mainsnak.datavalue.value.latitude";
 	private String longitude_jsonProp = "claims.P625.mainsnak.datavalue.value.longitude";
 
+	
+
 
 	@Override
 	public String getCountry() {
@@ -60,24 +69,26 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	}
 
 	@Override
-	public float getLatitude() {
+	public Float getLatitude() {
 		return latitude;
 	}
 
 	@Override
-	public void setLatitude(float setLatitude) {
+	public void setLatitude(Float setLatitude) {
 		latitude = setLatitude;
 	}
 
 	@Override
-	public float getLongitude() {
+	public Float getLongitude() {
 		return longitude;
 	}
 
 	@Override
-	public void setLongitude(float setLongitude) {
+	public void setLongitude(Float setLongitude) {
 		longitude = setLongitude;
 		
 	}
+
+
 
 }
