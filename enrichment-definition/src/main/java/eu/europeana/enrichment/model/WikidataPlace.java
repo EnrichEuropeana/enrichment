@@ -1,6 +1,8 @@
 package eu.europeana.enrichment.model;
 
-public interface WikidataPlace extends WikidataEntity{
+import java.util.Map;
+
+public interface WikidataPlace extends WikidataEntity {
 
 	/**
 	 * Retrieves Country for Place (i.e. json field: claims.P17.mainsnak.datavalue.value.id)
@@ -31,36 +33,7 @@ public interface WikidataPlace extends WikidataEntity{
 	 * @return
 	 */
 	public void setLogo(String setLogo);
-	
-	/**
-	 * Retrieves Latitude for Place (i.e. json field: claims.P625.mainsnak.datavalue.value.latitude)
-	 * 
-	 * @return
-	 */
-	public float getLatitude();
-	 
-	/**
-	 * Sets Latitude for Place
-	 * 
-	 * @param setLatitude
-	 * @return
-	 */
-	public void setLatitude(float setLatitude);
-	
-	/**
-	 * Retrieves Longitude for Place (i.e. json field: claims.P625.mainsnak.datavalue.value.longitude)
-	 * 
-	 * @return
-	 */
-	public float getLongitude();
-	 
-	/**
-	 * Sets Longitude for Place
-	 * 
-	 * @param setLongitude
-	 * @return
-	 */
-	public void setLongitude(float setLongitude);
+
 
 	String getCountry_jsonProp();
 
@@ -69,5 +42,15 @@ public interface WikidataPlace extends WikidataEntity{
 	String getLatitude_jsonProp();
 
 	String getLongitude_jsonProp();
+
+
+	Float getLatitude();
+
+	void setLatitude(Float setLatitude);
+
+	Float getLongitude();
+
+	void setLongitude(Float setLongitude);
+
 
 }

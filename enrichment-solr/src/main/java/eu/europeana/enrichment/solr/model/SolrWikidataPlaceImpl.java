@@ -8,6 +8,8 @@ import org.apache.solr.client.solrj.beans.Field;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
+import eu.europeana.entity.definitions.model.vocabulary.PlaceSolrFields;
+import eu.europeana.entity.solr.model.SolrUtils;
 
 public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {
 
@@ -19,7 +21,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		this.setEntityId(copy.getEntityId());
 		this.setInternalType(copy.getInternalType());
 		this.setModificationDate(copy.getModificationDate());
-		this.setPrefLabel(copy.getPrefLabel());
+		this.setPrefLabelStringMap(copy.getPrefLabelStringMap());
 		this.setSameAs(copy.getSameAs());
 		this.setLogo(copy.getLogo());
 		this.setLatitude(copy.getLatitude());
@@ -27,16 +29,21 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 	}
 	
 	@Override
-	@Field(EntitySolrFields.PREF_LABEL)
-	public void setPrefLabel(List<List<String>> prefLabel) {
-		super.setPrefLabel(prefLabel);
+	@Field(EntitySolrFields.PREF_LABEL_ALL)
+	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
+		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeStringMap(
+				EntitySolrFields.PREF_LABEL, prefLabel);
+		super.setPrefLabelStringMap(normalizedPrefLabel);
 	}
 
 	@Override
-	@Field(EntitySolrFields.ALT_LABEL)
-	public void setAltLabel(List<List<String>> altLabel) {
-		super.setAltLabel(altLabel);
+	@Field(EntitySolrFields.ALT_LABEL_ALL)
+	public void setAltLabel(Map<String, List<String>> altLabel) {
+		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(
+				EntitySolrFields.ALT_LABEL, altLabel);
+		super.setAltLabel(normalizedAltLabel);
 	}
+
 
 	@Override
 	@Field(EntitySolrFields.ID)
@@ -63,10 +70,11 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		
 	}
 
-	@Override
-	@Field(EntitySolrFields.DESCRIPTION)
-	public void setDescription(List<List<String>> description) {
-		super.setDescription(description);
+	@Field(EntitySolrFields.DC_DESCRIPTION_ALL)
+	public void setDescriptionsMap(Map<String, List<String>> dcDescription) {
+	    Map<String, String> normalizedDescription = SolrUtils.normalizeToStringMap(
+	    		EntitySolrFields.DC_DESCRIPTION, dcDescription);
+	    super.setDescription(normalizedDescription);
 	}
 
 	@Override
@@ -77,7 +85,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 
 	@Override
 	@Field(EntitySolrFields.SAME_AS)
-	public void setSameAs(List<List<String>> wikidataURLs) {
+	public void setSameAs(String[] wikidataURLs) {
 		super.setSameAs(wikidataURLs);		
 	}
 
@@ -87,19 +95,17 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 	public void setLogo(String setLogo) {
 		super.setLogo(setLogo);		
 	}
-
-
+	
 	@Override
 	@Field(EntitySolrFields.LATITUDE)
-	public void setLatitude(float setLatitude) {
-		super.setLatitude(setLatitude);
-	}
-
-
-	@Override
-	@Field(EntitySolrFields.LONGITUDE)
-	public void setLongitude(float setLongitude) {
-		super.setLongitude(setLongitude);		
+	public void setLatitude(Float latitude) {
+		super.setLatitude(latitude);
 	}
 	
+	@Override
+	@Field(EntitySolrFields.LONGITUDE)
+	public void setLongitude(Float longitude) {
+		super.setLongitude(longitude);
+	}
+
 }

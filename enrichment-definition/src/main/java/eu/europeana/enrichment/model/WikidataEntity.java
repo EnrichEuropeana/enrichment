@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This interface is a base for the objects related to the Wikidata IDs, i.e. the ones fould with
+ * This interface is a base for the objects related to the Wikidata IDs, i.e. the ones found with
  * the corresponding NER tool (those objects are: agent, place, and organization)
  * 
  * @author StevaneticS
@@ -17,25 +17,25 @@ public interface WikidataEntity {
 	 * Retrieves Preferable Label for the Entity (language,value)
 	 * format
 	 *  
-	 * @return A List<List<String>> for the Preferable Labels 
+	 * @return A Map<String, String> for the Preferable Labels 
 	 */
-	public List<List<String>> getPrefLabel();
+	public Map<String, String> getPrefLabelStringMap();
 
 	/**
 	 * Set Preferable Label for Entity
 	 * 
 	 * @param prefLabel
-	 *            A List<List<String>> for Preferable Label 
+	 *            A Map<String, String> for Preferable Label 
 	 */
-	public void setPrefLabel(List<List<String>> prefLabel);
+	void setPrefLabelStringMap (Map<String, String> prefLabel);
 
 	/**
 	 * Retrieves Alternative Label for Entity (language,value)
 	 * format
 	 * 
-	 * @return A List<List<String>> for Alternative Label 
+	 * @return A Map<String, List<String>> for Alternative Label 
 	 */
-	public List<List<String>> getAltLabel();
+	public Map<String, List<String>> getAltLabel();
 
 	/**
 	 * Set Alternative Label for Entity
@@ -43,7 +43,7 @@ public interface WikidataEntity {
 	 * @param altLabel
 	 *            A List<List<String>> for Alternative Label 
 	 */
-	public void setAltLabel(List<List<String>> altLabel);
+	public void setAltLabel(Map<String, List<String>> altLabel);
 
 	/**
 	 * Retrieves the ID of Entity (e.g. http://www.wikidata.org/entity/Q762)
@@ -105,17 +105,17 @@ public interface WikidataEntity {
 	 * Retrieves Description for Entity (language,value)
 	 * format
 	 *  
-	 * @return A List<List<String>> for the Description 
+	 * @return A Map<String, String> for the Description 
 	 */
-	public List<List<String>> getDescription();
+	public Map<String, String> getDescription();
 
 	/**
 	 * Set Description for Entity
 	 * 
 	 * @param description
-	 *            A List<List<String>> for Description 
+	 *            A Map<String, String> for Description 
 	 */
-	public void setDescription(List<List<String>> description);
+	public void setDescription(Map<String, String> description);
 		
 	/**
 	 * Retrieves the Wikidata links that represent the Entity in the format (site, url),
@@ -123,7 +123,7 @@ public interface WikidataEntity {
 	 * 
 	 * @return List<List<String>>
 	 */
-	public List<List<String>> getSameAs();
+	public String [] getSameAs();
 
 	
 	/**
@@ -132,7 +132,7 @@ public interface WikidataEntity {
 	 * 
 	 * @param wikidataURLs
 	 */
-	public void setSameAs(List<List<String>> wikidataURLs);
+	public void setSameAs(String [] wikidataURLs);
 	
 	/**
 	 * This method returns the json field from the wikidata json response which stores Modification Date for Entity
@@ -155,6 +155,8 @@ public interface WikidataEntity {
 	String getDescription_jsonProp();
 
 	String getSameAs_jsonProp();
+
+	
 
 
 }
