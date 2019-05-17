@@ -41,11 +41,11 @@
  			<artifactId>enrichment-ner</artifactId>
 		<version>${version.enrichmentAPI}</version>
 	</dependency>
-	<dependency>
+	<!-- dependency>
 		<groupId>eu.europeana.entity</groupId>
 		<artifactId>entity-solr</artifactId>
 		<version>${version.entityApi}</version>
-	</dependency>
+	</dependency-->
 	
 
 	

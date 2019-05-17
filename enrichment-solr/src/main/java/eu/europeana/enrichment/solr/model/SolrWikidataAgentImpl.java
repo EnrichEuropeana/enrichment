@@ -13,10 +13,11 @@ import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.entity.definitions.model.vocabulary.AgentSolrFields;
+import eu.europeana.enrichment.solr.commons.SolrUtils;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.OrganizationSolrFields;
-import eu.europeana.entity.solr.model.SolrUtils;
+import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
 
 public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{
 	
@@ -39,16 +40,26 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 	@Override
 	@Field(EntitySolrFields.PREF_LABEL_ALL)
 	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
-		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeStringMap(
-				EntitySolrFields.PREF_LABEL, prefLabel);
+		Map<String, String> normalizedPrefLabel = prefLabel;
+		if(prefLabel!=null && !prefLabel.isEmpty())
+		{		
+			//normalizedPrefLabel = SolrUtils.normalizeStringMap(EntitySolrFields.PREF_LABEL, prefLabel);
+			normalizedPrefLabel = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
+		}
 		super.setPrefLabelStringMap(normalizedPrefLabel);
 	}
 
 	@Override
 	@Field(EntitySolrFields.ALT_LABEL_ALL)
 	public void setAltLabel(Map<String, List<String>> altLabel) {
-		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(
-				EntitySolrFields.ALT_LABEL, altLabel);
+		
+		Map<String, List<String>> normalizedAltLabel = altLabel;
+		if(altLabel!=null && !altLabel.isEmpty())
+		{
+			normalizedAltLabel = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.ALT_LABEL+".", altLabel);
+			//normalizedAltLabel = SolrUtils.normalizeStringListMap(EntitySolrFields.ALT_LABEL, altLabel);
+		}
+				
 		super.setAltLabel(normalizedAltLabel);
 	}
 
@@ -81,8 +92,14 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 	@Override
 	@Field(EntitySolrFields.DC_DESCRIPTION_ALL)
 	public void setDescription(Map<String, String> dcDescription) {
-	    //Map<String, String> normalizedDescription = SolrUtils.normalizeToStringMap(EntitySolrFields.DC_DESCRIPTION, dcDescription);
-	    super.setDescription(dcDescription);
+		
+		Map<String, String> normalizedDescription = dcDescription;
+		if(dcDescription!=null && !dcDescription.isEmpty())
+		{
+			normalizedDescription = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
+			//normalizedDescription = SolrUtils.normalizeStringMap(EntitySolrFields.DC_DESCRIPTION, dcDescription);
+		}
+	    super.setDescription(normalizedDescription);
 	}
 
 	@Override
@@ -101,25 +118,34 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 	@Override
 	@Field(EntitySolrFields.DATE_OF_BIRTH_ALL)
 	public void setDateOfBirth(String[] dateOfBirth) {
-		String[] normalizedDateOfBirth = SolrUtils.normalizeStringList(
-				EntitySolrFields.DATE_OF_BIRTH_ALL, Arrays.asList(dateOfBirth));
+		String[] normalizedDateOfBirth = dateOfBirth;
+//		if(dateOfBirth!=null && dateOfBirth.length>0)
+//		{
+//				normalizedDateOfBirth = SolrUtils.normalizeStringList(EntitySolrFields.DATE_OF_BIRTH_ALL, Arrays.asList(dateOfBirth));
+//		}
 		super.setDateOfBirth(normalizedDateOfBirth);
 	}
 
 	@Override
 	@Field(EntitySolrFields.DATE_OF_DEATH_ALL)
 	public void setDateOfDeath(String[] dateOfDeath) {
-		String[] normalizedDateOfDeath = SolrUtils.normalizeStringList(
-				EntitySolrFields.DATE_OF_DEATH_ALL, Arrays.asList(dateOfDeath));
+		String[] normalizedDateOfDeath = dateOfDeath;
+//		if(dateOfDeath!=null && dateOfDeath.length>0)
+//		{
+//			normalizedDateOfDeath = SolrUtils.normalizeStringList(EntitySolrFields.DATE_OF_DEATH_ALL, Arrays.asList(dateOfDeath));
+//		}				
 		super.setDateOfDeath(normalizedDateOfDeath);
 	}
 
 
 	@Override
 	@Field(EntitySolrFields.PROFESSION_OR_OCCUPATION_ALL)
-	public void setProfessionOrOccupation(Map<String, List<String>> professionOrOccupation) {
-		Map<String, List<String>> normalizedProfessionOrOccupation = SolrUtils.normalizeStringListMap(
-				EntitySolrFields.PROFESSION_OR_OCCUPATION, professionOrOccupation);
+	public void setProfessionOrOccupation(String[] professionOrOccupation) {
+		String[] normalizedProfessionOrOccupation = professionOrOccupation;
+//		if(professionOrOccupation!=null && professionOrOccupation.length>0)
+//		{
+//			normalizedProfessionOrOccupation = SolrUtils.normalizeStringList(EntitySolrFields.PROFESSION_OR_OCCUPATION, Arrays.asList(professionOrOccupation));
+//		}				
 		super.setProfessionOrOccupation(normalizedProfessionOrOccupation);
 	}
 

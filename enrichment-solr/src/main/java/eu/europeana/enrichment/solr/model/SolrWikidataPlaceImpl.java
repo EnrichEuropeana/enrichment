@@ -7,9 +7,10 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
+import eu.europeana.enrichment.solr.commons.SolrUtils;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.PlaceSolrFields;
-import eu.europeana.entity.solr.model.SolrUtils;
+
 
 public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {
 
@@ -31,16 +32,25 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 	@Override
 	@Field(EntitySolrFields.PREF_LABEL_ALL)
 	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
-		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeStringMap(
-				EntitySolrFields.PREF_LABEL, prefLabel);
+		Map<String, String> normalizedPrefLabel = prefLabel;
+		if(prefLabel!=null && !prefLabel.isEmpty())
+		{		
+			//normalizedPrefLabel = SolrUtils.normalizeStringMap(EntitySolrFields.PREF_LABEL, prefLabel);
+			normalizedPrefLabel = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
+		}
 		super.setPrefLabelStringMap(normalizedPrefLabel);
 	}
 
 	@Override
 	@Field(EntitySolrFields.ALT_LABEL_ALL)
 	public void setAltLabel(Map<String, List<String>> altLabel) {
-		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(
-				EntitySolrFields.ALT_LABEL, altLabel);
+		Map<String, List<String>> normalizedAltLabel = altLabel;
+		if(altLabel!=null && !altLabel.isEmpty())
+		{
+			normalizedAltLabel = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.ALT_LABEL+".", altLabel);
+			//normalizedAltLabel = SolrUtils.normalizeStringListMap(EntitySolrFields.ALT_LABEL, altLabel);
+		}
+				
 		super.setAltLabel(normalizedAltLabel);
 	}
 
@@ -70,10 +80,15 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		
 	}
 
+	@Override
 	@Field(EntitySolrFields.DC_DESCRIPTION_ALL)
-	public void setDescriptionsMap(Map<String, List<String>> dcDescription) {
-	    Map<String, String> normalizedDescription = SolrUtils.normalizeToStringMap(
-	    		EntitySolrFields.DC_DESCRIPTION, dcDescription);
+	public void setDescription(Map<String, String> dcDescription) {
+		Map<String, String> normalizedDescription = dcDescription;
+		if(dcDescription!=null && !dcDescription.isEmpty())
+		{
+			normalizedDescription = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
+			//normalizedDescription = SolrUtils.normalizeStringMap(EntitySolrFields.DC_DESCRIPTION, dcDescription);
+		}
 	    super.setDescription(normalizedDescription);
 	}
 

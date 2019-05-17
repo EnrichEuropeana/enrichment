@@ -37,8 +37,8 @@ public interface WikidataAgent extends WikidataEntity {
 
 	void setDateOfDeath(String[] dateOfDeath);
 
-	Map<String, List<String>> getProfessionOrOccupation();
+	String[] getProfessionOrOccupation();
 
-	void setProfessionOrOccupation(Map<String, List<String>> professionOrOccupation);
+	void setProfessionOrOccupation(String[] professionOrOccupation);
 
 }
