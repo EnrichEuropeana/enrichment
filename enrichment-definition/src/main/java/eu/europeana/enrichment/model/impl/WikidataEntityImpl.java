@@ -10,10 +10,10 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	private String internalType;
 	private String entityId;
-	private List<List<String>> prefLabel;
-	private List<List<String>> altLabel;
-	private List<List<String>> description;	
-	private List<List<String>> sameAs;
+	private Map<String, String> prefLabel;
+	private Map<String, List<String>> altLabel;
+	private Map<String, String> description;	
+	private String [] sameAs;
 	private String depiction;
 	private String modificationDate;
 	
@@ -56,49 +56,43 @@ public class WikidataEntityImpl implements WikidataEntity {
 	private String sameAs_jsonProp = "sitelinks.*.url";
 	
 	@Override
-	public List<List<String>> getPrefLabel() {
+	public Map<String, String> getPrefLabelStringMap() {
 		return prefLabel;
 	}
 
 	@Override
-	public void setPrefLabel(List<List<String>> prefLabelArg) {
-		prefLabel = prefLabelArg;
+	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
+		this.prefLabel = prefLabel;
 	}
 
 	@Override
-	public List<List<String>> getAltLabel() {
-		
+	public Map<String, List<String>> getAltLabel() {
 		return altLabel;
 	}
 
 	@Override
-	public void setAltLabel(List<List<String>> altLabelArg) {
-		
-		altLabel = altLabelArg;
-		
+	public void setAltLabel(Map<String, List<String>> altLab) {
+		this.altLabel = altLab;
 	}
 
 	@Override
 	public String getEntityId() {
-		
 		return entityId;
 	}
 
 	@Override
-	public void setEntityId(String enitityIdArg) {
-		entityId = enitityIdArg;		
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
 	}
 
 	@Override
 	public String getInternalType() {
-		
 		return internalType;
 	}
 
 	@Override
-	public void setInternalType(String entityType) {
-		internalType = entityType;
-		
+	public void setInternalType(String internalType) {
+		this.internalType = internalType;
 	}
 
 	@Override
@@ -115,37 +109,32 @@ public class WikidataEntityImpl implements WikidataEntity {
 
 	@Override
 	public String getDepiction() {
-		
 		return depiction;
 	}
-
+	
 	@Override
-	public void setDepiction(String depictionArg) {
-		depiction = depictionArg;
-		
+	public void setDepiction(String depiction) {
+		this.depiction = depiction;
 	}
 
 	@Override
-	public List<List<String>> getDescription() {
-		
+	public Map<String, String> getDescription() {
 		return description;
 	}
 
 	@Override
-	public void setDescription(List<List<String>> descriptionArg) {
-		description = descriptionArg;
-		
+	public void setDescription(Map<String, String> desc) {
+	    	this.description = desc;
 	}
 
 	@Override
-	public List<List<String>> getSameAs() {
-		
+	public String[] getSameAs() {
 		return sameAs;
 	}
 
 	@Override
-	public void setSameAs(List<List<String>> wikidataURLs) {
-		sameAs = wikidataURLs;		
+	public void setSameAs(String[] sameAs) {
+		this.sameAs = sameAs;
 	}
 
 	

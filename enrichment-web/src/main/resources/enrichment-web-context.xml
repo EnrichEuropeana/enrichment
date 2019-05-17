@@ -57,7 +57,7 @@
 	</beans:bean >
 	
 	<beans:bean  id="solrEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl" >
-		<!--beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/-->
+		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
 	</beans:bean >
 	
 	<beans:bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
