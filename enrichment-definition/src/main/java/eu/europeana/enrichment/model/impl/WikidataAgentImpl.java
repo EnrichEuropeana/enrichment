@@ -13,7 +13,7 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	private String country;
 	private String[] dateOfBirth;
 	private String[] dateOfDeath;
-	private Map<String, List<String>> professionOrOccupation;
+	private String[] professionOrOccupation;
 	
 	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";
 	@Override
@@ -72,12 +72,12 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	@Override
-	public Map<String, List<String>> getProfessionOrOccupation() {
+	public String[] getProfessionOrOccupation() {
 		return professionOrOccupation;
 	}
 
 	@Override
-	public void setProfessionOrOccupation(Map<String, List<String>> professionOrOccupation) {
+	public void setProfessionOrOccupation(String[] professionOrOccupation) {
 		this.professionOrOccupation = professionOrOccupation;
 	}
 

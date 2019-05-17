@@ -142,7 +142,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 	}
 
-	/*
+	
 	public SolrEntityPositionsServiceImpl(String translatedEntities) {
 		
 		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");
@@ -166,7 +166,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		}
 
 	}
-	*/
+	
 
 	@Override
 	public int findTermPositionsInStory(String term, int startAfterOffset, int offsetTranslatedText, int rangeToObserve) throws Exception {

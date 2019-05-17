@@ -133,8 +133,12 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
-				Map<String,List<String>> occupationMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-				newWikidataAgent.setProfessionOrOccupation(occupationMap);
+				String [] occupationArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					occupationArray[i]=jsonElement.get(i).get(0);
+				}				
+				newWikidataAgent.setProfessionOrOccupation(occupationArray);
 			}
 			
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());

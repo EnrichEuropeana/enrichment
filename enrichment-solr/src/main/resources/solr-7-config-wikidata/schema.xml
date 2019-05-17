@@ -41,23 +41,77 @@
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
   
   <field name="wikidata_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  
   <field name="internal_type" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="modified" type="string" multiValued="false" indexed="false" required="false" stored="true"/>
-  <field name="skos_prefLabel" type="proper_name" indexed="false" stored="true" multiValued="true"/> 
-  <field name="skos_altLabel" type="proper_name" indexed="false" stored="true" multiValued="true"/> 
-  <field name="foaf_depiction" type="string" indexed="false" stored="true" multiValued="true"/> 
-  <field name="dc_description" type="string" indexed="false" stored="true" multiValued="true"/> 
+  
+  <field name="modified" type="string" multiValued="false" indexed="false" required="false" stored="true"/>  
+  
+  <field name="label" type="proper_name" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="label.*" type="proper_name" indexed="true" stored="true" multiValued="true"/>
+
+  <field name="skos_prefLabel" type="proper_name" indexed="false" stored="true" multiValued="true"/>
+  <dynamicField name="skos_prefLabel.*" type="string" indexed="false" stored="true" multiValued="false"/>
+  <copyField source="skos_prefLabel.*" dest="label" />
+  <copyField source="skos_prefLabel.*" dest="label.*" />
+  <copyField source="skos_prefLabel.*" dest="text.*" />
+  <copyField source="skos_prefLabel.*" dest="text" />
+    
+  <field name="skos_altLabel" type="proper_name" indexed="false" stored="true" multiValued="true"/>	
+  <dynamicField name="skos_altLabel*" type="string" indexed="false" stored="true" multiValued="true"/> 
+  <copyField source="skos_altLabel.*" dest="label" />
+  <copyField source="skos_altLabel.*" dest="label.*" />
+  <copyField source="skos_altLabel.*" dest="text.*" />
+  <copyField source="skos_altLabel.*" dest="text" />  
+  
+  <field name="foaf_depiction" type="string" indexed="false" stored="true" multiValued="true"/>
+  
+  <dynamicField name="dc_description.*" type="string" indexed="false" stored="true"/>
+  <copyField source="dc_description.*" dest="text.*" />
+  <copyField source="dc_description.*" dest="text" />
+  
   <field name="rdagr2_dateOfBirth" type="string" indexed="false" stored="true" multiValued="true"/>  
+  <dynamicField name="rdagr2_dateOfBirth.*" type="string" indexed="false" stored="true" multiValued="false"/>
+  <copyField source="rdagr2_dateOfBirth.*" dest="rdagr2_dateOfBirth" />
+  <!--  BEGIN FIELD -->
+  <field name="begin" type="string" indexed="true" stored="false" multiValued="true" />
+  <!--  Index all begin related dates -->
+  <copyField source="rdagr2_dateOfBirth.*" dest="begin" />
+  
+  <dynamicField name="rdagr2_dateOfDeath.*" type="string" indexed="false" stored="true" multiValued="false"/>
   <field name="rdagr2_dateOfDeath" type="string" indexed="false" stored="true" multiValued="true"/>
+  <copyField source="rdagr2_dateOfDeath.*" dest="rdagr2_dateOfDeath"/>
+  <!--  END FIELD -->
+  <!-- search field -->
+  <field name="end" type="string" indexed="true" stored="false" multiValued="true" />
+  <copyField source="rdagr2_dateOfDeath.*" dest="end" />
+  
+  <dynamicField name="rdagr2_professionOrOccupation.*" type="text" indexed="false" stored="true" multiValued="true"/>
   <field name="rdagr2_professionOrOccupation" type="text" indexed="true" stored="true" multiValued="true"/>
+  <!-- URI only -->
+  <field name="professionOrOccupation.uri" type="string" indexed="true" stored="true" multiValued="true"/>
+  <copyField source="rdagr2_professionOrOccupation." dest="professionOrOccupation.uri" />
+  <!--  alias for localized search -->
+  <dynamicField name="professionOrOccupation.*" type="text" indexed="true" stored="true" multiValued="true" />
+  <copyField source="rdagr2_professionOrOccupation.*" dest="professionOrOccupation.*" />
+  <!-- alias for general search  -->
+  <field name="professionOrOccupation" type="text" indexed="true" stored="false" multiValued="true" />
+  <copyField source="rdagr2_professionOrOccupation.*" dest="professionOrOccupation" />
+  <copyField source="rdagr2_professionOrOccupation.*" dest="text.*" />
+  <copyField source="rdagr2_professionOrOccupation.*" dest="text" />
+    
   <field name="country" type="string" indexed="true" stored="true" multiValued="false"/>
+  
   <field name="owl_sameAs" type="string" indexed="false" stored="true" multiValued="true"/>	
+  <field name="coref" type="string" indexed="true" stored="true" multiValued="true"/>
+  <copyField source="owl_sameAs" dest="coref"/>
+  
   <field name="foaf_logo" type="string" indexed="false" stored="true" multiValued="false" />
+  
   <field name="wgs84_pos_lat" type="float" indexed="false" stored="true" multiValued="false"/>
+  
   <field name="wgs84_pos_long" type="float" indexed="false" stored="true" multiValued="false"/>
   
-  <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
- 
+  <field name="text" type="text" multiValued="true" indexed="true" stored="true"/> 
   <dynamicField name="text.*" type="text" multiValued="true" indexed="true" stored="false"/>
 
 </schema>
