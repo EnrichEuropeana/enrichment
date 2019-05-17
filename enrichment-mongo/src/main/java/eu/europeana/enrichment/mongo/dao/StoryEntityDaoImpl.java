@@ -7,6 +7,7 @@ import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 
 public class StoryEntityDaoImpl implements StoryEntityDao{
@@ -34,17 +35,24 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 		StoryEntity dbStoryEntity = findStoryEntity(entity.getStoryId());
 		if(dbStoryEntity!=null)
 		{
-			dbStoryEntity.setStoryDescription(entity.getStoryDescription());
-			dbStoryEntity.setStoryLanguage(entity.getStoryLanguage());
-			dbStoryEntity.setStorySource(entity.getStorySource());
-			dbStoryEntity.setStorySummary(entity.getStorySummary());
-			dbStoryEntity.setStoryTitle(entity.getStoryTitle());
-			dbStoryEntity.setStoryTranscription(entity.getStoryTranscription());
+			dbStoryEntity.setDescription(entity.getDescription());
+			dbStoryEntity.setLanguage(entity.getLanguage());
+			dbStoryEntity.setSource(entity.getSource());
+			dbStoryEntity.setSummary(entity.getSummary());
+			dbStoryEntity.setTitle(entity.getTitle());
+			dbStoryEntity.setTranscription(entity.getTranscription());
 			this.datastore.save(dbStoryEntity);
 		}
 		else
 		{
-			this.datastore.save(entity);
+			DBStoryEntityImpl tmp = null;
+			if(entity instanceof DBStoryEntityImpl)
+				tmp = (DBStoryEntityImpl) entity;
+			else {
+				tmp = new DBStoryEntityImpl(entity);
+			}
+			if(tmp != null)
+				this.datastore.save(tmp);
 		}
 	}
 

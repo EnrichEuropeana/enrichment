@@ -13,22 +13,22 @@ public interface StoryEntity {
 	String getStoryId();
 	void setStoryId(String storyId);
 	
-	String getStoryTitle();
-	void setStoryTitle(String storyTitle);
+	String getTitle();
+	void setTitle(String storyTitle);
 	
-	String getStorySource();
-	void setStorySource(String storySource);
+	String getSource();
+	void setSource(String storySource);
 
-	String getStoryDescription();
-	void setStoryDescription(String storyDescription);
+	String getDescription();
+	void setDescription(String storyDescription);
 
-	String getStorySummary();
-	void setStorySummary(String storySummary);
+	String getSummary();
+	void setSummary(String storySummary);
 	
-	String getStoryLanguage();
-	void setStoryLanguage(String storyLanguage);
+	String getLanguage();
+	void setLanguage(String storyLanguage);
 
-	String getStoryTranscription();
-	void setStoryTranscription(String storyTranscription);
+	String getTranscription();
+	void setTranscription(String storyTranscription);
 	
 }

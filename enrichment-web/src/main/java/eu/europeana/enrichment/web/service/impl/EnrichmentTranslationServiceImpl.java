@@ -84,9 +84,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					return dbTranslationEntity.getTranslatedText();
 				
 				if((originalText == null || originalText.isEmpty()) && 
-						!(dbStoryEntity.getStoryTranscription() == null || dbStoryEntity.getStoryTranscription().isEmpty())) {
+						!(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
 					// Reuse of dbItemEntity text if original text is not given
-					originalText = dbStoryEntity.getStoryTranscription();
+					originalText = dbStoryEntity.getTranscription();
 				}
 			
 			}

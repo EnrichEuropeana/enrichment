@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
@@ -86,7 +86,7 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody DBStoryEntityImpl [] stories) throws HttpException {
+			@RequestBody StoryEntityImpl [] stories) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -118,7 +118,7 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody DBItemEntityImpl [] items) throws HttpException {
+			@RequestBody ItemEntityImpl [] items) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);

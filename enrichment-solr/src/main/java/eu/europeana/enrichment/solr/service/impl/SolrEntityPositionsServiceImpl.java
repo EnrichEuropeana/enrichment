@@ -908,7 +908,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * if the original language is the same as the target language, add positions in the original text
 		 * to be the same as in the translated text
 		 */
-		if(dbStoryEntity.getStoryLanguage().compareTo(targetLanguage)==0)
+		if(dbStoryEntity.getLanguage().compareTo(targetLanguage)==0)
 		{			
 			for (String classificationType : identifiedNER.keySet()) {
 				for (List<String> entityList : identifiedNER.get(classificationType)) {
@@ -924,9 +924,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 */
 		store(solrCore, dbStoryEntity, true);
 		
-		storyOriginalText=dbStoryEntity.getStoryTranscription();
+		storyOriginalText=dbStoryEntity.getTranscription();
 		storyTranslatedText=translatedText;
-		storyOriginalLanguage=dbStoryEntity.getStoryLanguage();
+		storyOriginalLanguage=dbStoryEntity.getLanguage();
 		storyTranslatedLanguage=targetLanguage;
 		storyIdSolr=dbStoryEntity.getStoryId();
 		fuzzyLogicSolr=fuzzyLogic;		

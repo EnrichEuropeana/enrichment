@@ -107,8 +107,14 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void saveNamedEntity(NamedEntity entity) {
-		//TODO: update
-		this.datastore.save(entity);
+		DBNamedEntityImpl tmp = null;
+		if(entity instanceof DBNamedEntityImpl)
+			tmp = (DBNamedEntityImpl) entity;
+		else {
+			tmp = new DBNamedEntityImpl(entity);
+		}
+		if(tmp != null)
+			this.datastore.save(tmp);
 	}
 
 	@Override
@@ -123,7 +129,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void deleteAllNamedEntities() {
-		datastore.delete(datastore.find(NamedEntityImpl.class));		
+		datastore.delete(datastore.find(DBNamedEntityImpl.class));		
 	}
 
 	

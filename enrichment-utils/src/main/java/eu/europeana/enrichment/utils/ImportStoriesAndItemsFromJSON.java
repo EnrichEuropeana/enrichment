@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.web.service;
+package eu.europeana.enrichment.utils;
 
 import static org.junit.Assert.*;
 import java.util.List;
@@ -15,6 +15,7 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
+import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config-book-dumitru.xml")
