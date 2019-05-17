@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.web.service;
+package eu.europeana.enrichment.utils;
 
 import static org.junit.Assert.*;
 
@@ -37,6 +37,7 @@ import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
+import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config-book-dumitru.xml")

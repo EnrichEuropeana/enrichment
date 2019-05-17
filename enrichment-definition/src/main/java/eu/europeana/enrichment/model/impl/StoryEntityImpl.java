@@ -31,64 +31,64 @@ public class StoryEntityImpl implements StoryEntity {
 	}
 
 	@Override
-	public String getStoryTitle() {
+	public String getTitle() {
 		return title;
 	}
 
 	@Override
-	public void setStoryTitle(String storyTitle) {
+	public void setTitle(String storyTitle) {
 		this.title=storyTitle;
 		
 	}
 
 	@Override
-	public String getStorySource() {
+	public String getSource() {
 		return source;
 	}
 
 	@Override
-	public void setStorySource(String storySource) {
+	public void setSource(String storySource) {
 		this.source=storySource;		
 	}
 
 	@Override
-	public String getStoryDescription() {
+	public String getDescription() {
 		return description;
 	}
 
 	@Override
-	public void setStoryDescription(String storyDescription) {
-		this.description=storyDescription;
+	public void setDescription(String description) {
+		this.description=description;
 	}
 
 	@Override
-	public String getStorySummary() {
+	public String getSummary() {
 		return summary;
 	}
 
 	@Override
-	public void setStorySummary(String storySummary) {
+	public void setSummary(String storySummary) {
 		this.summary=storySummary;
 		
 	}
 
 	@Override
-	public String getStoryLanguage() {
+	public String getLanguage() {
 		return language;
 	}
 
 	@Override
-	public void setStoryLanguage(String storyLanguage) {
+	public void setLanguage(String storyLanguage) {
 		this.language=storyLanguage;
 	}
 
 	@Override
-	public String getStoryTranscription() {
+	public String getTranscription() {
 		return transcriptionText;
 	}
 
 	@Override
-	public void setStoryTranscription(String storyTranscription) {
+	public void setTranscription(String storyTranscription) {
 		this.transcriptionText=storyTranscription;
 	}
 

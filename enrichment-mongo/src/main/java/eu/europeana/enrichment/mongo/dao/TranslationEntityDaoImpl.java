@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -10,6 +12,7 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
@@ -61,7 +64,19 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void saveTranslationEntity(TranslationEntity entity) {
-		this.datastore.save(entity);
+		DBTranslationEntityImpl tmp = null;
+		if(entity instanceof DBTranslationEntityImpl)
+			tmp = (DBTranslationEntityImpl) entity;
+		else {
+			try {
+				tmp = new DBTranslationEntityImpl(entity);
+			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(tmp != null)
+			this.datastore.save(tmp);
 	}
 
 	@Override

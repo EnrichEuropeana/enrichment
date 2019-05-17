@@ -4,11 +4,6 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-<<<<<<< HEAD
-=======
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
-//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
->>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -44,7 +39,7 @@ public interface NERService {
 		
 		String text;
 		if(storyEntity != null)
-			text = storyEntity.getStoryTranscription();
+			text = storyEntity.getTranscription();
 		else if(translationEntity != null)
 			text = translationEntity.getTranslatedText();
 		else {

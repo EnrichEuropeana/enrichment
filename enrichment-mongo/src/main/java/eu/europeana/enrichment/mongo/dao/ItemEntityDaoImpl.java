@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class ItemEntityDaoImpl implements ItemEntityDao{
 
@@ -23,7 +26,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		this.datastore = datastore;
 	}
 	
-	private void addAdditionalInformation(DBItemEntityImpl dbEntity) {
+	private void addAdditionalInformation(ItemEntity dbEntity) {
 		StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
 		dbEntity.setStoryEntity(dbStoryEntity);
 	}
@@ -70,7 +73,19 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		}
 		else
 		{
-			this.datastore.save(entity);
+			DBItemEntityImpl tmp = null;
+			if(entity instanceof DBItemEntityImpl)
+				tmp = (DBItemEntityImpl) entity;
+			else {
+				try {
+					tmp = new DBItemEntityImpl(entity);
+				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(tmp != null)
+				this.datastore.save(tmp);
 		}
 	}
 

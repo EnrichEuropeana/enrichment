@@ -1,9 +1,5 @@
 package eu.europeana.enrichment.web.service.impl;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +16,7 @@ import org.json.JSONObject;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -106,6 +103,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
+		//TODO: add if description or summary or transcription or items
+		
 		List<String> tools = requestParam.getNERTools();
 		List<String> linking = requestParam.getLinking();
 		String translationTool = requestParam.getTranslationTool();
@@ -169,7 +168,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage);
 			String text = "";
 			if(dbTranslationEntity!=null) text = dbTranslationEntity.getTranslatedText();
-			else text = dbStoryEntity.getStoryTranscription();
+			else text = dbStoryEntity.getTranscription();
 			
 			/*
 			 * Get all named entities
@@ -229,7 +228,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					/*
 					 * Add linking information to named entity
 					 */
-					nerLinkingService.addLinkingInformation(dbEntity, linking, dbStoryEntity.getStoryLanguage());
+					nerLinkingService.addLinkingInformation(dbEntity, linking, dbStoryEntity.getLanguage());
 				}
 			}
 		}
@@ -340,7 +339,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 	private void findStoryEntitiesFromIds(String storyId, List<StoryEntity> result) throws HttpException {
 				
-		if((storyId == null || storyId.isEmpty()))
+		if(storyId == null || storyId.isEmpty())
 		{
 			String params = String.join(",", EnrichmentNERRequest.PARAM_STORY_ID, EnrichmentNERRequest.PARAM_STORY_ITEM_IDS);
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, params, null);
@@ -354,22 +353,22 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String uploadStories(DBStoryEntityImpl[] stories) throws HttpException {
+	public String uploadStories(StoryEntity[] stories) throws HttpException {
 		
-		for (DBStoryEntityImpl story : stories) {
+		for (StoryEntity story : stories) {
 			if(story.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
-			if(story.getStoryDescription() == null)
+			if(story.getDescription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_DESCRIPTION, null);
-			if(story.getStoryLanguage() == null)
+			if(story.getLanguage() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_LANGUAGE, null);
-			if(story.getStorySource() == null)
+			if(story.getSource() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SOURCE, null);
-			if(story.getStorySummary() == null)
+			if(story.getSummary() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SUMMARY, null);
-			if(story.getStoryTitle() == null)
+			if(story.getTitle() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TITLE, null);
-			if(story.getStoryTranscription() == null)
+			if(story.getTranscription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_TRANSCRIPTION, null);
 
 			persistentStoryEntityService.saveStoryEntity(story);
@@ -379,9 +378,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String uploadItems(DBItemEntityImpl[] items) throws HttpException {
+	public String uploadItems(ItemEntity[] items) throws HttpException {
 		
-		for (DBItemEntityImpl item : items) {
+		for (ItemEntity item : items) {
 			if(item.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
 			if(item.getLanguage() == null)
@@ -400,5 +399,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 		}
 		return "Done!";
+	}
+
+	@Override
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

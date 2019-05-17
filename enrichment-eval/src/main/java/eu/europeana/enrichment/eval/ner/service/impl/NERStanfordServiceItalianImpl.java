@@ -68,7 +68,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException {
 		
 		
 		  // Use for example a text in a String text = "I topi non avevano nipoti. Il mio nome è Nicolo Rossi. Il mio nome è Massimo Pietro."; 
@@ -103,7 +103,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		 * e.printStackTrace(); }
 		 */	
 		
-		return null;
+		return map;
 	}
 	
 	/*

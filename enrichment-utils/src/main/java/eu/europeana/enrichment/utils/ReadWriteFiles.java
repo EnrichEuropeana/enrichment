@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.web.service;
+package eu.europeana.enrichment.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -211,8 +211,7 @@ public class ReadWriteFiles {
 	    	europeanaJavaPDFWriter.writeFormatedPDF(outputFormatedPDFOriginal, originalText, NERNamedEntities, 1);
 	    }
 	}
-	
-<<<<<<< HEAD
+
 	@SuppressWarnings("unchecked")
 	public void readStoriesAndItemsFromJson () {
 		
@@ -292,10 +291,7 @@ public class ReadWriteFiles {
 				String itemLanguage = (String)items.get(i).get("language");
 				if(itemLanguage==null) itemLanguage="";
 				String itemTranscription = (String)items.get(i).get("transcription");				
-=======
->>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 
-<<<<<<< HEAD
 //				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
 //				{
 					
@@ -368,7 +364,5 @@ public class ReadWriteFiles {
 		
 		
 	}
-=======
->>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 	
 }

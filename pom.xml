@@ -91,7 +91,8 @@
     <module>enrichment-solr</module>
     <module>enrichment-solr-positions-highlighter</module>
     <module>enrichment-eval</module>
-  </modules>
+    <module>enrichment-utils</module>
+	</modules>
 
 	<build>
 		<!-- configure source and output locations -->
