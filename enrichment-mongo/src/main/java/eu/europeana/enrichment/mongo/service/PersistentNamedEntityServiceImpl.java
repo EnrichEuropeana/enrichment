@@ -43,5 +43,10 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	public void deleteNamedEntity(NamedEntity entity) {
 		namedEntityDao.deleteNamedEntity(entity);
 	}
+	@Override
+	public void deleteAllNamedEntities() {
+		namedEntityDao.deleteAllNamedEntities();
+		
+	}
 
 }

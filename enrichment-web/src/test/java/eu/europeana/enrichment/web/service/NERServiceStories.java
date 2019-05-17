@@ -11,6 +11,8 @@ import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -64,20 +66,35 @@ public class NERServiceStories {
 	@Resource(name = "solrEntityService")
 	SolrEntityPositionsService solrEntityService;
 
+	Logger logger = LogManager.getLogger(getClass());
 	
 	@Test
 	public void test() throws Exception {
-		
+
+/*		
 		//deleting all NamedEntities in the db so that we do not get the saved one if we update the input .txt file
 		List<NamedEntity> all_named_entities= persistentNamedEntityService.getAllNamedEntities();
+		int num=0;
 		if(all_named_entities!=null)
 		{
 			for(NamedEntity named_entity : all_named_entities) {
+				num++;
+				logger.info("NamedEntity to be deleted: " + String.valueOf(num));
 				persistentNamedEntityService.deleteNamedEntity(named_entity);
+				
 			}
 		}
+*/
 		
-		List<StoryEntity> dbStoryEntities = persistentStoryEntityService.getAllStoryEntities();				
+		persistentNamedEntityService.deleteAllNamedEntities();
+		
+		List<StoryEntity> dbStoryEntities = persistentStoryEntityService.getAllStoryEntities();
+		
+		/*
+		List<StoryEntity> dbStoryEntities = new ArrayList<StoryEntity>();
+		dbStoryEntities.add(persistentStoryEntityService.findStoryEntity("5037"));
+		*/
+		
 		if(dbStoryEntities!=null)
 		{
 			for(StoryEntity story : dbStoryEntities) {
@@ -90,6 +107,7 @@ public class NERServiceStories {
 					/*
 					 * delete all named entities for the previous story
 					 */
+					/*
 					all_named_entities= persistentNamedEntityService.getAllNamedEntities();
 					if(all_named_entities!=null)
 					{
@@ -97,6 +115,8 @@ public class NERServiceStories {
 							persistentNamedEntityService.deleteNamedEntity(named_entity);
 						}
 					}
+					*/
+					persistentNamedEntityService.deleteAllNamedEntities();
 	
 					
 					List<String> linkingTools = Arrays.asList("Wikidata");

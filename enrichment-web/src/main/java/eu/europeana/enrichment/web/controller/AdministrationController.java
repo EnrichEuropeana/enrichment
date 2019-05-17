@@ -34,6 +34,43 @@ public class AdministrationController extends BaseRest {
 	EnrichmentTranslationService enrichmentTranslationService;
 	
 	/*
+	 * This method represents the /administration/uploadStoriesAndItemsFromJson end point,
+	 * where a request with 2 json files (one for stories and one for items) to be read and 
+	 * saved to the database is sent
+	 * 
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey						is the application key which is required
+	 * 
+	 * @param jsonFileStoriesPath		the path to the json file for stories
+	 * 
+	 * @param jsonFileItemsPath		    the path to the json file for items
+	 * 
+	 * @return							"Done" if everything ok
+	 */
+	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson")
+	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadStories(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
+			@RequestParam(value = "jsonFileItems", required = true) String jsonItems
+			) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String uploadStoriesStatus = enrichmentNerService.readStoriesAndItemsFromJson(jsonStories, jsonItems);
+			
+			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
+		
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}	
+	}
+	
+	/*
 	 * This method represents the /administration/uploadStories end point,
 	 * where a request with an array of StoryEntity to be saved to the database is sent
 	 * All requests on this end point are processed here.

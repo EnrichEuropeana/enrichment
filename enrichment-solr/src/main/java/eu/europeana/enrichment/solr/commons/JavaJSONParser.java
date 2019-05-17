@@ -28,7 +28,10 @@ public class JavaJSONParser {
 	@SuppressWarnings({ "unchecked", "serial" })
 	public void getPositionsFromJSON(QueryResponse response, List<String> terms, List<Double> positions, List<List<Double>> offsets) throws ParseException {
 				
-		String jsonResponse = gson.toJson(response.getResponse()); 
+		if(response==null) return; 
+				
+		String jsonResponse = gson.toJson(response.getResponse());
+
 		
 //		Map<String, Object> retMap = new Gson().fromJson(
 //				jsonResponse, new TypeToken<HashMap<String, Object>>() {}.getType()

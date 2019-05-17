@@ -62,5 +62,11 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 
 		return translation.getTranslatedText();
 	}
+
+	@Override
+	public void eTranslationResponse(String targetLanguage, String translatedText, String requestId,
+			String externalReference) {
+				
+	}
 	
 }

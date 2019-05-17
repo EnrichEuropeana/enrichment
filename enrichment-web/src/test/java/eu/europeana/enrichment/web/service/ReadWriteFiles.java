@@ -38,14 +38,14 @@ public class ReadWriteFiles {
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
 
-	@Resource
-	EnrichmentNERService enrichmentNerService;
+//	@Resource
+//	EnrichmentNERService enrichmentNerService;
 
 	@Resource(name= "europeanaJavaPDFWriter")
 	JavaPDFWriter europeanaJavaPDFWriter;
 	
-	@Resource(name = "javaJSONParser")
-	JavaJSONParser javaJSONParser;
+//	@Resource(name = "javaJSONParser")
+//	JavaJSONParser javaJSONParser;
 
 	private String translatedText;
 	private String originalText;
@@ -63,6 +63,14 @@ public class ReadWriteFiles {
 	private String outputFormatedPDFOriginal;
 	
 	private String jsonStories;
+	public String getJsonStories() {
+		return jsonStories;
+	}
+
+	public String getJsonItems() {
+		return jsonItems;
+	}
+
 	private String jsonItems;
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -204,6 +212,7 @@ public class ReadWriteFiles {
 	    }
 	}
 	
+<<<<<<< HEAD
 	@SuppressWarnings("unchecked")
 	public void readStoriesAndItemsFromJson () {
 		
@@ -283,7 +292,10 @@ public class ReadWriteFiles {
 				String itemLanguage = (String)items.get(i).get("language");
 				if(itemLanguage==null) itemLanguage="";
 				String itemTranscription = (String)items.get(i).get("transcription");				
+=======
+>>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 
+<<<<<<< HEAD
 //				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
 //				{
 					
@@ -356,5 +368,7 @@ public class ReadWriteFiles {
 		
 		
 	}
+=======
+>>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 	
 }

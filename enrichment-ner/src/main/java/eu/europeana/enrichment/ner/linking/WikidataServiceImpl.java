@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import net.arnx.jsonic.JSONException;
+//import net.arnx.jsonic.JSONException;
 
 public class WikidataServiceImpl implements WikidataService {
 	
@@ -205,9 +205,9 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
+	public List<List<String>> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
 		
-		List<String> result = new ArrayList<String>();
+		List<List<String>> result = new ArrayList<List<String>>();
 		JSONObject responseJson = new JSONObject(WikidataJSON);
 		JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
 		Iterator<String> entitiesIterator = responseJsonEntities.keys();
@@ -223,24 +223,87 @@ public class WikidataServiceImpl implements WikidataService {
 		
 	}
 
-	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<String> result)
+	/**
+	 * This function is a recursive implementation that enables taking a specific JSON field
+	 * from the obtained Wikidata json response, containing both plain JSONObject but also 
+	 * JSONArray json elements.
+	 * 
+	 * @param jsonElement
+	 * @param field
+	 * @param result
+	 */
+	
+	private void analyseJSONFieldFromWikidataJSON (Object jsonElement, String field, List<List<String>> result)
 	{
 		String[] fieldParts = field.split("\\.");
 		
 		if(fieldParts.length==1)
 		{
-			JSONObject obj = (JSONObject) jsonElement;
-			result.add(obj.getString(fieldParts[0]));
-			return;
+			if(jsonElement instanceof JSONObject)
+			{
+				JSONObject obj = (JSONObject) jsonElement;			
+				if(fieldParts[0].compareTo("*")==0)
+				{
+					Iterator<String> allJsonElementsIterator = obj.keys();
+					List<String> toAddList = new ArrayList<String>();
+					while(allJsonElementsIterator.hasNext())
+					{
+						String jsonElementKey = allJsonElementsIterator.next();					
+						//toAddList.add(obj.getString(jsonElementKey));
+						toAddList.add(obj.get(jsonElementKey).toString());
+					}
+					result.add(toAddList);
+				}
+				else
+				{
+					List<String> toAddList = new ArrayList<String>();
+					//toAddList.add(obj.getString(fieldParts[0]));
+					toAddList.add(obj.get(fieldParts[0]).toString());
+					result.add(toAddList);
+				}
+				
+				return;
+				
+			}
+			else if(jsonElement instanceof JSONArray)
+			{
+				JSONArray array = (JSONArray) jsonElement;
+				for(int i=0;i<array.length();i++)
+				{
+					analyseJSONFieldFromWikidataJSON(array.get(i),field, result);
+				}
+			}	
+			else
+			{
+				logger.error("The analysed Wikidata JSON element: " + fieldParts[0] + " in the JSON field: " + field  + " contains some element which is niether JSON object nor JSONArray!");
+			}
+			
 		}
+		
 		
 		if(jsonElement instanceof JSONObject)
 		{
 			JSONObject obj = (JSONObject) jsonElement;
-			if(obj.has(fieldParts[0]))
+			String [] newField = field.split("\\.",2);
+			
+			//take all elements of the given json element
+			if(fieldParts[0].compareTo("*")==0)
 			{
-				String [] newField = field.split("\\.",2);
+				Iterator<String> allJsonElementsIterator = obj.keys();
+				while(allJsonElementsIterator.hasNext())
+				{
+					String jsonElementKey = allJsonElementsIterator.next();
+					analyseJSONFieldFromWikidataJSON(obj.get(jsonElementKey),newField[1],result);
+				}
+			}
+			else if(obj.has(fieldParts[0]))
+			{				
 				analyseJSONFieldFromWikidataJSON(obj.get(fieldParts[0]),newField[1], result);
+			}
+			else
+			{
+				logger.error("The analysed Wikidata JSON response does not contain the required JSON object: " + 
+						fieldParts[0] + " in the JSON field: " + field);
 			}
 			
 		}
@@ -251,6 +314,10 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				analyseJSONFieldFromWikidataJSON(array.get(i),field, result);
 			}
+		}
+		else
+		{
+			logger.error("The analysed Wikidata JSON element: " + fieldParts[0] + " in the JSON field: " + field  + " contains some element which is niether JSON object nor JSONArray!");
 		}
 			
 	}
