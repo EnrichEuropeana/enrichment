@@ -18,7 +18,8 @@ public interface WikidataService {
 	 * from the Wikidata JSON file. The format for the field is
 	 * given in the point separated way, e.g. claims.P569.mainsnak.datavalue.value.time
 	 * which means that each name after the dot is a json element within a
-	 * a given json element before the dot
+	 * a given json element before the dot. In special case, if the name between 2 dots is "*",
+	 * this means taking all elements of the given json element (e.g. aliases.*.language)
 	 * 
 	 * @param WikidataJSON			(e.g. entities: {
 													Q762: {
@@ -39,7 +40,7 @@ public interface WikidataService {
 	 * @param field					(e.g. claims.P569.mainsnak.datavalue.value.time)
 	 * @return
 	 */
-	public List<String> getJSONFieldFromWikidataJSON (String WikidataJSON, String field);
+	public List<List<String>> getJSONFieldFromWikidataJSON (String WikidataJSON, String field);
 	
 	/*
 	 * This method sends a Wikidata Geonames ID sparql search query

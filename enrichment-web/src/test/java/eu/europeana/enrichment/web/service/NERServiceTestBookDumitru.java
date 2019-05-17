@@ -32,7 +32,9 @@ import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
+import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
@@ -82,7 +84,9 @@ public class NERServiceTestBookDumitru {
 
 	@Resource(name = "solrEntityService")
 	SolrEntityPositionsService solrEntityService;
-
+	
+	@Resource(name = "solrWikidataEntityService")
+	SolrWikidataEntityService solrWikidataEntityService;
 	
 	@Test
 	public void test() throws Exception {
@@ -112,15 +116,15 @@ public class NERServiceTestBookDumitru {
 //		dbTranslationEntity.setTranslatedText(bookText);
 //		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		
-		/*
+		
 		//saving the story to Solr for finding the positions of NE in the original text
 		try {
-			solrEntityService.store(dbStoryEntity, true);
+			solrEntityService.store("enrichment",dbStoryEntity, true);
 		} catch (SolrNamedEntityServiceException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		*/
+		
 		
 		List<String> linkingTools = Arrays.asList("Wikidata");
 		europeanaEnrichmentNERRequest.setLinking(linkingTools);
@@ -157,9 +161,12 @@ public class NERServiceTestBookDumitru {
 		
 			europeanaReadWriteFiles.writeToFile(NERNamedEntities);
 			
-			String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID("http://www.wikidata.org/entity/Q762");
+			//String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID("http://www.wikidata.org/entity/Q762");
 			//wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P569.mainsnak.datavalue.value.time");
-			wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P106.mainsnak.datavalue.value.id");
+			//wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON, "claims.P106.mainsnak.datavalue.value.id");
+			
+			solrWikidataEntityService.storeWikidataFromURL("https://www.wikidata.org/entity/Q51056", "agent");
+			solrWikidataEntityService.storeWikidataFromURL("http://www.wikidata.org/entity/Q48320", "place");
 			
 		} catch (IOException | HttpException | SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block

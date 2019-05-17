@@ -57,4 +57,13 @@ public interface EnrichmentNERService {
 	 */
 	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws HttpException, SolrNamedEntityServiceException, Exception;
 	
+	/**
+	 * Reads stories and items from the given json file and stores them
+	 * in the mongo db
+	 * 
+	 * @param jsonStoriesImport
+	 * @param jsonItemsImport
+	 */
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
+	
 }

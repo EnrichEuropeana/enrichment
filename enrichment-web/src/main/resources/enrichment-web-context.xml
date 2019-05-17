@@ -45,12 +45,24 @@
 	<!-- beans:import resource="enrichment-ner-context.xml"/-->
 	<beans:import resource="mongo-config.xml"/>
 	
-	<beans:bean id="solrEntityService" name="entity_solr_entity_service"
+	<!-- beans:bean id="solrEntityService" name="entity_solr_entity_service"
 		class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl"
 		p:solrServer-ref="entity_solr_server" >
 		<beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
+	</beans:bean -->
+	
+	<beans:bean  id="solrBaseClientService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrBaseClientServiceImpl"
+		p:solrServer-ref="entity_solr_server" >		
+	</beans:bean >
+	
+	<beans:bean  id="solrEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl" >
+		<!--beans:constructor-arg type="String" value="${enrich.solr.translated.entities}"/-->
+	</beans:bean >
+	
+	<beans:bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
 	</beans:bean>
-		
+	
 	<beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	
 	<beans:bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
@@ -80,22 +92,28 @@
 	<beans:bean id="stanfordNerService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
 	</beans:bean>
+	
+	
 	<!-- beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
 	</beans:bean>
 	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model7}"/>
-	</beans:bean>
+	</beans:bean>	
+	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
+	</beans:bean-->
+	
 	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
 	</beans:bean>
 	
-	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
-	</beans:bean-->
-	
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>
+	
+	
+	
+	
 	<!--beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
 		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>

@@ -122,6 +122,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				if(sendRequest)
 					returnValue = eTranslationService.translateText(originalText, sourceLanguage, defaultTargetLanguage);
 				tmpTranslationEntity.setKey(returnValue);
+				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			default:
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);

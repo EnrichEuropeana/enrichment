@@ -4,6 +4,11 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+<<<<<<< HEAD
+=======
+import eu.europeana.enrichment.ner.exception.NERAnnotateException;
+//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+>>>>>>> branch 'develop' of https://github.com/EnrichEuropeana/enrichment
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;

@@ -16,4 +16,17 @@ public interface TranslationService {
 	 * @throws TranslationException	
 	 */
 	public String translateText(String text, String sourceLanguage, String targetLanguage) throws TranslationException;
+
+	/**
+	 * Called when eTranslation returns the translated text back to our application.
+	 * Based on the "externalReference" which is unique for each translation request
+	 * the corresponding translated text is updated which indicates that we got the
+	 * translation from the eTranslation service.
+	 * 
+	 * @param targetLanguage
+	 * @param translatedText
+	 * @param requestId
+	 * @param externalReference
+	 */
+	void eTranslationResponse(String targetLanguage, String translatedText, String requestId, String externalReference);
 }

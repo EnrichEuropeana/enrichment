@@ -75,7 +75,7 @@ public class ImportStoriesAndItemsFromJSON {
 		/*
 		 * import stories and items from a json file to the mongo db
 		 */
-		europeanaReadWriteFiles.readStoriesAndItemsFromJson();
+		enrichmentNerService.readStoriesAndItemsFromJson(europeanaReadWriteFiles.getJsonStories(), europeanaReadWriteFiles.getJsonItems());
 		
 		assertTrue(true);
 		

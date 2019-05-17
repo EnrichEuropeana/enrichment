@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
@@ -21,6 +23,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Resource(name = "translationEntityDao")
 	TranslationEntityDao translationEntityDao;
 	private Datastore datastore; 
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	public NamedEntityDaoImpl( Datastore datastore) {
 		this.datastore = datastore;
@@ -71,6 +75,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 				NamedEntity dbEntity = result.get(index);
 				addAdditonalInformation(dbEntity);
 				tmpResult.add(dbEntity);
+				logger.info("NamedEntity found is: " + String.valueOf(index));
 			}
 			return tmpResult;
 		}
@@ -114,6 +119,11 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public void deleteNamedEntityByKey(String key) {
 		datastore.delete(datastore.find(DBNamedEntityImpl.class).filter("key", key));
+	}
+
+	@Override
+	public void deleteAllNamedEntities() {
+		datastore.delete(datastore.find(NamedEntityImpl.class));		
 	}
 
 	

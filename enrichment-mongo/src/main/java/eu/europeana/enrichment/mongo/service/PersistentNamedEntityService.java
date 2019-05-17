@@ -44,5 +44,10 @@ public interface PersistentNamedEntityService {
 	 * @return
 	 */
 	public void deleteNamedEntity(NamedEntity entity);
+	
+	/**
+	 * Deletes all NamedEntities form the Mongo db
+	 */
+	public void deleteAllNamedEntities ();
 
 }
