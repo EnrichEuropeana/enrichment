@@ -1,5 +1,9 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +38,7 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
+import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
@@ -58,6 +63,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	NERService stanfordNerService;
 	@Resource(name = "dbpediaSpotlightService")
 	NERService dbpediaSpotlightService;
+	
+	@Resource(name = "javaJSONParser")
+	JavaJSONParser javaJSONParser;
 	
 	/*
 	 * Defining the available tools for named entities
@@ -297,7 +305,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						NamedEntity resultNamedEntity = endResultCategoryValues.get(resultIndex);
 						PositionEntity pos = resultNamedEntity.getPositionEntities().get(0);
 						pos.setStoryId(dbStoryEntity.getStoryId());
-						pos.setTranslationKey(dbTranslationEntity.getKey());
+						if(dbTranslationEntity != null)
+							pos.setTranslationKey(dbTranslationEntity.getKey());
 						List<Integer> tmpOffsets = tmpNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText();
 						List<Integer> resultOffsets = pos.getOffsetsTranslatedText();
 						resultOffsets.addAll(tmpOffsets);
@@ -403,7 +412,154 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 	@Override
 	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		/*
+		 * reading stories and items from json
+		 */
+		
+		BufferedReader brStories = null;
+		BufferedReader brItems = null;
+		try {
+			brStories = new BufferedReader(new FileReader(jsonStoriesImportPath));
+			brItems = new BufferedReader(new FileReader(jsonItemsImportPath));
+			
+			/*
+			 * reading stories
+			 */
+			List<Map<String, Object>> stories = null;			
+			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
+			for(int i=0;i<retMapStories.size();i++)				
+			{
+				String type = (String) retMapStories.get(i).get("type");
+				if(type.compareTo("table")==0) {
+					stories = (List<Map<String, Object>>) retMapStories.get(i).get("data");
+				}
+				
+			}
+			
+			List<DBStoryEntityImpl> storyEntities = new ArrayList<DBStoryEntityImpl>();
+			
+			
+			for (int i=0;i<stories.size();i++)
+			{
+				String storyLanguage = (String)stories.get(i).get("language");
+				if(storyLanguage==null) storyLanguage="";
+//				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
+//				{
+					DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
+					newStoryEntity.setTitle("");
+					newStoryEntity.setDescription("");
+					newStoryEntity.setStoryId("");
+					newStoryEntity.setLanguage("");
+					newStoryEntity.setSummary("");
+					newStoryEntity.setTranscription("");				
+	
+					
+					if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
+					if(stories.get(i).get("title")!=null) newStoryEntity.setTitle((String) stories.get(i).get("title"));
+					if(stories.get(i).get("description")!=null) newStoryEntity.setDescription((String) stories.get(i).get("description"));
+					if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
+					if(stories.get(i).get("language")!=null) newStoryEntity.setLanguage((String) stories.get(i).get("language"));	
+					if(stories.get(i).get("summary")!=null)	newStoryEntity.setSummary((String) stories.get(i).get("summary"));
+				
+					storyEntities.add(newStoryEntity);
+//				}				
+				
+			}
+			
+			String uploadStoriesStatus = uploadStories(storyEntities.toArray(new DBStoryEntityImpl[0]));
+			
+			/*
+			 * reading items
+			 */
+			List<Map<String, Object>> items = null;
+			List<Map<String, Object>> retMapItems = javaJSONParser.getStoriesAndItemsFromJSON(brItems);
+			for(int i=0;i<retMapItems.size();i++)				
+			{
+				String type = (String) retMapItems.get(i).get("type");
+				if(type.compareTo("table")==0) {
+					items = (List<Map<String, Object>>) retMapItems.get(i).get("data");
+				}
+				
+			}
+			
+			List<DBItemEntityImpl> itemEntities = new ArrayList<DBItemEntityImpl>();
+			for (int i=0;i<items.size();i++)
+			{
+				String itemLanguage = (String)items.get(i).get("language");
+				if(itemLanguage==null) itemLanguage="";
+				String itemTranscription = (String)items.get(i).get("transcription");				
+
+//				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+//				{
+					
+					DBItemEntityImpl newItemEntity=new DBItemEntityImpl();
+					newItemEntity.setTitle("");
+					newItemEntity.setStoryId("");
+					newItemEntity.setLanguage("");
+					newItemEntity.setTranscription("");	
+					newItemEntity.setType("");	
+					newItemEntity.setItemId("");
+	
+					
+					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
+					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
+					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
+					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
+					if(items.get(i).get("item_id")!=null) newItemEntity.setItemId((String) items.get(i).get("item_id"));
+	
+					if(items.get(i).get("story_id")!=null && items.get(i).get("transcription")!=null)
+					{		
+						String itemStoryId = (String) items.get(i).get("story_id");
+						String transcription = (String) items.get(i).get("transcription");
+						/*
+						 * adding item transcription to the story transcription
+						 */
+						StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(itemStoryId);
+						if(dbStoryEntity!=null)
+						{
+							String storyTranscription = dbStoryEntity.getTranscription();
+							storyTranscription += " " + transcription;
+							dbStoryEntity.setTranscription(storyTranscription);
+							persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
+						}
+					}
+					
+					itemEntities.add(newItemEntity);
+//				}
+				
+			}
+			
+			String uploadItemsStatus = uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
+			
+			logger.info("Stories and Items are saved to the database from the JSON file!");
+			return "Done!";
+		}
+		catch (FileNotFoundException e) {
+		    e.printStackTrace();
+		} catch (HttpException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			  if (brStories != null) {
+				  try {
+					  brStories.close();
+				  } catch (IOException e) {
+		    		// TODO Auto-generated catch block
+		    		e.printStackTrace();
+				  }
+			  }
+			  if (brItems != null) {
+				  try {
+					  brItems.close();
+				  } catch (IOException e) {
+		    		// TODO Auto-generated catch block
+		    		e.printStackTrace();
+				  }
+			  }
+			  //TODO: throw httpexception
+			  return "Fail";
+		}	
+		
 	}
 }

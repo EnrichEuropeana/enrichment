@@ -17,7 +17,7 @@ import eu.europeana.enrichment.solr.commons.SolrUtils;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.OrganizationSolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
+//import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
 
 public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{
 	
