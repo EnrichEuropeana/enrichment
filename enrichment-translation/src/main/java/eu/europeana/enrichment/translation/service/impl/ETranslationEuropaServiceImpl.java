@@ -5,7 +5,9 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +77,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @param credentialFilePath		is the path to the credential file
 	 */
 	private void readCredentialFile(String credentialFilePath) {
-		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
+				
+		//try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getClassLoader().getResourceAsStream(credentialFilePath)))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] splitString = line.split("=");
@@ -101,22 +105,40 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
 		//String contentBody =  createTranslationBody (text, sourceLanguage);
 		String reponseCode = createHttpRequest(contentBody);
-		logger.info("Created and sent eTranslation request. Response code: " + reponseCode);
+		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);
 		
-		while(createdRequests.get(externalReference) == null)
+		long maxWaitingTime = 2 * 60 * 1000;// in millisec.
+		long waitingTime = 0;
+		long sleepingTime = 500; //in millisec.
+		while(createdRequests.get(externalReference) == null && waitingTime < maxWaitingTime)
 		{
 			try {
-				Thread.sleep(500);
+				Thread.sleep(sleepingTime);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			waitingTime += sleepingTime;
 		}
-				
-		String response = createdRequests.get(externalReference);
-		createdRequests.remove(externalReference);
 		
+		String response;
+		
+		if(waitingTime >= maxWaitingTime)
+		{
+			logger.info("Maximum waiting time of: " + String.valueOf(maxWaitingTime) + " for the eTranslation response has elapsed! No response obtained!");
+			response = "";
+		}
+		else
+		{
+			logger.info("eTranslation response arrived and is successfully processed!");
+			response = createdRequests.get(externalReference);
+		}
+		
+		createdRequests.remove(externalReference);
+
 		return response;
+		
+		
 	}
 
 	/**
@@ -182,10 +204,10 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 				.put("sourceLanguage", sourceLanguage.toUpperCase())
 				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
 				.put("domain", domain)
+				.put("textToTranslate", text)
 				.put("destinations",
-						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://dsi-demo.ait.ac.at/enrichment-web")))
-				.put("documentToTranslateBase64",
-						new JSONObject().put("format", fileFormat).put("content", base64content));
+						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://dsi-demo.ait.ac.at/enrichment-web")));
+				//.put("documentToTranslateBase64", new JSONObject().put("format", fileFormat).put("content", base64content));
 
 		return jsonBody.toString();
 	}
@@ -225,9 +247,20 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	@Override
 	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference)
 	{
+		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" .");
+		
 		if(createdRequests.containsKey(externalReference))
-		{
-			createdRequests.put(externalReference, translatedText);
+		{	
+			String URLDecodedTranslatedText = "";
+			try {
+				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			logger.info("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
+			createdRequests.put(externalReference, URLDecodedTranslatedText);
+			
 		}
 	}
 
