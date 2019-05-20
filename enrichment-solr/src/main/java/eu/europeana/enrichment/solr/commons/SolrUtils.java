@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
+//import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
 
 /**
  * This class implements supporting methods for Solr*Impl classes e.g. normalization of the content
