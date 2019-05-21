@@ -74,7 +74,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			
 			//TODO: implement information retrieval from Wikidata
 			List<String> wikidataIDs = new ArrayList<>();
-			if(namedEntity.getType() == NERClassification.AGENT.toString()) {
+			if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
 				String namedEntityKey = namedEntity.getKey();
 				/*
 				 * Agents with only first name or last name will not be searched
@@ -82,7 +82,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				if(namedEntityKey.split(" ").length > 1)
 					wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getKey(), "en");
 			}
-			else if(namedEntity.getType() == NERClassification.PLACE.toString())
+			else if(namedEntity.getType().equals(NERClassification.PLACE.toString()))
 				wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getKey(), sourceLanguage);
 			if(wikidataIDs != null && wikidataIDs.size() > 0) {
 				for(String wikidataID : wikidataIDs) {

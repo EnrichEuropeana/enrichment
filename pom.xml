@@ -92,7 +92,8 @@
     <module>enrichment-solr-positions-highlighter</module>
     <module>enrichment-eval</module>
     <module>enrichment-utils</module>
-	</modules>
+    <module>enrichment-stanford-web</module>
+  </modules>
 
 	<build>
 		<!-- configure source and output locations -->
