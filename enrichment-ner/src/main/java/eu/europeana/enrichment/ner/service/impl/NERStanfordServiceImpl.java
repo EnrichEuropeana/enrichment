@@ -1,135 +1,81 @@
 package eu.europeana.enrichment.ner.service.impl;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
-import javax.annotation.Resource;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
-import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
-import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
+import eu.europeana.enrichment.ner.linking.model.StanfordNerRequest;
 import eu.europeana.enrichment.ner.service.NERService;
-//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-//import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
+import eu.europeana.enrichment.ner.service.model.StanfordNamedEntityImpl;
 
 
 public class NERStanfordServiceImpl implements NERService{
 
-	private CRFClassifier<CoreLabel> classifier;
+	private String endpoint;
 	
 	/*
 	 * This class constructor loads a model for the Stanford named
 	 * entity recognition and classification
 	 */
-	public NERStanfordServiceImpl(String model) {
-		if(model == null || model.isEmpty()) {
-			System.err.println("NERStanfordServiceImp: No model for classifier defined");
-		}
-		else {
-			classifier = CRFClassifier.getClassifierNoExceptions(model);
-		}
+	public NERStanfordServiceImpl(String url) {
+		endpoint = url;
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
-		List<List<CoreLabel>> classify = classifier.classify(text);
-		return processClassifiedResult(classify);
-	}
-	
-	/*
-	 * This methods combines words and creates a TreeMap based on the classification
-	 * 
-	 * @param classify 					contains all words including their classification
-	 * @return 							a TreeMap with all relevant words
-	 * @throws 							NERAnnotateException
-	 */
-	//TODO: check where exception could appear
-	private TreeMap<String, List<NamedEntity>> processClassifiedResult(List<List<CoreLabel>> classify) throws NERAnnotateException{
-		TreeMap<String, List<NamedEntity>> map = new TreeMap<>();
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) {
+		TreeMap<String, List<NamedEntity>> map = null;
+		String serializedRequest = null;
+		try {
+			serializedRequest = new ObjectMapper().writeValueAsString(new StanfordNerRequest(text));
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(serializedRequest == null)
+			return null;
+		String response = createRequest(serializedRequest);
 		
-		String previousWord = "";
-		String previousCategory = "";
-		NamedEntity previousNamedEntity;
-		int previousOffset=-1;
-		
-		for (List<CoreLabel> coreLabels : classify) {
-			for (CoreLabel coreLabel : coreLabels) {	
-				
-				int wordOffset=coreLabel.beginPosition();
-				
-				String word = coreLabel.word();
-				String category = coreLabel.get(CoreAnnotations.AnswerAnnotation.class);
-				// Check if previous word is from the same category
-				String originalCategory = category;
-				if(NERStanfordClassification.isAgent(category))
-					category = NERClassification.AGENT.toString();
-				else if(NERStanfordClassification.isPlace(category))
-					category = NERClassification.PLACE.toString();
-				else if(NERStanfordClassification.isOrganization(category))
-					category = NERClassification.ORGANIZATION.toString();
-				else if(NERStanfordClassification.isMisc(category))
-					category = NERClassification.MISC.toString();
-				
-				if (category.equals(previousCategory) && (NERStanfordClassification.isAgent(originalCategory) || 
-						NERStanfordClassification.isPlace(originalCategory) ||
-						NERStanfordClassification.isOrganization(originalCategory) ||
-						NERStanfordClassification.isMisc(originalCategory))) {
-					word = previousWord + " " + word;
-					wordOffset=previousOffset;
-					
-					map.get(category).remove(map.get(category).size()-1);
-				}
-				
-				previousWord = word;
-				previousCategory = category;
-				previousOffset = wordOffset;
-				
-				NamedEntity namedEntity = new NamedEntityImpl(word);
-				namedEntity.setType(category);
-				PositionEntity positionEntity = new PositionEntityImpl();
-				// default: Offset position will be added to the translated 
-				positionEntity.addOfssetsTranslatedText(wordOffset);
-				namedEntity.addPositionEntity(positionEntity);
-				previousNamedEntity = namedEntity;
-				
-				if (!"O".equals(category)) {
-					
-					List<NamedEntity> tmp;
-					
-					if (map.containsKey(category)) {
-						// key is already their just insert in the list {word,position}
-						tmp = map.get(category);
-					} else {
-						tmp = new ArrayList<>();
-						map.put(category, tmp);
-					}
-					
-					NamedEntity alreadyExistNamedEntity = null;
-					for(int index = 0; index < tmp.size(); index++) {
-						if(tmp.get(index).getKey().equals(namedEntity.getKey())) {
-							alreadyExistNamedEntity = tmp.get(index);
-							break;
-						}
-					}
-					if(alreadyExistNamedEntity == null)
-						tmp.add(namedEntity);
-					else 
-						alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(wordOffset);
-				}
-			}
+		ObjectMapper mapper = new ObjectMapper();
+		TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>> typeRef = new TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>>() {};
+		try {
+			map = mapper.readValue(response, typeRef);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return map;
+		//return processClassifiedResult(classify);
+	}
+	
+	private String createRequest(String requestJson) {
+		try {
+			CloseableHttpClient httpClient = HttpClients.createDefault();
+			HttpPost request = new HttpPost(endpoint);
+			StringEntity body = new StringEntity(requestJson, ContentType.APPLICATION_JSON);
+			request.setEntity(body);
+			HttpResponse result = httpClient.execute(request);
+			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
+			return responeString;
+
+		} catch (Exception ex) {
+			System.err.println(ex.getMessage());
+			return "";
+		}
 	}
 	
 }

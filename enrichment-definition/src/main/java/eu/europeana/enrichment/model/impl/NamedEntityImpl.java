@@ -9,14 +9,14 @@ import eu.europeana.enrichment.model.PositionEntity;
 
 public class NamedEntityImpl implements NamedEntity{
 
-	private String type;
-	private String key;
-	private List<String> europeanaIds;
-	private List<String> wikidataIds;
-	private List<String> dbpediaIds;
-	private List<String> dbpediaWikidataIds;
-	private List<String> preferedWikidataIds;
-	private List<PositionEntity> positionEntities;
+	protected String type;
+	protected String key;
+	protected List<String> europeanaIds;
+	protected List<String> wikidataIds;
+	protected List<String> dbpediaIds;
+	protected List<String> dbpediaWikidataIds;
+	protected List<String> preferedWikidataIds;
+	protected List<PositionEntity> positionEntities;
 	
 	public NamedEntityImpl() {
 		init();

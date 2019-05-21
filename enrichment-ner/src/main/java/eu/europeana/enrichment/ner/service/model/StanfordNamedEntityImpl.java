@@ -1,0 +1,66 @@
+package eu.europeana.enrichment.ner.service.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonSetter;
+
+import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+
+public class StanfordNamedEntityImpl extends NamedEntityImpl {
+
+	@JsonSetter("type")
+	@Override
+	public void setType(String classificationtype) {
+		this.type = classificationtype;
+	}
+
+	@JsonSetter("key")
+	@Override
+	public void setKey(String key) {
+		this.key = key;
+	}
+	
+	
+	@JsonSetter("positionEntities")
+	public void setPositionEntitiesImpl(List<PositionEntityImpl> positions) {
+		this.positionEntities = new ArrayList<>();
+		for(PositionEntity pos : positions) {
+			positionEntities.add(pos);
+		}
+	}
+	
+	@JsonSetter("dbpediaWikidataIds")
+	@Override
+	public void setDbpediaWikidataIds(List<String> ids) {
+		this.dbpediaWikidataIds = ids;
+	}
+
+	@JsonSetter("europeanaIds")
+	@Override
+	public void setEuropeanaIds(List<String> ids) {
+		this.europeanaIds = ids;
+	}
+
+	@JsonSetter("wikidataIds")
+	@Override
+	public void setWikidataIds(List<String> ids) {
+		this.wikidataIds = ids;
+	}
+	
+	@JsonSetter("preferedWikidataIds")
+	@Override
+	public void setPreferedWikidataIds(List<String> ids) {
+		this.preferedWikidataIds = ids;
+	}
+
+	@JsonSetter("DBpediaIds")
+	@Override
+	public void setDBpediaIds(List<String> ids) {
+		this.dbpediaIds = ids;
+	}
+
+	
+}

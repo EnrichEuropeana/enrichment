@@ -280,7 +280,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			StoryEntity dbStoryEntity, TranslationEntity dbTranslationEntity) {
 		TreeMap<String, List<NamedEntity>> combinedResult = new TreeMap<>();
 		if(mapPreResult.size() == 0)
+		{
+			for(Map.Entry<String, List<NamedEntity>> categoryList : mapCurrentResult.entrySet()) {
+				for(NamedEntity entity : categoryList.getValue()) {
+					PositionEntity pos = entity.getPositionEntities().get(0);
+					pos.setStoryId(dbStoryEntity.getStoryId());
+					if(dbTranslationEntity != null)
+						pos.setTranslationKey(dbTranslationEntity.getKey());
+				}
+			}
 			return mapCurrentResult;
+		}
 		
 		for(Map.Entry<String, List<NamedEntity>> tmpCategoryMap : mapCurrentResult.entrySet()) {
 			String categoryKey = tmpCategoryMap.getKey();
@@ -289,8 +299,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				for(NamedEntity entity : tmpCategoryValues) {
 					// Only first PositionEntity is set, because NER tools create new NamedEntities
 					PositionEntity pos = entity.getPositionEntities().get(0);
-					pos.setStoryEntity(dbStoryEntity);
-					pos.setTranslationEntity(dbTranslationEntity);
+					pos.setStoryId(dbStoryEntity.getStoryId());
+					if(dbTranslationEntity != null)
+						pos.setTranslationKey(dbTranslationEntity.getKey());
 				}
 				combinedResult.put(categoryKey, tmpCategoryValues);
 				continue;
