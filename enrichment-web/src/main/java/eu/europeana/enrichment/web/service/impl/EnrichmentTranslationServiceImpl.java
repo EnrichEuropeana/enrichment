@@ -52,7 +52,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	public String translate(EnrichmentTranslationRequest requestParam) throws HttpException{
 		try {
 			//TODO: check parameters and return other status code
-			String defaultTargetLanguage = "en";
+			String defaultTargetLanguage = "fr";
 			String storyId = requestParam.getStoryId();			
 			String originalText = requestParam.getText();
 			String translationTool = requestParam.getTranslationTool();

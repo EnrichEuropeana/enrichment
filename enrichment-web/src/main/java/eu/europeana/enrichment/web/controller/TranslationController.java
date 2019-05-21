@@ -78,16 +78,16 @@ public class TranslationController extends BaseRest {
 	 */
 	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation")
 	@RequestMapping(value = "/enrichment/eTranslation", method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+			consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getETranslation(
 			@RequestParam(value = "target-language", required = false) String targetLanguage,
-			@RequestParam(value = "translated-text", required = false) String translatedText,
+			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
 			@RequestParam(value = "external-reference", required = false) String externalReference
 			) 
 	{
 		
-		eTranslationService.eTranslationResponse(targetLanguage,translatedText,requestId,externalReference);
+		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);
 		
 		ResponseEntity<String> response = new ResponseEntity<String>("eTranslation callback has been executed!", HttpStatus.OK);
 		
