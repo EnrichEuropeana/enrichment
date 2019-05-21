@@ -115,12 +115,6 @@
 			<artifactId>javax.annotation-api</artifactId>
 			<version>${version.annotation-api}</version>
 		</dependency>
-		<dependency>
-    		<groupId>edu.stanford.nlp</groupId>
-    		<artifactId>stanford-corenlp</artifactId>
-    		<version>${version.stanfordCoreNLP}</version>
-    		<classifier>models</classifier>
-		</dependency>
 			 
 		<dependency>
     		<groupId>eu.fbk.dh</groupId>
