@@ -6,7 +6,7 @@ enrich.mongodb.truststorepass=
 
 # Named entity recognition and classification section
 # NER Stanford classifier configuration
-enrich.ner.stanford.url=http://10.103.251.28:9090/stanford_en/namedEntityRecognition
+enrich.ner.stanford.url=http://10.103.251.28:9090/stanford/en/namedEntityRecognition
 
 # NER Python configuration
 enrich.ner.python.path=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv64\\Scripts\\python.exe
@@ -17,7 +17,7 @@ enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait
 # Additional: 
 #	Docker command: docker pull dbpedia/spotlight-english
 #	Docker command: docker run --name spotlight -p 2222:80 -it dbpedia/spotlight-english spotlight.sh
-enrich.ner.dbpedia.baseUrl=http://localhost:2222/rest/annotate
+enrich.ner.dbpedia.baseUrl=http://10.103.251.28:9090/dbpedia/en/rest/annotate
 
 # Named entity linking section
 enrich.ner.linking.europeana.apikey=apidemo
