@@ -15,6 +15,13 @@ import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.TextNode;
+import org.jsoup.parser.Parser;
+import org.jsoup.safety.Whitelist;
+import org.jsoup.select.Elements;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
@@ -445,6 +452,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			 * reading stories
 			 */		
 			
+			/*
+
 			List<Map<String, Object>> stories = null;			
 			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
 			for(int i=0;i<retMapStories.size();i++)				
@@ -487,7 +496,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			
 			uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
-						
+				
+			*/
 			
 			
 			/*
@@ -532,6 +542,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					if(items.get(i).get("transcription")!=null)
 					{
 						String itemTrans = (String) items.get(i).get("transcription");
+						
+						parseHTMLWithJsoup(itemTrans);
+						
 						newItemEntity.setTranscription(adaptTranscriptionText(itemTrans));
 					}					
 					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
@@ -610,4 +623,40 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		logger.info(dummy3);
 		return dummy3;
 	}
+	
+	private void parseHTMLWithJsoup (String htmlText)
+	{
+//		StringBuilder response = new StringBuilder ();
+		
+		//https://stackoverflow.com/questions/5640334/how-do-i-preserve-line-breaks-when-using-jsoup-to-convert-html-to-plain-text
+		String response = "";
+		Document doc = Jsoup.parse(htmlText);		
+		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));//makes html() preserve linebreaks and spacing
+	    doc.select("br").append("\\n");
+	    doc.select("p").prepend("\\n\\n");
+	    String s = doc.html().replaceAll("\\\\n", "\n");
+	    /*
+	     * By passing it Whitelist.none() we make sure that all HTML is removed.
+	     * By passsing new OutputSettings().prettyPrint(false) we make sure that the output is not reformatted and line breaks are preserved.
+	     */
+	    String whole = Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+	    
+	    /*
+	     * These are used to escape characters that are markup sensitive in certain contexts:
+		 *	&amp; → & (ampersand, U+0026)
+		 *	&lt; → < (less-than sign, U+003C)
+		 *	&gt; → > (greater-than sign, U+003E)
+		 *	&quot; → " (quotation mark, U+0022)
+		 *	&apos; → ' (apostrophe, U+0027)
+		 *  &nbsp;  → " " (space)
+	     */
+	    response = Parser.unescapeEntities(whole, false);
+	    System.out.print(response);
+	    
+//	    Elements allParagraphs = doc.getElementsByTag("p");
+//		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
+//		logger.info(whole);
+//		System.out.print(whole);
+	}
+	
 }
