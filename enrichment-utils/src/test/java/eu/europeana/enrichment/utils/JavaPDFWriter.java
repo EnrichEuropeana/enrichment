@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.web.service;
+package eu.europeana.enrichment.utils;
 
 import java.io.FileOutputStream;
 import java.util.ArrayList;

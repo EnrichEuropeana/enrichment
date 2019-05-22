@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Copyright 2007-2012 The Europeana Foundation Licenced under the EUPL, 
+	Version 1.1 (the "Licence") and subsequent versions as approved by the European 
+	Commission; You may not use this work except in compliance with the Licence. 
+	You may obtain a copy of the Licence at: http://joinup.ec.europa.eu/software/page/eupl 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the Licence is distributed on an "AS IS" basis, without warranties 
+	or conditions of any kind, either express or implied. See the Licence for 
+	the specific language governing permissions and limitations under the Licence. -->
+
+<beans 
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.5.xsd
+	">
+      
+	<!-- context:property-placeholder location="classpath:test-enrichment-book-dumitru.properties" /-->
+	
+	<import resource="../../src/main/resources/enrichment-web-context.xml" />
+	
+	<bean id="europeanaReadWriteFiles" class="eu.europeana.enrichment.utils.ReadWriteFiles">
+		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.original}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.translatedText.pdf}"/>
+		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.originalText.pdf}"/>
+		<constructor-arg type="String" value="${enrich.stories.import}"/>
+		<constructor-arg type="String" value="${enrich.items.import}"/>
+	</bean>
+	
+	<bean id="solrBaseClientService" name="entity_solr_entity_service"
+		class="eu.europeana.enrichment.solr.service.impl.SolrBaseClientServiceImpl"
+		p:solrServer-ref="entity_solr_server" >		
+	</bean>
+	
+	<bean id="solrEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrEntityPositionsServiceImpl" >
+		<constructor-arg type="String" value="${enrich.solr.translated.entities}"/>
+	</bean>
+	
+	<bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
+	</bean>
+	
+		
+	<bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
+	
+	<bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
+	
+	<bean id="googleTranslator" class="eu.europeana.enrichment.solr.commons.GoogleTranslator" />
+	
+	
+	<!-- LAZY INIT: the next beans has lazy init, to prevent them from being started when not used... -->
+	<bean id="entity_solr_server" class="org.apache.solr.client.solrj.impl.HttpSolrClient" lazy-init="true">
+		<constructor-arg value="${solr.entity-positions.url}"/>
+		<property name="followRedirects" value="false"/>
+		<property name="connectionTimeout" value="${solr.entity-positions.timeout}"/>
+		<property name="defaultMaxConnectionsPerHost" value="64"/>
+		<property name="maxTotalConnections" value="125"/>
+	</bean>
+	
+	
+	
+	<bean id="europeanaEnrichmentNERRequest" class="eu.europeana.enrichment.web.model.EnrichmentNERRequest" />
+	
+	<bean id="europeanaJavaPDFWriter" class="eu.europeana.enrichment.utils.JavaPDFWriter" />
+	
+</beans>
