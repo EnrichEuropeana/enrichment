@@ -150,10 +150,10 @@ public class NERServiceTestBookDumitru {
 			 */
 			String transText = "";
 			if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
-			else transText  = dbStoryEntity.getStoryTranscription();
+			else transText  = dbStoryEntity.getTranscription();
 
-			europeanaReadWriteFiles.setLanguages(dbStoryEntity.getStoryLanguage(), dbStoryEntity.getStoryLanguage());
-			europeanaReadWriteFiles.setOriginalAndTranslatedText(dbStoryEntity.getStoryTranscription(), transText);
+			europeanaReadWriteFiles.setLanguages(dbStoryEntity.getLanguage(), dbStoryEntity.getLanguage());
+			europeanaReadWriteFiles.setOriginalAndTranslatedText(dbStoryEntity.getTranscription(), transText);
 			String outputFileResults = "results-"+dbStoryEntity.getStoryId()+".txt";
 			String outputFilePDFTranslated = "translatedText-"+dbStoryEntity.getStoryId()+".pdf";
 			String outputFilePDFOriginal = "originalText-"+dbStoryEntity.getStoryId()+".pdf";

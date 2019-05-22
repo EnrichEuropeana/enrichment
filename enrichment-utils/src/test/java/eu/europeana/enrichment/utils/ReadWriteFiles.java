@@ -32,20 +32,21 @@ import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
 public class ReadWriteFiles {
 
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
 
-//	@Resource
-//	EnrichmentNERService enrichmentNerService;
+	@Resource
+	EnrichmentNERService enrichmentNerService;
 
 	@Resource(name= "europeanaJavaPDFWriter")
 	JavaPDFWriter europeanaJavaPDFWriter;
 	
-//	@Resource(name = "javaJSONParser")
-//	JavaJSONParser javaJSONParser;
+	@Resource(name = "javaJSONParser")
+	JavaJSONParser javaJSONParser;
 
 	private String translatedText;
 	private String originalText;
@@ -249,20 +250,20 @@ public class ReadWriteFiles {
 //				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
 //				{
 					DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
-					newStoryEntity.setStoryTitle("");
-					newStoryEntity.setStoryDescription("");
+					newStoryEntity.setTitle("");
+					newStoryEntity.setDescription("");
 					newStoryEntity.setStoryId("");
-					newStoryEntity.setStoryLanguage("");
-					newStoryEntity.setStorySummary("");
-					newStoryEntity.setStoryTranscription("");				
+					newStoryEntity.setLanguage("");
+					newStoryEntity.setSummary("");
+					newStoryEntity.setTranscription("");				
 	
 					
-					if(stories.get(i).get("source")!=null) newStoryEntity.setStorySource((String) stories.get(i).get("source"));
-					if(stories.get(i).get("title")!=null) newStoryEntity.setStoryTitle((String) stories.get(i).get("title"));
-					if(stories.get(i).get("description")!=null) newStoryEntity.setStoryDescription((String) stories.get(i).get("description"));
+					if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
+					if(stories.get(i).get("title")!=null) newStoryEntity.setTitle((String) stories.get(i).get("title"));
+					if(stories.get(i).get("description")!=null) newStoryEntity.setDescription((String) stories.get(i).get("description"));
 					if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
-					if(stories.get(i).get("language")!=null) newStoryEntity.setStoryLanguage((String) stories.get(i).get("language"));	
-					if(stories.get(i).get("summary")!=null)	newStoryEntity.setStorySummary((String) stories.get(i).get("summary"));
+					if(stories.get(i).get("language")!=null) newStoryEntity.setLanguage((String) stories.get(i).get("language"));	
+					if(stories.get(i).get("summary")!=null)	newStoryEntity.setSummary((String) stories.get(i).get("summary"));
 				
 					storyEntities.add(newStoryEntity);
 //				}				
@@ -320,9 +321,9 @@ public class ReadWriteFiles {
 						StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(itemStoryId);
 						if(dbStoryEntity!=null)
 						{
-							String storyTranscription = dbStoryEntity.getStoryTranscription();
+							String storyTranscription = dbStoryEntity.getTranscription();
 							storyTranscription += " " + transcription;
-							dbStoryEntity.setStoryTranscription(storyTranscription);
+							dbStoryEntity.setTranscription(storyTranscription);
 							persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
 						}
 					}

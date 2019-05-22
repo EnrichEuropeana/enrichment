@@ -100,7 +100,7 @@ public class NERServiceStories {
 		{
 			for(StoryEntity story : dbStoryEntities) {
 
-				String storyLanguage = story.getStoryLanguage();
+				String storyLanguage = story.getLanguage();
 				if(storyLanguage==null) storyLanguage="";
 				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
 				{
@@ -123,17 +123,17 @@ public class NERServiceStories {
 					List<String> linkingTools = Arrays.asList("Wikidata");
 					europeanaEnrichmentNERRequest.setLinking(linkingTools);
 					europeanaEnrichmentNERRequest.setStoryId(story.getStoryId());
-					if(story.getStoryLanguage().compareTo("English")==0)
+					if(story.getLanguage().compareTo("English")==0)
 					{
 						//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_3");
 					}
-					else if(story.getStoryLanguage().compareTo("German")==0) 
+					else if(story.getLanguage().compareTo("German")==0) 
 					{
 						//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_German");
 					}
 					String transTool = "eTranslation";
 					europeanaEnrichmentNERRequest.setTranslationTool(transTool);
-					String translationLanguage = story.getStoryLanguage();
+					String translationLanguage = story.getLanguage();
 					europeanaEnrichmentNERRequest.setTranslationlanguage(translationLanguage);	
 					
 					try {
@@ -149,10 +149,10 @@ public class NERServiceStories {
 								findTranslationEntityWithStoryInformation(story.getStoryId(), transTool, translationLanguage);					
 						String transText = "";
 						if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
-						else transText  = story.getStoryTranscription();
+						else transText  = story.getTranscription();
 	
-						europeanaReadWriteFiles.setLanguages(translationLanguage, story.getStoryLanguage());
-						europeanaReadWriteFiles.setOriginalAndTranslatedText(story.getStoryTranscription(), transText);
+						europeanaReadWriteFiles.setLanguages(translationLanguage, story.getLanguage());
+						europeanaReadWriteFiles.setOriginalAndTranslatedText(story.getTranscription(), transText);
 						String outputFileResults = "results-"+story.getStoryId()+".txt";
 						String outputFilePDFTranslated = "translatedText-"+story.getStoryId()+".pdf";
 						String outputFilePDFOriginal = "originalText-"+story.getStoryId()+".pdf";
