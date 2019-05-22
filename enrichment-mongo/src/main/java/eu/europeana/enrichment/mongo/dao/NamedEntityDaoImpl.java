@@ -13,10 +13,8 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
-import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
@@ -51,9 +49,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	@Override
 	public NamedEntity findNamedEntity(String key) {
-		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);
+		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
 		persistentNamedEntities.field("key").equal(key);
-		List<NamedEntityImpl> result = persistentNamedEntities.asList();
+		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else
@@ -66,8 +64,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	@Override
 	public List<NamedEntity> findAllNamedEntities() {
-		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);		
-		List<NamedEntityImpl> result = persistentNamedEntities.asList();
+		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);		
+		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else
@@ -86,12 +84,12 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, boolean translation) {
-		Query<NamedEntityImpl> persistentNamedEntities = datastore.createQuery(NamedEntityImpl.class);
+		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
 		if(translation)
 			persistentNamedEntities.disableValidation().field("positionEntities.translationKey").equal(storyId);
 		else
 			persistentNamedEntities.disableValidation().field("positionEntities.storyId").equal(storyId);
-		List<NamedEntityImpl> result = persistentNamedEntities.asList();
+		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
 		List<NamedEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
 			NamedEntity dbEntity = result.get(index);
@@ -109,8 +107,14 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void saveNamedEntity(NamedEntity entity) {
-		//TODO: update
-		this.datastore.save(entity);
+		DBNamedEntityImpl tmp = null;
+		if(entity instanceof DBNamedEntityImpl)
+			tmp = (DBNamedEntityImpl) entity;
+		else {
+			tmp = new DBNamedEntityImpl(entity);
+		}
+		if(tmp != null)
+			this.datastore.save(tmp);
 	}
 
 	@Override
@@ -120,12 +124,12 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void deleteNamedEntityByKey(String key) {
-		datastore.delete(datastore.find(NamedEntityImpl.class).filter("key", key));
+		datastore.delete(datastore.find(DBNamedEntityImpl.class).filter("key", key));
 	}
 
 	@Override
 	public void deleteAllNamedEntities() {
-		datastore.delete(datastore.find(NamedEntityImpl.class));		
+		datastore.delete(datastore.find(DBNamedEntityImpl.class));		
 	}
 
 	

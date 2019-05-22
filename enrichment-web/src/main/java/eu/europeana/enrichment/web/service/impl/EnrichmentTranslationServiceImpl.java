@@ -2,23 +2,17 @@ package eu.europeana.enrichment.web.service.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import javax.annotation.Resource;
-
-import org.springframework.cache.annotation.Cacheable;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
 import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.StoryEntityImpl;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.TranslationEntityImpl;
-import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
@@ -90,9 +84,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					return dbTranslationEntity.getTranslatedText();
 				
 				if((originalText == null || originalText.isEmpty()) && 
-						!(dbStoryEntity.getStoryTranscription() == null || dbStoryEntity.getStoryTranscription().isEmpty())) {
+						!(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
 					// Reuse of dbItemEntity text if original text is not given
-					originalText = dbStoryEntity.getStoryTranscription();
+					originalText = dbStoryEntity.getTranscription();
 				}
 			
 			}
@@ -108,7 +102,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 			
 			
-			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
+			TranslationEntity tmpTranslationEntity = new DBTranslationEntityImpl();
 			tmpTranslationEntity.setStoryEntity(tmpStoryEntity);
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
 			tmpTranslationEntity.setTool(translationTool);

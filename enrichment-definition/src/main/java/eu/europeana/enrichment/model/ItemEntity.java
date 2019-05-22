@@ -2,7 +2,6 @@ package eu.europeana.enrichment.model;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 public interface ItemEntity {
 	
