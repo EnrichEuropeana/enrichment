@@ -34,5 +34,15 @@ public interface NamedEntity {
 	List<String> getWikidataIds();
 	void setWikidataIds(List<String> ids);
 	void addWikidataId(String id);
+	List<String> getDbpediaWikidataIds();
+	void setDbpediaWikidataIds(List<String> ids);
+	void addDbpediaWikidataId(String id);
+	List<String> getPreferedWikidataIds();
+	void setPreferedWikidataIds(List<String> ids);
+	void addPreferedWikidataId(String id);
+	
+	List<String> getDBpediaIds();
+	void setDBpediaIds(List<String> ids);
+	void addDBpediaId(String id);
 	
 }

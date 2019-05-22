@@ -89,36 +89,13 @@
 	<beans:bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
 	<beans:bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
 	
-	<beans:bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model3}"/>
-	</beans:bean>
-	
-	
-	<!-- beans:bean id="stanfordNerModel4Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model4}"/>
-	</beans:bean>
-	<beans:bean id="stanfordNerModel7Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.model7}"/>
-	</beans:bean>	
-	<beans:bean id="stanfordNerItalianModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceItalianImpl">
-	</beans:bean-->
-	
-	<beans:bean id="stanfordNerGermanModelService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.stanford.modelGerman}"/>
+	<beans:bean id="stanfordNerService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
+		<beans:constructor-arg type="String" value="${enrich.ner.stanford.url}"/>
 	</beans:bean>
 	
 	<beans:bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
 	</beans:bean>
-	
-	
-	
-	
-	<!--beans:bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
-		<beans:constructor-arg type="String" value="${enrich.ner.python.path}"/>
-		<beans:constructor-arg type="String" value="${enrich.ner.python.script}"/>
-        <beans:constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
-	</beans:bean-->
 	
 	<beans:bean id="enrichmentNerService" class="eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl">
     </beans:bean>

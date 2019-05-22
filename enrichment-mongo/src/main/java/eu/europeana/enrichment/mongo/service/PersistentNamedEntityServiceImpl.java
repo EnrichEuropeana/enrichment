@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 
 public class PersistentNamedEntityServiceImpl implements PersistentNamedEntityService {
@@ -43,6 +44,7 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	public void deleteNamedEntity(NamedEntity entity) {
 		namedEntityDao.deleteNamedEntity(entity);
 	}
+	
 	@Override
 	public void deleteAllNamedEntities() {
 		namedEntityDao.deleteAllNamedEntities();

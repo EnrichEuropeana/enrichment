@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -10,7 +12,8 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.TranslationEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
@@ -23,37 +26,37 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 		this.datastore = datastore;
 	}
 	
-	private void addItemEntity(TranslationEntityImpl dbEntity) {
+	private void addItemEntity(DBTranslationEntityImpl dbEntity) {
 		StoryEntity dbItemEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
 		dbEntity.setStoryEntity(dbItemEntity);
 	}
 	
 	@Override
 	public TranslationEntity findTranslationEntity(String key) {
-		Query<TranslationEntityImpl> persistentNamedEntities = datastore.createQuery(TranslationEntityImpl.class);
+		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
 		persistentNamedEntities.field("key").equal(key);
-		List<TranslationEntityImpl> result = persistentNamedEntities.asList();
+		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else {
-			TranslationEntityImpl dbEntity = result.get(0);
+			DBTranslationEntityImpl dbEntity = result.get(0);
 			addItemEntity(dbEntity);
 			return dbEntity;
 		}
 	}
 	@Override
 	public TranslationEntity findTranslationEntityWithStoryInformation(String storyId, String tool, String language) {
-		Query<TranslationEntityImpl> persistentNamedEntities = datastore.createQuery(TranslationEntityImpl.class);
+		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
 		persistentNamedEntities.and(
 				persistentNamedEntities.criteria("storyId").equal(storyId),
 				persistentNamedEntities.criteria("tool").equal(tool),
 				persistentNamedEntities.criteria("language").equal(language)
 				);
-		List<TranslationEntityImpl> result = persistentNamedEntities.asList();
+		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else{
-			TranslationEntityImpl dbEntity = result.get(0);
+			DBTranslationEntityImpl dbEntity = result.get(0);
 			addItemEntity(dbEntity);
 			return dbEntity;
 		}
@@ -61,7 +64,19 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void saveTranslationEntity(TranslationEntity entity) {
-		this.datastore.save(entity);
+		DBTranslationEntityImpl tmp = null;
+		if(entity instanceof DBTranslationEntityImpl)
+			tmp = (DBTranslationEntityImpl) entity;
+		else {
+			try {
+				tmp = new DBTranslationEntityImpl(entity);
+			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(tmp != null)
+			this.datastore.save(tmp);
 	}
 
 	@Override
@@ -71,7 +86,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void deleteTranslationEntityByKey(String key) {
-		datastore.delete(datastore.find(TranslationEntityImpl.class).filter("key", key));
+		datastore.delete(datastore.find(DBTranslationEntityImpl.class).filter("key", key));
 	}
 
 }

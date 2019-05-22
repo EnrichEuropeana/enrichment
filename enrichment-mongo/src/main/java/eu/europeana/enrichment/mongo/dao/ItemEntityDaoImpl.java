@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,8 @@ import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.mongo.model.ItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class ItemEntityDaoImpl implements ItemEntityDao{
 
@@ -23,20 +26,20 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		this.datastore = datastore;
 	}
 	
-	private void addAdditionalInformation(ItemEntityImpl dbEntity) {
+	private void addAdditionalInformation(ItemEntity dbEntity) {
 		StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
 		dbEntity.setStoryEntity(dbStoryEntity);
 	}
 	
 	@Override
 	public ItemEntity findItemEntity(String key) {
-		Query<ItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(ItemEntityImpl.class);
+		Query<DBItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(DBItemEntityImpl.class);
 		persistentStoryItemEntities.field("itemId").equal(key);
-		List<ItemEntityImpl> result = persistentStoryItemEntities.asList();
+		List<DBItemEntityImpl> result = persistentStoryItemEntities.asList();
 		if(result.size() == 0)
 			return null;
 		else {
-			ItemEntityImpl dbEntity = result.get(0);
+			DBItemEntityImpl dbEntity = result.get(0);
 			addAdditionalInformation(dbEntity);
 			return dbEntity;
 		}
@@ -44,12 +47,12 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	
 	@Override
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId){
-		Query<ItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(ItemEntityImpl.class);
+		Query<DBItemEntityImpl> persistentStoryItemEntities = datastore.createQuery(DBItemEntityImpl.class);
 		persistentStoryItemEntities.field("storyId").equal(storyId);
-		List<ItemEntityImpl> result = persistentStoryItemEntities.asList();
+		List<DBItemEntityImpl> result = persistentStoryItemEntities.asList();
 		List<ItemEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
-			ItemEntityImpl dbEntity = result.get(index);
+			DBItemEntityImpl dbEntity = result.get(index);
 			addAdditionalInformation(dbEntity);
 			tmpResult.add(dbEntity);
 		}
@@ -70,7 +73,19 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		}
 		else
 		{
-			this.datastore.save(entity);
+			DBItemEntityImpl tmp = null;
+			if(entity instanceof DBItemEntityImpl)
+				tmp = (DBItemEntityImpl) entity;
+			else {
+				try {
+					tmp = new DBItemEntityImpl(entity);
+				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(tmp != null)
+				this.datastore.save(tmp);
 		}
 	}
 
@@ -81,7 +96,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Override
 	public void deleteItemEntityByStoryItemId(String key) {
-		datastore.delete(datastore.find(ItemEntityImpl.class).filter("itemId", key));
+		datastore.delete(datastore.find(DBItemEntityImpl.class).filter("itemId", key));
 	}
 
 }

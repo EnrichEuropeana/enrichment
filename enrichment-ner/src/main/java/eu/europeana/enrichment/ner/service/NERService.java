@@ -1,22 +1,15 @@
 package eu.europeana.enrichment.ner.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
-//import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
-import eu.europeana.enrichment.mongo.model.PositionEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBPositionEntityImpl;
+import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 
 public interface NERService {
 
@@ -28,7 +21,7 @@ public interface NERService {
 	 * 								including all named entities findings
 	 * @throws NERAnnotateException	
 	 */
-	public TreeMap<String, List<List<String>>> identifyNER(String text) throws NERAnnotateException;
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text);
 	
 	/*
 	 * This methods is the default implementation for getting the positions of the NER entities
@@ -46,7 +39,7 @@ public interface NERService {
 		
 		String text;
 		if(storyEntity != null)
-			text = storyEntity.getStoryTranscription();
+			text = storyEntity.getTranscription();
 		else if(translationEntity != null)
 			text = translationEntity.getTranslatedText();
 		else {
@@ -59,7 +52,7 @@ public interface NERService {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getStoryId()
 					.equals(storyEntity.getStoryId())).collect(Collectors.toList());
 			if(positions.size() == 0) {
-				posEntity = new PositionEntityImpl();
+				posEntity = new DBPositionEntityImpl();
 				posEntity.setStoryEntity(storyEntity);
 				positions.add(posEntity);
 			}
@@ -71,7 +64,7 @@ public interface NERService {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getTranslationKey()
 					.equals(translationEntity.getKey())).collect(Collectors.toList());
 			if(positions.size() == 0) {
-				posEntity = new PositionEntityImpl();
+				posEntity = new DBPositionEntityImpl();
 				posEntity.setTranslationEntity(translationEntity);
 				positions.add(posEntity);
 			}

@@ -10,7 +10,7 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.dao.StoryEntityDao;
-import eu.europeana.enrichment.mongo.model.NamedEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class PersistentStoryEntityServiceImpl implements PersistentStoryEntityService {
 

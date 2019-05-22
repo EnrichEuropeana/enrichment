@@ -32,7 +32,7 @@ public class EnrichmentNERRequest {
 	
 	public String storyId;
 	public List<String> storyItemIds;
-	public String nerTool;
+	public List<String> nerTools;
 	public List<String> linking;
 	public String translationTool;
 	public String translationLanguage;
@@ -49,11 +49,11 @@ public class EnrichmentNERRequest {
 	public void setStoryItemIds(List<String> storyItemIds) {
 		this.storyItemIds = storyItemIds;
 	}
-	public String getNERTool() {
-		return nerTool;
+	public List<String> getNERTools() {
+		return nerTools;
 	}
-	public void setNERTool(String tool) {
-		this.nerTool = tool;
+	public void setNERTools(List<String> tools) {
+		this.nerTools = tools;
 	}
 	public List<String> getLinking(){
 		return linking;
