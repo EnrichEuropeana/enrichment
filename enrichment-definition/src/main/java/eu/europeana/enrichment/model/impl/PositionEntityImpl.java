@@ -12,6 +12,16 @@ public class PositionEntityImpl implements PositionEntity{
 	private List<Integer> offsetsTranslatedText;
 	private List<Integer> offsetsOriginalText;
 	private String storyId;
+	private String storyFieldUsedForNER;
+	
+	public String getStoryFieldUsedForNER() {
+		return storyFieldUsedForNER;
+	}
+
+	public void setStoryFieldUsedForNER(String storyFieldUsedForNER) {
+		this.storyFieldUsedForNER = storyFieldUsedForNER;
+	}
+
 	private String translationKey;
 	
 	public PositionEntityImpl() {

@@ -164,5 +164,17 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		}
 		return map;
 	}
+
+	@Override
+	public String getEnpoint() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setEndpoint(String endpoint) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

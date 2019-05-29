@@ -77,5 +77,15 @@ public class NERStanfordServiceImpl implements NERService{
 			return "";
 		}
 	}
+
+	@Override
+	public String getEnpoint() {
+		return endpoint;
+	}
+
+	@Override
+	public void setEndpoint(String endpoint) {
+		this.endpoint = endpoint;
+	}
 	
 }

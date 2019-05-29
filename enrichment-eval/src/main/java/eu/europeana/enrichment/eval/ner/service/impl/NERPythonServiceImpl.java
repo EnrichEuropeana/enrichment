@@ -147,4 +147,16 @@ public class NERPythonServiceImpl implements NERService{
 		}
 		return tmp;
 	}
+
+	@Override
+	public String getEnpoint() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setEndpoint(String endpoint) {
+		// TODO Auto-generated method stub
+		
+	}
 }

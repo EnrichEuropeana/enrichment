@@ -14,6 +14,20 @@ import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 public interface NERService {
 
 	/**
+	 * Getter for the service endpoint.
+	 * @return
+	 */
+	
+	public String getEnpoint ();
+	
+	/**
+	 * Setter for the NER service endpoint.
+	 * @param endpoint
+	 */
+	
+	public void setEndpoint (String endpoint);
+	
+	/**
 	 * This method identifies named entities based on the translated text.
 	 * 
 	 * @param text					translated text in English

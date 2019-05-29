@@ -2,10 +2,20 @@ package eu.europeana.enrichment.web.model;
 
 import java.util.List;
 
-/*
+/**
  * This class represents the Rest Post body structure for
  * end point /enrichment/entities. The request body will
- * be parsed into this class.
+ * be parsed into this class. An example of the request body:
+ * {
+ * "linking": ["Wikidata"],
+ * "nerTools": ["Stanford_NER"],
+ *	"translationTool": "eTranslation",
+ *	"translationLanguage": "en",
+ *	"storyId": "1495",
+ *	"fieldForNER": "description"
+ * }
+ * @author StevaneticS
+ *
  */
 public class EnrichmentNERRequest {
 
@@ -36,7 +46,15 @@ public class EnrichmentNERRequest {
 	public List<String> linking;
 	public String translationTool;
 	public String translationLanguage;
+	public String fieldForNER;
 	
+	
+	public String getFieldForNER() {
+		return fieldForNER;
+	}
+	public void setFieldForNER(String fieldToTranslate) {
+		this.fieldForNER = fieldToTranslate;
+	}
 	public String getStoryId() {
 		return storyId;
 	}
