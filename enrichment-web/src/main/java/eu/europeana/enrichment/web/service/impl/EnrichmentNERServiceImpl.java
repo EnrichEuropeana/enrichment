@@ -565,7 +565,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				  } catch (IOException e) {
 		    		// TODO Auto-generated catch block
 		    		e.printStackTrace();
+		    		return "Fail";
 				  }
+				 
 			  }
 			  if (brItems != null) {
 				  try {
@@ -573,10 +575,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				  } catch (IOException e) {
 		    		// TODO Auto-generated catch block
 		    		e.printStackTrace();
+		    		return "Fail";
 				  }
 			  }
 			  //TODO: throw httpexception
-			  return "Fail";
+			  return "Done!";
 		}	
 		
 	}
@@ -608,7 +611,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 *  &nbsp;  → " " (space)
 	     */
 	    response = Parser.unescapeEntities(whole, false);
-	    System.out.print(response);
+	    //System.out.print(response);
 
 //	    Elements allParagraphs = doc.getElementsByTag("p");
 //		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
