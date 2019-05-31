@@ -1,7 +1,10 @@
 package eu.europeana.enrichment.solr.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +12,11 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataAgent;
@@ -22,8 +30,10 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
+import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
+
 import riotcmd.json;
 
 public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService {
@@ -256,5 +266,119 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 					
 		}
 		return altLabelMap;
+	}
+
+	@Override
+	public String searchByWikidataURL(String wikidataURL) {
+		
+		log.debug("Search wikidata entity by its URL: " + wikidataURL);
+
+		/**
+		 * Construct a SolrQuery
+		 */
+		SolrQuery query = new SolrQuery();
+		
+		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		
+	    QueryResponse rsp = null;
+		try {
+			rsp = solrBaseClientService.query(solrCore, query);
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    SolrDocumentList docs = rsp.getResults();
+
+	    if (docs.getNumFound() != 1) return null;
+	    else
+	    {
+	    	Map<String,Collection<Object>> map = docs.get(0).getFieldValuesMap();
+	    	
+	    	String result = "{";
+	    	
+	    	//please note that all map operations are not supported on this solr returned "map" object
+	    	Iterator<String> entries = map.keySet().iterator();
+	    	
+	    	while (entries.hasNext()) {
+	    		
+	    		String mapKey = entries.next();
+    		
+    			Collection<Object> valueCollection = map.get(mapKey);
+    			
+    			if(valueCollection != null && !valueCollection.isEmpty())
+    			{
+    				
+    				if(entries.hasNext())
+    				{
+    	    			result += "\""+mapKey.toString()+"\"";
+    	    			result += ":";
+    	    			result += "[";    	    			
+
+    	    			Iterator<Object> objIterator = valueCollection.iterator();
+    	    			
+    					while (objIterator.hasNext()) {
+    						
+    						Object nextObj = objIterator.next();
+    						
+    						if(objIterator.hasNext())
+    						{
+    							result += "\""+nextObj.toString()+"\"";
+    							result += ",";
+    						}
+    						else
+    						{
+    							result += "\""+nextObj.toString()+"\"";
+    						}
+    					}
+    					result += "]";
+    					
+    					result += ",";
+    				}
+    				else
+    				{
+    	    			result += "\""+mapKey.toString()+"\"";
+    	    			result += ":";
+    	    			result += "[";    	    			
+
+    	    			Iterator<Object> objIterator = valueCollection.iterator();
+    	    			
+    					while (objIterator.hasNext()) {
+    						
+    						Object nextObj = objIterator.next();
+    						
+    						if(objIterator.hasNext())
+    						{
+    							result += "\""+nextObj.toString()+"\"";
+    							result += ",";
+    						}
+    						else
+    						{
+    							result += "\""+nextObj.toString()+"\"";
+    						}
+    					}
+    					
+    					result += "]";
+   
+    				}
+    			}
+    			else
+    			{
+    				if(entries.hasNext())
+    				{
+    					result += "[],";
+    				}
+    				else
+    				{
+    					result += "[]";
+    				}
+    			}
+	    		
+	    	}
+	    	
+	    	result += "}";
+
+	    	return result;
+	    }
+		
 	}
 }
