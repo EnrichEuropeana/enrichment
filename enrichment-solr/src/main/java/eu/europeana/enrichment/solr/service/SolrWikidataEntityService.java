@@ -1,12 +1,16 @@
 package eu.europeana.enrichment.solr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public interface SolrWikidataEntityService {
+	
+	
+	public String searchByWikidataURL (String wikidataURL);
 
 	/**
 	 * Storing a single WikidataEntity to the Solr server 
