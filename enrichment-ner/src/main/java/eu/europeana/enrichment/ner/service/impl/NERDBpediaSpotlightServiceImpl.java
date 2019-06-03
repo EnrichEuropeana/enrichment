@@ -198,4 +198,14 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		}
 	}
 
+	@Override
+	public String getEnpoint() {
+		return baseUrl;
+	}
+
+	@Override
+	public void setEndpoint(String endpoint) {
+		this.baseUrl = endpoint;
+	}
+
 }

@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,7 @@ import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
@@ -39,6 +43,7 @@ import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
+import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -51,6 +56,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 */
 	@Resource(name = "solrEntityService")
 	SolrEntityPositionsService solrEntityService;
+	
+	@Resource(name = "solrWikidataEntityService")
+	SolrWikidataEntityService solrWikidataEntityService;
 	
 	/*
 	 * Loading all translation services
@@ -76,6 +84,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 */
 	private static final String stanfordNer = "Stanford_NER";
 	private static final String dbpediaSpotlightName = "DBpedia_Spotlight";
+	private static final Map<String, String> languageCodeMap;
+    static {
+        Map<String, String> aMap = new HashMap<String, String>();
+        aMap.put("German", "de");
+        aMap.put("English", "en");
+        aMap.put("Italian", "it");
+        aMap.put("Romanian", "ro");
+        aMap.put("French", "fr");
+        languageCodeMap = Collections.unmodifiableMap(aMap);
+    }
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -93,6 +111,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		String storyId = requestParam.getStoryId();
+		String storyFieldUsedForNER = requestParam.getFieldForNER();
 		
 		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam);
 		/*
@@ -103,7 +122,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		else
 		{
-			prepareOutput(resultMap, storyId);
+			prepareOutput(resultMap, storyId, storyFieldUsedForNER);
 			return new JSONObject(resultMap).toString();
 		}
 	}
@@ -115,12 +134,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
+		String storyFieldUsedForNER = requestParam.getFieldForNER(); 
 		//TODO: add if description or summary or transcription or items
 		
 		List<String> tools = requestParam.getNERTools();
 		List<String> linking = requestParam.getLinking();
 		String translationTool = requestParam.getTranslationTool();
 		String translationLanguage = requestParam.getTranslationLanguage();
+		
 		
 		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
 		/*
@@ -178,14 +199,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
 					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage);
-			String text = "";
-			if(dbTranslationEntity!=null) text = dbTranslationEntity.getTranslatedText();
-			else text = dbStoryEntity.getTranscription();
+			String textForNer = "";
+			/*
+			 * Getting the specified story field to do the NER (summary, description, or traslationText) using Java reflection
+			 * When nothing is specified, the traslationText field is taken.
+			 */
+			if(storyFieldUsedForNER == null || storyFieldUsedForNER.isEmpty())
+			{
+				storyFieldUsedForNER = "transcriptionText";
+				if(dbTranslationEntity!=null) textForNer = dbTranslationEntity.getTranslatedText();
+				else textForNer = dbStoryEntity.getTranscription();
+			}
+			else
+			{
+				StoryEntityImpl storyEntityReflection = (StoryEntityImpl) dbStoryEntity;
+				Field privateStoryField = StoryEntityImpl.class.getDeclaredField(storyFieldUsedForNER);
+				privateStoryField.setAccessible(true);
+				textForNer = (String) privateStoryField.get(storyEntityReflection);
+			}
 			
 			/*
 			 * Get all named entities
 			 */
-			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, text, dbStoryEntity, dbTranslationEntity);
+			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, storyFieldUsedForNER, dbStoryEntity, dbTranslationEntity);
 			
 			/*
 			 * finding the positions of the entities in the original text using Solr 
@@ -250,6 +286,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 */
 		for (String key : resultMap.keySet()) {
 			for (NamedEntity entity : resultMap.get(key)) {
+				//save the wikidata ids to solr
+				for(String wikidataId : entity.getWikidataIds())
+				{
+					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
+				}
+				//save the NamedEntity to mongo db
 				persistentNamedEntityService.saveNamedEntity(entity);
 			}
 		}
@@ -257,7 +299,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return resultMap;
 	}
 	
-	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, 
+	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, String storyFieldUsedForNER,
 			StoryEntity dbStoryEntity, TranslationEntity dbTranslationEntity) throws ParamValidationException{
 		TreeMap<String, List<NamedEntity>> mapResult = new TreeMap<>();
 		for(String tool_string : tools) {
@@ -272,16 +314,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				default:
 					throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_NER_TOOL, tool_string);
 			}
+			
+			adaptNERServiceEndpointBasedOnLanguage(tmpTool, dbStoryEntity.getLanguage());
+			
 			TreeMap<String, List<NamedEntity>> tmpResult = tmpTool.identifyNER(text);
 			//comparison and update of previous values
-			mapResult = mapResultCombination(mapResult, tmpResult, dbStoryEntity, dbTranslationEntity);
+			mapResult = mapResultCombination(mapResult, tmpResult, dbStoryEntity, storyFieldUsedForNER, dbTranslationEntity);
 			
 		}
 		return mapResult;
 	}
 	
 	private TreeMap<String, List<NamedEntity>> mapResultCombination(TreeMap<String, List<NamedEntity>> mapPreResult, TreeMap<String, List<NamedEntity>> mapCurrentResult,
-			StoryEntity dbStoryEntity, TranslationEntity dbTranslationEntity) {
+			StoryEntity dbStoryEntity, String storyFieldUsedForNER, TranslationEntity dbTranslationEntity) {
 		TreeMap<String, List<NamedEntity>> combinedResult = new TreeMap<>();
 		if(mapPreResult.size() == 0)
 		{
@@ -289,6 +334,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				for(NamedEntity entity : categoryList.getValue()) {
 					PositionEntity pos = entity.getPositionEntities().get(0);
 					pos.setStoryId(dbStoryEntity.getStoryId());
+					pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
 					if(dbTranslationEntity != null)
 						pos.setTranslationKey(dbTranslationEntity.getKey());
 				}
@@ -304,6 +350,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					// Only first PositionEntity is set, because NER tools create new NamedEntities
 					PositionEntity pos = entity.getPositionEntities().get(0);
 					pos.setStoryId(dbStoryEntity.getStoryId());
+					pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
 					if(dbTranslationEntity != null)
 						pos.setTranslationKey(dbTranslationEntity.getKey());
 				}
@@ -320,6 +367,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						NamedEntity resultNamedEntity = endResultCategoryValues.get(resultIndex);
 						PositionEntity pos = resultNamedEntity.getPositionEntities().get(0);
 						pos.setStoryId(dbStoryEntity.getStoryId());
+						pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
 						if(dbTranslationEntity != null)
 							pos.setTranslationKey(dbTranslationEntity.getKey());
 						List<Integer> tmpOffsets = tmpNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText();
@@ -336,7 +384,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return combinedResult;
 	}
 	
-	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, String storyId) {
+	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, String storyId, String storyFieldUsedForNER) {
 		for (String classificationType : resultMap.keySet()) {
 			List<NamedEntity> namedEntities = resultMap.get(classificationType);
 			for(int index = namedEntities.size()-1; index >= 0; index--) {
@@ -350,6 +398,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					else {
 						tmpPositionEntity.setStoryEntity(null);
 						tmpPositionEntity.setStoryId(tmpStoryId);
+						tmpPositionEntity.setStoryFieldUsedForNER(storyFieldUsedForNER);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
@@ -425,12 +474,15 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return "Done!";
 	}
 
+	@SuppressWarnings("finally")
 	@Override
 	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
 		
 		/*
 		 * reading stories and items from json
 		 */
+		
+		String resultString = "Done!";
 		
 		BufferedReader brStories = null;
 		BufferedReader brItems = null;
@@ -459,8 +511,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			{
 				String storyLanguage = (String)stories.get(i).get("language");
 				if(storyLanguage==null) storyLanguage="";
-//				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
-//				{
+				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
+				{
 					DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
 					newStoryEntity.setTitle("");
 					newStoryEntity.setDescription("");
@@ -478,7 +530,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					if(stories.get(i).get("summary")!=null)	newStoryEntity.setSummary((String) stories.get(i).get("summary"));
 				
 					storyEntities.add(newStoryEntity);
-//				}				
+				}				
 				
 			}
 			
@@ -505,8 +557,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(itemLanguage==null) itemLanguage="";
 				String itemTranscription = (String)items.get(i).get("transcription");				
 
-//				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
-//				{
+				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+				{
 					
 					DBItemEntityImpl newItemEntity=new DBItemEntityImpl();
 					newItemEntity.setTitle("");
@@ -519,15 +571,20 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					
 					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
 					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
-					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
+					if(items.get(i).get("transcription")!=null)
+					{
+						String itemTranscriptionTextHtml = (String) items.get(i).get("transcription");
+						String itemTranscriptionText = parseHTMLWithJsoup(itemTranscriptionTextHtml);
+						newItemEntity.setTranscription(itemTranscriptionText);
+					}
 					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
 					if(items.get(i).get("item_id")!=null) newItemEntity.setItemId((String) items.get(i).get("item_id"));
 	
 					if(items.get(i).get("story_id")!=null && items.get(i).get("transcription")!=null)
 					{		
 						String itemStoryId = (String) items.get(i).get("story_id");
-						String transcription = (String) items.get(i).get("transcription");
-						parseHTMLWithJsoup(transcription);
+						String transcription = newItemEntity.getTranscription();
+						
 						/*
 						 * adding item transcription to the story transcription
 						 */
@@ -544,20 +601,22 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					}
 					
 					itemEntities.add(newItemEntity);
-//				}
+				}
 				
 			}
 			
 			String uploadItemsStatus = uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
 			
 			logger.info("Stories and Items are saved to the database from the JSON file!");
-			return "Done!";
+			resultString = "Done!";
 		}
 		catch (FileNotFoundException e) {
 		    e.printStackTrace();
+		    resultString = "Fail! File not found!";
 		} catch (HttpException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			resultString = "Fail! Http Exception!";
 		} finally {
 			  if (brStories != null) {
 				  try {
@@ -565,7 +624,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				  } catch (IOException e) {
 		    		// TODO Auto-generated catch block
 		    		e.printStackTrace();
-		    		return "Fail";
+		    		resultString = "Fail!";
 				  }
 				 
 			  }
@@ -575,16 +634,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				  } catch (IOException e) {
 		    		// TODO Auto-generated catch block
 		    		e.printStackTrace();
-		    		return "Fail";
+		    		resultString = "Fail!";
 				  }
 			  }
 			  //TODO: throw httpexception
-			  return "Done!";
 		}	
 		
+		return resultString;
 	}
 	
-	private void parseHTMLWithJsoup (String htmlText)
+	private String parseHTMLWithJsoup (String htmlText)
 	{
 //		StringBuilder response = new StringBuilder ();
 
@@ -612,10 +671,24 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	     */
 	    response = Parser.unescapeEntities(whole, false);
 	    //System.out.print(response);
+	    //System.out.print(response);
+	    return response;
 
 //	    Elements allParagraphs = doc.getElementsByTag("p");
 //		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
 //		logger.info(whole);
 //		System.out.print(whole);
+	}
+	
+	/**
+	 * This function adapts the endpoint of the NER service Stanford
+	 * @param endpointToAdapt
+	 * @param languageForNER
+	 * @return
+	 */
+	private void adaptNERServiceEndpointBasedOnLanguage (NERService service, String languageForNER)
+	{
+		String endpoint = service.getEnpoint();
+		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageCodeMap.get(languageForNER)+"/"));
 	}
 }
