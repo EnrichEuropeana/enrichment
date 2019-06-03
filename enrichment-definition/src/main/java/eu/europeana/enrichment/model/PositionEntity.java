@@ -9,8 +9,13 @@ public interface PositionEntity {
 	 */
 	StoryEntity getStoryEntity();
 	void setStoryEntity(StoryEntity ItemEntity);
+	
 	public String getStoryId();
 	public void setStoryId(String storyId);
+	
+	public String getStoryFieldUsedForNER();
+	public void setStoryFieldUsedForNER(String storyFieldUsedForNER);
+
 	
 	/*
 	 * 

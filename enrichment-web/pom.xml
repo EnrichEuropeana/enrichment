@@ -41,6 +41,12 @@
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-ner</artifactId>
 			<version>${version.enrichmentAPI}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
@@ -56,6 +62,12 @@
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-solr</artifactId>
 			<version>${version.enrichmentAPI}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		
@@ -64,11 +76,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>${version.commonsLang3}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>${version.googleGuava}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -84,7 +91,12 @@
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-translate</artifactId>
 			<version>${version.googleTranslation}</version>
-			
+			<!-- exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions-->
 		</dependency>
 		<!-- for some reasons -->
 		<dependency>
@@ -219,6 +231,12 @@
 			<groupId>org.languagetool</groupId>
 			<artifactId>language-en</artifactId>
 			<version>${version.languagetool}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<!-- Test dependencies -->
