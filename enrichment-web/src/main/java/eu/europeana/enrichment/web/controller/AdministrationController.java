@@ -49,8 +49,7 @@ public class AdministrationController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson")
-	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.GET},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.GET} , produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,

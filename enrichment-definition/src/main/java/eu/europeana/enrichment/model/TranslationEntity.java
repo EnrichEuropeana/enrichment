@@ -36,4 +36,7 @@ public interface TranslationEntity {
 	void setStoryEntity(StoryEntity ItemEntity);
 	String getStoryId();
 	void setStoryId(String storyId);
+	
+	String getType();
+	void setType(String type);
 }

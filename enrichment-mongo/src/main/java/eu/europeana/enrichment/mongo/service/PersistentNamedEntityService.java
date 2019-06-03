@@ -14,7 +14,7 @@ public interface PersistentNamedEntityService {
 	 * @return							a database named entity 
 	 */
 	public NamedEntity findNamedEntity(String key);
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, boolean translation);
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String itemId, String type, boolean translation);
 	/*
 	 * This method retrieves all named entities from the Mongo database
 	 * 

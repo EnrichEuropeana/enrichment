@@ -56,7 +56,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String storyId = requestParam.getStoryId();			
 			String originalText = requestParam.getText();
 			String translationTool = requestParam.getTranslationTool();
-			String sourceLanguage = requestParam.getSourceLanguage();
+			String type = requestParam.getType();
 			Boolean sendRequest = requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
 			
 			/*
@@ -66,8 +66,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
 			else if(translationTool == null || translationTool.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
-			else if(sourceLanguage == null || sourceLanguage.isEmpty())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, null);
+			
+			if(type == null || type.isEmpty())
+				type = "transcription";
 			
 			/*
 			 * Check if story / storyItem already exist and
@@ -75,21 +76,34 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 */
 			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);						
 			StoryEntity tmpStoryEntity = null;
+			String sourceLanguage = requestParam.getSourceLanguage();
 			if(dbStoryEntity != null) {
-			
+				sourceLanguage = dbStoryEntity.getLanguage();
 				tmpStoryEntity = dbStoryEntity;
 				TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryInformation(storyId, translationTool, sourceLanguage);
+							findTranslationEntityWithStoryInformation(storyId, translationTool, sourceLanguage, type);
 				if(dbTranslationEntity != null)
 					return dbTranslationEntity.getTranslatedText();
 				
-				if((originalText == null || originalText.isEmpty()) && 
-						!(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
-					// Reuse of dbItemEntity text if original text is not given
-					originalText = dbStoryEntity.getTranscription();
+				if(originalText == null || originalText.isEmpty())
+				{
+					if(type.toLowerCase().equals("transcription") && !(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
+						// Reuse of dbItemEntity text if original text is not given
+						originalText = dbStoryEntity.getTranscription();
+					}
+					else if(type.toLowerCase().equals("summary") && !(dbStoryEntity.getSummary() == null || dbStoryEntity.getSummary().isEmpty())) {
+						// Reuse of dbItemEntity text if original text is not given
+						originalText = dbStoryEntity.getSummary();
+					}
+					else if(type.toLowerCase().equals("description") && !(dbStoryEntity.getDescription() == null || dbStoryEntity.getDescription().isEmpty())) {
+						// Reuse of dbItemEntity text if original text is not given
+						originalText = dbStoryEntity.getDescription();
+					}
 				}
-			
 			}
+			
+			if(sourceLanguage == null || sourceLanguage.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, null);
 			
 			if(originalText == null || originalText.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
@@ -107,6 +121,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
 			tmpTranslationEntity.setTool(translationTool);
 			tmpTranslationEntity.setStoryId(storyId);
+			tmpTranslationEntity.setType(type);
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");
 
@@ -153,13 +168,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String translatedText = requestParam.getText();		
 		String translationTool = requestParam.getTranslationTool();
 		String language = requestParam.getSourceLanguage();
+		String type = requestParam.getType();
 		
-		if(storyId.isEmpty() || translatedText.isEmpty() || translationTool.isEmpty() || language.isEmpty()) {
+		if(storyId.isEmpty() || translatedText.isEmpty() || translationTool.isEmpty() || language.isEmpty() || type.isEmpty()) {
 			//TODO: proper exception handling
 			return "";
 		}
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithStoryInformation(storyId, translationTool, language);
+				findTranslationEntityWithStoryInformation(storyId, translationTool, language, type);
 		if(dbTranslationEntity == null) {
 			//TODO: proper exception handling
 			return "";
