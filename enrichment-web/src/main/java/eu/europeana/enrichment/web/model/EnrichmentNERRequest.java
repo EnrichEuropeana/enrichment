@@ -46,14 +46,21 @@ public class EnrichmentNERRequest {
 	public List<String> linking;
 	public String translationTool;
 	public String translationLanguage;
-	public String fieldForNER;
+	public String type;
+	public boolean original;
 	
 	
-	public String getFieldForNER() {
-		return fieldForNER;
+	public boolean getOriginal() {
+		return original;
 	}
-	public void setFieldForNER(String fieldToTranslate) {
-		this.fieldForNER = fieldToTranslate;
+	public void setOriginal(boolean original) {
+		this.original = original;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	public String getStoryId() {
 		return storyId;

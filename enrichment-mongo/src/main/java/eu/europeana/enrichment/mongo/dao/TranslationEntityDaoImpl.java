@@ -45,12 +45,13 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 		}
 	}
 	@Override
-	public TranslationEntity findTranslationEntityWithStoryInformation(String storyId, String tool, String language) {
+	public TranslationEntity findTranslationEntityWithStoryInformation(String storyId, String tool, String language, String type) {
 		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
 		persistentNamedEntities.and(
 				persistentNamedEntities.criteria("storyId").equal(storyId),
 				persistentNamedEntities.criteria("tool").equal(tool),
-				persistentNamedEntities.criteria("language").equal(language)
+				persistentNamedEntities.criteria("language").equal(language),
+				persistentNamedEntities.criteria("type").equal(type)
 				);
 		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)

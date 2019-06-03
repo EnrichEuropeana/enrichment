@@ -16,6 +16,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private String tool;
 	private String eTranslationId;
 	private String storyId;
+	private String type;
 	
 	public String getETranslationId() {
 		return eTranslationId;
@@ -71,6 +72,16 @@ public class TranslationEntityImpl implements TranslationEntity{
 	@Override
 	public void setTool(String tool) {
 		this.tool = tool;
+	}
+	
+	@Override
+	public String getType() {
+		return type;
+	}
+	
+	@Override
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 	@Override

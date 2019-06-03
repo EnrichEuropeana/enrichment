@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,13 +31,13 @@ import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
+import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
@@ -111,7 +110,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		String storyId = requestParam.getStoryId();
-		String storyFieldUsedForNER = requestParam.getFieldForNER();
 		
 		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam);
 		/*
@@ -122,7 +120,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		else
 		{
-			prepareOutput(resultMap, storyId, storyFieldUsedForNER);
+			prepareOutput(resultMap, storyId);
 			return new JSONObject(resultMap).toString();
 		}
 	}
@@ -134,8 +132,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
-		String storyFieldUsedForNER = requestParam.getFieldForNER(); 
+		String type = requestParam.getType();
+		if(type == null || type.isEmpty())
+			type = "transcription";
 		//TODO: add if description or summary or transcription or items
+		boolean original = requestParam.getOriginal();
 		
 		List<String> tools = requestParam.getNERTools();
 		List<String> linking = requestParam.getLinking();
@@ -173,9 +174,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
+		
+		//Named entities should also get the type where it was found
+		
 		//check if named entities already exist
 		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
-			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryEntity.getStoryId(), false));
+			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(dbStoryEntity.getStoryId(), type, false));
 		}
 		//TODO: check if update is need (e.g.: linking tools)
 		if(tmpNamedEntities.size() > 0) {
@@ -192,36 +196,36 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			return resultMap;
 		}
+		
 			
 		/*
 		 * Apply named entity recognition on all story translations
 		 */
 		for(StoryEntity dbStoryEntity : tmpStoryEntity) {
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-					findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage);
+			TranslationEntity dbTranslationEntity = null;
+			if(!original) {
+				dbTranslationEntity = persistentTranslationEntityService.
+						findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage, type);
+			}
 			String textForNer = "";
+			
 			/*
 			 * Getting the specified story field to do the NER (summary, description, or traslationText) using Java reflection
 			 * When nothing is specified, the traslationText field is taken.
 			 */
-			if(storyFieldUsedForNER == null || storyFieldUsedForNER.isEmpty())
-			{
-				storyFieldUsedForNER = "transcriptionText";
-				if(dbTranslationEntity!=null) textForNer = dbTranslationEntity.getTranslatedText();
-				else textForNer = dbStoryEntity.getTranscription();
-			}
+			if(dbTranslationEntity!=null) 
+				textForNer = dbTranslationEntity.getTranslatedText();
+			else if(type.toLowerCase().equals("summary") && dbTranslationEntity==null)
+				textForNer = dbStoryEntity.getSummary();
+			else if(type.toLowerCase().equals("description") && dbTranslationEntity==null) 
+				textForNer = dbStoryEntity.getSummary();
 			else
-			{
-				StoryEntityImpl storyEntityReflection = (StoryEntityImpl) dbStoryEntity;
-				Field privateStoryField = StoryEntityImpl.class.getDeclaredField(storyFieldUsedForNER);
-				privateStoryField.setAccessible(true);
-				textForNer = (String) privateStoryField.get(storyEntityReflection);
-			}
+				textForNer = dbStoryEntity.getTranscription();
 			
 			/*
 			 * Get all named entities
 			 */
-			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, storyFieldUsedForNER, dbStoryEntity, dbTranslationEntity);
+			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, type, dbStoryEntity, dbTranslationEntity);
 			
 			/*
 			 * finding the positions of the entities in the original text using Solr 
@@ -384,8 +388,15 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return combinedResult;
 	}
 	
-	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, String storyId, String storyFieldUsedForNER) {
+	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, String storyId) {
+		List<String> classificationTypeForRemoval = new ArrayList<>();
 		for (String classificationType : resultMap.keySet()) {
+			if(!(classificationType.equals(NERClassification.AGENT.toString()) || 
+					classificationType.equals(NERClassification.PLACE.toString())))
+			{
+				classificationTypeForRemoval.add(classificationType);
+				continue;
+			}
 			List<NamedEntity> namedEntities = resultMap.get(classificationType);
 			for(int index = namedEntities.size()-1; index >= 0; index--) {
 				NamedEntity tmpNamedEntity = namedEntities.get(index);
@@ -398,7 +409,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					else {
 						tmpPositionEntity.setStoryEntity(null);
 						tmpPositionEntity.setStoryId(tmpStoryId);
-						tmpPositionEntity.setStoryFieldUsedForNER(storyFieldUsedForNER);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
@@ -406,6 +416,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				}
 				tmpNamedEntity.setType(null);
 			}
+		}
+		
+		for(String type : classificationTypeForRemoval) {
+			resultMap.remove(type);
 		}
 	}
 	
