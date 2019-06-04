@@ -72,6 +72,11 @@
 		
 		
 		<!-- Other -->
+		 <dependency>
+		     <groupId>com.neovisionaries</groupId>
+		     <artifactId>nv-i18n</artifactId>
+		     <version>1.25</version>
+		 </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

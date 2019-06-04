@@ -39,6 +39,7 @@ public class EnrichmentNERRequest {
 	public static final String PARAM_LINKING = "linking";
 	public static final String PARAM_TRANSLATION_TOOL = "translationTool";
 	public static final String PARAM_TRANSLATION_LANGUAGE = "translationLanguage";
+	public static final String PARAM_TYPE = "type";
 	
 	public String storyId;
 	public List<String> storyItemIds;

@@ -24,6 +24,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Whitelist;
 
+import com.neovisionaries.i18n.LanguageCode;
+
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.ItemEntity;
@@ -46,6 +48,7 @@ import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
+import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
@@ -135,6 +138,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		String type = requestParam.getType();
 		if(type == null || type.isEmpty())
 			type = "transcription";
+		else if(!(type.equals("summary") || type.equals("description") || type.equals("transcription")))
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TYPE, null);
 		//TODO: add if description or summary or transcription or items
 		boolean original = requestParam.getOriginal();
 		
@@ -155,9 +160,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 */
 		if(tools == null || tools.isEmpty())
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_NER_TOOL, null);
-		if(translationTool == null || translationTool.isEmpty())
+		if(!original && (translationTool == null || translationTool.isEmpty()))
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_TOOL, null);
-		if(translationLanguage == null || translationLanguage.isEmpty())
+		if(!original && (translationLanguage == null || translationLanguage.isEmpty()))
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_LANGUAGE, null);
 		List<String> invalidLinkinParams = new ArrayList<>();
 		for(String newLinkingTool : linking) {
@@ -272,7 +277,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 							tmpClassificationList.add(dbEntity);
 					}
 					else {
-						dbEntity = tmpNamedEntity; //(DBNamedEntityImpl) tmpNamedEntity;
+						dbEntity = tmpNamedEntity;
 						tmpClassificationList.add(dbEntity);
 					}
 					
@@ -289,9 +294,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * Save and update all named entities
 		 */
 		for (String key : resultMap.keySet()) {
-			for (NamedEntity entity : resultMap.get(key)) {
+			List<NamedEntity> entities = resultMap.get(key);
+			for (NamedEntity entity : entities) {
 				//save the wikidata ids to solr
-				for(String wikidataId : entity.getWikidataIds())
+				for(String wikidataId : entity.getPreferedWikidataIds())
 				{
 					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
 				}
@@ -319,7 +325,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_NER_TOOL, tool_string);
 			}
 			
-			adaptNERServiceEndpointBasedOnLanguage(tmpTool, dbStoryEntity.getLanguage());
+			String language = dbStoryEntity.getLanguage();
+			if(dbTranslationEntity != null)
+				language = dbTranslationEntity.getLanguage();
+			adaptNERServiceEndpointBasedOnLanguage(tmpTool, language);
 			
 			TreeMap<String, List<NamedEntity>> tmpResult = tmpTool.identifyNER(text);
 			//comparison and update of previous values
@@ -374,6 +383,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
 						if(dbTranslationEntity != null)
 							pos.setTranslationKey(dbTranslationEntity.getKey());
+						
+						for(String dbpediaId : tmpNamedEntity.getDBpediaIds())
+						{
+							resultNamedEntity.addDBpediaId(dbpediaId);
+						}
+						
 						List<Integer> tmpOffsets = tmpNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText();
 						List<Integer> resultOffsets = pos.getOffsetsTranslatedText();
 						resultOffsets.addAll(tmpOffsets);
@@ -524,28 +539,36 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			for (int i=0;i<stories.size();i++)
 			{
 				String storyLanguage = (String)stories.get(i).get("language");
-				if(storyLanguage==null) storyLanguage="";
-				if(storyLanguage.compareTo("English")==0 || storyLanguage.compareTo("German")==0)
-				{
-					DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
-					newStoryEntity.setTitle("");
-					newStoryEntity.setDescription("");
-					newStoryEntity.setStoryId("");
-					newStoryEntity.setLanguage("");
-					newStoryEntity.setSummary("");
-					newStoryEntity.setTranscription("");				
-	
+				if(storyLanguage==null) 
+					storyLanguage="";
+				else {
+					List<LanguageCode> languageCodes = LanguageCode.findByName(storyLanguage);
+					if(languageCodes.size() > 0)
+						storyLanguage = languageCodes.get(0).toString();
+				}
 					
-					if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
-					if(stories.get(i).get("title")!=null) newStoryEntity.setTitle((String) stories.get(i).get("title"));
-					if(stories.get(i).get("description")!=null) newStoryEntity.setDescription((String) stories.get(i).get("description"));
-					if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
-					if(stories.get(i).get("language")!=null) newStoryEntity.setLanguage((String) stories.get(i).get("language"));	
-					if(stories.get(i).get("summary")!=null)	newStoryEntity.setSummary((String) stories.get(i).get("summary"));
 				
-					storyEntities.add(newStoryEntity);
-				}				
+				if(languageCodeMap.containsKey(storyLanguage))
+					storyLanguage = languageCodeMap.get(storyLanguage);
 				
+				DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
+				newStoryEntity.setTitle("");
+				newStoryEntity.setDescription("");
+				newStoryEntity.setStoryId("");
+				newStoryEntity.setLanguage("");
+				newStoryEntity.setSummary("");
+				newStoryEntity.setTranscription("");
+				newStoryEntity.setLanguage(storyLanguage);
+				
+				if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
+				if(stories.get(i).get("title")!=null) newStoryEntity.setTitle((String) stories.get(i).get("title"));
+				if(stories.get(i).get("description")!=null) newStoryEntity.setDescription((String) stories.get(i).get("description"));
+				if(stories.get(i).get("story_id")!=null) newStoryEntity.setStoryId((String) stories.get(i).get("story_id"));
+				if(stories.get(i).get("summary")!=null)	newStoryEntity.setSummary((String) stories.get(i).get("summary"));
+				
+				//if(stories.get(i).get("language")!=null) newStoryEntity.setLanguage((String) stories.get(i).get("language"));	
+			
+				storyEntities.add(newStoryEntity);
 			}
 			
 			String uploadStoriesStatus = uploadStories(storyEntities.toArray(new DBStoryEntityImpl[0]));
@@ -567,11 +590,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			List<DBItemEntityImpl> itemEntities = new ArrayList<DBItemEntityImpl>();
 			for (int i=0;i<items.size();i++)
 			{
-				String itemLanguage = (String)items.get(i).get("language");
-				if(itemLanguage==null) itemLanguage="";
+
 				String itemTranscription = (String)items.get(i).get("transcription");				
 
-				if(itemTranscription!=null && (itemLanguage.compareTo("English")==0 || itemLanguage.compareTo("German")==0))
+				if(itemTranscription!=null)
 				{
 					
 					DBItemEntityImpl newItemEntity=new DBItemEntityImpl();
@@ -591,7 +613,18 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						String itemTranscriptionText = parseHTMLWithJsoup(itemTranscriptionTextHtml);
 						newItemEntity.setTranscription(itemTranscriptionText);
 					}
-					if(items.get(i).get("language")!=null) newItemEntity.setLanguage((String) items.get(i).get("language"));
+					
+					String itemLanguage = (String) items.get(i).get("language");
+					if(items.get(i).get("language")!=null) {
+						List<LanguageCode> languageCodes = LanguageCode.findByName(itemLanguage);
+						if(languageCodes.size() > 0)
+							newItemEntity.setLanguage(languageCodes.get(0).toString());
+						else
+							newItemEntity.setLanguage("");
+					} else {
+						newItemEntity.setLanguage("");
+					}
+					
 					if(items.get(i).get("item_id")!=null) newItemEntity.setItemId((String) items.get(i).get("item_id"));
 	
 					if(items.get(i).get("story_id")!=null && items.get(i).get("transcription")!=null)
@@ -703,6 +736,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	private void adaptNERServiceEndpointBasedOnLanguage (NERService service, String languageForNER)
 	{
 		String endpoint = service.getEnpoint();
-		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageCodeMap.get(languageForNER)+"/"));
+		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
 	}
 }

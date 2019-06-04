@@ -69,6 +69,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			
 			if(type == null || type.isEmpty())
 				type = "transcription";
+			else if(!(type.equals("summary") || type.equals("description") || type.equals("transcription")))
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TYPE, null);
 			
 			/*
 			 * Check if story / storyItem already exist and
