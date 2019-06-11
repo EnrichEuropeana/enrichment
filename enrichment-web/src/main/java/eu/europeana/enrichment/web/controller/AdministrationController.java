@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
@@ -25,13 +26,16 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @EnableCaching
 @SwaggerSelect
-@Api(tags = "Administrator service", description=" ")
+@Api(tags = "Administration service", description=" ")
 public class AdministrationController extends BaseRest {
 
 	@Resource
 	EnrichmentNERService enrichmentNerService;
 	@Resource
 	EnrichmentTranslationService enrichmentTranslationService;
+	
+	@Resource(name = "eTranslationService")
+	TranslationService eTranslationService;
 	
 	/*
 	 * This method represents the /administration/uploadStoriesAndItemsFromJson end point,
@@ -49,7 +53,7 @@ public class AdministrationController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson")
-	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.GET} , produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.POST} , produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
@@ -85,12 +89,12 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody StoryEntityImpl [] stories) throws HttpException {
+			@RequestBody StoryEntityImpl [] body) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String uploadStoriesStatus = enrichmentNerService.uploadStories(stories);
+			String uploadStoriesStatus = enrichmentNerService.uploadStories(body);
 			
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
 		
@@ -117,12 +121,12 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody ItemEntityImpl [] items) throws HttpException {
+			@RequestBody ItemEntityImpl [] body) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String uploadItemsStatus = enrichmentNerService.uploadItems(items);
+			String uploadItemsStatus = enrichmentNerService.uploadItems(body);
 			
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
 		
@@ -137,18 +141,46 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest translationRequest) throws HttpException {
+			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String translation = enrichmentTranslationService.uploadTranslation(translationRequest);
+			String translation = enrichmentTranslationService.uploadTranslation(body);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
 			return response;
 		} catch (HttpException e) {
 			throw e;
 		}	
+	}
+	
+	/*
+	 * This method represents the /enrichment/eTranslation end point,
+	 * where a translation response from eTranslation will be processed.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param translationRequest		is the Rest Post body with the original
+	 * 									text for translation into English
+	 * return 							the translated text or for eTranslation
+	 * 									only an ID
+	 */
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation")
+	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> getETranslation(
+			@RequestParam(value = "target-language", required = false) String targetLanguage,
+			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
+			@RequestParam(value = "request-id", required = false) String requestId,
+			@RequestParam(value = "external-reference", required = false) String externalReference
+			) 
+	{
+		
+		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);
+		
+		ResponseEntity<String> response = new ResponseEntity<String>("eTranslation callback has been executed!", HttpStatus.OK);
+		
+		return response;
 	}
 
 }

@@ -51,47 +51,18 @@ public class TranslationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest translationRequest) throws HttpException {
+			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String translation = enrichmentTranslationService.translate(translationRequest);
+			String translation = enrichmentTranslationService.translate(body);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 			
 			return response;
 		} catch (HttpException e) {
 			throw e;
 		}
-	}
-	
-	
-	/*
-	 * This method represents the /enrichment/eTranslation end point,
-	 * where a translation response from eTranslation will be processed.
-	 * All requests on this end point are processed here.
-	 * 
-	 * @param translationRequest		is the Rest Post body with the original
-	 * 									text for translation into English
-	 * return 							the translated text or for eTranslation
-	 * 									only an ID
-	 */
-	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation")
-	@RequestMapping(value = "/enrichment/eTranslation", method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> getETranslation(
-			@RequestParam(value = "target-language", required = false) String targetLanguage,
-			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
-			@RequestParam(value = "request-id", required = false) String requestId,
-			@RequestParam(value = "external-reference", required = false) String externalReference
-			) 
-	{
-		
-		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);
-		
-		ResponseEntity<String> response = new ResponseEntity<String>("eTranslation callback has been executed!", HttpStatus.OK);
-		
-		return response;
 	}
 
 }

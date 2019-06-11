@@ -20,15 +20,14 @@ public class EnrichmentTranslationRequest {
 	public String text;
 	public String type;
 	public String translationTool;
-	public String sourceLanguage;
-	public Boolean sendRequest;
-	
-	public Boolean getSendRequest() {
-		return sendRequest;
-	}
-	public void setSendRequest(Boolean sendRequest) {
-		this.sendRequest = sendRequest;
-	}
+//	public Boolean sendRequest;
+//	
+//	public Boolean getSendRequest() {
+//		return sendRequest;
+//	}
+//	public void setSendRequest(Boolean sendRequest) {
+//		this.sendRequest = sendRequest;
+//	}
 	public String getStoryId() {
 		return storyId;
 	}
@@ -53,12 +52,6 @@ public class EnrichmentTranslationRequest {
 	}
 	public void setTranslationTool(String tool) {
 		this.translationTool = tool;
-	}
-	public String getSourceLanguage() {
-		return sourceLanguage;
-	}
-	public void setSourceLanguage(String sourceLangauge) {
-		this.sourceLanguage = sourceLangauge;
 	}
 	
 }

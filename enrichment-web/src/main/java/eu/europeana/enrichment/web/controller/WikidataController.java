@@ -30,7 +30,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @EnableCaching
 @SwaggerSelect
-@Api(tags = "Wikidata entities service", description=" ")
+@Api(tags = "Entity preview service", description=" ")
 public class WikidataController extends BaseRest {
 
 	@Resource
@@ -50,17 +50,16 @@ public class WikidataController extends BaseRest {
      * @throws SolrNamedEntityServiceException
      */
 	
-	@ApiOperation(value = "Get entities from text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getWikidataEntity")
-	@RequestMapping(value = "/enrichment/wikidata", method = {RequestMethod.GET},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNEREntities(
+	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity")
+	@RequestMapping(value = "/enrichment/resolve", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody WikidataRequest wikidataRequest) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wikidataId", required = true) String wikidataId) throws Exception, HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataRequest.getWikidataId());
+			String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
 			
 			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
 					

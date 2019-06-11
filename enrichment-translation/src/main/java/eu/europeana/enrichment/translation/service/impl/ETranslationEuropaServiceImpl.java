@@ -34,7 +34,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 
 	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
 	private String domain;
-	private String requesterCallback;
+	private String requesterCallback = "http://dsi-demo.ait.ac.at/enrichment-web/administration/eTranslation";
 	private String errorCallback;
 	private String emailDestination;
 	private String fileFormat = "txt";
@@ -198,7 +198,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		// .put("externalReference", "123")
 		
 		JSONObject jsonBody = new JSONObject().put("priority", 0)
-				.put("requesterCallback", "http://dsi-demo.ait.ac.at/enrichment-web/enrichment/eTranslation")
+				.put("requesterCallback", requesterCallback)
 				.put("externalReference", externalReference)
 				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
 				.put("sourceLanguage", sourceLanguage.toUpperCase())

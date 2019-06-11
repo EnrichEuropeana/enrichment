@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @EnableCaching
 @SwaggerSelect
-@Api(tags = "NER get entities service", description=" ")
+@Api(tags = "Enrichment service", description=" ")
 public class NERController extends BaseRest {
 
 	@Resource
@@ -41,17 +41,42 @@ public class NERController extends BaseRest {
 	 * @return							a map of all named entities including 
 	 * 									their classification types 
 	 */
-	@ApiOperation(value = "Get entities from text (Stanford_NER_model_3, Stanford_NER_model_4, Stanford_NER_model_7)", nickname = "getNEREntities")
+	@ApiOperation(value = "Get named entities", nickname = "getNEREntities")
 	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest nerRequest) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestBody EnrichmentNERRequest body) throws Exception, HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String jsonLd = enrichmentNerService.getEntities(nerRequest);
+			String jsonLd = enrichmentNerService.getEntities(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw e;
+		}
+	}
+	
+	@ApiOperation(value = "Get named entities", nickname = "getEntities")
+	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.GET},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getEntities(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody EnrichmentNERRequest body) throws Exception, HttpException, SolrNamedEntityServiceException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String jsonLd = enrichmentNerService.getEntities(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
