@@ -39,17 +39,15 @@ public class EnrichmentNERRequest {
 	public static final String PARAM_LINKING = "linking";
 	public static final String PARAM_TRANSLATION_TOOL = "translationTool";
 	public static final String PARAM_TRANSLATION_LANGUAGE = "translationLanguage";
-	public static final String PARAM_TYPE = "type";
+	public static final String PARAM_PROPERTY = "property";
 	
 	public String storyId;
 	public List<String> storyItemIds;
 	public List<String> nerTools;
 	public List<String> linking;
 	public String translationTool;
-	public String translationLanguage;
-	public String type;
+	public String property;
 	public boolean original;
-	
 	
 	public boolean getOriginal() {
 		return original;
@@ -57,11 +55,11 @@ public class EnrichmentNERRequest {
 	public void setOriginal(boolean original) {
 		this.original = original;
 	}
-	public String getType() {
-		return type;
+	public String getProperty() {
+		return property;
 	}
-	public void setType(String type) {
-		this.type = type;
+	public void setProperty(String type) {
+		this.property = type;
 	}
 	public String getStoryId() {
 		return storyId;
@@ -75,10 +73,10 @@ public class EnrichmentNERRequest {
 	public void setStoryItemIds(List<String> storyItemIds) {
 		this.storyItemIds = storyItemIds;
 	}
-	public List<String> getNERTools() {
+	public List<String> getNerTools() {
 		return nerTools;
 	}
-	public void setNERTools(List<String> tools) {
+	public void setNerTools(List<String> tools) {
 		this.nerTools = tools;
 	}
 	public List<String> getLinking(){
@@ -93,10 +91,5 @@ public class EnrichmentNERRequest {
 	public void setTranslationTool(String translationTool) {
 		this.translationTool = translationTool;
 	}
-	public String getTranslationLanguage() {
-		return translationLanguage;
-	}
-	public void setTranslationlanguage(String translationLanguage) {
-		this.translationLanguage = translationLanguage;
-	}
+
 }

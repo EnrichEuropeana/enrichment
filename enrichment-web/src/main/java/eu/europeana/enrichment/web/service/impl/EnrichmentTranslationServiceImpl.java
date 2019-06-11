@@ -57,7 +57,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String originalText = requestParam.getText();
 			String translationTool = requestParam.getTranslationTool();
 			String type = requestParam.getType();
-			Boolean sendRequest = requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
+			Boolean sendRequest = true;//requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
 			
 			/*
 			 * Parameter check
@@ -78,7 +78,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 */
 			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);						
 			StoryEntity tmpStoryEntity = null;
-			String sourceLanguage = requestParam.getSourceLanguage();
+			String sourceLanguage = null;
 			if(dbStoryEntity != null) {
 				sourceLanguage = dbStoryEntity.getLanguage();
 				tmpStoryEntity = dbStoryEntity;
@@ -102,20 +102,20 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 						originalText = dbStoryEntity.getDescription();
 					}
 				}
+			} else {
+				//TODO: throw exception
+				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
 			}
-			
-			if(sourceLanguage == null || sourceLanguage.isEmpty())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_SOURCE_LANGUAGE, null);
 			
 			if(originalText == null || originalText.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 			
-			if(tmpStoryEntity == null) {
-				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-//				tmpStoryEntity = new StoryEntityImpl();
-//				tmpStoryEntity.setStoryId(storyId);
-//				persistentStoryEntityService.saveStoryEntity(tmpStoryEntity);
-			}
+//			if(tmpStoryEntity == null) {
+//				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+////				tmpStoryEntity = new StoryEntityImpl();
+////				tmpStoryEntity.setStoryId(storyId);
+////				persistentStoryEntityService.saveStoryEntity(tmpStoryEntity);
+//			}
 			
 			
 			TranslationEntity tmpTranslationEntity = new DBTranslationEntityImpl();
@@ -169,7 +169,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String storyId = requestParam.getStoryId();
 		String translatedText = requestParam.getText();		
 		String translationTool = requestParam.getTranslationTool();
-		String language = requestParam.getSourceLanguage();
+		String language = "en";
 		String type = requestParam.getType();
 		
 		if(storyId.isEmpty() || translatedText.isEmpty() || translationTool.isEmpty() || language.isEmpty() || type.isEmpty()) {

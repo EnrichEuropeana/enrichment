@@ -110,11 +110,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	//@Cacheable("nerResults")
 	@Override
-	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
+	public String getEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
 		
 		String storyId = requestParam.getStoryId();
 		
-		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam);
+		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam, process);
 		/*
 		 * Output preparation
 		 */
@@ -129,13 +129,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 	
 	@Override
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam) throws Exception {
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
 		
 		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
-		String type = requestParam.getType();
+		String type = requestParam.getProperty();
 		if(type == null || type.isEmpty())
 			type = "transcription";
 		else if(!(type.equals("summary") || type.equals("description") || type.equals("transcription")))
@@ -143,10 +143,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		//TODO: add if description or summary or transcription or items
 		boolean original = requestParam.getOriginal();
 		
-		List<String> tools = requestParam.getNERTools();
+		List<String> tools = requestParam.getNerTools();
 		List<String> linking = requestParam.getLinking();
 		String translationTool = requestParam.getTranslationTool();
-		String translationLanguage = requestParam.getTranslationLanguage();
+		String translationLanguage = "en";
 		
 		
 		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
@@ -201,7 +201,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			return resultMap;
 		}
-		
+		if(!process) {
+			//TODO: throw exception 404
+			//throw new HttpException("");
+			return resultMap;
+		}
 			
 		/*
 		 * Apply named entity recognition on all story translations
@@ -426,7 +430,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						tmpPositionEntity.setStoryId(tmpStoryId);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
-						//tmpPositionEntity.setTranslationKey(tmpTranslationEntityKey);
+						tmpPositionEntity.setTranslationKey(null);
 					}
 				}
 				tmpNamedEntity.setType(null);
@@ -538,6 +542,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			for (int i=0;i<stories.size();i++)
 			{
+				String storyId = (String) stories.get(i).get("story_id");
+				boolean found = false;
+				for(DBStoryEntityImpl tmp : storyEntities) {
+					if(tmp.getStoryId().equals(storyId)) {
+						found = true;
+						break;
+					}
+				}
+				if(found)
+					continue;
 				String storyLanguage = (String)stories.get(i).get("language");
 				if(storyLanguage==null) 
 					storyLanguage="";
@@ -546,10 +560,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					if(languageCodes.size() > 0)
 						storyLanguage = languageCodes.get(0).toString();
 				}
-					
-				
-				if(languageCodeMap.containsKey(storyLanguage))
-					storyLanguage = languageCodeMap.get(storyLanguage);
 				
 				DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
 				newStoryEntity.setTitle("");
