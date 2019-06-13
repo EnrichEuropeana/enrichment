@@ -134,19 +134,19 @@ public class NERServiceStories {
 					String transTool = "eTranslation";
 					europeanaEnrichmentNERRequest.setTranslationTool(transTool);
 					String translationLanguage = story.getLanguage();
-					europeanaEnrichmentNERRequest.setTranslationlanguage(translationLanguage);	
+					//europeanaEnrichmentNERRequest.setTranslationlanguage(translationLanguage);	
 					
 					try {
 						/*
 						 * identify NE in the text
 						 */
-						TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);		
+						TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest, true);		
 								
 						/*
 						 * write results to the output files
 						 */
 						TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-								findTranslationEntityWithStoryInformation(story.getStoryId(), transTool, translationLanguage);					
+								findTranslationEntityWithStoryInformation(story.getStoryId(), transTool, translationLanguage, "Letter");					
 						String transText = "";
 						if(dbTranslationEntity!=null) transText  = dbTranslationEntity.getTranslatedText();
 						else transText  = story.getTranscription();
