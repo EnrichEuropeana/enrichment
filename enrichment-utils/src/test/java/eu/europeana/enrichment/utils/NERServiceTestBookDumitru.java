@@ -113,7 +113,7 @@ public class NERServiceTestBookDumitru {
 //		persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
 		
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), "eTranslation", "en");
+				findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), "eTranslation", "en","Letter");
 //		dbTranslationEntity.setTranslatedText(bookText);
 //		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		
@@ -135,10 +135,10 @@ public class NERServiceTestBookDumitru {
 		//europeanaEnrichmentNERRequest.setNERTool("DBpedia_Spotlight");
 		//europeanaEnrichmentNERRequest.setNERTool("Stanford_NER_model_Italian");
 		europeanaEnrichmentNERRequest.setTranslationTool("eTranslation");
-		europeanaEnrichmentNERRequest.setTranslationlanguage("German");
+		//europeanaEnrichmentNERRequest.setTranslationlanguage("German");
 		
 		try {
-			TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest);
+			TreeMap<String, List<NamedEntity>> NERNamedEntities = enrichmentNerService.getNamedEntities(europeanaEnrichmentNERRequest, true);
 
 		
 		//TreeMap<String, TreeSet<String>> NERStringEntities = stanfordNerModel3Service.identifyNER(bookText);
