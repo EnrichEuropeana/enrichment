@@ -89,11 +89,11 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getKey(), sourceLanguage);
 			}
 			
-			if(namedEntity.getPreferedWikidataIds().size() == 0) {
+			if(namedEntity.getPreferredWikidataIds().size() == 0) {
 				if(wikidataIDs != null && wikidataIDs.size() > 0) {
 					for(String wikidataID : wikidataIDs) {
 						if(namedEntity.getDbpediaWikidataIds().contains(wikidataID))
-							namedEntity.addPreferedWikidataId(wikidataID);
+							namedEntity.addPreferredWikidataId(wikidataID);
 						namedEntity.addWikidataId(wikidataID);
 					}
 				}

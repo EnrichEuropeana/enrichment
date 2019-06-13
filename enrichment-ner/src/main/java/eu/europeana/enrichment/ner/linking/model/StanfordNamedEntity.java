@@ -34,8 +34,8 @@ public class StanfordNamedEntity extends NamedEntityImpl {
 		super.setDbpediaWikidataIds(ids);
 	}
 	
-	public void setPreferedWikidataIds(List<String> ids) {
-		super.setPreferedWikidataIds(ids);
+	public void setPreferredWikidataIds(List<String> ids) {
+		super.setPreferredWikidataIds(ids);
 	}
 	
 	public void setDBpediaIds(List<String> ids) {
