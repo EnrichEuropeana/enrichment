@@ -23,7 +23,7 @@ public class DBNamedEntityImpl extends NamedEntityImpl{
 		setEuropeanaIds(entity.getEuropeanaIds());
 		setWikidataIds(entity.getWikidataIds());
 		setDbpediaWikidataIds(entity.getDbpediaWikidataIds());
-		setPreferedWikidataIds(entity.getPreferedWikidataIds());
+		setPreferredWikidataIds(entity.getPreferredWikidataIds());
 		setDBpediaIds(entity.getDBpediaIds());
 		setPositionEntities(entity.getPositionEntities());
 	}

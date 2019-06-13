@@ -46,8 +46,27 @@ public class TranslationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "getTranslation")
+	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "postTranslation")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> postTranslation(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			String translation = enrichmentTranslationService.translate(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		}
+	}
+	
+	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation")
+	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.GET},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -56,7 +75,7 @@ public class TranslationController extends BaseRest {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String translation = enrichmentTranslationService.translate(body);
+			String translation = enrichmentTranslationService.translate(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 			
 			return response;
