@@ -15,7 +15,7 @@ public class NamedEntityImpl implements NamedEntity{
 	protected List<String> wikidataIds;
 	protected List<String> dbpediaIds;
 	protected List<String> dbpediaWikidataIds;
-	protected List<String> preferedWikidataIds;
+	protected List<String> preferredWikidataIds;
 	protected List<PositionEntity> positionEntities;
 	
 	public NamedEntityImpl() {
@@ -33,7 +33,7 @@ public class NamedEntityImpl implements NamedEntity{
 		europeanaIds = new ArrayList<>();
 		wikidataIds = new ArrayList<>();
 		dbpediaIds = new ArrayList<>();
-		preferedWikidataIds = new ArrayList<>();
+		preferredWikidataIds = new ArrayList<>();
 		dbpediaWikidataIds = new ArrayList<>();
 	}
 	
@@ -110,18 +110,18 @@ public class NamedEntityImpl implements NamedEntity{
 	}
 	
 	@Override
-	public List<String> getPreferedWikidataIds(){
-		return preferedWikidataIds;
+	public List<String> getPreferredWikidataIds(){
+		return preferredWikidataIds;
 	}
 	
 	@Override
-	public void setPreferedWikidataIds(List<String> ids) {
-		preferedWikidataIds = ids;
+	public void setPreferredWikidataIds(List<String> ids) {
+		preferredWikidataIds = ids;
 	}
 	
 	@Override
-	public void addPreferedWikidataId(String id) {
-		preferedWikidataIds.add(id);
+	public void addPreferredWikidataId(String id) {
+		preferredWikidataIds.add(id);
 	}
 
 	@Override

@@ -49,7 +49,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
 	//@Cacheable("translationResults")
 	@Override
-	public String translate(EnrichmentTranslationRequest requestParam) throws HttpException{
+	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException{
 		try {
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
@@ -83,9 +83,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				sourceLanguage = dbStoryEntity.getLanguage();
 				tmpStoryEntity = dbStoryEntity;
 				TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryInformation(storyId, translationTool, sourceLanguage, type);
-				if(dbTranslationEntity != null)
+							findTranslationEntityWithStoryInformation(storyId, translationTool, defaultTargetLanguage, type);
+				if(dbTranslationEntity != null) {
 					return dbTranslationEntity.getTranslatedText();
+				}
 				
 				if(originalText == null || originalText.isEmpty())
 				{
@@ -105,6 +106,13 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			} else {
 				//TODO: throw exception
 				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+			}
+			
+			if(!process) {
+				//TODO: proper exception (like EnrichmentNERServiceImpl
+				//TODO: throw exception 404
+				//throw new HttpException("");
+				return "";
 			}
 			
 			if(originalText == null || originalText.isEmpty())
