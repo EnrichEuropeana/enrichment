@@ -301,7 +301,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			List<NamedEntity> entities = resultMap.get(key);
 			for (NamedEntity entity : entities) {
 				//save the wikidata ids to solr
-				for(String wikidataId : entity.getPreferedWikidataIds())
+				for(String wikidataId : entity.getPreferredWikidataIds())
 				{
 					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
 				}
