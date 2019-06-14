@@ -1,14 +1,18 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import eu.europeana.enrichment.model.WikidataAgent;
+import ioinformarics.oss.jackson.module.jsonld.annotation.JsonldProperty;
 
+
+@JsonPropertyOrder({ "id", "type", "description", "depiction","country", "dateOfBirth","dateOfDeath","proffessionOrOccupation","prefLabel","altLabel","modificationDate","sameAs"})
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAgent {
-
-
 
 	private String country;
 	private String[] dateOfBirth;
@@ -41,6 +45,7 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 
 
 	@Override
+	@JsonldProperty("country")
 	public String getCountry() {
 		// TODO Auto-generated method stub
 		return country;
@@ -52,6 +57,7 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	@Override
+	@JsonldProperty("dateOfBirth")
 	public String[] getDateOfBirth() {
 		return dateOfBirth;
 	}
@@ -62,6 +68,7 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	@Override
+	@JsonldProperty("dateOfDeath")
 	public String[] getDateOfDeath() {
 		return dateOfDeath;
 	}
@@ -72,6 +79,7 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	}
 
 	@Override
+	@JsonldProperty("proffessionOrOccupation")
 	public String[] getProfessionOrOccupation() {
 		return professionOrOccupation;
 	}
@@ -80,6 +88,127 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	public void setProfessionOrOccupation(String[] professionOrOccupation) {
 		this.professionOrOccupation = professionOrOccupation;
 	}
+		
+	@Override
+	public String getModificationDate_jsonProp() {
+		return modificationDate_jsonProp;
+	}
+
+	@Override
+	public String getPrefLabel_jsonProp() {
+		return prefLabel_jsonProp;
+	}
+
+	@Override
+	public String getAltLabel_jsonProp() {
+		return altLabel_jsonProp;
+	}
+
+	@Override
+	public String getDepiction_jsonProp() {
+		return depiction_jsonProp;
+	}
+
+	@Override
+	public String getDescription_jsonProp() {
+		return description_jsonProp;
+	}
+
+	@Override
+	public String getSameAs_jsonProp() {
+		return sameAs_jsonProp;
+	}
+	
+	@Override
+	@JsonldProperty("prefLabel")
+	public Map<String, String> getPrefLabelStringMap() {
+		return prefLabel;
+	}
+
+	@Override
+	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
+		this.prefLabel = prefLabel;
+	}
+
+	@Override
+	@JsonldProperty("altLabel")
+	public Map<String, List<String>> getAltLabel() {
+		return altLabel;
+	}
+
+	@Override
+	public void setAltLabel(Map<String, List<String>> altLab) {
+		this.altLabel = altLab;
+	}
+
+	@Override
+	@JsonldProperty("id")
+	public String getEntityId() {
+		return entityId;
+	}
+
+	@Override
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
+	}
+
+	@Override
+	@JsonldProperty("type")
+	public String getInternalType() {
+		return internalType;
+	}
+
+	@Override
+	public void setInternalType(String internalType) {
+		this.internalType = internalType;
+	}
+
+	@Override
+	@JsonldProperty("modificationDate")
+	public String getModificationDate() {
+		
+		return modificationDate;
+	}
+
+	@Override
+	public void setModificationDate(String date) {
+		modificationDate = date;
+		
+	}
+
+	@Override
+	@JsonldProperty("depiction")
+	public String getDepiction() {
+		return depiction;
+	}
+	
+	@Override
+	public void setDepiction(String depiction) {
+		this.depiction = depiction;
+	}
+
+	@Override
+	@JsonldProperty("description")
+	public Map<String, String> getDescription() {
+		return description;
+	}
+
+	@Override
+	public void setDescription(Map<String, String> desc) {
+	    	this.description = desc;
+	}
+
+	@Override
+	@JsonldProperty("sameAs")
+	public String[] getSameAs() {
+		return sameAs;
+	}
+
+	@Override
+	public void setSameAs(String[] sameAs) {
+		this.sameAs = sameAs;
+	}
+
 
 
 }

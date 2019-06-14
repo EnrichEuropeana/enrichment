@@ -24,6 +24,31 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-core</artifactId>
+    	<version>2.9.8</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-annotations</artifactId>
+    	<version>2.9.8</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-databind</artifactId>
+    	<version>2.9.8</version>
+	</dependency>
+    <!-- https://mvnrepository.com/artifact/com.io-informatics.oss/jackson-jsonld -->
+	<dependency>
+    	<groupId>com.io-informatics.oss</groupId>
+    	<artifactId>jackson-jsonld</artifactId>
+    	<version>0.0.5</version>
+	</dependency>
+    
     	
   </dependencies>
 </project>

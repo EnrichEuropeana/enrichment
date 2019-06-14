@@ -59,8 +59,9 @@ public class WikidataController extends BaseRest {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
-			
+			//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
+			String solrResponse = solrWikidataEntityService.searchByWikidataURL_usingJackson(wikidataId);
+						
 			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
 					
 			return response;
