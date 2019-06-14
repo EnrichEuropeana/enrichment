@@ -4,20 +4,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+
 import eu.europeana.enrichment.model.WikidataEntity;
+
 
 public class WikidataEntityImpl implements WikidataEntity {
 	
-	private String internalType;
-	private String entityId;
-	private Map<String, String> prefLabel;
-	private Map<String, List<String>> altLabel;
-	private Map<String, String> description;	
-	private String [] sameAs;
-	private String depiction;
-	private String modificationDate;
+	protected String internalType;
+	protected String entityId;
+	protected Map<String, String> prefLabel;
+	protected Map<String, List<String>> altLabel;
+	protected Map<String, String> description;	
+	protected String [] sameAs;
+	protected String depiction;
+	protected String modificationDate;
 	
-	private String modificationDate_jsonProp = "modified";
+	protected String modificationDate_jsonProp = "modified";
 	
 	@Override
 	public String getModificationDate_jsonProp() {
@@ -49,11 +51,11 @@ public class WikidataEntityImpl implements WikidataEntity {
 		return sameAs_jsonProp;
 	}
 
-	private String prefLabel_jsonProp = "labels.*.*";
-	private String altLabel_jsonProp = "aliases.*.*";
-	private String depiction_jsonProp = "claims.P18.mainsnak.datavalue.value";
-	private String description_jsonProp = "descriptions.*.*";
-	private String sameAs_jsonProp = "sitelinks.*.url";
+	protected String prefLabel_jsonProp = "labels.*.*";
+	protected String altLabel_jsonProp = "aliases.*.*";
+	protected String depiction_jsonProp = "claims.P18.mainsnak.datavalue.value";
+	protected String description_jsonProp = "descriptions.*.*";
+	protected String sameAs_jsonProp = "sitelinks.*.url";
 	
 	@Override
 	public Map<String, String> getPrefLabelStringMap() {

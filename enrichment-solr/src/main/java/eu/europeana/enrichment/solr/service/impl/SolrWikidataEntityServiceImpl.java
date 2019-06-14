@@ -14,10 +14,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import eu.europeana.api.commons.definitions.search.ResultSet;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -26,6 +28,7 @@ import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.ner.linking.WikidataService;
+import eu.europeana.enrichment.solr.commons.WikidataEntitySerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
@@ -33,6 +36,9 @@ import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
+
+import eu.europeana.entity.definitions.model.Entity;
+import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
 
 import riotcmd.json;
 
@@ -380,5 +386,70 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    	return result;
 	    }
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends WikidataEntity> String searchByWikidataURL_usingJackson(String wikidataURL) {
+		
+		SolrQuery query = new SolrQuery();
+		
+		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		
+	    QueryResponse rsp = null;
+		try {
+			rsp = solrBaseClientService.query(solrCore, query);
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		ResultSet<T> resultSet = new ResultSet<>();		
+		DocumentObjectBinder binder = new DocumentObjectBinder();
+		SolrDocumentList docList = rsp.getResults();
+		String type;
+		T entity;
+		Class<T> entityClass = null;
+		List<T> beans = new ArrayList<T>();
+		
+		for (SolrDocument doc : docList) {
+			type = (String) doc.get(EntitySolrFields.INTERNAL_TYPE);
+			//entityClass = (Class<T>) EntityObjectFactory.getInstance().getClassForType(type);
+			if(type.compareToIgnoreCase("agent")==0) entityClass = (Class<T>) SolrWikidataAgentImpl.class;
+			else if(type.compareToIgnoreCase("place")==0) entityClass = (Class<T>) SolrWikidataPlaceImpl.class;
+			
+			entity = (T) binder.getBean(WikidataEntity.class, doc);
+			
+			beans.add(entity);
+		}
+		
+		if (beans.size() != 1) return null;
+	    else
+	    {
+	    	WikidataEntitySerializer serializer = new WikidataEntitySerializer();
+	    	String serializedUserSetJsonLdStr=null;
+	    	if(beans.get(0) instanceof SolrWikidataAgentImpl)
+	    	{
+				try {
+					serializedUserSetJsonLdStr = serializer.serialize((WikidataAgentImpl) beans.get(0));
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	    	}
+			else if(beans.get(0) instanceof SolrWikidataPlaceImpl)
+			{
+				try {
+					serializedUserSetJsonLdStr = serializer.serialize((SolrWikidataPlaceImpl) beans.get(0));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+	    	
+	    	return serializedUserSetJsonLdStr;
+	    	
+	    }
+
 	}
 }
