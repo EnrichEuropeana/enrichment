@@ -227,7 +227,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else if(type.toLowerCase().equals("summary") && dbTranslationEntity==null)
 				textForNer = dbStoryEntity.getSummary();
 			else if(type.toLowerCase().equals("description") && dbTranslationEntity==null) 
-				textForNer = dbStoryEntity.getSummary();
+				textForNer = dbStoryEntity.getDescription();
 			else
 				textForNer = dbStoryEntity.getTranscription();
 			
@@ -301,7 +301,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			List<NamedEntity> entities = resultMap.get(key);
 			for (NamedEntity entity : entities) {
 				//save the wikidata ids to solr
-				for(String wikidataId : entity.getPreferredWikidataIds())
+				//for(String wikidataId : entity.getPreferredWikidataIds())
+				for(String wikidataId : entity.getWikidataIds())
 				{
 					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
 				}

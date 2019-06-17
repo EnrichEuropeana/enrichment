@@ -138,7 +138,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			solrStoryEntity=new SolrStoryEntityImpl(storyEntity);
 		}
 		
-		solrBaseClientService.store(solrCollection, solrStoryEntity,doCommit);
+		solrBaseClientService.storeStoryEntity(solrCollection, solrStoryEntity,doCommit);
 		
 	}
 

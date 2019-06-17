@@ -107,7 +107,7 @@ public interface WikidataEntity {
 	 *  
 	 * @return A Map<String, String> for the Description 
 	 */
-	public Map<String, String> getDescription();
+	public Map<String, List<String>> getDescription();
 
 	/**
 	 * Set Description for Entity
@@ -115,7 +115,7 @@ public interface WikidataEntity {
 	 * @param description
 	 *            A Map<String, String> for Description 
 	 */
-	public void setDescription(Map<String, String> description);
+	public void setDescription(Map<String, List<String>> description);
 		
 	/**
 	 * Retrieves the Wikidata links that represent the Entity in the format (site, url),

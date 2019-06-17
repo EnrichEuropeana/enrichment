@@ -4,17 +4,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 
-
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataEntityImpl implements WikidataEntity {
 	
 	protected String internalType;
 	protected String entityId;
 	protected Map<String, String> prefLabel;
 	protected Map<String, List<String>> altLabel;
-	protected Map<String, String> description;	
+	protected Map<String, List<String>> description;	
 	protected String [] sameAs;
 	protected String depiction;
 	protected String modificationDate;
@@ -22,31 +24,37 @@ public class WikidataEntityImpl implements WikidataEntity {
 	protected String modificationDate_jsonProp = "modified";
 	
 	@Override
+	@JsonIgnore
 	public String getModificationDate_jsonProp() {
 		return modificationDate_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getPrefLabel_jsonProp() {
 		return prefLabel_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getAltLabel_jsonProp() {
 		return altLabel_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getDepiction_jsonProp() {
 		return depiction_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getDescription_jsonProp() {
 		return description_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getSameAs_jsonProp() {
 		return sameAs_jsonProp;
 	}
@@ -120,12 +128,12 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
-	public Map<String, String> getDescription() {
+	public Map<String, List<String>> getDescription() {
 		return description;
 	}
 
 	@Override
-	public void setDescription(Map<String, String> desc) {
+	public void setDescription(Map<String, List<String>> desc) {
 	    	this.description = desc;
 	}
 

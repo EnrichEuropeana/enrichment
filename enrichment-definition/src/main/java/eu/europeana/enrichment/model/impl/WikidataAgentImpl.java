@@ -3,6 +3,7 @@ package eu.europeana.enrichment.model.impl;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -21,24 +22,28 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	
 	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";
 	@Override
+	@JsonIgnore
 	public String getCountry_jsonProp() {
 		return country_jsonProp;
 	}
 
 	private String dateOfBirth_jsonProp = "claims.P569.mainsnak.datavalue.value.time";
 	@Override
+	@JsonIgnore
 	public String getDateOfBirth_jsonProp() {
 		return dateOfBirth_jsonProp;
 	}
 
 	private String dateOfDeath_jsonProp = "claims.P570.mainsnak.datavalue.value.time";
 	@Override
+	@JsonIgnore
 	public String getDateOfDeath_jsonProp() {
 		return dateOfDeath_jsonProp;
 	}
 
 	private String professionOrOccupation_jsonProp = "claims.P106.mainsnak.datavalue.value.id";
 	@Override
+	@JsonIgnore
 	public String getProfessionOrOccupation_jsonProp() {
 		return professionOrOccupation_jsonProp;
 	}
@@ -189,12 +194,12 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 
 	@Override
 	@JsonldProperty("description")
-	public Map<String, String> getDescription() {
+	public Map<String, List<String>> getDescription() {
 		return description;
 	}
 
 	@Override
-	public void setDescription(Map<String, String> desc) {
+	public void setDescription(Map<String, List<String>> desc) {
 	    	this.description = desc;
 	}
 

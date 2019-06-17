@@ -14,6 +14,9 @@ import eu.europeana.entity.definitions.model.vocabulary.PlaceSolrFields;
 
 public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {
 
+	public SolrWikidataPlaceImpl () {
+		
+	}
 	public SolrWikidataPlaceImpl (WikidataPlace copy) {
 		this.setAltLabel(copy.getAltLabel());
 		this.setCountry(copy.getCountry());
@@ -82,11 +85,11 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 
 	@Override
 	@Field(EntitySolrFields.DC_DESCRIPTION_ALL)
-	public void setDescription(Map<String, String> dcDescription) {
-		Map<String, String> normalizedDescription = dcDescription;
+	public void setDescription(Map<String, List<String>> dcDescription) {
+		Map<String, List<String>> normalizedDescription = dcDescription;
 		if(dcDescription!=null && !dcDescription.isEmpty())
 		{
-			normalizedDescription = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
+			normalizedDescription = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
 			//normalizedDescription = SolrUtils.normalizeStringMap(EntitySolrFields.DC_DESCRIPTION, dcDescription);
 		}
 	    super.setDescription(normalizedDescription);
