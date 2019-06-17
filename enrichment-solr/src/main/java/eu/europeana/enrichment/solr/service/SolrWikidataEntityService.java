@@ -9,7 +9,7 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public interface SolrWikidataEntityService {
 	
-	public <T extends WikidataEntity> String searchByWikidataURL_usingJackson (String wikidataURL);
+	public String searchByWikidataURL_usingJackson (String wikidataURL);
 	public String searchByWikidataURL (String wikidataURL);
 
 	/**
@@ -33,6 +33,8 @@ public interface SolrWikidataEntityService {
 	 * @throws SolrNamedEntityServiceException
 	 */
 	public void storeWikidataFromURL (String wikidataURL, String type) throws SolrNamedEntityServiceException;
+	
+	
 	
 	
 }

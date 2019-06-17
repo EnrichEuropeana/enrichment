@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public interface SolrBaseClientService {
@@ -34,13 +35,22 @@ public interface SolrBaseClientService {
 	public boolean store(String solrCollection, Object solrObject) throws SolrNamedEntityServiceException ;
 	
 	/**
+	 * This method stores a WikidataEntity object in SOLR.
+	 * @param solrObject
+	 * @param doCommit commit
+	 * @param solrCollection
+	 * @throws SolrNamedEntityServiceException 
+	 */
+	public void storeWikidataEntity(String solrCollection,WikidataEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;	
+
+	/**
 	 * This method stores a StoryEntity object in SOLR.
 	 * @param solrObject
 	 * @param doCommit commit
 	 * @param solrCollection
 	 * @throws SolrNamedEntityServiceException 
 	 */
-	public void store(String solrCollection,Object solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;	
+	public void storeStoryEntity(String solrCollection,StoryEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;	
 
 	/**
 	 * This method searches for a term in SOLR.

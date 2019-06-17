@@ -17,11 +17,14 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
+import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
+import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 
@@ -53,7 +56,7 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 	}
 
 	@Override
-	public void store(String solrCollection, Object solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
+	public void storeStoryEntity(String solrCollection, StoryEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
 		try {
 			
 			log.debug("store: " + solrObject.toString());
@@ -64,11 +67,41 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 				solrServer.commit(solrCollection);
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing the object: " + solrObject.toString(),
+					"Unexpected Solr server exception occured when storing StoryEntity: " + solrObject.toString(),
 					ex);
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing the object: " + solrObject.toString() + "in Solr.", ex);
+					"Unexpected IO exception occured when storing StoryEntity: " + solrObject.toString() + "in Solr.", ex);
+		}
+		
+	}
+	
+	@Override
+	public void storeWikidataEntity(String solrCollection, WikidataEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
+		try {
+			
+			log.debug("store: " + solrObject.toString());
+				
+			UpdateResponse rsp = solrServer.addBean(solrCollection, solrObject);
+//			if(solrObject instanceof SolrWikidataAgentImpl) 
+//			{
+//				rsp = solrServer.addBean(solrCollection, (SolrWikidataAgentImpl)solrObject);
+//			}
+//			else
+//			{
+//				rsp = solrServer.addBean(solrCollection, (SolrWikidataPlaceImpl)solrObject);
+//			}
+			
+			log.info("store response: " + rsp.toString());
+			if(doCommit)
+				solrServer.commit(solrCollection);
+		} catch (SolrServerException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected Solr server exception occured when storing WikidataEntity: " + solrObject.toString(),
+					ex);
+		} catch (IOException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected IO exception occured when storing WikidataEntity: " + solrObject.toString() + "in Solr.", ex);
 		}
 		
 	}

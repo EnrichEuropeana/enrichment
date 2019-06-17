@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -24,21 +25,25 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	private String country_jsonProp = "claims.P17.mainsnak.datavalue.value.id";
 	
 	@Override
+	@JsonIgnore
 	public String getCountry_jsonProp() {
 		return country_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getLogo_jsonProp() {
 		return logo_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getLatitude_jsonProp() {
 		return latitude_jsonProp;
 	}
 
 	@Override
+	@JsonIgnore
 	public String getLongitude_jsonProp() {
 		return longitude_jsonProp;
 	}
@@ -172,12 +177,12 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 
 	@Override
 	@JsonldProperty("description")
-	public Map<String, String> getDescription() {
+	public Map<String, List<String>> getDescription() {
 		return description;
 	}
 
 	@Override
-	public void setDescription(Map<String, String> desc) {
+	public void setDescription(Map<String, List<String>> desc) {
 	    	this.description = desc;
 	}
 
