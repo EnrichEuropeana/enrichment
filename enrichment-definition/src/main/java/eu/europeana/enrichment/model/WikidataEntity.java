@@ -19,7 +19,7 @@ public interface WikidataEntity {
 	 *  
 	 * @return A Map<String, String> for the Preferable Labels 
 	 */
-	public Map<String, String> getPrefLabelStringMap();
+	public Map<String, List<String>> getPrefLabel();
 
 	/**
 	 * Set Preferable Label for Entity
@@ -27,7 +27,7 @@ public interface WikidataEntity {
 	 * @param prefLabel
 	 *            A Map<String, String> for Preferable Label 
 	 */
-	void setPrefLabelStringMap (Map<String, String> prefLabel);
+	void setPrefLabel (Map<String, List<String>> prefLabel);
 
 	/**
 	 * Retrieves Alternative Label for Entity (language,value)
