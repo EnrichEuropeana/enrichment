@@ -42,7 +42,4 @@ public interface EntitySolrFields {
 	public static final String PROFESSION_OR_OCCUPATION = "rdagr2_professionOrOccupation";
 	public static final String PROFESSION_OR_OCCUPATION_ALL = "rdagr2_professionOrOccupation"+".*";
 
-
-
-
 }

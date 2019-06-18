@@ -3,13 +3,19 @@ package eu.europeana.enrichment.solr.commons;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.model.WikidataAgent;
+import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
+import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
+import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
+import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import ioinformarics.oss.jackson.module.jsonld.JsonldModule;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResource;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResourceBuilder;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
 public class WikidataEntitySerializer {
 
@@ -23,32 +29,46 @@ public class WikidataEntitySerializer {
 	}
 	
 	/**
-	 * This method provides full serialization of a WikidataAgent
-	 * @param WikidataAgent
-	 * @return full WikidataAgent view
+	 * This method provides full serialization of a SolrWikidataAgentImpl
+	 * @param solrWikidataAgent
+	 * @return json representation of SolrWikidataAgentImpl
 	 * @throws IOException
 	 */
 	
-	public String serialize(WikidataAgent wikidataAgent) throws IOException {
-		
-		mapper.registerModule(new JsonldModule(() -> mapper.createObjectNode())); 
-		JsonldResourceBuilder<WikidataAgent> jsonResourceBuilder = JsonldResource.Builder.create();
-		jsonResourceBuilder.context(CONTEXT);
-		String jsonString = mapper.writer().writeValueAsString(jsonResourceBuilder.build(wikidataAgent));
-		return jsonString;
-	}
+//	public String serializeSolrAgent(SolrWikidataAgentImpl solrWikidataAgent) throws IOException {
+//		
+//		mapper.registerModule(new JsonldModule(() -> mapper.createObjectNode())); 
+//		JsonldResourceBuilder<SolrWikidataAgentImpl> jsonResourceBuilder = JsonldResource.Builder.create();
+//		jsonResourceBuilder.context(CONTEXT);
+//		String jsonString = mapper.writer().writeValueAsString(jsonResourceBuilder.build(solrWikidataAgent));
+//		return jsonString;
+//	}
 
 	/**
-	 * This method provides full serialization of a WikidataPlace
-	 * @param WikidataPlace
-	 * @return full WikidataPlace view
+	 * This method provides full serialization of a SolrWikidataPlaceImpl
+	 * @param solrWikidataPlace
+	 * @return json representation of SolrWikidataPlaceImpl
 	 * @throws IOException
 	 */
 	
-	public String serialize(WikidataPlace wikidataPlace) throws IOException {		
+//	public String serializeSolrPlace(SolrWikidataPlaceImpl solrWikidataPlace) throws IOException {		
+//		mapper.registerModule(new JsonldModule(() -> mapper.createObjectNode())); 
+//		JsonldResourceBuilder<SolrWikidataPlaceImpl> jsonResourceBuilder = JsonldResource.Builder.create();
+//		String jsonString = mapper.writer().writeValueAsString(jsonResourceBuilder.build(solrWikidataPlace));
+//		return jsonString;
+//	}
+	
+	/**
+	 * This method provides full serialization of a WikidataEntity
+	 * @param wikidataEntity
+	 * @return json representation of WikidataEntity
+	 * @throws IOException
+	 */
+	
+	public String serialize(WikidataEntity wikidataEntity) throws IOException {		
 		mapper.registerModule(new JsonldModule(() -> mapper.createObjectNode())); 
-		JsonldResourceBuilder<WikidataPlace> jsonResourceBuilder = JsonldResource.Builder.create();
-		String jsonString = mapper.writer().writeValueAsString(jsonResourceBuilder.build(wikidataPlace));
+		JsonldResourceBuilder<WikidataEntity> jsonResourceBuilder = JsonldResource.Builder.create();
+		String jsonString = mapper.writer().writeValueAsString(jsonResourceBuilder.build(wikidataEntity));
 		return jsonString;
 	}
 

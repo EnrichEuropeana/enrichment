@@ -48,7 +48,11 @@
     	<artifactId>jackson-jsonld</artifactId>
     	<version>0.0.5</version>
 	</dependency>
-    
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 		<artifactId>enrichment-common</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>    
     	
   </dependencies>
 </project>

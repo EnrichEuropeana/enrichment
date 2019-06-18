@@ -6,15 +6,20 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import eu.europeana.enrichment.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataEntity;
+import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
+@JsonPropertyOrder({ "entityId", "type", "description", "depiction","prefLabel","altLabel","modified","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataEntityImpl implements WikidataEntity {
 	
 	protected String internalType;
 	protected String entityId;
-	protected Map<String, String> prefLabel;
+	protected Map<String, List<String>> prefLabel;
 	protected Map<String, List<String>> altLabel;
 	protected Map<String, List<String>> description;	
 	protected String [] sameAs;
@@ -66,19 +71,36 @@ public class WikidataEntityImpl implements WikidataEntity {
 	protected String sameAs_jsonProp = "sitelinks.*.url";
 	
 	@Override
-	public Map<String, String> getPrefLabelStringMap() {
+	@JsonIgnore
+	public Map<String, List<String>> getPrefLabel() {
 		return prefLabel;
 	}
+	
+	@JsonProperty("prefLabel")
+	public Map<String, String> getEntityPrefLabel() {
+		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeToStringMap(WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, this.getPrefLabel());
+		return normalizedPrefLabel;
+	}
+
 
 	@Override
-	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
+	public void setPrefLabel(Map<String, List<String>> prefLabel) {
 		this.prefLabel = prefLabel;
 	}
 
 	@Override
+	@JsonIgnore
 	public Map<String, List<String>> getAltLabel() {
 		return altLabel;
 	}
+	
+	@JsonProperty("altLabel")
+	public Map<String, List<String>> getEntityAltLabel() {
+		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED, this.getAltLabel());
+		return normalizedAltLabel;
+
+	}
+
 
 	@Override
 	public void setAltLabel(Map<String, List<String>> altLab) {
@@ -86,6 +108,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
+	@JsonProperty("entityId")
 	public String getEntityId() {
 		return entityId;
 	}
@@ -96,6 +119,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
+	@JsonProperty("type")
 	public String getInternalType() {
 		return internalType;
 	}
@@ -106,6 +130,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
+	@JsonProperty("modified")
 	public String getModificationDate() {
 		
 		return modificationDate;
@@ -118,6 +143,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
+	@JsonProperty("depiction")
 	public String getDepiction() {
 		return depiction;
 	}
@@ -128,16 +154,26 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
+	@JsonIgnore
 	public Map<String, List<String>> getDescription() {
 		return description;
 	}
 
+	@JsonProperty("description")
+	public Map<String, List<String>> getEntityDescription() {
+		Map<String, List<String>> normalizedDescription = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED, this.getDescription());
+		return normalizedDescription;
+
+	}
+
+	
 	@Override
 	public void setDescription(Map<String, List<String>> desc) {
 	    	this.description = desc;
 	}
 
 	@Override
+	@JsonProperty("sameAs")
 	public String[] getSameAs() {
 		return sameAs;
 	}

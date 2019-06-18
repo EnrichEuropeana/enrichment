@@ -5,11 +5,12 @@
   <parent>
     <groupId>eu.europeana.enrich</groupId>
     <artifactId>enrichment-services</artifactId>
-    <version>${version.enrichmentAPI}</version>
+    <!-- version>${version.enrichmentAPI}</version-->
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>eu.europeana.enrich</groupId>
+  <!-- groupId>eu.europeana.enrich</groupId-->
   <artifactId>enrichment-utils</artifactId>
-  <version>${version.enrichmentAPI}</version>
+  <!-- version>${version.enrichmentAPI}</version-->
   <name>enrichment-utils</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -45,11 +46,6 @@
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-solr</artifactId>
-			<version>${version.enrichmentAPI}</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.europeana.enrich</groupId>
-  			<artifactId>enrichment-web</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
 		

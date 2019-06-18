@@ -5,9 +5,9 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
+import eu.europeana.enrichment.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
-import eu.europeana.enrichment.solr.commons.SolrUtils;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.entity.definitions.model.vocabulary.PlaceSolrFields;
 
@@ -25,7 +25,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		this.setEntityId(copy.getEntityId());
 		this.setInternalType(copy.getInternalType());
 		this.setModificationDate(copy.getModificationDate());
-		this.setPrefLabelStringMap(copy.getPrefLabelStringMap());
+		this.setPrefLabel(copy.getPrefLabel());
 		this.setSameAs(copy.getSameAs());
 		this.setLogo(copy.getLogo());
 		this.setLatitude(copy.getLatitude());
@@ -34,14 +34,14 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 	
 	@Override
 	@Field(EntitySolrFields.PREF_LABEL_ALL)
-	public void setPrefLabelStringMap(Map<String, String> prefLabel) {
-		Map<String, String> normalizedPrefLabel = prefLabel;
+	public void setPrefLabel(Map<String, List<String>> prefLabel) {
+		Map<String, List<String>> normalizedPrefLabel = prefLabel;
 		if(prefLabel!=null && !prefLabel.isEmpty())
 		{		
 			//normalizedPrefLabel = SolrUtils.normalizeStringMap(EntitySolrFields.PREF_LABEL, prefLabel);
-			normalizedPrefLabel = SolrUtils.normalizeStringMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
+			normalizedPrefLabel = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
 		}
-		super.setPrefLabelStringMap(normalizedPrefLabel);
+		super.setPrefLabel(normalizedPrefLabel);
 	}
 
 	@Override

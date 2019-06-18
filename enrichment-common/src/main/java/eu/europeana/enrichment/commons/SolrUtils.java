@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.solr.commons;
+package eu.europeana.enrichment.commons;
 
 import java.util.List;
 import java.util.Map;

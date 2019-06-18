@@ -180,13 +180,13 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			newWikidataAgent.setProfessionOrOccupation(occupationArray);
 			
 			
-			Map<String,String> prefLabelMap = null;
+			Map<String,List<String>> prefLabelMap = null;
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{ 
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndString(jsonElement);
+				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			newWikidataAgent.setPrefLabelStringMap(prefLabelMap);
+			newWikidataAgent.setPrefLabel(prefLabelMap);
 			
 			
 			String [] sameAsArray=null;
@@ -279,13 +279,13 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			}
 			newWikidataPlace.setLogo(logo);
 		
-			Map<String,String> prefLabelMap = null;
+			Map<String,List<String>> prefLabelMap = null;
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndString(jsonElement);
+				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			newWikidataPlace.setPrefLabelStringMap(prefLabelMap);
+			newWikidataPlace.setPrefLabel(prefLabelMap);
 			
 			String [] sameAsArray = null;
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
@@ -486,6 +486,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		 * TODO: create a class of types as in the entity-api EntityTypes and check there for the 
 		 * type of the class that needs to be serialized
 		 */
+
 		if(type.compareToIgnoreCase("agent")==0)
 		{
 			SolrWikidataAgentImpl entity;
