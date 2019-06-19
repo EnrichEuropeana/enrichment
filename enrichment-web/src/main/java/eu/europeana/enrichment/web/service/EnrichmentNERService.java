@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -66,4 +67,12 @@ public interface EnrichmentNERService {
 	 */
 	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
 	
+	/**
+	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class
+	 * 
+	 * @param storyId
+	 * @return
+	 * @throws HttpException, IOException 
+	 */
+	public String getStoryAnnotation (String storyId) throws HttpException, IOException;
 }

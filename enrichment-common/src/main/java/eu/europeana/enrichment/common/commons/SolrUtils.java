@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.commons;
+package eu.europeana.enrichment.common.commons;
 
 import java.util.List;
 import java.util.Map;
