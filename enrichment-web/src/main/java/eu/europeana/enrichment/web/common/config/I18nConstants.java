@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.common.config;
+package eu.europeana.enrichment.web.common.config;
 
 public interface I18nConstants extends eu.europeana.api.commons.config.i18n.I18nConstants{
 	

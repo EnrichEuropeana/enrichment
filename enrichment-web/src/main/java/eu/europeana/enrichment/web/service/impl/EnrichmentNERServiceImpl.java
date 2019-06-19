@@ -27,13 +27,15 @@ import org.jsoup.safety.Whitelist;
 import com.neovisionaries.i18n.LanguageCode;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.common.config.I18nConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -46,6 +48,8 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.web.common.config.I18nConstants;
+import eu.europeana.enrichment.web.commons.StoryEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -61,6 +65,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	@Resource(name = "solrWikidataEntityService")
 	SolrWikidataEntityService solrWikidataEntityService;
+	
+
+	@Resource(name = "storyEntitySerializer")
+	StoryEntitySerializer storyEntitySerializer;
 	
 	/*
 	 * Loading all translation services
@@ -302,7 +310,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			for (NamedEntity entity : entities) {
 				//save the wikidata ids to solr
 				//for(String wikidataId : entity.getPreferredWikidataIds())
-				for(String wikidataId : entity.getWikidataIds())
+				for(String wikidataId : entity.getPreferredWikidataIds())
 				{
 					solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
 				}
@@ -748,5 +756,37 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	{
 		String endpoint = service.getEnpoint();
 		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
+	}
+
+	@Override
+	public String getStoryAnnotation(String storyId) throws HttpException, IOException {
+		
+		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
+		findStoryEntitiesFromIds(storyId,tmpStoryEntity);
+		
+		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
+		
+		//taking NamedEntitiy-ies for the story "description" and "transcription" 
+		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, "description", false));
+		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, "transcription", false));
+		
+		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
+		for (NamedEntity entity : NESet)
+		{
+			for(String wikidataId : entity.getPreferredWikidataIds())
+			{				
+				namedEntityAnnoList.add(new NamedEntityAnnotationImpl(storyId, wikidataId, tmpStoryEntity.get(0).getSource()));
+			}
+		}
+			
+		if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
+		{
+			return storyEntitySerializer.serialize(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId));
+		}
+		else
+		{
+			return "No valid entries found!"; 
+		}
+		
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.commons.SolrUtils;
+import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;

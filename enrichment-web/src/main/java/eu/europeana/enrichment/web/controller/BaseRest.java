@@ -2,7 +2,7 @@ package eu.europeana.enrichment.web.controller;
 
 import org.springframework.util.StringUtils;
 
-import eu.europeana.enrichment.common.config.I18nConstants;
+import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
 
 public abstract class BaseRest {

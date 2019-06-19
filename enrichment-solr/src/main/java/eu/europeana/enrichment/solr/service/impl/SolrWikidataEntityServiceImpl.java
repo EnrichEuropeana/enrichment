@@ -47,6 +47,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	@Resource(name = "solrBaseClientService")
 	SolrBaseClientService solrBaseClientService;
 	
+	@Resource(name = "wikidataEntitySerializer")
+	WikidataEntitySerializer wikidataEntitySerializer;
+	
+	
 	@Resource(name = "wikidataService")
 	WikidataService wikidataService;	
 
@@ -493,11 +497,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			Class<SolrWikidataAgentImpl> entityClass = null;
 			entityClass = SolrWikidataAgentImpl.class;
 			entity = (SolrWikidataAgentImpl) binder.getBean(entityClass, doc);
-			
-			WikidataEntitySerializer serializer = new WikidataEntitySerializer();
+						
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = serializer.serialize(entity);
+				serializedUserSetJsonLdStr = wikidataEntitySerializer.serialize(entity);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -511,11 +514,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			Class<SolrWikidataPlaceImpl> entityClass = null;
 			entityClass = SolrWikidataPlaceImpl.class;
 			entity = (SolrWikidataPlaceImpl) binder.getBean(entityClass, doc);
-			
-			WikidataEntitySerializer serializer = new WikidataEntitySerializer();
+					
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = serializer.serialize(entity);
+				serializedUserSetJsonLdStr = wikidataEntitySerializer.serialize(entity);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
