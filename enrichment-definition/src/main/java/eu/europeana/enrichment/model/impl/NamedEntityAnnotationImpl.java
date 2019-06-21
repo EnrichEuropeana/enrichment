@@ -23,8 +23,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	protected String type;
 	protected String motivation;
 	protected Map<String,String> body;
-	
-	
+
 	public NamedEntityAnnotationImpl (String storyId, String wikidataId, String storySource) {
 
 		source = wikidataId;
@@ -35,7 +34,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		body = new HashMap<String, String>();
 		body.put("type", "SpecificResource");
 		body.put("source", source);
-		body.put("purpose", "tagging");		
+		body.put("purpose", "tagging");
 	}
 	
 	@Override

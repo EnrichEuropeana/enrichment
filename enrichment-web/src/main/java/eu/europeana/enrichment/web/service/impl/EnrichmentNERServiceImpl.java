@@ -49,7 +49,7 @@ import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
-import eu.europeana.enrichment.web.commons.StoryEntitySerializer;
+import eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -68,7 +68,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 
 	@Resource(name = "storyEntitySerializer")
-	StoryEntitySerializer storyEntitySerializer;
+	StoryWikidataEntitySerializer storyEntitySerializer;
 	
 	/*
 	 * Loading all translation services
@@ -759,7 +759,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String getStoryAnnotation(String storyId) throws HttpException, IOException {
+	public String getStoryAnnotationCollection(String storyId) throws HttpException, IOException {
 		
 		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
 		findStoryEntitiesFromIds(storyId,tmpStoryEntity);
@@ -781,12 +781,39 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 		if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
 		{
-			return storyEntitySerializer.serialize(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId));
+			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId));
 		}
 		else
 		{
 			return "No valid entries found!"; 
 		}
 		
+	}
+
+	@Override
+	public String getStoryAnnotation(String storyId, String wikidataEntity) throws HttpException, IOException {
+		
+		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
+		findStoryEntitiesFromIds(storyId,tmpStoryEntity);
+		
+		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
+		
+		//taking NamedEntitiy-ies for the story "description" and "transcription" 
+		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, "description", false));
+		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, "transcription", false));
+		
+		for (NamedEntity entity : NESet)
+		{
+			for(String wikidataId : entity.getPreferredWikidataIds())
+			{	
+				if(wikidataId.contains(wikidataEntity))
+				{
+					return storyEntitySerializer.serialize(new NamedEntityAnnotationImpl(storyId, wikidataId, tmpStoryEntity.get(0).getSource()));
+				}
+			}
+		}
+		
+		return "No valid entries found!";
+
 	}
 }

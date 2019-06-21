@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiOperation;
 @EnableCaching
 @SwaggerSelect
 @Api(tags = "Enrichment service", description=" ")
-public class NERController extends BaseRest {
+public class NERController extends BaseRest { 
 
 	@Resource
 	EnrichmentNERService enrichmentNerService;
