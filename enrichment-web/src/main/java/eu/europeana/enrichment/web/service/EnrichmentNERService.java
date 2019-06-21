@@ -68,11 +68,22 @@ public interface EnrichmentNERService {
 	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
 	
 	/**
-	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class
+	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.
+	 * All NamedEntity-ies that are found using the corresponding NER tool in the story and serialized as a collection
 	 * 
 	 * @param storyId
 	 * @return
 	 * @throws HttpException, IOException 
 	 */
-	public String getStoryAnnotation (String storyId) throws HttpException, IOException;
+	public String getStoryAnnotationCollection (String storyId) throws HttpException, IOException;
+	/**
+	 * Returns a JSON serialization (with the Jackson library) of a single WikidataEntity using the NamedEntityAnnotation class.
+	 * 
+	 * @param storyId
+	 * @param wikidataEntity
+	 * @return
+	 * @throws HttpException, IOException 
+	 */
+	public String getStoryAnnotation (String storyId, String wikidataEntity) throws HttpException, IOException;
+
 }
