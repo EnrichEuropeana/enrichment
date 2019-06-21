@@ -2,8 +2,12 @@ package eu.europeana.enrichment.web.service.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Resource;
+
+import org.jsoup.Jsoup;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
@@ -134,18 +138,23 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			tmpTranslationEntity.setType(type);
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");
-
+			
 			String returnValue = "-1";
 			switch (translationTool) {
 			case googleToolName:
-				if(sendRequest)
-					returnValue = googleTranslationService.translateText(originalText, sourceLanguage, defaultTargetLanguage);
+				if(sendRequest) {
+					List<String> textArray = textSplitter(originalText);
+					returnValue = googleTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
+					returnValue = Jsoup.parse(returnValue).text();
+				}
 				tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			case eTranslationToolName:
-				if(sendRequest)
-					returnValue = eTranslationService.translateText(originalText, sourceLanguage, defaultTargetLanguage);
+				if(sendRequest) {
+					List<String> textArray = textSplitter(originalText);
+					returnValue = eTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
+				}
 				tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
@@ -170,6 +179,23 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			throw new InternalServerException(e);
 		}
+	}
+	
+	private List<String> textSplitter(String originaltext){
+		List<String> textArray = new ArrayList<>();
+		List<String> sentences = translationLanguageTool.sentenceSplitter(originaltext);
+		String tmpString = "";
+		for (String tmpSentence : sentences) {
+			tmpString += tmpSentence + " ";
+			if(tmpString.length() > 50000) {
+				textArray.add(tmpString);
+				tmpString = "";
+			}
+		}
+		if(!tmpString.equals(""))
+			textArray.add(tmpString);
+			
+		return textArray;
 	}
 
 	@Override

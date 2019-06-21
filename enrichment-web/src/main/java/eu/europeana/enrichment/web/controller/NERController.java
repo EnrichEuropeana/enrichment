@@ -1,12 +1,13 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.Arrays;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,14 +43,26 @@ public class NERController extends BaseRest {
 	 * 									their classification types 
 	 */
 	@ApiOperation(value = "Get named entities", nickname = "getNEREntities")
-	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest body) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "stroyId", required = true) String storyId,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "property", required = false) String property,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
+			
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setTranslationTool(translationTool);
+			body.setProperty(property);
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(original);
 			
 			String jsonLd = enrichmentNerService.getEntities(body, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
@@ -67,14 +80,26 @@ public class NERController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Get named entities", nickname = "getEntities")
-	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.GET},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getEntities(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentNERRequest body) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "stroyId", required = true) String storyId,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "property", required = false) String property,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
+			
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setTranslationTool(translationTool);
+			body.setProperty(property);
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(original);
 			
 			String jsonLd = enrichmentNerService.getEntities(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);

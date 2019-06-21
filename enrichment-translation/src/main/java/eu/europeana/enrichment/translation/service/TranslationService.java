@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.translation.service;
 
+import java.util.List;
+
 import eu.europeana.enrichment.translation.exception.TranslationException;
 
 
@@ -15,7 +17,7 @@ public interface TranslationService {
 	 * 									original transcribed text
 	 * @throws TranslationException	
 	 */
-	public String translateText(String text, String sourceLanguage, String targetLanguage) throws TranslationException;
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLanguage) throws TranslationException;
 
 	/**
 	 * Called when eTranslation returns the translated text back to our application.
