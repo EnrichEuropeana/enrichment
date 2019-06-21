@@ -108,7 +108,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	}
 
 	@Override
-	@JsonProperty("entityId")
+	@JsonProperty("id")
 	public String getEntityId() {
 		return entityId;
 	}
