@@ -1,21 +1,15 @@
 package eu.europeana.enrichment.translation.service.impl;
 
 import java.io.FileInputStream;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.Translate.TranslateOption;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.common.collect.Lists;
-import com.google.cloud.translate.Translate.TranslateOption;
-
-
-import com.google.api.gax.paging.Page;
-//import com.google.auth.appengine.AppEngineCredentials;
-import com.google.auth.oauth2.ComputeEngineCredentials;
-import com.google.auth.oauth2.GoogleCredentials;
-
-import java.io.FileInputStream;
-import java.io.IOException;
 
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.TranslationService;
@@ -49,18 +43,38 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     }
     
 	@Override
-	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException {
 		
 		if(translate == null) {
 			//TODO: throws exception
 			return null;
 		}
 		
-	    Translation translation = translate.translate(text, 
-	    		TranslateOption.sourceLanguage(sourceLanguage), 
-	    		TranslateOption.targetLanguage(targetLang));
+		String finalTranslationText = "";
+		
+		for(int index = 0; index < textArray.size(); index++) {
+			String text = textArray.get(index);
+			try {
+			Translation translation = translate.translate(text, 
+		    		TranslateOption.sourceLanguage(sourceLanguage), 
+		    		TranslateOption.targetLanguage(targetLang));
+				finalTranslationText += translation.getTranslatedText() + " ";
+			}
+			catch(Exception ex) {
+				System.err.println(ex.getMessage());
+				index--;
+			}
 
-		return translation.getTranslatedText();
+
+			try {
+				TimeUnit.SECONDS.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return finalTranslationText;
 	}
 
 	@Override

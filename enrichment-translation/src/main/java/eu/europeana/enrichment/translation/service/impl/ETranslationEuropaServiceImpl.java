@@ -95,14 +95,15 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 
 	@Override
-	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException {
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
 		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
 		//String externalReference = "123";
 		createdRequests.put(externalReference, null);
 		
-		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
+		//TODO: handle textArray with more then one request
+		String contentBody = createTranslationBodyForDirectCallback(textArray.get(0), sourceLanguage, externalReference);
 		//String contentBody =  createTranslationBody (text, sourceLanguage);
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);

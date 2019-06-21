@@ -6,7 +6,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,8 +16,6 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
-import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
-import eu.europeana.enrichment.web.service.impl.EnrichmentTranslationServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -47,14 +44,20 @@ public class TranslationController extends BaseRest {
 	 * 									only an ID
 	 */
 	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "postTranslation")
-	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslation(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "storyId", required = true) String storyId,
+			@RequestParam(value = "translationTool", required = true) String translationTool,
+			@RequestParam(value = "type", required = false) String type) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
+			
+			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
+			body.setStoryId(storyId);
+			body.setTranslationTool(translationTool);
+			body.setType(type);
 			
 			String translation = enrichmentTranslationService.translate(body, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
@@ -66,14 +69,20 @@ public class TranslationController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation")
-	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.GET},
-			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.GET}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "storyId", required = true) String storyId,
+			@RequestParam(value = "translationTool", required = true) String translationTool,
+			@RequestParam(value = "type", required = false) String type) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
+			
+			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
+			body.setStoryId(storyId);
+			body.setTranslationTool(translationTool);
+			body.setType(type);
 			
 			String translation = enrichmentTranslationService.translate(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
