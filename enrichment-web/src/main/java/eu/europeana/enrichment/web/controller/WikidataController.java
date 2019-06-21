@@ -63,5 +63,5 @@ public class WikidataController extends BaseRest {
 			// TODO Auto-generated catch block
 			throw e;
 		}
-	}
+	} 
 }

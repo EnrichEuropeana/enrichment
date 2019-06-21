@@ -1,17 +1,10 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataPlace;
-import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
-
 
 //@JsonPropertyOrder({ "id", "type", "description", "depiction","country", "logo","latitude","longitude","prefLabel","altLabel","modificationDate","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)

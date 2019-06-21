@@ -48,6 +48,5 @@ public interface NamedEntityAnnotation {
 	
 	Map<String,String> getBody ();
 	void setBody (Map<String,String> bodyParam);
-
 	
 }

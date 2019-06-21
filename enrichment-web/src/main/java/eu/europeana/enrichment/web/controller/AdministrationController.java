@@ -100,7 +100,7 @@ public class AdministrationController extends BaseRest {
 		
 			return response;
 		} catch (HttpException e) {
-			throw e;
+			throw e; 
 		}	
 	}
 	
