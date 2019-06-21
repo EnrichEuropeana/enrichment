@@ -111,6 +111,7 @@
 	<!-- Translation service beans -->
 	<beans:bean id="googleTranslationService" class="eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.translation.google.credentials}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.google.waittime}"/>
 	</beans:bean>
 	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
