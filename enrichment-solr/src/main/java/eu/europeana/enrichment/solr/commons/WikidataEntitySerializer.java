@@ -13,7 +13,7 @@ import ioinformarics.oss.jackson.module.jsonld.JsonldResourceBuilder;
 public class WikidataEntitySerializer {
 
 	public static final String SET_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-	public final static String CONTEXT = "http://www.europeana.eu/schemas/context/collection.jsonld";
+	public final static String CONTEXT = "http://www.europeana.eu/schemas/context/entity.jsonld";
 	ObjectMapper mapper = new ObjectMapper(); 
 		
 	public WikidataEntitySerializer() {
