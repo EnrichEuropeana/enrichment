@@ -63,7 +63,7 @@
 	<beans:bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
 	</beans:bean>
 	
-	<beans:bean id="storyEntitySerializer" class="eu.europeana.enrichment.web.commons.StoryEntitySerializer" >
+	<beans:bean id="storyEntitySerializer" class="eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer" >
 	</beans:bean>
 	
 	<beans:bean id="wikidataEntitySerializer" class="eu.europeana.enrichment.solr.commons.WikidataEntitySerializer" >

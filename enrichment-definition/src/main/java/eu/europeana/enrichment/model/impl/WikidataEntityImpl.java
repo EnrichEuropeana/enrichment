@@ -13,7 +13,7 @@ import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
-@JsonPropertyOrder({ "entityId", "type", "description", "depiction","prefLabel","altLabel","modified","sameAs"})
+@JsonPropertyOrder({ "entityId","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataEntityImpl implements WikidataEntity {
 	
