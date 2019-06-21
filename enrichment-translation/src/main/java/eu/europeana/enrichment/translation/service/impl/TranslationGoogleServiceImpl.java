@@ -19,6 +19,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 
     Translate translate;
     private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
+    private int waittime = 100;
 
     /*
      * This class constructor reads to Google Cloud credentials and 
@@ -28,13 +29,14 @@ public class TranslationGoogleServiceImpl implements TranslationService{
      * 									credential file
      * @return
      */
-    public TranslationGoogleServiceImpl(String credentialFilePath) {
+    public TranslationGoogleServiceImpl(String credentialFilePath, String waittime) {
     	try {
     		// You can specify a credential file by providing a path to GoogleCredentials.
     		// Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
     		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialFilePath))
     				.createScoped(Lists.newArrayList(credentialScope));
         	translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
+        	this.waittime = Integer.parseInt(waittime);
     	}
     	catch (Exception e) {
 			// TODO: handle exception
@@ -51,23 +53,29 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 		}
 		
 		String finalTranslationText = "";
-		
+		int error = 0;
 		for(int index = 0; index < textArray.size(); index++) {
 			String text = textArray.get(index);
 			try {
-			Translation translation = translate.translate(text, 
+				Translation translation = translate.translate(text, 
 		    		TranslateOption.sourceLanguage(sourceLanguage), 
 		    		TranslateOption.targetLanguage(targetLang));
 				finalTranslationText += translation.getTranslatedText() + " ";
+				error=0;
 			}
 			catch(Exception ex) {
 				System.err.println(ex.getMessage());
 				index--;
+				error++;
+				if(error == 3)
+				{
+					break;
+				}
 			}
 
 
 			try {
-				TimeUnit.SECONDS.sleep(100);
+				TimeUnit.SECONDS.sleep(waittime);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
