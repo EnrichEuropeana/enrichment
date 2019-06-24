@@ -37,6 +37,9 @@ package eu.europeana.enrichment.solr.commons;
 
 import java.io.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
   * Stemmer, implementing the Porter Stemming Algorithm
   *
@@ -46,7 +49,9 @@ import java.io.*;
   */
 
 public class Stemmer
-{  private char[] b;
+{
+
+   private char[] b;
    private int i,     /* offset into b */
                i_end, /* offset to end of stemmed word */
                j, k;
@@ -406,6 +411,7 @@ public class Stemmer
                           /* u = new String(s.getResultBuffer(), 0, s.getResultLength()); */
 
                           System.out.print(u);
+                          
                        }
                        break;
                     }

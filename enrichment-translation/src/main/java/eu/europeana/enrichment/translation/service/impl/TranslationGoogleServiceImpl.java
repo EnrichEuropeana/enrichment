@@ -4,6 +4,9 @@ import java.io.FileInputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.Translate.TranslateOption;
@@ -20,6 +23,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     Translate translate;
     private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
     private int waittime = 100;
+    private final Logger logger = LogManager.getLogger(getClass());
 
     /*
      * This class constructor reads to Google Cloud credentials and 
@@ -40,6 +44,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     	}
     	catch (Exception e) {
 			// TODO: handle exception
+    		logger.error("Exception raised during reading and setting Google credentials" + e.getMessage());
     		System.err.println(e.getMessage());
 		}
     }
@@ -64,6 +69,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 				error=0;
 			}
 			catch(Exception ex) {
+				logger.error("Exception raised by translating text!" + ex.getMessage());
 				System.err.println(ex.getMessage());
 				index--;
 				error++;

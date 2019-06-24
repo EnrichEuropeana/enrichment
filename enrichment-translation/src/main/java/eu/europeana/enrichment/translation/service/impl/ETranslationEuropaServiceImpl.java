@@ -90,6 +90,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			logger.error("Exception raised by reading eTranslation credentials!" + e.getMessage());
 			System.err.println(e.getMessage());
 		}
 	}
@@ -158,6 +159,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);
 		}catch(UnsupportedEncodingException ex) {
+			logger.error("Exception by creating translation request body: " + ex.getMessage());
 			System.out.println(ex.getMessage());
 		}
 
@@ -193,6 +195,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);
 		}catch(UnsupportedEncodingException ex) {
+			logger.error("Exception by creating translation request body: " + ex.getMessage());
 			System.out.println(ex.getMessage());
 		}
 
@@ -240,6 +243,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			return responeString;
 		} catch (Exception ex) {
 			//TODO: proper exception handling
+			logger.error("Exception raised during the creation of eTranslation request: " + ex.getMessage());
 			System.err.println(ex.getMessage());
 			return "";
 		}

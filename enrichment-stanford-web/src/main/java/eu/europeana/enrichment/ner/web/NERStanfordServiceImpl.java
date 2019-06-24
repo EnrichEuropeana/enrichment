@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
@@ -22,6 +24,7 @@ import eu.europeana.enrichment.ner.service.NERService;
 public class NERStanfordServiceImpl{
 
 	private CRFClassifier<CoreLabel> classifier;
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * This class constructor loads a model for the Stanford named
@@ -29,6 +32,7 @@ public class NERStanfordServiceImpl{
 	 */
 	public NERStanfordServiceImpl(String model) {
 		if(model == null || model.isEmpty()) {
+			logger.error("NERStanfordServiceImp: No model for classifier defined!");
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {
