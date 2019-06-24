@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.jsoup.Jsoup;
+import org.springframework.http.HttpStatus;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
@@ -115,8 +116,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			if(!process) {
 				//TODO: proper exception (like EnrichmentNERServiceImpl
 				//TODO: throw exception 404
-				//throw new HttpException("");
-				return "";
+				throw new HttpException(null, "The translation of the required property was not performed yet. Please invoke the POST method, using the same parameters first.", HttpStatus.PRECONDITION_REQUIRED);
+				
 			}
 			
 			if(originalText == null || originalText.isEmpty())

@@ -12,6 +12,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,6 +28,7 @@ import eu.europeana.enrichment.ner.service.NERService;
 public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 	private String baseUrl;
+	private final Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * DBpedia spotlight JSON response keys 
@@ -193,6 +196,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			return responeString;
 
 		} catch (Exception ex) {
+			logger.error("Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage());
 			System.err.println(ex.getMessage());
 			return "";
 		}

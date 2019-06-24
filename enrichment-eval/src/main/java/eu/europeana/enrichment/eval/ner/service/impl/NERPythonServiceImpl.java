@@ -12,6 +12,8 @@ import java.net.URL;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
@@ -29,6 +31,7 @@ import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 public class NERPythonServiceImpl implements NERService{
 
 	private String pythonCommand;
+	private final Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * This class constructor is used to create the required python command
@@ -86,6 +89,7 @@ public class NERPythonServiceImpl implements NERService{
 				sb.append(currentLine);
 			}
 			String pythonErrorResponse = sb.toString();
+			logger.error("Python error: " + pythonErrorResponse);
 			System.out.println("Python error: " + pythonErrorResponse);
 			
 			byte[] bytesDecoded = Base64.getDecoder().decode(pythonResponse.getBytes("UTF-8"));
@@ -98,6 +102,7 @@ public class NERPythonServiceImpl implements NERService{
 			reader.close();
 			// mProcess -> terminate or close
 		} catch (Exception e) {
+			logger.error("Exception raised during Python NER processing: " + e.toString());
 			System.out.println("Exception Raised" + e.toString());
 		}
 		

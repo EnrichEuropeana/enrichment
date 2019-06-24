@@ -479,7 +479,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 		if(docList.size() != 1)
 		{
-			log.error("There are several or 0 Solr documents with the same wikidata URL!");
+			log.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
 			return null;
 		}
 		

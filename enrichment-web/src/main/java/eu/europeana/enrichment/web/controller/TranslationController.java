@@ -43,13 +43,15 @@ public class TranslationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "postTranslation")
+	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "postTranslation", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
+			"The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
+			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslation(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "storyId", required = true) String storyId,
-			@RequestParam(value = "translationTool", required = true) String translationTool,
-			@RequestParam(value = "type", required = false) String type) throws HttpException {
+			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -57,7 +59,7 @@ public class TranslationController extends BaseRest {
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
 			body.setTranslationTool(translationTool);
-			body.setType(type);
+			body.setType(property);
 			
 			String translation = enrichmentTranslationService.translate(body, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
@@ -68,13 +70,15 @@ public class TranslationController extends BaseRest {
 		}
 	}
 	
-	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation")
+	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation", notes = "This method retrieves the translation of textual information for transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
+			"The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
+			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.GET}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "storyId", required = true) String storyId,
-			@RequestParam(value = "translationTool", required = true) String translationTool,
-			@RequestParam(value = "type", required = false) String type) throws HttpException {
+			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -82,7 +86,7 @@ public class TranslationController extends BaseRest {
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
 			body.setTranslationTool(translationTool);
-			body.setType(type);
+			body.setType(property);
 			
 			String translation = enrichmentTranslationService.translate(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
