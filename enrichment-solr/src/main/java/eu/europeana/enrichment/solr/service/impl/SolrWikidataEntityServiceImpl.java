@@ -116,7 +116,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				country=jsonElement.get(0).get(0);
+				country="http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
 			}
 			newWikidataAgent.setCountry(country);
 
@@ -178,7 +178,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 				occupationArray = new String [jsonElement.size()];
 				for(int i=0;i<jsonElement.size();i++)
 				{
-					occupationArray[i]=jsonElement.get(i).get(0);
+					occupationArray[i]="http://www.wikidata.org/entity/" + jsonElement.get(i).get(0);
 				}				
 			}
 			newWikidataAgent.setProfessionOrOccupation(occupationArray);
@@ -225,7 +225,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
-				country = jsonElement.get(0).get(0);
+				country = "http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
 			}
 			newWikidataPlace.setCountry(country);
 			
