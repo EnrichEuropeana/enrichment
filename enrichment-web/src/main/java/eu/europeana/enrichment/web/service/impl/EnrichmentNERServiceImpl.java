@@ -428,6 +428,15 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			List<NamedEntity> namedEntities = resultMap.get(classificationType);
 			for(int index = namedEntities.size()-1; index >= 0; index--) {
 				NamedEntity tmpNamedEntity = namedEntities.get(index);
+				//set all empty values to be null
+				if(tmpNamedEntity.getDBpediaIds().isEmpty()) tmpNamedEntity.setDBpediaIds(null);
+				if(tmpNamedEntity.getDbpediaWikidataIds().isEmpty()) tmpNamedEntity.setDbpediaWikidataIds(null);
+				if(tmpNamedEntity.getEuropeanaIds().isEmpty()) tmpNamedEntity.setEuropeanaIds(null);
+				if(tmpNamedEntity.getPositionEntities().isEmpty()) tmpNamedEntity.setPositionEntities(null);
+				if(tmpNamedEntity.getPreferredWikidataIds().isEmpty()) tmpNamedEntity.setPreferredWikidataIds(null);
+				if(tmpNamedEntity.getWikidataIds().isEmpty()) tmpNamedEntity.setWikidataIds(null);
+				
+				
 				List<PositionEntity> tmpPositions = tmpNamedEntity.getPositionEntities();
 				for(int posIndex = tmpPositions.size()-1; posIndex >= 0; posIndex--) {
 					PositionEntity tmpPositionEntity = tmpPositions.get(posIndex);
@@ -440,6 +449,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						tmpPositionEntity.setTranslationKey(null);
+						
+						//set all empty values to be null
+						if(tmpPositionEntity.getOffsetsOriginalText().isEmpty()) tmpPositionEntity.setOffsetsOriginalText(null);
+						if(tmpPositionEntity.getOffsetsTranslatedText().isEmpty()) tmpPositionEntity.setOffsetsTranslatedText(null);
+						if(tmpPositionEntity.getStoryFieldUsedForNER().isEmpty()) tmpPositionEntity.setStoryFieldUsedForNER(null);
 					}
 				}
 				tmpNamedEntity.setType(null);
