@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.model;
 
 import java.util.List;
-import java.util.Map;
 
 public interface NamedEntityAnnotation {
 	
@@ -46,7 +45,7 @@ public interface NamedEntityAnnotation {
 	String getMotivation ();
 	void setMotivation (String motivationParam);
 	
-	Map<String,String> getBody ();
-	void setBody (Map<String,String> bodyParam);
+	String getBody ();
+	void setBody (String bodyParam);
 	
 }

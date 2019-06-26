@@ -46,7 +46,7 @@ public class NERController extends BaseRest {
 	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "stroyId", required = true) String storyId,
+			@RequestParam(value = "storyId", required = true) String storyId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
