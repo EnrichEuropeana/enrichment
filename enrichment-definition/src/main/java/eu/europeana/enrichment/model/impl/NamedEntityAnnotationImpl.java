@@ -22,7 +22,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	protected String target;
 	protected String type;
 	protected String motivation;
-	protected Map<String,String> body;
+	protected String body;
 
 	public NamedEntityAnnotationImpl (String storyId, String wikidataId, String storySource) {
 
@@ -31,10 +31,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		id = idBase + storyId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
 		type = "Annotation";
 		motivation = "tagging";
-		body = new HashMap<String, String>();
-		body.put("type", "SpecificResource");
-		body.put("source", source);
-		body.put("purpose", "tagging");
+		body = source;
 	}
 	
 	@Override
@@ -100,13 +97,13 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
 	@Override
 	@JsonProperty("body")
-	public Map<String, String> getBody() {
+	public String getBody() {
 		
 		return body;
 	}
 
 	@Override
-	public void setBody(Map<String, String> bodyParam) {
+	public void setBody(String bodyParam) {
 		body = bodyParam;
 		
 	}

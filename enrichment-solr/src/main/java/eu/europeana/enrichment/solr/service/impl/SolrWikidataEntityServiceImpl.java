@@ -145,7 +145,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				depiction = jsonElement.get(0).get(0);
+				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
 			}
 			newWikidataAgent.setDepiction(depiction);
 			
@@ -250,7 +250,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
-				depiction = jsonElement.get(0).get(0);
+				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
 			}
 			newWikidataPlace.setDepiction(depiction);
 		
