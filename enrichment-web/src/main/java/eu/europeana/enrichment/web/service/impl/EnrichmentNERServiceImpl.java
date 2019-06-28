@@ -143,6 +143,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
+		String itemId = requestParam.getItemId();
 		String type = requestParam.getProperty();
 		if(type == null || type.isEmpty())
 			type = "transcription";
@@ -222,7 +223,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			TranslationEntity dbTranslationEntity = null;
 			if(!original) {
 				dbTranslationEntity = persistentTranslationEntityService.
-						findTranslationEntityWithStoryInformation(dbStoryEntity.getStoryId(), translationTool, translationLanguage, type);
+						findTranslationEntityWithStoryAndItemInformation(dbStoryEntity.getStoryId(), itemId, translationTool, translationLanguage, type);
 			}
 			String textForNer = "";
 			

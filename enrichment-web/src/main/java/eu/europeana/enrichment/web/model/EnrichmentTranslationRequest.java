@@ -17,6 +17,7 @@ public class EnrichmentTranslationRequest {
 	public static final String PARAM_SEND_REQUEST = "sendRequest";
 	
 	public String storyId;
+	public String itemId;
 	public String text;
 	public String type;
 	public String translationTool;
@@ -34,6 +35,13 @@ public class EnrichmentTranslationRequest {
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+
 		
 	public String getText() {
 		return text;

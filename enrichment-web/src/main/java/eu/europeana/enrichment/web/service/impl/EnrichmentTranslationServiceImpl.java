@@ -59,6 +59,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
 			String storyId = requestParam.getStoryId();			
+			String itemId = requestParam.getItemId();			
 			String originalText = requestParam.getText();
 			String translationTool = requestParam.getTranslationTool();
 			String type = requestParam.getType();
@@ -88,7 +89,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				sourceLanguage = dbStoryEntity.getLanguage();
 				tmpStoryEntity = dbStoryEntity;
 				TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryInformation(storyId, translationTool, defaultTargetLanguage, type);
+							findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
 				if(dbTranslationEntity != null) {
 					return dbTranslationEntity.getTranslatedText();
 				}
@@ -202,6 +203,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Override
 	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException{
 		String storyId = requestParam.getStoryId();
+		String itemId = requestParam.getItemId();			
 		String translatedText = requestParam.getText();		
 		String translationTool = requestParam.getTranslationTool();
 		String language = "en";
@@ -212,7 +214,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return "";
 		}
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithStoryInformation(storyId, translationTool, language, type);
+				findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, language, type);
 		if(dbTranslationEntity == null) {
 			//TODO: proper exception handling
 			return "";

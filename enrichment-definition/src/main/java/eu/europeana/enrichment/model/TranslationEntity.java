@@ -30,12 +30,21 @@ public interface TranslationEntity {
 	void setTool(String tool);
 	
 	/*
-	 * Transcribathon and Europeana StoryItem
+	 * Transcribathon and Europeana Story
 	 */
 	StoryEntity getStoryEntity();
 	void setStoryEntity(StoryEntity ItemEntity);
 	String getStoryId();
 	void setStoryId(String storyId);
+	
+	/*
+	 * Transcribathon and Europeana Item
+	 */
+	ItemEntity getItemEntity();
+	void setItemEntity(ItemEntity itemEntity);
+	String getItemId();
+	void setItemId(String itemId);
+
 	
 	String getType();
 	void setType(String type);

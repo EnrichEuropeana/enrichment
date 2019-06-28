@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
@@ -16,6 +17,18 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private String tool;
 	private String eTranslationId;
 	private String storyId;
+	private String itemId;
+	
+	@Override
+	public String getItemId() {
+		return itemId;
+	}
+
+	@Override
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+
 	private String type;
 	
 	public String getETranslationId() {
@@ -102,6 +115,18 @@ public class TranslationEntityImpl implements TranslationEntity{
 
 	@Override
 	public void setStoryEntity(StoryEntity ItemEntity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ItemEntity getItemEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setItemEntity(ItemEntity itemEntity) {
 		// TODO Auto-generated method stub
 		
 	}
