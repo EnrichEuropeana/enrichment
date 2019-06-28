@@ -42,6 +42,7 @@ public class EnrichmentNERRequest {
 	public static final String PARAM_PROPERTY = "property";
 	
 	public String storyId;
+	public String itemId;
 	public List<String> storyItemIds;
 	public List<String> nerTools;
 	public List<String> linking;
@@ -60,6 +61,12 @@ public class EnrichmentNERRequest {
 	}
 	public void setProperty(String type) {
 		this.property = type;
+	}
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
 	}
 	public String getStoryId() {
 		return storyId;
