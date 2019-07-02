@@ -3,6 +3,7 @@ package eu.europeana.enrichment.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -12,6 +13,8 @@ public class PositionEntityImpl implements PositionEntity{
 	private List<Integer> offsetsTranslatedText;
 	private List<Integer> offsetsOriginalText;
 	private String storyId;
+	private String itemId;
+
 	private String storyFieldUsedForNER;
 	
 	public String getStoryFieldUsedForNER() {
@@ -29,6 +32,14 @@ public class PositionEntityImpl implements PositionEntity{
 		offsetsOriginalText = new ArrayList<Integer>();
 	}
 	
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+
 	public String getStoryId() {
 		return storyId;
 	}
@@ -97,6 +108,18 @@ public class PositionEntityImpl implements PositionEntity{
 
 	@Override
 	public void setTranslationEntity(TranslationEntity translationEntity) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ItemEntity getItemEntity() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setItemEntity(ItemEntity itemEntity) {
 		// TODO Auto-generated method stub
 		
 	}

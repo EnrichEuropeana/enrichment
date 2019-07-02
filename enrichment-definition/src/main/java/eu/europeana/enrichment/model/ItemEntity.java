@@ -29,6 +29,10 @@ public interface ItemEntity {
 	String getTranscription();
 	void setTranscription(String transcriptionText);
 	
+	String getDescription();
+	void setDescription(String descriptionText);
+
+	
 	String getTitle();
 	void setTitle(String storyItemTitle);
 	

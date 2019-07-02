@@ -19,7 +19,10 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Resource(name= "storyEntityDao")
 	StoryEntityDao storyEntityDao;
-	
+
+	@Resource(name= "ItemEntityDao")
+	ItemEntityDao ItemEntityDao;
+
 	private Datastore datastore;
 	
 	public ItemEntityDaoImpl(Datastore datastore) {
@@ -43,6 +46,24 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 			addAdditionalInformation(dbEntity);
 			return dbEntity;
 		}
+	}
+	@Override
+	public ItemEntity findItemEntityFromStory(String itemId, String storyId)
+	{
+		Query<DBItemEntityImpl> persistentItemEntities = datastore.createQuery(DBItemEntityImpl.class);
+		persistentItemEntities.disableValidation().and(
+				persistentItemEntities.criteria("positionEntities.storyId").equal(storyId),
+				persistentItemEntities.criteria("positionEntities.itemId").equal(itemId)
+				);
+		List<DBItemEntityImpl> result = persistentItemEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else {
+			DBItemEntityImpl dbEntity = result.get(0);
+			addAdditionalInformation(dbEntity);
+			return dbEntity;
+		}
+
 	}
 	
 	@Override

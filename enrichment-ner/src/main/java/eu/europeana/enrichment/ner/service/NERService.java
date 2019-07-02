@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -37,18 +38,16 @@ public interface NERService {
 	 */
 	public TreeMap<String, List<NamedEntity>> identifyNER(String text);
 	
-	/*
+	/**
 	 * This methods is the default implementation for getting the positions of the NER entities
 	 * on the original text
 	 * 
-	 * @param 						findings are the NER findings which are 
-	 * 								generated throw the identifyNER function
-	 * @param 						originalText is the transcribed text where 
-	 * 								the NER needs to be located
-	 * @return 						all findings including their original 
-	 * 								position at the transcribed text
+	 * @param namedEntity
+	 * @param storyEntity
+	 * @param itemEntity
+	 * @param translationEntity
 	 */
-	default void getPositions(NamedEntity namedEntity, StoryEntity storyEntity, TranslationEntity translationEntity){
+	default void getPositions(NamedEntity namedEntity, StoryEntity storyEntity, ItemEntity itemEntity, TranslationEntity translationEntity){
 		//TODO: report named entities which we could not find in the original text
 		
 		String text;
@@ -61,7 +60,7 @@ public interface NERService {
 			return;
 		}
 
-		PositionEntity posEntity;
+		PositionEntity posEntity = null;
 		if(storyEntity != null) {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getStoryId()
 					.equals(storyEntity.getStoryId())).collect(Collectors.toList());
@@ -71,7 +70,15 @@ public interface NERService {
 				positions.add(posEntity);
 			}
 			else {
-				posEntity = positions.get(0);
+				for(PositionEntity posItemEntity : positions)
+				{
+					if(posItemEntity.getItemId().compareTo(itemEntity.getItemId())==0)
+					{
+						posEntity = posItemEntity;
+						break;
+					}
+				}
+				
 			}
 		}
 		else {

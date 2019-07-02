@@ -12,7 +12,13 @@ public interface PositionEntity {
 	
 	public String getStoryId();
 	public void setStoryId(String storyId);
+
+	ItemEntity getItemEntity();
+	void setItemEntity(ItemEntity itemEntity);
 	
+	public String getItemId();
+	public void setItemId(String itemId);
+
 	public String getStoryFieldUsedForNER();
 	public void setStoryFieldUsedForNER(String storyFieldUsedForNER);
 
