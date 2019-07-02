@@ -14,6 +14,7 @@ public class ItemEntityImpl implements ItemEntity{
 	private String language;
 	private String type;
 	private String transcriptionText;
+	private String description;
 	private String hashKey;
 	private String storyId;
 	private String title;
@@ -104,5 +105,17 @@ public class ItemEntityImpl implements ItemEntity{
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public String getDescription() {
+		return description;
+	}
+
+	@Override
+	public void setDescription(String descriptionText) {
+		this.description = descriptionText;	
+	}
+
+
 	
 }

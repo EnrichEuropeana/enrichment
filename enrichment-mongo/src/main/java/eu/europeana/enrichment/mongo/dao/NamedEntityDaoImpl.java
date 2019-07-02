@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -20,6 +21,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Resource(name = "storyEntityDao")
 	StoryEntityDao storyEntityDao;
+	@Resource(name = "ItemEntityDao")
+	ItemEntityDao ItemEntityDao;
+
 	@Resource(name = "translationEntityDao")
 	TranslationEntityDao translationEntityDao;
 	private Datastore datastore; 
@@ -35,10 +39,15 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		for(int index = positions.size()-1; index >= 0; index--) {
 			PositionEntity dbPositionEntity = positions.get(index);
 			String storyId = dbPositionEntity.getStoryId();
+			String itemId = dbPositionEntity.getItemId();
 			String translationKey = dbPositionEntity.getTranslationKey();
 			if(storyId != null && !storyId.isEmpty()) {
 				StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(storyId);
 				dbPositionEntity.setStoryEntity(dbStoryEntity);
+			}
+			if(itemId != null && !itemId.isEmpty()) {
+				ItemEntity dbItemEntity = ItemEntityDao.findItemEntityFromStory(itemId, storyId);
+				dbPositionEntity.setItemEntity(dbItemEntity);
 			}
 			if(translationKey != null && !translationKey.isEmpty()) {
 				TranslationEntity dbTranslationEntity = translationEntityDao.findTranslationEntity(translationKey);
@@ -83,7 +92,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 
 	@Override
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String type, boolean translation) {
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {
 		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
 		if(translation) {
 			persistentNamedEntities.disableValidation().and(
@@ -93,6 +102,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		} else {
 			persistentNamedEntities.disableValidation().and(
 					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
+					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
 					persistentNamedEntities.criteria("positionEntities.storyFieldUsedForNER").equal(type)
 					);
 		}

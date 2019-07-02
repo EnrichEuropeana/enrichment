@@ -47,6 +47,7 @@ public class NERController extends BaseRest {
 	public ResponseEntity<String> getNEREntities(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "storyId", required = true) String storyId,
+			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
@@ -58,6 +59,7 @@ public class NERController extends BaseRest {
 			
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
+			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
@@ -84,6 +86,7 @@ public class NERController extends BaseRest {
 	public ResponseEntity<String> getEntities(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "stroyId", required = true) String storyId,
+			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
@@ -95,6 +98,7 @@ public class NERController extends BaseRest {
 			
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
+			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
