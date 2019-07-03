@@ -69,21 +69,26 @@ public interface EnrichmentNERService {
 	
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.
-	 * All NamedEntity-ies that are found using the corresponding NER tool in the story and serialized as a collection
+	 * All NamedEntity-ies that are found using the corresponding NER tool in the story and serialized as a collection.
+	 * The parameter "save" tells us if the found entity should be saved to the db  
 	 * 
 	 * @param storyId
+	 * @param itemId 
+	 * @param save
 	 * @return
-	 * @throws HttpException, IOException 
+	 * @throws HttpException
+	 * @throws IOException
 	 */
-	public String getStoryAnnotationCollection (String storyId) throws HttpException, IOException;
+	public String getStoryOrItemAnnotationCollection (String storyId, String itemId, boolean save) throws HttpException, IOException;
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of a single WikidataEntity using the NamedEntityAnnotation class.
 	 * 
 	 * @param storyId
+	 * @param itemId 
 	 * @param wikidataEntity
 	 * @return
 	 * @throws HttpException, IOException 
 	 */
-	public String getStoryAnnotation (String storyId, String wikidataEntity) throws HttpException, IOException;
+	public String getStoryOrItemAnnotation (String storyId, String itemId, String wikidataEntity) throws HttpException, IOException;
 
 }

@@ -18,11 +18,19 @@ public class NamedEntityAnnotationCollection {
 	private String creator = "https://pro.europeana.eu/project/enrich-europeana";
 	private String total; 
 
-	public NamedEntityAnnotationCollection(List<NamedEntityAnnotationImpl> itemsParam, String storyId) {
+	public NamedEntityAnnotationCollection(List<NamedEntityAnnotationImpl> itemsParam, String storyId, String itemId) {
 		
 		items = itemsParam;
 		total = String.valueOf(items.size());
-		id = idBase + storyId;
+		if(itemId.compareTo("all")==0)
+		{
+			id = idBase + storyId;
+		}
+		else
+		{
+			id = idBase + storyId + "/" + itemId;
+		}
+		
 		
 	}
 	

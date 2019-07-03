@@ -44,6 +44,11 @@
 	<bean id="ItemEntityDao" class="eu.europeana.enrichment.mongo.dao.ItemEntityDaoImpl">
 		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
 	</bean>
+	
+	<bean id="namedEntityAnnotationDao" class="eu.europeana.enrichment.mongo.dao.NamedEntityAnnotationDaoImpl">
+		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
+	</bean>
+	
 
 	<bean id="namedEntityDao" class="eu.europeana.enrichment.mongo.dao.NamedEntityDaoImpl">
 		<constructor-arg ref="enrich_db_morphia_datastore" name="datastore"/>
