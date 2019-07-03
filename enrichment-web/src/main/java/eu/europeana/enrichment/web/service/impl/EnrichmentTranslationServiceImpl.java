@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
@@ -82,38 +83,74 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 * Check if story / storyItem already exist and
 			 * if there is a translation
 			 */
-			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);						
-			StoryEntity tmpStoryEntity = null;
-			String sourceLanguage = null;
-			if(dbStoryEntity != null) {
-				sourceLanguage = dbStoryEntity.getLanguage();
-				tmpStoryEntity = dbStoryEntity;
-				TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
-				if(dbTranslationEntity != null) {
-					return dbTranslationEntity.getTranslatedText();
-				}
-				
-				if(originalText == null || originalText.isEmpty())
-				{
-					if(type.toLowerCase().equals("transcription") && !(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
-						// Reuse of dbItemEntity text if original text is not given
-						originalText = dbStoryEntity.getTranscription();
-					}
-					else if(type.toLowerCase().equals("summary") && !(dbStoryEntity.getSummary() == null || dbStoryEntity.getSummary().isEmpty())) {
-						// Reuse of dbItemEntity text if original text is not given
-						originalText = dbStoryEntity.getSummary();
-					}
-					else if(type.toLowerCase().equals("description") && !(dbStoryEntity.getDescription() == null || dbStoryEntity.getDescription().isEmpty())) {
-						// Reuse of dbItemEntity text if original text is not given
-						originalText = dbStoryEntity.getDescription();
-					}
-				}
-			} else {
-				//TODO: throw exception
-				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
+			if(dbTranslationEntity != null) {
+				return dbTranslationEntity.getTranslatedText();
 			}
+
 			
+			StoryEntity dbStoryEntity = null;
+			ItemEntity dbItemEntity = null;
+			String sourceLanguage = null;
+			
+			//TODO: the "if" part below takes into account story and item, can be improved not to hardcode it in if 
+			//translate text for the whole story including all items
+			if(itemId.compareTo("all")==0)
+			{		
+				dbStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);
+				if(dbStoryEntity != null)
+				{
+					sourceLanguage = dbStoryEntity.getLanguage();
+					//Reuse of StoryEntity text if original text is not given
+					if(originalText == null || originalText.isEmpty())
+					{
+						if(type.toLowerCase().equals("transcription") && !(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
+							
+							originalText = dbStoryEntity.getTranscription();
+						}
+						else if(type.toLowerCase().equals("summary") && !(dbStoryEntity.getSummary() == null || dbStoryEntity.getSummary().isEmpty())) {
+							
+							originalText = dbStoryEntity.getSummary();
+						}
+						else if(type.toLowerCase().equals("description") && !(dbStoryEntity.getDescription() == null || dbStoryEntity.getDescription().isEmpty())) {
+							
+							originalText = dbStoryEntity.getDescription();
+						}
+					}
+
+				}
+				else
+				{
+					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+				}
+			}
+			//translate text for the specific item
+			else
+			{
+				dbItemEntity = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+				if(dbItemEntity!=null)
+				{
+					sourceLanguage = dbItemEntity.getLanguage();
+					//Reuse of ItemEntity text if original text is not given
+					if(originalText == null || originalText.isEmpty())
+					{
+						if(type.toLowerCase().equals("transcription") && !(dbItemEntity.getTranscription() == null || dbItemEntity.getTranscription().isEmpty())) {
+							
+							originalText = dbItemEntity.getTranscription();
+						}
+						else if(type.toLowerCase().equals("description") && !(dbItemEntity.getDescription() == null || dbItemEntity.getDescription().isEmpty())) {
+							
+							originalText = dbItemEntity.getDescription();
+						}
+					}
+				}
+				else
+				{
+					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
+				}
+
+			}
+						
 			if(!process) {
 				//TODO: proper exception (like EnrichmentNERServiceImpl
 				//TODO: throw exception 404
@@ -124,19 +161,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			if(originalText == null || originalText.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 			
-//			if(tmpStoryEntity == null) {
-//				throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-////				tmpStoryEntity = new StoryEntityImpl();
-////				tmpStoryEntity.setStoryId(storyId);
-////				persistentStoryEntityService.saveStoryEntity(tmpStoryEntity);
-//			}
-			
 			
 			TranslationEntity tmpTranslationEntity = new DBTranslationEntityImpl();
-			tmpTranslationEntity.setStoryEntity(tmpStoryEntity);
+			tmpTranslationEntity.setStoryEntity(dbStoryEntity);
+			tmpTranslationEntity.setItemEntity(dbItemEntity);
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
 			tmpTranslationEntity.setTool(translationTool);
 			tmpTranslationEntity.setStoryId(storyId);
+			tmpTranslationEntity.setItemId(itemId);
 			tmpTranslationEntity.setType(type);
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");

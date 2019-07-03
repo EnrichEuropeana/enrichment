@@ -50,6 +50,7 @@ public class TranslationController extends BaseRest {
 	public ResponseEntity<String> postTranslation(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "storyId", required = true) String storyId,
+			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
 		try {
@@ -58,6 +59,7 @@ public class TranslationController extends BaseRest {
 			
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
+			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
@@ -77,6 +79,7 @@ public class TranslationController extends BaseRest {
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@RequestParam(value = "storyId", required = true) String storyId,
+			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
 		try {
@@ -85,6 +88,7 @@ public class TranslationController extends BaseRest {
 			
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
+			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			

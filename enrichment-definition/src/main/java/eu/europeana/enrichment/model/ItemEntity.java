@@ -32,6 +32,8 @@ public interface ItemEntity {
 	String getDescription();
 	void setDescription(String descriptionText);
 
+	String getSource();
+	void setSource(String sourceParam);
 	
 	String getTitle();
 	void setTitle(String storyItemTitle);

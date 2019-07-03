@@ -29,15 +29,16 @@ import com.neovisionaries.i18n.LanguageCode;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
@@ -52,7 +53,6 @@ import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
-import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
@@ -115,6 +115,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	PersistentStoryEntityService persistentStoryEntityService;
 	@Resource(name = "persistentItemEntityService")
 	PersistentItemEntityService persistentItemEntityService;
+	@Resource(name = "persistentNamedEntityAnnotationService")
+	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
 	
 	//@Cacheable("nerResults")
 	@Override
@@ -222,39 +224,50 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				dbTranslationEntity = persistentTranslationEntityService.
 						findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, translationLanguage, type);
 			}
+		
 			
 			String textForNer = "";
 			String originalLanguage = null;
-
+			StoryEntity tmpStoryEntity = null;
+			ItemEntity tmpItemEntity = null;
 			
-			List<StoryEntity> tmpStoryEntity = new ArrayList<>();
-			List<ItemEntity> tmpItemEntity = new ArrayList<>();
-			findStoryAndItemEntitiesFromIds(storyId,itemId,tmpStoryEntity,tmpItemEntity);
+			if(itemId.compareTo("all")==0)
+			{		
+				tmpStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);
+				if(tmpStoryEntity == null )
+					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentNERRequest.PARAM_STORY_ID, null);
+			}
+			else
+			{
+				tmpItemEntity = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+				if(tmpItemEntity == null )
+					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentNERRequest.PARAM_ITEM_ID, null);
+			}
+			
 
 			/*
 			 * Getting the specified story field to do the NER (summary, description, or traslationText) using Java reflection
 			 * When nothing is specified, the traslationText field is taken.
 			 */
-
-			if(dbTranslationEntity!=null) 
-				textForNer = dbTranslationEntity.getTranslatedText();
+			if(dbTranslationEntity!=null) textForNer = dbTranslationEntity.getTranslatedText();
 			else if(type.toLowerCase().equals("summary") && dbTranslationEntity==null)
 			{
-				if(!tmpStoryEntity.isEmpty()) textForNer = tmpStoryEntity.get(0).getSummary();					
+				if(tmpStoryEntity!=null) textForNer = tmpStoryEntity.getSummary();					
 			}
 			else if(type.toLowerCase().equals("description") && dbTranslationEntity==null) 
 			{
-				if(!tmpStoryEntity.isEmpty()) textForNer = tmpStoryEntity.get(0).getDescription();
-				else textForNer = tmpItemEntity.get(0).getDescription();
+				if(tmpStoryEntity!=null) textForNer = tmpStoryEntity.getDescription();
+				else textForNer = tmpItemEntity.getDescription();
 			}
 			else
 			{
-				if(!tmpStoryEntity.isEmpty()) textForNer = tmpStoryEntity.get(0).getTranscription();
-				else tmpItemEntity.get(0).getTranscription();
+				if(tmpStoryEntity!=null) textForNer = tmpStoryEntity.getTranscription();
+				else tmpItemEntity.getTranscription();
 			}
 			
-			if(!tmpStoryEntity.isEmpty()) originalLanguage=tmpStoryEntity.get(0).getLanguage();
-			else originalLanguage=tmpItemEntity.get(0).getLanguage();
+			if(tmpStoryEntity!=null) originalLanguage=tmpStoryEntity.getLanguage();
+			else originalLanguage=tmpItemEntity.getLanguage();
+
 			
 			/*
 			 * Get all named entities
@@ -691,12 +704,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					newItemEntity.setTranscription("");	
 					newItemEntity.setType("");	
 					newItemEntity.setItemId("");
+					newItemEntity.setSource("");
 	
 					
 					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
 					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
 					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
 					if(items.get(i).get("description")!=null) newItemEntity.setDescription((String) items.get(i).get("description"));
+					if(items.get(i).get("source")!=null) newItemEntity.setSource((String) items.get(i).get("source"));
 					
 					String itemLanguage = (String) items.get(i).get("language");
 					if(items.get(i).get("language")!=null) {
@@ -804,63 +819,83 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String getStoryAnnotationCollection(String storyId) throws HttpException, IOException {
-		
-		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
-		List<ItemEntity> tmpItemEntity=null;
-		findStoryAndItemEntitiesFromIds(storyId,"all",tmpStoryEntity,tmpItemEntity);
-		
-		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
-		
-		//taking NamedEntitiy-ies for the story "description" and "transcription" 
-		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,"all", "description", false));
-		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, "all" ,"transcription", false));
+	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity) throws HttpException, IOException {
 		
 		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
-		for (NamedEntity entity : NESet)
+		//just retrieve the entities from the db
+		if(!saveEntity)
 		{
-			for(String wikidataId : entity.getPreferredWikidataIds())
-			{				
-				namedEntityAnnoList.add(new NamedEntityAnnotationImpl(storyId, wikidataId, tmpStoryEntity.get(0).getSource()));
+			List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryAndItemId(storyId, itemId);
+			if(entities!=null && !entities.isEmpty())
+			{
+				for(NamedEntityAnnotation anno : entities )
+				{
+					namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
+				}
+				
+				return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
 			}
-		}
+			else
+			{
+				return "No valid entries found! Please use the POST method first to save the data to the database."; 
+			}
 			
-		if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
-		{
-			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId));
 		}
 		else
-		{
-			return "No valid entries found!"; 
+		{			
+			String source = null;
+			if(itemId.compareTo("all")==0)
+			{		
+				source = persistentStoryEntityService.findStoryEntity(storyId).getSource();
+			}
+			else
+			{
+				source = persistentItemEntityService.findItemEntityFromStory(storyId, itemId).getSource();
+			}
+			
+			
+			Set<NamedEntity> NESet = new HashSet<NamedEntity>();
+			
+			//taking NamedEntitiy-ies for the story "description" and "transcription" 
+			NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,itemId, "description", false));
+			NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,itemId,"transcription", false));
+			
+			for (NamedEntity entity : NESet)
+			{
+				for(String wikidataId : entity.getPreferredWikidataIds())
+				{				
+					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source); 
+					namedEntityAnnoList.add(tmpNamedEntityAnnotation);
+					
+					//saving the entity to the db
+					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+				}
+			}
+			
+			if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
+			{
+				return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
+			}
+			else
+			{
+				return "No valid entries found! There are no entries for the given storyId to be generated."; 
+			}
 		}
 		
 	}
 
 	@Override
-	public String getStoryAnnotation(String storyId, String wikidataEntity) throws HttpException, IOException {
+	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
-		List<StoryEntity> tmpStoryEntity = new ArrayList<>();
-		List<ItemEntity> tmpItemEntity=null;
-		findStoryAndItemEntitiesFromIds(storyId,"all",tmpStoryEntity,tmpItemEntity);
-		
-		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
-		
-		//taking NamedEntitiy-ies for the story "description" and "transcription" 
-		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,"all", "description", false));
-		NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,"all", "transcription", false));
-		
-		for (NamedEntity entity : NESet)
+		String wikidataIdGenerated = "http://www.wikidata.org/entity/" + wikidataEntity;
+		NamedEntityAnnotation entityAnno = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
+		if(entityAnno!=null)
 		{
-			for(String wikidataId : entity.getPreferredWikidataIds())
-			{	
-				if(wikidataId.contains(wikidataEntity))
-				{
-					return storyEntitySerializer.serialize(new NamedEntityAnnotationImpl(storyId, wikidataId, tmpStoryEntity.get(0).getSource()));
-				}
-			}
+			return storyEntitySerializer.serialize(new NamedEntityAnnotationImpl(entityAnno));
 		}
-		
-		return "No valid entries found!";
-
+		else
+		{
+			return "No valid entries found! Please use the POST method first to save the data to the database.";
+		}
 	}
 }

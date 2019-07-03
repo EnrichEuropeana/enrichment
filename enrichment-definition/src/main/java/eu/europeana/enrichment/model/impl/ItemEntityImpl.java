@@ -18,6 +18,7 @@ public class ItemEntityImpl implements ItemEntity{
 	private String hashKey;
 	private String storyId;
 	private String title;
+	private String source;
 	
 	@Override
 	public String getStoryId() {
@@ -114,6 +115,18 @@ public class ItemEntityImpl implements ItemEntity{
 	@Override
 	public void setDescription(String descriptionText) {
 		this.description = descriptionText;	
+	}
+
+	@Override
+	public String getSource() {
+		
+		return source;
+	}
+
+	@Override
+	public void setSource(String sourceParam) {
+		this.source = sourceParam;
+		
 	}
 
 
