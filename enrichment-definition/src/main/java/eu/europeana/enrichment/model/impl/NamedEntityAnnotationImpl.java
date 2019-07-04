@@ -41,7 +41,23 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public String getItemId() {
 		return itemId;
 	}
-
+	
+	public NamedEntityAnnotationImpl () {
+		init();
+	}
+	
+	void init() {
+		source = "";
+		target = "";
+		annoId = "";
+		type = "";
+		motivation = "";
+		body = "";
+		wikidataId = "";
+		storyId = "";
+		itemId = "";		
+	}
+	
 	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
 		this.source = entity.getWikidataId();
 		this.target = entity.getTarget();

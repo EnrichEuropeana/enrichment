@@ -34,7 +34,7 @@ public class SolrNamedEntityImpl extends DBNamedEntityImpl implements NamedEntit
 	public void setWikidataIds(List<String> ids) {
 		super.setWikidataIds(ids);
 	}
-
+	
 	@Override
 	//@Field(NamedEntitySolrFields.POSITION_ENTITIES)
 	public void setPositionEntities(List<PositionEntity> positions) {

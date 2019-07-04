@@ -117,6 +117,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		return tmpResult;
 	}
 	
+
+
 	/*@Override
 	public List<NamedEntity> getAllNamedEntities() {
 		//return this.mongoOps.findAll(NamedEntity.class, NAMEDENTITY_COLLECTION);
@@ -149,6 +151,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	public void deleteAllNamedEntities() {
 		datastore.delete(datastore.find(DBNamedEntityImpl.class));		
 	}
+
 
 	
 

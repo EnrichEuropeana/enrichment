@@ -18,6 +18,7 @@ public class NamedEntityImpl implements NamedEntity{
 	protected List<String> preferredWikidataIds;
 	protected List<PositionEntity> positionEntities;
 	
+
 	public NamedEntityImpl() {
 		init();
 	}
@@ -37,6 +38,7 @@ public class NamedEntityImpl implements NamedEntity{
 		dbpediaWikidataIds = new ArrayList<>();
 	}
 	
+
 	@Override
 	public String getId() {
 		// TODO Auto-generated method stub

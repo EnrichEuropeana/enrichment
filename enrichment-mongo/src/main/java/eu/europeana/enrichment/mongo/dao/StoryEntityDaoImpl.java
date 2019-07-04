@@ -1,21 +1,25 @@
 package eu.europeana.enrichment.mongo.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 
 public class StoryEntityDaoImpl implements StoryEntityDao{
 
 	private Datastore datastore; 
 	
+	private static Map<String, List<String>> nerToolsForStory;
+	
 	public StoryEntityDaoImpl(Datastore datastore) {
 		this.datastore = datastore;
+		nerToolsForStory = new HashMap<String, List<String>>();
 	}
 	
 	@Override
@@ -81,6 +85,27 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 			}
 			return tmpResult;
 		}
+	}
+
+	@Override
+	public void updateNerToolsForStory(String storyId, String nerTool) {
+
+		if(nerToolsForStory.get(storyId)==null)
+		{
+			List<String> toolsForNer = new ArrayList<String>();
+			toolsForNer.add(nerTool);
+			nerToolsForStory.put(storyId, toolsForNer);
+		}
+		else if(!nerToolsForStory.get(storyId).contains(nerTool))
+		{
+			nerToolsForStory.get(storyId).add(nerTool);
+		}
+
+	}
+
+	@Override
+	public List<String> getNerToolsForStory(String storyId) {
+		return nerToolsForStory.get(storyId);
 	}
 
 }

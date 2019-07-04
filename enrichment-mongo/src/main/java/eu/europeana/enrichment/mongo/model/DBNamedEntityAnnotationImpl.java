@@ -11,6 +11,10 @@ public class DBNamedEntityAnnotationImpl extends NamedEntityAnnotationImpl {
 	//id will be used for storing MongoDB _id
 	@Id
     public String _id = new ObjectId().toString();
+	
+	public DBNamedEntityAnnotationImpl() {
+		super();
+	}
 
 	public DBNamedEntityAnnotationImpl(String storyId, String itemId, String wikidataId, String storyOrItemSource) {
 		super(storyId, itemId, wikidataId, storyOrItemSource);
