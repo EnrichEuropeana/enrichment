@@ -3,7 +3,9 @@ package eu.europeana.enrichment.mongo.dao;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -25,8 +27,11 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	private Datastore datastore;
 	
+	private static Map<String, List<String>> nerToolsForItem;
+	
 	public ItemEntityDaoImpl(Datastore datastore) {
 		this.datastore = datastore;
+		nerToolsForItem = new HashMap<String, List<String>>();
 	}
 	
 	private void addAdditionalInformation(ItemEntity dbEntity) {
@@ -48,12 +53,12 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		}
 	}
 	@Override
-	public ItemEntity findItemEntityFromStory(String itemId, String storyId)
+	public ItemEntity findItemEntityFromStory(String storyId, String itemId)
 	{
 		Query<DBItemEntityImpl> persistentItemEntities = datastore.createQuery(DBItemEntityImpl.class);
 		persistentItemEntities.disableValidation().and(
-				persistentItemEntities.criteria("positionEntities.storyId").equal(storyId),
-				persistentItemEntities.criteria("positionEntities.itemId").equal(itemId)
+				persistentItemEntities.criteria("storyId").equal(storyId),
+				persistentItemEntities.criteria("itemId").equal(itemId)
 				);
 		List<DBItemEntityImpl> result = persistentItemEntities.asList();
 		if(result.size() == 0)
@@ -119,5 +124,27 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	public void deleteItemEntityByStoryItemId(String key) {
 		datastore.delete(datastore.find(DBItemEntityImpl.class).filter("itemId", key));
 	}
+	
+	@Override
+	public void updateNerToolsForItem(String itemId, String nerTool) {
+
+		if(nerToolsForItem.get(itemId)==null)
+		{
+			List<String> toolsForNer = new ArrayList<String>();
+			toolsForNer.add(nerTool);
+			nerToolsForItem.put(itemId, toolsForNer);
+		}
+		else if(!nerToolsForItem.get(itemId).contains(nerTool))
+		{
+			nerToolsForItem.get(itemId).add(nerTool);
+		}
+
+	}
+
+	@Override
+	public List<String> getNerToolsForItem(String itemId) {
+		return nerToolsForItem.get(itemId);
+	}
+
 
 }

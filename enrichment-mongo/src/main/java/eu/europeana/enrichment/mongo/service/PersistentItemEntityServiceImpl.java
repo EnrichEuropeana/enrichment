@@ -51,5 +51,16 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 		
 		return ItemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}
+	
+	@Override
+	public void updateNerToolsForItem(String itemId, String nerTool) {
+		ItemEntityDao.updateNerToolsForItem(itemId, nerTool);
+	}
+
+	@Override
+	public List<String> getNerToolsForItem(String itemId) {
+		return ItemEntityDao.getNerToolsForItem(itemId);
+	}
+
 
 }

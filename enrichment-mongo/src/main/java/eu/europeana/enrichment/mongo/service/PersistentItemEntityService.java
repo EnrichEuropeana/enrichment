@@ -54,4 +54,20 @@ public interface PersistentItemEntityService {
 	 */
 	public void deleteItemEntity(ItemEntity entity);
 
+	/**
+	 * This function updates the NER tools list that are already applied to the given story
+	 * 
+	 * @param itemId
+	 * @param nerTool
+	 */
+	void updateNerToolsForItem(String itemId, String nerTool);
+	
+	/**
+	 * This function retrieves the NER tools list that are already applied to the given story
+	 * 
+	 * @param itemId
+	 * @return
+	 */
+	List<String> getNerToolsForItem(String itemId);
+
 }

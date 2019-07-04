@@ -14,4 +14,6 @@ public interface StoryEntityDao {
 	public void saveStoryEntity(StoryEntity entity);
 	public void deleteStoryEntity(StoryEntity entity);
 	public void deleteStoryEntityByStoryId(String key);
+	public void updateNerToolsForStory(String storyId, String nerTool);
+	public List<String> getNerToolsForStory(String storyId);
 }

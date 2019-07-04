@@ -42,5 +42,19 @@ public interface PersistentStoryEntityService {
 	 * @return
 	 */
 	public void deleteStoryEntity(StoryEntity entity);
+	
+	/**
+	 * This function updates the NER tools list that are already applied to the given story
+	 * @param storyId
+	 * @param nerTool
+	 */
+	void updateNerToolsForStory(String storyId, String nerTool);
+	
+	/**
+	 * This function retrieves the NER tools list that are already applied to the given story
+	 * @param storyId
+	 * @return
+	 */
+	List<String> getNerToolsForStory(String storyId);
 
 }

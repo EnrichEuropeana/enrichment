@@ -10,10 +10,12 @@ import eu.europeana.enrichment.model.ItemEntity;
 public interface ItemEntityDao {
 
 	public ItemEntity findItemEntity(String key);
-	public ItemEntity findItemEntityFromStory (String itemId, String storyId);
+	public ItemEntity findItemEntityFromStory (String storyId, String itemId);
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
 	public void saveItemEntity(ItemEntity entity);
 	public void deleteItemEntity(ItemEntity entity);
 	public void deleteItemEntityByStoryItemId(String key);
+	public void updateNerToolsForItem(String itemId, String nerTool);
+	public List<String> getNerToolsForItem(String itemId);
 }

@@ -1,16 +1,11 @@
 package eu.europeana.enrichment.mongo.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.mongodb.morphia.query.Query;
-
-import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.dao.StoryEntityDao;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class PersistentStoryEntityServiceImpl implements PersistentStoryEntityService {
 
@@ -43,5 +38,16 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	public void deleteStoryEntity(StoryEntity entity) {
 		storyEntityDao.deleteStoryEntity(entity);
 	}
+	
+	@Override
+	public void updateNerToolsForStory(String storyId, String nerTool) {
+		storyEntityDao.updateNerToolsForStory(storyId, nerTool);
+	}
+
+	@Override
+	public List<String> getNerToolsForStory(String storyId) {
+		return storyEntityDao.getNerToolsForStory(storyId);
+	}
+
 
 }
