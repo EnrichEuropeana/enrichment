@@ -19,8 +19,8 @@ public interface PositionEntity {
 	public String getItemId();
 	public void setItemId(String itemId);
 
-	public String getStoryFieldUsedForNER();
-	public void setStoryFieldUsedForNER(String storyFieldUsedForNER);
+	public String getFieldUsedForNER();
+	public void setFieldUsedForNER(String fieldUsedForNER);
 
 	
 	/*
@@ -44,5 +44,12 @@ public interface PositionEntity {
 	List<Integer> getOffsetsOriginalText();
 	void setOffsetsOriginalText(List<Integer> offsetPositions);
 	void addOfssetsOriginalText(int offsetPosition);
+	
+	boolean equals(PositionEntity pe);
+	int hashCode();
+	
+	List<String> getNERTools();
+	void addNERTool(String tool);
+	void setNERTools(List<String> tools);
 
 }

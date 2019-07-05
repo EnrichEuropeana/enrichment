@@ -192,11 +192,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		
 		//Named entities should also get the type where it was found
-		
 		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
 		
+			
 		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued
-		boolean allNerToolsAnalysisComplete = checkAllNerToolsAlreadyCompleted(storyId, itemId, tools);
+		boolean allNerToolsAnalysisComplete = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, tools, tmpNamedEntities);
 		
 		//TODO: check if update is need (e.g.: linking tools)
 		if(tmpNamedEntities.size() > 0 && allNerToolsAnalysisComplete) {
@@ -309,7 +309,20 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				
 					
 					if(dbEntity != null) {
-						dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+						//check if there are new position entities to be added
+						int addPositionEntitiesCheck = 1;
+						for(PositionEntity pe : dbEntity.getPositionEntities())
+						{
+							if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+							{
+								addPositionEntitiesCheck = 0;
+								break;
+							}
+						}
+						if(addPositionEntitiesCheck==1) dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+						
+						
+						
 						for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
 							int tmpIndex = dbpediaIndex;
 							boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
@@ -328,6 +341,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					}
 					else {
 						dbEntity = tmpNamedEntity;
+						
 						tmpClassificationList.add(dbEntity);
 					}
 					
@@ -360,36 +374,35 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return resultMap;
 	}
 	
-	private boolean checkAllNerToolsAlreadyCompleted (String storyId, String itemId, List<String> tools)
+	private boolean checkAllNerToolsAlreadyCompleted (String storyId, String itemId, String fieldForNER, List<String> tools, List<NamedEntity> tmpNamedEntities)
 	{
 		boolean allNerToolsAnalysisComplete = true;
-		List<String> nerToolsForStoryOrItem = null;
-		if(itemId.compareTo("all")==0)
+		Set<String> nerToolsForStoryOrItem = new HashSet<String>();
+		for (NamedEntity ne : tmpNamedEntities)
 		{
-			nerToolsForStoryOrItem = persistentStoryEntityService.getNerToolsForStory(storyId);
+			for(PositionEntity pe : ne.getPositionEntities())
+			{
+				if(pe.getStoryId().compareTo(storyId)==0 && pe.getItemId().compareTo(itemId)==0 && pe.getFieldUsedForNER().compareTo(fieldForNER)==0)
+				{
+					nerToolsForStoryOrItem.addAll(pe.getNERTools());
+				}
+			}
+			
 		}
-		else
-		{
-			nerToolsForStoryOrItem = persistentItemEntityService.getNerToolsForItem(itemId);
-		}
-		
+				
 		List<String> toolsToRemove = new ArrayList<String>();
 		for (String nerToolsNew : tools)
 		{
-			if(nerToolsForStoryOrItem!=null && nerToolsForStoryOrItem.contains(nerToolsNew)) toolsToRemove.add(nerToolsNew);
-			else
-			{
-				if(itemId.compareTo("all")==0) persistentStoryEntityService.updateNerToolsForStory(storyId, nerToolsNew);
-				else persistentItemEntityService.updateNerToolsForItem(itemId, nerToolsNew);
-			}
+			if(nerToolsForStoryOrItem.contains(nerToolsNew)) toolsToRemove.add(nerToolsNew);
 		}
+		
 		tools.removeAll(toolsToRemove);
 		if(!tools.isEmpty()) allNerToolsAnalysisComplete=false;
 
 		return allNerToolsAnalysisComplete;
 	}
 	
-	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, String storyFieldUsedForNER,
+	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, String fieldUsedForNER,
 			String storyId, String itemId, String originalLanguage, TranslationEntity dbTranslationEntity) throws ParamValidationException{
 		TreeMap<String, List<NamedEntity>> mapResult = new TreeMap<>();
 		for(String tool_string : tools) {
@@ -412,14 +425,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			TreeMap<String, List<NamedEntity>> tmpResult = tmpTool.identifyNER(text);
 			//comparison and update of previous values
-			mapResult = mapResultCombination(mapResult, tmpResult, storyId, itemId, storyFieldUsedForNER, dbTranslationEntity);
+			mapResult = mapResultCombination(mapResult, tmpResult, storyId, itemId, fieldUsedForNER, dbTranslationEntity, tool_string);
 			
 		}
 		return mapResult;
 	}
 	
 	private TreeMap<String, List<NamedEntity>> mapResultCombination(TreeMap<String, List<NamedEntity>> mapPreResult, TreeMap<String, List<NamedEntity>> mapCurrentResult,
-			String storyId, String itemId, String storyFieldUsedForNER, TranslationEntity dbTranslationEntity) {
+			String storyId, String itemId, String fieldUsedForNER, TranslationEntity dbTranslationEntity, String tool_string) {
 		TreeMap<String, List<NamedEntity>> combinedResult = new TreeMap<>();
 		if(mapPreResult.size() == 0)
 		{
@@ -428,7 +441,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					PositionEntity pos = entity.getPositionEntities().get(0);
 					pos.setStoryId(storyId);
 					pos.setItemId(itemId);
-					pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
+					pos.setFieldUsedForNER(fieldUsedForNER);
+					pos.addNERTool(tool_string);
 					if(dbTranslationEntity != null)
 						pos.setTranslationKey(dbTranslationEntity.getKey());
 				}
@@ -445,7 +459,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					PositionEntity pos = entity.getPositionEntities().get(0);
 					pos.setStoryId(storyId);
 					pos.setItemId(itemId);
-					pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
+					pos.setFieldUsedForNER(fieldUsedForNER);
+					pos.addNERTool(tool_string);
 					if(dbTranslationEntity != null)
 						pos.setTranslationKey(dbTranslationEntity.getKey());
 				}
@@ -454,16 +469,20 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			combinedResult.put(categoryKey, new ArrayList<>());
 			List<NamedEntity> endResultCategoryValues = mapPreResult.get(categoryKey);
+			//add all NamedEntities found in the previous result
+			combinedResult.get(categoryKey).addAll(endResultCategoryValues);
 			
 			for(int index = 0; index < tmpCategoryValues.size(); index++) {
 				NamedEntity tmpNamedEntity = tmpCategoryValues.get(index);
+				boolean foundNamedEntityInPreviousResults = false;
 				for(int resultIndex = 0; resultIndex < endResultCategoryValues.size(); resultIndex++) {
 					if(endResultCategoryValues.get(resultIndex).getKey().equals(tmpNamedEntity.getKey())) {
 						NamedEntity resultNamedEntity = endResultCategoryValues.get(resultIndex);
 						PositionEntity pos = resultNamedEntity.getPositionEntities().get(0);
 						pos.setStoryId(storyId);
 						pos.setItemId(itemId);
-						pos.setStoryFieldUsedForNER(storyFieldUsedForNER);
+						pos.setFieldUsedForNER(fieldUsedForNER);
+						pos.addNERTool(tool_string);
 						if(dbTranslationEntity != null)
 							pos.setTranslationKey(dbTranslationEntity.getKey());
 						
@@ -477,9 +496,23 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						resultOffsets.addAll(tmpOffsets);
 						Set<Integer> uniqueList = new HashSet<Integer>(resultOffsets);
 						pos.setOffsetsTranslatedText(new ArrayList<Integer>(uniqueList));
-						combinedResult.get(categoryKey).add(resultNamedEntity);
+						//updated new NamedEntity added to the list
+						//combinedResult.get(categoryKey).add(resultNamedEntity);
+						foundNamedEntityInPreviousResults = true;
 						break;
 					}
+				}
+				if(!foundNamedEntityInPreviousResults)
+				{
+					//add new entity
+					// Only first PositionEntity is set, because NER tools create new NamedEntities
+					PositionEntity pos = tmpNamedEntity.getPositionEntities().get(0);
+					pos.setStoryId(storyId);
+					pos.setItemId(itemId);
+					pos.setFieldUsedForNER(fieldUsedForNER);
+					pos.addNERTool(tool_string);
+					if(dbTranslationEntity != null) pos.setTranslationKey(dbTranslationEntity.getKey());
+					combinedResult.get(categoryKey).add(tmpNamedEntity);
 				}
 			}
 		}
@@ -511,6 +544,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					PositionEntity tmpPositionEntity = tmpPositions.get(posIndex);
 					String tmpStoryId = tmpPositionEntity.getStoryId();
 					String tmpItemId = tmpPositionEntity.getItemId();
+					List<String> tmpNERTools = tmpPositionEntity.getNERTools();
 					if(storyId.compareTo(tmpStoryId)!=0 || itemId.compareTo(tmpItemId)!=0)
 						tmpPositions.remove(posIndex);
 					else {
@@ -518,6 +552,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						tmpPositionEntity.setStoryId(tmpStoryId);
 						tmpPositionEntity.setItemEntity(null);
 						tmpPositionEntity.setItemId(tmpItemId);
+						tmpPositionEntity.setNERTools(tmpNERTools);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						tmpPositionEntity.setTranslationKey(null);
@@ -525,7 +560,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						//set all empty values to be null
 						if(tmpPositionEntity.getOffsetsOriginalText().isEmpty()) tmpPositionEntity.setOffsetsOriginalText(null);
 						if(tmpPositionEntity.getOffsetsTranslatedText().isEmpty()) tmpPositionEntity.setOffsetsTranslatedText(null);
-						if(tmpPositionEntity.getStoryFieldUsedForNER().isEmpty()) tmpPositionEntity.setStoryFieldUsedForNER(null);
+						if(tmpPositionEntity.getFieldUsedForNER().isEmpty()) tmpPositionEntity.setFieldUsedForNER(null);
+						if(tmpPositionEntity.getNERTools().isEmpty()) tmpPositionEntity.setNERTools(null);
 					}
 				}
 				tmpNamedEntity.setType(null);
@@ -883,6 +919,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			for (NamedEntity entity : NESet)
 			{
+				
+
 				for(String wikidataId : entity.getPreferredWikidataIds())
 				{				
 					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source); 
@@ -891,6 +929,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					//saving the entity to the db
 					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
 				}
+				
+				//in case of annotations for the whole story take only cross-checked wikidata and dbpedia entities
+				//in case of annotations for a specific item take into account additionally all named entities labels found by Stanford_NER
+				if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
+				{
+					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getKey(), source); 
+					namedEntityAnnoList.add(tmpNamedEntityAnnotation);
+					
+					//saving the entity to the db
+					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+
+				}
+			
 			}
 			
 			if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())

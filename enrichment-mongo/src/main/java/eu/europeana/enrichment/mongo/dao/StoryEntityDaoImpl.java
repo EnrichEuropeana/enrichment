@@ -17,9 +17,11 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	
 	private static Map<String, List<String>> nerToolsForStory;
 	
+	
 	public StoryEntityDaoImpl(Datastore datastore) {
 		this.datastore = datastore;
 		nerToolsForStory = new HashMap<String, List<String>>();
+		
 	}
 	
 	@Override
@@ -107,5 +109,15 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	public List<String> getNerToolsForStory(String storyId) {
 		return nerToolsForStory.get(storyId);
 	}
+	
+//	@Override
+//	public int getNumerAnalysedNamedEntities(String field) {
+//		return numberAnalysedNamedEntities.get(field).intValue();
+//	}
+//
+//	@Override
+//	public void setNumerAnalysedNamedEntities(String field, int num) {
+//		numberAnalysedNamedEntities.put(field, Integer.valueOf(num));
+//	}
 
 }

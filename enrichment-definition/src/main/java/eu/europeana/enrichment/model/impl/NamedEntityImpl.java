@@ -17,6 +17,7 @@ public class NamedEntityImpl implements NamedEntity{
 	protected List<String> dbpediaWikidataIds;
 	protected List<String> preferredWikidataIds;
 	protected List<PositionEntity> positionEntities;
+
 	
 
 	public NamedEntityImpl() {
@@ -155,4 +156,6 @@ public class NamedEntityImpl implements NamedEntity{
 	public void addDBpediaId(String id) {
 		dbpediaIds.add(id);
 	}
+
+
 }
