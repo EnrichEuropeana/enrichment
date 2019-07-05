@@ -55,6 +55,8 @@ public interface PersistentStoryEntityService {
 	 * @param storyId
 	 * @return
 	 */
-	List<String> getNerToolsForStory(String storyId);
+//	List<String> getNerToolsForStory(String storyId);
+//	
+//	int getNumerAnalysedNamedEntities(String field);
 
 }

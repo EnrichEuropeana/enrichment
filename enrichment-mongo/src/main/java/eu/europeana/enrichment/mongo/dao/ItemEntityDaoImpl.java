@@ -146,5 +146,15 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		return nerToolsForItem.get(itemId);
 	}
 
+//	@Override
+//	public int getNumerAnalysedNamedEntities(String field) {
+//		return numberAnalysedNamedEntities.get(field).intValue();
+//	}
+//
+//	@Override
+//	public void setNumerAnalysedNamedEntities(String field, int num) {
+//		numberAnalysedNamedEntities.put(field, Integer.valueOf(num));
+//	}
+
 
 }

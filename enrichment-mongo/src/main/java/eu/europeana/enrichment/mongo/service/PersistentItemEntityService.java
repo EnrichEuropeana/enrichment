@@ -68,6 +68,9 @@ public interface PersistentItemEntityService {
 	 * @param itemId
 	 * @return
 	 */
-	List<String> getNerToolsForItem(String itemId);
+	
+//	int getNumerAnalysedNamedEntities(String field);
+//	
+//	List<String> getNerToolsForItem(String itemId);
 
 }

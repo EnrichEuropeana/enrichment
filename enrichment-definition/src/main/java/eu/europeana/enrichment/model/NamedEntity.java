@@ -44,5 +44,6 @@ public interface NamedEntity {
 	List<String> getDBpediaIds();
 	void setDBpediaIds(List<String> ids);
 	void addDBpediaId(String id);
-	
+
+
 }

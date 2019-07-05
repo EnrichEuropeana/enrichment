@@ -18,4 +18,6 @@ public interface ItemEntityDao {
 	public void deleteItemEntityByStoryItemId(String key);
 	public void updateNerToolsForItem(String itemId, String nerTool);
 	public List<String> getNerToolsForItem(String itemId);
+//	public int getNumerAnalysedNamedEntities(String field);
+//	public void setNumerAnalysedNamedEntities(String field, int num);
 }

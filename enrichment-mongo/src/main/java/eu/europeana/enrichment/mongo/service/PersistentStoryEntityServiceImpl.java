@@ -44,10 +44,15 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 		storyEntityDao.updateNerToolsForStory(storyId, nerTool);
 	}
 
-	@Override
-	public List<String> getNerToolsForStory(String storyId) {
-		return storyEntityDao.getNerToolsForStory(storyId);
-	}
+//	@Override
+//	public List<String> getNerToolsForStory(String storyId) {
+//		return storyEntityDao.getNerToolsForStory(storyId);
+//	}
+//
+//	@Override
+//	public int getNumerAnalysedNamedEntities(String field) {
+//		return storyEntityDao.getNumerAnalysedNamedEntities(field);
+//	}
 
 
 }

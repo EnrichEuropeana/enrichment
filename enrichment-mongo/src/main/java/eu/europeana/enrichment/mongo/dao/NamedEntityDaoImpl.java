@@ -97,13 +97,13 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		if(translation) {
 			persistentNamedEntities.disableValidation().and(
 					persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId),
-					persistentNamedEntities.criteria("positionEntities.storyFieldUsedForNER").equal(type)
+					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
 					);
 		} else {
 			persistentNamedEntities.disableValidation().and(
 					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
 					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
-					persistentNamedEntities.criteria("positionEntities.storyFieldUsedForNER").equal(type)
+					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
 					);
 		}
 

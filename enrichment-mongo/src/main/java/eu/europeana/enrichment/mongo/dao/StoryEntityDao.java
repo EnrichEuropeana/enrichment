@@ -16,4 +16,6 @@ public interface StoryEntityDao {
 	public void deleteStoryEntityByStoryId(String key);
 	public void updateNerToolsForStory(String storyId, String nerTool);
 	public List<String> getNerToolsForStory(String storyId);
+//	public int getNumerAnalysedNamedEntities(String field);
+//	public void setNumerAnalysedNamedEntities(String field, int num);
 }
