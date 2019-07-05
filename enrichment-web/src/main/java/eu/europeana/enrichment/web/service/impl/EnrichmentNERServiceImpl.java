@@ -552,7 +552,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						tmpPositionEntity.setStoryId(tmpStoryId);
 						tmpPositionEntity.setItemEntity(null);
 						tmpPositionEntity.setItemId(tmpItemId);
-						tmpPositionEntity.setNERTools(tmpNERTools);
 						String tmpTranslationEntityKey = tmpPositionEntity.getTranslationKey();
 						tmpPositionEntity.setTranslationEntity(null);
 						tmpPositionEntity.setTranslationKey(null);

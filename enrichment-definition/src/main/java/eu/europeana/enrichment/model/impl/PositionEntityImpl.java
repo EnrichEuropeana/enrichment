@@ -167,7 +167,7 @@ public class PositionEntityImpl implements PositionEntity{
 
 	@Override
 	public void addNERTool(String tool) {
-		nerTools.add(tool);
+		if(!nerTools.contains(tool)) nerTools.add(tool);
 	}
 
 	@Override
