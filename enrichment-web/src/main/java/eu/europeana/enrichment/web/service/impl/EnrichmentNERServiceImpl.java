@@ -226,7 +226,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			TranslationEntity dbTranslationEntity = null;
 			if(!original) {
 				dbTranslationEntity = persistentTranslationEntityService.
-						findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, translationLanguage, type);
+						findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
 			}
 		
 			
@@ -893,7 +893,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			else
 			{
-				return "No valid entries found! Please use the POST method first to save the data to the database."; 
+				logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
+				return "";
 			}
 			
 		}
@@ -949,7 +950,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			else
 			{
-				return "No valid entries found! There are no entries for the given storyId to be generated."; 
+				logger.info("No valid entries found! There are no entries for the given storyId to be generated.");
+				return "";
 			}
 		}
 		
@@ -966,7 +968,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		else
 		{
-			return "No valid entries found! Please use the POST method first to save the data to the database.";
+			logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
+			return "";
 		}
 	}
 }

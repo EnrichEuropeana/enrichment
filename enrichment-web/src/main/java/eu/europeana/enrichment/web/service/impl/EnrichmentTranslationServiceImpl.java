@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -71,6 +72,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 */
 			if(storyId == null || storyId.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
+			else if(itemId == null || itemId.isEmpty())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
 			else if(translationTool == null || translationTool.isEmpty())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
 			
@@ -78,16 +81,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				type = "transcription";
 			else if(!(type.equals("summary") || type.equals("description") || type.equals("transcription")))
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TYPE, null);
-			
-			/*
-			 * Check if story / storyItem already exist and
-			 * if there is a translation
-			 */
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
-			if(dbTranslationEntity != null) {
-				return dbTranslationEntity.getTranslatedText();
-			}
-
 			
 			StoryEntity dbStoryEntity = null;
 			ItemEntity dbItemEntity = null;
@@ -150,6 +143,19 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				}
 
 			}
+			
+			/*
+			 * Check if story / storyItem already exist and
+			 * if there is a translation
+			 */
+
+			String translationKey = HelperFunctions.generateHashFromText(originalText);
+
+			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAllAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type, translationKey);
+			if(dbTranslationEntity != null) {
+				return dbTranslationEntity.getTranslatedText();
+			}
+
 						
 			if(!process) {
 				//TODO: proper exception (like EnrichmentNERServiceImpl
@@ -170,6 +176,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			tmpTranslationEntity.setStoryId(storyId);
 			tmpTranslationEntity.setItemId(itemId);
 			tmpTranslationEntity.setType(type);
+			tmpTranslationEntity.setKey(originalText);
 			//Empty string because of callback
 			tmpTranslationEntity.setTranslatedText("");
 			
@@ -181,7 +188,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					returnValue = googleTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
 					returnValue = Jsoup.parse(returnValue).text();
 				}
-				tmpTranslationEntity.setKey(returnValue);
+				//tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			case eTranslationToolName:
@@ -189,7 +196,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					List<String> textArray = textSplitter(originalText);
 					returnValue = eTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
 				}
-				tmpTranslationEntity.setKey(returnValue);
+				//tmpTranslationEntity.setKey(returnValue);
 				tmpTranslationEntity.setTranslatedText(returnValue);
 				break;
 			default:
@@ -240,25 +247,43 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String translationTool = requestParam.getTranslationTool();
 		String language = "en";
 		String type = requestParam.getType();
+		String originalText = requestParam.getOriginalText();
 		
-		if(storyId.isEmpty() || translatedText.isEmpty() || translationTool.isEmpty() || language.isEmpty() || type.isEmpty()) {
-			//TODO: proper exception handling
-			return "";
+		if(storyId.isEmpty() || storyId==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
 		}
+		else if(itemId.isEmpty() || itemId==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
+		}
+		else if(translatedText.isEmpty() || translatedText==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TEXT, null);
+		}
+		else if(translationTool.isEmpty() || translationTool==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
+		}
+		else if(type.isEmpty() || type==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TYPE, null);
+		}
+		else if(originalText.isEmpty() || originalText==null) {
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_ORIGINAL_TEXT, null);
+		}
+		
 		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithStoryAndItemInformation(storyId, itemId, translationTool, language, type);
+				findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, language, type);
 		if(dbTranslationEntity == null) {
 			//TODO: proper exception handling
 			return "";
 		}
+		
 		try {
-			dbTranslationEntity.setKey(translatedText);
+			dbTranslationEntity.setKey(originalText);
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling
 			e.printStackTrace();
 			return "";
 		}
 		dbTranslationEntity.setTranslatedText(translatedText);
+		
 		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		return "Done";
 	}
