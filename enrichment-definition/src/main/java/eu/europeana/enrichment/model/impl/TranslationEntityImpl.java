@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -51,10 +52,21 @@ public class TranslationEntityImpl implements TranslationEntity{
 
 	@Override
 	public void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		MessageDigest digest = MessageDigest.getInstance("SHA-256");
-		String textWithoutWithespace = text.replaceAll("\\s+","");
-		byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
-		key = new String(hash, "UTF-8");
+		
+		key = HelperFunctions.generateHashFromText(text);
+		
+//		MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//		String textWithoutWithespace = text.replaceAll("\\s+","");
+//		byte[] hash = digest.digest(textWithoutWithespace.getBytes(StandardCharsets.UTF_8));
+//		
+//		// bytes to hex
+//        StringBuilder sb = new StringBuilder();
+//        for (byte b : hash) {
+//            sb.append(String.format("%02x", b));
+//        }
+//        key = sb.toString();
+		
+		//key = new String(hash, "UTF-8");
 	}
 
 	@Override

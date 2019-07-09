@@ -45,7 +45,29 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 		}
 	}
 	@Override
-	public TranslationEntity findTranslationEntityWithStoryAndItemInformation(String storyId, String itemId, String tool, String language, String type) {
+	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
+		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
+		persistentNamedEntities.and(
+				persistentNamedEntities.criteria("storyId").equal(storyId),
+				persistentNamedEntities.criteria("itemId").equal(itemId),
+				persistentNamedEntities.criteria("tool").equal(tool),
+				persistentNamedEntities.criteria("language").equal(language),
+				persistentNamedEntities.criteria("type").equal(type),
+				persistentNamedEntities.criteria("key").equal(key)
+				);
+		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else{
+			DBTranslationEntityImpl dbEntity = result.get(0);
+			addItemEntity(dbEntity);
+			return dbEntity;
+		}
+	}
+	
+	@Override
+	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId,
+			String tool, String language, String type) {
 		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
 		persistentNamedEntities.and(
 				persistentNamedEntities.criteria("storyId").equal(storyId),
@@ -90,5 +112,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	public void deleteTranslationEntityByKey(String key) {
 		datastore.delete(datastore.find(DBTranslationEntityImpl.class).filter("key", key));
 	}
+
+	
 
 }

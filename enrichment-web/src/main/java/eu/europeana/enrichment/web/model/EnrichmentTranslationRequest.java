@@ -11,6 +11,7 @@ public class EnrichmentTranslationRequest {
 	public static final String PARAM_STORY_ID = "storyId";
 	public static final String PARAM_STORY_ITEM_ID = "itemId";
 	public static final String PARAM_TEXT = "text";
+	public static final String PARAM_ORIGINAL_TEXT = "originalText";	
 	public static final String PARAM_TYPE = "type";
 	public static final String PARAM_TRANSLATION_TOOL = "translationTools";
 	public static final String PARAM_SOURCE_LANGUAGE = "sourceLanguage";
@@ -21,6 +22,8 @@ public class EnrichmentTranslationRequest {
 	public String text;
 	public String type;
 	public String translationTool;
+	public String originalText;
+
 //	public Boolean sendRequest;
 //	
 //	public Boolean getSendRequest() {
@@ -61,5 +64,13 @@ public class EnrichmentTranslationRequest {
 	public void setTranslationTool(String tool) {
 		this.translationTool = tool;
 	}
+	
+	public String getOriginalText() {
+		return originalText;
+	}
+	public void setOriginalText(String originalText) {
+		this.originalText = originalText;
+	}
+
 	
 }
