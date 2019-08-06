@@ -44,7 +44,9 @@ public class TranslationController extends BaseRest {
 	 * 									only an ID
 	 */
 	@ApiOperation(value = "Translate text (Google, eTranslation)", nickname = "postTranslation", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
-			"The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
+			" The parameter \"itemId\" further enables considering only specific story item. If \"itemId\" is set to \"all\", then the text of the whole"
+			+ " story is taken into account. " +
+			" The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
 			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslation(
@@ -72,9 +74,7 @@ public class TranslationController extends BaseRest {
 		}
 	}
 	
-	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation", notes = "This method retrieves the translation of textual information for transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
-			"The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
-			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
+	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation")
 	@RequestMapping(value = "/enrichment/translation", method = {RequestMethod.GET}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getTranslation(
 			@RequestParam(value = "wskey", required = true) String wskey,

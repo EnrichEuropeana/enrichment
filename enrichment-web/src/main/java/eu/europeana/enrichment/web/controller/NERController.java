@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,24 +31,109 @@ public class NERController extends BaseRest {
 	@Resource
 	EnrichmentNERService enrichmentNerService;
 	
-	/*
-	 * This method represents the /enrichment/entities end point,
-	 * where a request with a translated text is send and 
-	 * the named entities based on this text is retrieved.
+	/**
+	 * This method represents the /enrichment/ner/{storyId} end point,
+	 * where a request with a translated text is send and the named entities based on this text are retrieved.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey						is the application key which is required
-	 * @param nerRequest				is the Rest Post body which contains 
-	 * 									the text for the named entity recognition tools
-	 * @return							a map of all named entities including 
-	 * 									their classification types 
+	 * @param wskey
+	 * @param storyId
+	 * @param translationTool
+	 * @param property
+	 * @param linking
+	 * @param nerTools
+	 * @param original
+	 * @return											a list of named entities converted to a json format
+	 * @throws Exception
+	 * @throws HttpException
+	 * @throws SolrNamedEntityServiceException
 	 */
-	@ApiOperation(value = "Get named entities", nickname = "getNEREntities")
-	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNEREntities(
+	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory")
+	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "storyId", required = true) String storyId,
-			@RequestParam(value = "itemId", required = true) String itemId,
+			@PathVariable("storyId") String storyId,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "property", required = false) String property,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setItemId("all");
+			body.setTranslationTool(translationTool);
+			body.setProperty(property);
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(original);
+			
+			String jsonLd = enrichmentNerService.getEntities(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw e;
+		}
+	}
+	
+	@ApiOperation(value = "Get named entities for a story", nickname = "getEntitiesStory")
+	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getEntitiesStory(
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@PathVariable("storyId") String storyId,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "property", required = false) String property,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setItemId("all");
+			body.setTranslationTool(translationTool);
+			body.setProperty(property);
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(original);
+			
+			String jsonLd = enrichmentNerService.getEntities(body, false);
+			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			
+			return response;
+		} catch (HttpException e) {
+			throw e;
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw e;
+		}
+	}
+	
+	/*
+	 * NER services for items
+	 */
+	
+	@ApiOperation(value = "Get named entities for an item", nickname = "getNEREntitiesItem")
+	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getNEREntitiesItem(
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@PathVariable("storyId") String storyId,
+			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
@@ -81,12 +167,12 @@ public class NERController extends BaseRest {
 		}
 	}
 	
-	@ApiOperation(value = "Get named entities", nickname = "getEntities")
-	@RequestMapping(value = "/enrichment/entities", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getEntities(
+	@ApiOperation(value = "Get named entities for an item", nickname = "getEntitiesItem")
+	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getEntitiesItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "stroyId", required = true) String storyId,
-			@RequestParam(value = "itemId", required = true) String itemId,
+			@PathVariable("storyId") String storyId,
+			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
