@@ -134,8 +134,6 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
-			@RequestParam(value = "translationTool", required = false) String translationTool,
-			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
@@ -146,8 +144,7 @@ public class NERController extends BaseRest {
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
 			body.setItemId(itemId);
-			body.setTranslationTool(translationTool);
-			body.setProperty(property);
+			body.setTranslationTool("Google");
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
@@ -173,7 +170,6 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
-			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
@@ -185,7 +181,7 @@ public class NERController extends BaseRest {
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
 			body.setItemId(itemId);
-			body.setTranslationTool(translationTool);
+			body.setTranslationTool("Google");
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
