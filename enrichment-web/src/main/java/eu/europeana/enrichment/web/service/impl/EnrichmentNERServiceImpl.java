@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -218,11 +219,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			//throw new HttpException("");
 			return resultMap;
 		}
-			
-		/*
-		 * Apply named entity recognition on all story translations
-		 */
 
+		
+		/*
+		 * This part from here down only executes for POST requests.
+		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
+		 */
+		
+		List<String> allNERFieldTypes = new ArrayList<String>();
+		if(itemId == "all")
+		{
+			allNERFieldTypes.add(type);
+		}
+		else
+		{
+			allNERFieldTypes.add("transcription");
+			allNERFieldTypes.add("description");
+			allNERFieldTypes.add("summary");
+		}
+		
+		for(String typeNERField : allNERFieldTypes)
+		{
+			type=typeNERField;
+			
 			TranslationEntity dbTranslationEntity = null;
 			if(!original) {
 				dbTranslationEntity = persistentTranslationEntityService.
@@ -273,85 +292,90 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else originalLanguage=tmpItemEntity.getLanguage();
 
 			
-			/*
-			 * Get all named entities
-			 */
-			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, type, storyId, itemId, originalLanguage, dbTranslationEntity);
-			
-			/*
-			 * finding the positions of the entities in the original text using Solr 
-			 */			
-			//solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity,translationLanguage,text, tmpResult);
-			
-			for (String classificationType : tmpResult.keySet()) {
-				
-				List<NamedEntity> tmpClassificationList = new ArrayList<>();
+			//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
+			if(textForNer!=null && !textForNer.isEmpty())
+			{
 				/*
-				 * Check if already named entities exists from the previous story item
+				 * Get all named entities
 				 */
-				if(resultMap.containsKey(classificationType))
-					tmpClassificationList = resultMap.get(classificationType);
-				else
-					resultMap.put(classificationType, tmpClassificationList);
+				TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, type, storyId, itemId, originalLanguage, dbTranslationEntity);
 				
-				for (NamedEntity tmpNamedEntity : tmpResult.get(classificationType)) {
-					NamedEntity dbEntity;
-					/*
-					 * Check if named entity with the same label was found in the
-					 * previous story item or in the database
-					 */
-					List<NamedEntity> tmpResultNamedEntityList = tmpClassificationList.stream().
-							filter(x -> x.getKey().equals(tmpNamedEntity.getKey())).collect(Collectors.toList());
-					if(tmpResultNamedEntityList.size() > 0)
-						dbEntity = tmpResultNamedEntityList.get(0);
-					else
-						dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getKey());
+				/*
+				 * finding the positions of the entities in the original text using Solr 
+				 */			
+				//solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity,translationLanguage,text, tmpResult);
 				
+				for (String classificationType : tmpResult.keySet()) {
 					
-					if(dbEntity != null) {
-						//check if there are new position entities to be added
-						int addPositionEntitiesCheck = 1;
-						for(PositionEntity pe : dbEntity.getPositionEntities())
-						{
-							if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+					List<NamedEntity> tmpClassificationList = new ArrayList<>();
+					/*
+					 * Check if already named entities exists from the previous story item
+					 */
+					if(resultMap.containsKey(classificationType))
+						tmpClassificationList = resultMap.get(classificationType);
+					else
+						resultMap.put(classificationType, tmpClassificationList);
+					
+					for (NamedEntity tmpNamedEntity : tmpResult.get(classificationType)) {
+						NamedEntity dbEntity;
+						/*
+						 * Check if named entity with the same label was found in the
+						 * previous story item or in the database
+						 */
+						List<NamedEntity> tmpResultNamedEntityList = tmpClassificationList.stream().
+								filter(x -> x.getKey().equals(tmpNamedEntity.getKey())).collect(Collectors.toList());
+						if(tmpResultNamedEntityList.size() > 0)
+							dbEntity = tmpResultNamedEntityList.get(0);
+						else
+							dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getKey());
+					
+						
+						if(dbEntity != null) {
+							//check if there are new position entities to be added
+							int addPositionEntitiesCheck = 1;
+							for(PositionEntity pe : dbEntity.getPositionEntities())
 							{
-								addPositionEntitiesCheck = 0;
-								break;
+								if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+								{
+									addPositionEntitiesCheck = 0;
+									break;
+								}
 							}
-						}
-						if(addPositionEntitiesCheck==1) dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
-						
-						
-						
-						for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
-							int tmpIndex = dbpediaIndex;
-							boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
-							if(!found){
-								dbEntity.addDBpediaId(tmpNamedEntity.getDBpediaIds().get(tmpIndex));
+							if(addPositionEntitiesCheck==1) dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+							
+							
+							
+							for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
+								int tmpIndex = dbpediaIndex;
+								boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
+								if(!found){
+									dbEntity.addDBpediaId(tmpNamedEntity.getDBpediaIds().get(tmpIndex));
+								}
 							}
+							
+					
+							
+							/*
+							 * Check if named entity is already at the TreeSet
+							 */
+							if(tmpResultNamedEntityList.size() == 0)
+								tmpClassificationList.add(dbEntity);
+						}
+						else {
+							dbEntity = tmpNamedEntity;
+							
+							tmpClassificationList.add(dbEntity);
 						}
 						
-				
 						
 						/*
-						 * Check if named entity is already at the TreeSet
+						 * Add linking information to named entity
 						 */
-						if(tmpResultNamedEntityList.size() == 0)
-							tmpClassificationList.add(dbEntity);
+						nerLinkingService.addLinkingInformation(dbEntity, linking, originalLanguage);
 					}
-					else {
-						dbEntity = tmpNamedEntity;
-						
-						tmpClassificationList.add(dbEntity);
-					}
-					
-					
-					/*
-					 * Add linking information to named entity
-					 */
-					nerLinkingService.addLinkingInformation(dbEntity, linking, originalLanguage);
+	
 				}
-
+			}
 		}
 		
 		/*
