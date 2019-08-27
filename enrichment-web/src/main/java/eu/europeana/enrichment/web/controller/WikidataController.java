@@ -64,4 +64,54 @@ public class WikidataController extends BaseRest {
 			throw e;
 		}
 	} 
+	
+	/**
+	 * This method is used to get a collection of NamedEntity from Solr based on some search parameters.
+	 * The result is serialized to JSON using Jackson Jsonld serialization library.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey
+	 * @param query									Solr query to search for entities (e.g. "Glas*","Glasgow", etc.)
+	 * @param type									comma separated list, used to indicate which entity types (i.e. place,person) should be included in the results. If the parameter is not provided, all entities should be searched
+	 * @param lang									list of comma separated values for language filtering, if not provided “en” is used as default
+	 * @param qf									solr query for filtering results
+	 * @param sort									sorting criteria according to solr specs
+	 * @param pageSize								the number of results returned, if not provided defaults to 5
+	 * @param page									the results page, if not provided defaults to 0 
+	 * @return
+	 * @throws Exception
+	 * @throws HttpException
+	 * @throws SolrNamedEntityServiceException
+	 */
+	
+	@ApiOperation(value = "Get named entities from Solr", nickname = "getNamedEntitiesFromSolr")
+	@RequestMapping(value = "/enrichment/search", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getNamedEntitiesFromSolr(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "query", required = true) String query,
+			@RequestParam(value = "type", required = false) String type,
+			@RequestParam(value = "lang", required = false) String lang,
+			@RequestParam(value = "qf", required = false) String qf,
+			@RequestParam(value = "sort", required = false) String sort,
+			@RequestParam(value = "pageSize", required = false) String pageSize,
+			@RequestParam(value = "page", required = false) String page
+			) throws Exception, HttpException, SolrNamedEntityServiceException {
+		try {
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
+			String solrResponse = solrWikidataEntityService.searchNamedEntities_usingJackson(wskey, query, type, lang, qf, sort, pageSize, page);
+						
+			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+					
+			return response;
+		
+		} catch (HttpException e) {
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw e;
+		}
+	} 
 }

@@ -24,11 +24,13 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
+import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
+import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.solr.commons.WikidataEntitySerializer;
+import eu.europeana.enrichment.solr.commons.JacksonSerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
@@ -47,8 +49,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	@Resource(name = "solrBaseClientService")
 	SolrBaseClientService solrBaseClientService;
 	
-	@Resource(name = "wikidataEntitySerializer")
-	WikidataEntitySerializer wikidataEntitySerializer;
+	@Resource(name = "jacksonSerializer")
+	JacksonSerializer jacksonSerializer;
 	
 	
 	@Resource(name = "wikidataService")
@@ -500,7 +502,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 						
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = wikidataEntitySerializer.serialize(entity);
+				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -517,7 +519,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 					
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = wikidataEntitySerializer.serialize(entity);
+				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -531,4 +533,193 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			return null;
 		}
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) {
+		
+		//forming required properties for the class to be serialized
+		String URLPage = "";
+		String URLWithoutPage = "";
+		int totalResultsPerPage;
+		int totalResultsAll;
+		List<WikidataEntityImpl> items = new ArrayList<WikidataEntityImpl>();
+
+		
+		//forming solr queries to get the data from Solr
+		log.info("Forming Solr queries to get the data from Solr.");
+		
+		SolrQuery queryOnePage = new SolrQuery();
+		SolrQuery queryAllPages = new SolrQuery();	
+		
+		if(lang==null || lang.isEmpty())
+		{
+			lang="en";
+		}
+		
+		if(entityType!=null && !entityType.isEmpty())
+		{
+			String[] listTypes = entityType.split("\\s*,\\s*");
+			String typeQueryText = "(";
+			for(int i=0;i<listTypes.length;i++)
+			{
+				typeQueryText+=listTypes[i];
+				if(i!=listTypes.length-1)
+				{
+					typeQueryText+="OR";
+				}
+			}
+			typeQueryText+=")";
+			
+			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
+			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
+			
+			URLPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLWithoutPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			
+		}
+		else
+		{
+			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText);
+			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText);
+			
+			URLPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLWithoutPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+		}
+		
+		if(solrSortText!=null && !solrSortText.isEmpty())
+		{
+			queryOnePage.set("sort", solrSortText);
+		}
+		
+		if(solrQuery!=null && !solrQuery.isEmpty())
+		{
+			queryOnePage.set("fq", solrQuery);
+			queryAllPages.set("fq", solrQuery);
+		}
+		
+		if(pageSize==null || pageSize.isEmpty())
+		{	
+			pageSize="5";
+		}
+		
+		if(page==null || page.isEmpty())
+		{	
+			page="0";
+		}
+		
+		
+		queryOnePage.set("start", Integer.valueOf(pageSize)*Integer.valueOf(page));
+		
+		queryOnePage.set("rows", Integer.valueOf(pageSize));
+	
+		
+		log.info("Calling Solr for executing queries.");
+		
+	    QueryResponse rspOnePage = null;
+	    QueryResponse rspAllPages = null;
+		try {
+			rspOnePage = solrBaseClientService.query(solrCore, queryOnePage);
+			rspAllPages = solrBaseClientService.query(solrCore, queryAllPages);
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		log.info("Getting results from Solr in the form of SolrDocumentList.");
+		
+		//ResultSet<T> resultSet = new ResultSet<>();		
+		DocumentObjectBinder binder = new DocumentObjectBinder();
+		SolrDocumentList docListOnePage = rspOnePage.getResults();
+		SolrDocumentList docListAllPages = rspAllPages.getResults();
+			
+		URLPage+="&page="+ page +"&pageSize=" + pageSize;
+		totalResultsPerPage = Integer.valueOf(pageSize);
+		totalResultsAll = docListAllPages.size();
+		
+		log.info("Analysing Solr data for NamedEntity types.");
+		
+		for(int i=0;i<docListOnePage.size();i++)
+		{
+			SolrDocument doc = docListOnePage.get(i);		
+			String internalType = (String) doc.get(EntitySolrFields.INTERNAL_TYPE);
+			//entityClass = (Class<T>) EntityObjectFactory.getInstance().getClassForType(type);
+			/*
+			 * TODO: create a class of types as in the entity-api EntityTypes and check there for the 
+			 * type of the class that needs to be serialized
+			 */
+
+			WikidataEntityImpl wikidataEntity=null;
+			
+			if(internalType.compareToIgnoreCase("agent")==0)
+			{
+				SolrWikidataAgentImpl entity;
+				Class<SolrWikidataAgentImpl> entityClass = null;
+				entityClass = SolrWikidataAgentImpl.class;
+				entity = (SolrWikidataAgentImpl) binder.getBean(entityClass, doc);
+				items.add(entity);
+				wikidataEntity=entity;
+								    	
+			}
+			else if(internalType.compareToIgnoreCase("place")==0) 
+			{
+				SolrWikidataPlaceImpl entity;
+				Class<SolrWikidataPlaceImpl> entityClass = null;
+				entityClass = SolrWikidataPlaceImpl.class;
+				entity = (SolrWikidataPlaceImpl) binder.getBean(entityClass, doc);
+				items.add(entity);
+				wikidataEntity=entity;
+			}
+			else
+			{
+				log.error("Solr document retrived is niether of type \"agent\" nor \"place\".");
+				return null;
+			}
+			
+			//adjust for languages, i.e. remove the fields for other not required languages
+			removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
+			removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
+			removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
+		}
+		
+		log.info("Serializing Solr data using Jackson to JSON string.");
+		
+		NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);
+		
+		String serializedNamedEntityCollection=null;
+    	try {
+    		serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	
+    	return serializedNamedEntityCollection;
+	}
+	
+	private void removeDataForLanguages (Map<String,List<String>> data, String stringForDenormalization, String languages)
+	{
+		List<String> keysToRemove = new ArrayList<String>();
+		for (String key : data.keySet())
+		{
+			String denormalizedString = key.substring(stringForDenormalization.length()+1);
+			if(!languages.contains(denormalizedString)) keysToRemove.add(key);
+		}
+		
+		for (String key : keysToRemove)
+		{
+			data.remove(key);
+		}
+		
+		//this is added to avoid NoSuchElementException in case we remove all fields from the data
+		//TODO: find another better solution
+		if(data.isEmpty())
+		{
+			List<String> addEmptyElem = new ArrayList<String>();
+			addEmptyElem.add(null);
+			data.put(stringForDenormalization+".en", addEmptyElem);
+		}
+
+	}
+
 }
