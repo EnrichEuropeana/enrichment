@@ -1,20 +1,24 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
+
+
 @JsonPropertyOrder({ "entityId","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+
 public class WikidataEntityImpl implements WikidataEntity {
 	
 	protected String internalType;

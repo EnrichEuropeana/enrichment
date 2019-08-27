@@ -2,6 +2,7 @@ package eu.europeana.enrichment.solr.model.vocabulary;
 
 public interface EntitySolrFields {
 	
+	public static final String LABEL = "label";
     public static final String PREF_LABEL = "skos_prefLabel";
     public static final String PREF_LABEL_ALL = PREF_LABEL + ".*";
 	public static final String ALT_LABEL = "skos_altLabel";
