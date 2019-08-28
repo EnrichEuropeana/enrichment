@@ -1,6 +1,9 @@
 package eu.europeana.enrichment.ner.linking;
 
+import java.io.IOException;
 import java.util.List;
+
+import eu.europeana.enrichment.model.WikidataEntity;
 
 public interface WikidataService {
 
@@ -94,5 +97,15 @@ public interface WikidataService {
 	 * @return						a list of Wikidata agents entity urls
 	 */
 	public List<String> getWikidataAgentIdWithLabel(String label, String language);
+	
+	/**
+	 * This method creates and returns WikidataEntity based on the given wikidataURL
+	 * 
+	 * @param wikidataURL			a URL used to fetch the wikidata
+	 * @param type					(agent, place, etc.)
+	 * @return
+	 */
+	
+	public WikidataEntity getWikidataEntity (String wikidataURL, String type) throws IOException;
 	
 }

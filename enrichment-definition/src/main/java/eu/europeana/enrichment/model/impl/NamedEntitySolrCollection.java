@@ -8,17 +8,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import eu.europeana.enrichment.model.WikidataEntity;
+
 @JsonPropertyOrder({ "@context", "id", "type", "total","partOf", "items"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntitySolrCollection {
 
-	List<WikidataEntityImpl> items;
+	List<WikidataEntity> items;
 	private String id;
 	private String type = "ResultPage";
 	private Map<String,String> partOf; 
 	private String total; 
 
-	public NamedEntitySolrCollection(List<WikidataEntityImpl> itemsParam, String url, String urlWithoutPageInfo, int totalPage, int totalAll) {
+	public NamedEntitySolrCollection(List<WikidataEntity> itemsParam, String url, String urlWithoutPageInfo, int totalPage, int totalAll) {
 		
 		partOf = new HashMap<String, String>();
 		partOf.put("id", urlWithoutPageInfo);
@@ -30,11 +32,11 @@ public class NamedEntitySolrCollection {
 	}
 	
 	@JsonProperty("items")
-	public List<WikidataEntityImpl> getItems() {
+	public List<WikidataEntity> getItems() {
 		return items;
 	}
 	
-	public void setItems(List<WikidataEntityImpl> items) {
+	public void setItems(List<WikidataEntity> items) {
 		this.items = items;
 	}
 	
