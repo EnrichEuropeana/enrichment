@@ -1,10 +1,15 @@
 package eu.europeana.enrichment.ner.linking;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
@@ -21,6 +26,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.europeana.enrichment.model.WikidataAgent;
+import eu.europeana.enrichment.model.WikidataEntity;
+import eu.europeana.enrichment.model.WikidataPlace;
+import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
+import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 
 //import net.arnx.jsonic.JSONException;
 
@@ -75,6 +86,15 @@ public class WikidataServiceImpl implements WikidataService {
 	private final String wikidataItemKey = "item";
 	private final String wikidataDescriptionKey = "description";
 	private final String wikidataValueKey = "value";
+	
+	
+	private String wikidataDirectory;
+	
+	public WikidataServiceImpl (String wikidataPath)
+	{
+		wikidataDirectory = wikidataPath;
+	}
+	
 	
 	public Logger getLogger() {
 		return logger;
@@ -320,5 +340,297 @@ public class WikidataServiceImpl implements WikidataService {
 			logger.error("The analysed Wikidata JSON element: " + fieldParts[0] + " in the JSON field: " + field  + " contains some element which is niether JSON object nor JSONArray!");
 		}
 			
+	}
+
+	private void saveWikidataJsonToFile (String directory, String wikidataURL, String content) throws IOException
+	{
+		String result=null;
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		BufferedWriter bw = null;
+	    try 
+	    {
+		 
+	    	//Specify the file name and path here
+	    	File file = new File(directory + "/" + "wikidata-" + "entity-" + fileName + ".json");
+
+	    	/* This logic will make sure that the file 
+			 * gets created if it is not present at the
+			 * specified location
+		    */
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			else
+			{
+				return;
+			}
+	
+			FileWriter fw = new FileWriter(file);
+			
+			bw = new BufferedWriter(fw);
+			
+			bw.write(content);
+			
+		    logger.info("Wikidata JSON File is written successfully!");
+			    
+		} catch (IOException ioe) 
+	    {
+			logger.error("Error in writting to a file: " + result);
+			throw ioe;
+	    }
+		finally
+		{ 
+		    try{
+			   if(bw!=null) bw.close();
+		    } catch(Exception ex){
+			   logger.error("Error in closing the BufferedWriter!");
+			   throw ex;
+		    }
+		}
+	    
+	}
+	
+	private Map<String, List<String>> convertListOfListOfStringToMapOfStringAndListOfString (List<List<String>> jsonElement)
+	{
+		Map<String,List<String>> altLabelMap = new HashMap<String,List<String>>();
+		for (List<String> altLabelElem : jsonElement)
+		{
+			if(altLabelMap.containsKey(altLabelElem.get(0)))
+			{
+				List<String> altLabelMapValue = altLabelMap.get(altLabelElem.get(0));
+				altLabelMapValue.add(altLabelElem.get(1));
+				altLabelMap.put(altLabelElem.get(0), altLabelMapValue);
+			}
+			else
+			{
+				List<String> newaltLabelMapValue = new ArrayList<String>();
+				newaltLabelMapValue.add(altLabelElem.get(1));
+				altLabelMap.put(altLabelElem.get(0), newaltLabelMapValue);
+			}
+			
+		}
+		return altLabelMap;
+	}
+
+	
+	@Override
+	public WikidataEntity getWikidataEntity(String wikidataURL, String type) throws IOException {
+		
+		String WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
+		
+		//saving wikidata to a local json file for further usage
+		saveWikidataJsonToFile(wikidataDirectory, wikidataURL, WikidataJSON);
+		
+		List<List<String>> jsonElement;
+		
+		if(type.compareToIgnoreCase("agent")==0)
+		{
+			WikidataAgent newWikidataAgent = new WikidataAgentImpl ();
+			
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getAltLabel_jsonProp());
+			//converting the "jsonElement" to the appropriate object to be saved in Solr
+			Map<String,List<String>> altLabelMap = null;
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			newWikidataAgent.setAltLabel(altLabelMap);
+
+			String country = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				country="http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
+			}
+			newWikidataAgent.setCountry(country);
+
+			String [] dateBirthArray = new String [1];
+			dateBirthArray[0] = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{				
+				dateBirthArray[0]=jsonElement.get(0).get(0);				
+			}
+			newWikidataAgent.setDateOfBirth(dateBirthArray);
+			
+			String [] dateDeathArray = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfDeath_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				dateDeathArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					dateDeathArray[i]=jsonElement.get(i).get(0);
+				}				
+			}
+			newWikidataAgent.setDateOfDeath(dateDeathArray);
+			
+			String depiction = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
+			}
+			newWikidataAgent.setDepiction(depiction);
+			
+			Map<String,List<String>> descriptionsMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDescription_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			newWikidataAgent.setDescription(descriptionsMap);
+			
+			newWikidataAgent.setEntityId(wikidataURL);			
+			
+			newWikidataAgent.setInternalType(type);
+			
+			
+			String modificationDate = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getModificationDate_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				modificationDate = jsonElement.get(0).get(0);
+			}
+			newWikidataAgent.setModificationDate(modificationDate);
+			
+			
+			String [] occupationArray = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				occupationArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					occupationArray[i]="http://www.wikidata.org/entity/" + jsonElement.get(i).get(0);
+				}				
+			}
+			newWikidataAgent.setProfessionOrOccupation(occupationArray);
+			
+			
+			Map<String,List<String>> prefLabelMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{ 
+				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			newWikidataAgent.setPrefLabel(prefLabelMap);
+			
+			
+			String [] sameAsArray=null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getSameAs_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())	
+			{
+				sameAsArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					sameAsArray[i]=jsonElement.get(i).get(0);
+				}				
+			}
+			newWikidataAgent.setSameAs(sameAsArray);
+			
+			return newWikidataAgent;
+
+		}
+		else
+		{
+			
+			WikidataPlace newWikidataPlace = new WikidataPlaceImpl ();
+			
+			Map<String,List<String>> altLabelMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getAltLabel_jsonProp()); 
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				
+			}
+			newWikidataPlace.setAltLabel(altLabelMap);
+			
+			String country = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				country = "http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
+			}
+			newWikidataPlace.setCountry(country);
+			
+			Float latitude = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLatitude_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				latitude = Float.valueOf(jsonElement.get(0).get(0));
+			}
+			newWikidataPlace.setLatitude(latitude);
+
+			
+			Float longitude = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLongitude_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				longitude = Float.valueOf(jsonElement.get(0).get(0));
+			}
+			newWikidataPlace.setLongitude(longitude);
+
+			String depiction = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
+			}
+			newWikidataPlace.setDepiction(depiction);
+		
+			Map<String,List<String>> descriptionsMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDescription_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			newWikidataPlace.setDescription(descriptionsMap);
+			
+			newWikidataPlace.setEntityId(wikidataURL);
+			
+			newWikidataPlace.setInternalType(type);
+			
+			String modificationDate = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getModificationDate_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				modificationDate = jsonElement.get(0).get(0);
+			}
+			newWikidataPlace.setModificationDate(modificationDate);
+		
+			
+			String logo = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLogo_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				logo = jsonElement.get(0).get(0);
+			}
+			newWikidataPlace.setLogo(logo);
+		
+			Map<String,List<String>> prefLabelMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty())
+			{
+				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			newWikidataPlace.setPrefLabel(prefLabelMap);
+			
+			String [] sameAsArray = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
+			if(jsonElement!=null && !jsonElement.isEmpty()) 
+			{
+				sameAsArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					sameAsArray[i]=jsonElement.get(i).get(0);
+				}		
+			}
+			newWikidataPlace.setSameAs(sameAsArray);
+
+			return newWikidataPlace;
+			
+		}	
+		
 	}
 }

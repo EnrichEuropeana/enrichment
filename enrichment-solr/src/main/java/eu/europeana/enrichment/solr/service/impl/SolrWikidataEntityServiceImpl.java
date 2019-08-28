@@ -3,7 +3,6 @@ package eu.europeana.enrichment.solr.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -13,36 +12,25 @@ import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
-import eu.europeana.api.commons.definitions.search.ResultSet;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
-import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
-import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.commons.JacksonSerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
-
-import eu.europeana.entity.definitions.model.Entity;
-import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
-
-import riotcmd.json;
 
 public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService {
 
@@ -94,255 +82,18 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			solrBaseClientService.storeWikidataEntity(solrCollection, solrWikidataPlace, doCommit);
 		}
 	}
+	
+
 
 	@Override
-	public void storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException {
+	public void storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
-		String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID(wikidataURL);
-		List<List<String>> jsonElement;
-		
-		if(type.compareToIgnoreCase("agent")==0)
-		{
-			WikidataAgent newWikidataAgent = new WikidataAgentImpl ();
-			
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getAltLabel_jsonProp());
-			//converting the "jsonElement" to the appropriate object to be saved in Solr
-			Map<String,List<String>> altLabelMap = null;
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			}
-			newWikidataAgent.setAltLabel(altLabelMap);
+		WikidataEntity entity = wikidataService.getWikidataEntity(wikidataURL, type);
 
-			String country = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				country="http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
-			}
-			newWikidataAgent.setCountry(country);
-
-			String [] dateBirthArray = new String [1];
-			dateBirthArray[0] = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{				
-				dateBirthArray[0]=jsonElement.get(0).get(0);				
-			}
-			newWikidataAgent.setDateOfBirth(dateBirthArray);
-			
-			String [] dateDeathArray = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfDeath_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				dateDeathArray = new String [jsonElement.size()];
-				for(int i=0;i<jsonElement.size();i++)
-				{
-					dateDeathArray[i]=jsonElement.get(i).get(0);
-				}				
-			}
-			newWikidataAgent.setDateOfDeath(dateDeathArray);
-			
-			String depiction = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
-			}
-			newWikidataAgent.setDepiction(depiction);
-			
-			Map<String,List<String>> descriptionsMap = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDescription_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			}
-			newWikidataAgent.setDescription(descriptionsMap);
-			
-			newWikidataAgent.setEntityId(wikidataURL);			
-			
-			newWikidataAgent.setInternalType(type);
-			
-			
-			String modificationDate = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getModificationDate_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				modificationDate = jsonElement.get(0).get(0);
-			}
-			newWikidataAgent.setModificationDate(modificationDate);
-			
-			
-			String [] occupationArray = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				occupationArray = new String [jsonElement.size()];
-				for(int i=0;i<jsonElement.size();i++)
-				{
-					occupationArray[i]="http://www.wikidata.org/entity/" + jsonElement.get(i).get(0);
-				}				
-			}
-			newWikidataAgent.setProfessionOrOccupation(occupationArray);
-			
-			
-			Map<String,List<String>> prefLabelMap = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{ 
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			}
-			newWikidataAgent.setPrefLabel(prefLabelMap);
-			
-			
-			String [] sameAsArray=null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getSameAs_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())	
-			{
-				sameAsArray = new String [jsonElement.size()];
-				for(int i=0;i<jsonElement.size();i++)
-				{
-					sameAsArray[i]=jsonElement.get(i).get(0);
-				}				
-			}
-			newWikidataAgent.setSameAs(sameAsArray);
-			
-			store(solrCore, newWikidataAgent, true);
-		}
-		else if (type.compareToIgnoreCase("place")==0)
-		{
-			
-			WikidataPlace newWikidataPlace = new WikidataPlaceImpl ();
-			
-			Map<String,List<String>> altLabelMap = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getAltLabel_jsonProp()); 
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-				
-			}
-			newWikidataPlace.setAltLabel(altLabelMap);
-			
-			String country = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				country = "http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
-			}
-			newWikidataPlace.setCountry(country);
-			
-			Float latitude = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLatitude_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				latitude = Float.valueOf(jsonElement.get(0).get(0));
-			}
-			newWikidataPlace.setLatitude(latitude);
-
-			
-			Float longitude = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLongitude_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				longitude = Float.valueOf(jsonElement.get(0).get(0));
-			}
-			newWikidataPlace.setLongitude(longitude);
-
-			String depiction = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
-			}
-			newWikidataPlace.setDepiction(depiction);
+		store(solrCore, entity, true);
 		
-			Map<String,List<String>> descriptionsMap = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDescription_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			}
-			newWikidataPlace.setDescription(descriptionsMap);
-			
-			newWikidataPlace.setEntityId(wikidataURL);
-			
-			newWikidataPlace.setInternalType(type);
-			
-			String modificationDate = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getModificationDate_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				modificationDate = jsonElement.get(0).get(0);
-			}
-			newWikidataPlace.setModificationDate(modificationDate);
-		
-			
-			String logo = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLogo_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				logo = jsonElement.get(0).get(0);
-			}
-			newWikidataPlace.setLogo(logo);
-		
-			Map<String,List<String>> prefLabelMap = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty())
-			{
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			}
-			newWikidataPlace.setPrefLabel(prefLabelMap);
-			
-			String [] sameAsArray = null;
-			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
-			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{
-				sameAsArray = new String [jsonElement.size()];
-				for(int i=0;i<jsonElement.size();i++)
-				{
-					sameAsArray[i]=jsonElement.get(i).get(0);
-				}		
-			}
-			newWikidataPlace.setSameAs(sameAsArray);
-
-			store(solrCore, newWikidataPlace, true);
-			
-		}	
-		
-	}
-	private Map<String, List<String>> convertListOfListOfStringToMapOfStringAndListOfString (List<List<String>> jsonElement)
-	{
-		Map<String,List<String>> altLabelMap = new HashMap<String,List<String>>();
-		for (List<String> altLabelElem : jsonElement)
-		{
-			if(altLabelMap.containsKey(altLabelElem.get(0)))
-			{
-				List<String> altLabelMapValue = altLabelMap.get(altLabelElem.get(0));
-				altLabelMapValue.add(altLabelElem.get(1));
-				altLabelMap.put(altLabelElem.get(0), altLabelMapValue);
-			}
-			else
-			{
-				List<String> newaltLabelMapValue = new ArrayList<String>();
-				newaltLabelMapValue.add(altLabelElem.get(1));
-				altLabelMap.put(altLabelElem.get(0), newaltLabelMapValue);
-			}
-			
-		}
-		return altLabelMap;
 	}
 	
-	private Map<String, String> convertListOfListOfStringToMapOfStringAndString (List<List<String>> jsonElement)
-	{
-		Map<String,String> altLabelMap = new HashMap<String,String>();
-		for (List<String> altLabelElem : jsonElement)
-		{
-			altLabelMap.put(altLabelElem.get(0), altLabelElem.get(1));
-					
-		}
-		return altLabelMap;
-	}
-
 	@Override
 	public String searchByWikidataURL(String wikidataURL) {
 		
@@ -543,7 +294,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		String URLWithoutPage = "";
 		int totalResultsPerPage;
 		int totalResultsAll;
-		List<WikidataEntityImpl> items = new ArrayList<WikidataEntityImpl>();
+		List<WikidataEntity> items = new ArrayList<WikidataEntity>();
 
 		
 		//forming solr queries to get the data from Solr

@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.EnableCaching;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.model.WikidataEntity;
+import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
@@ -26,6 +31,10 @@ public class WikidataController extends BaseRest {
 
 	@Resource
 	SolrWikidataEntityService solrWikidataEntityService;
+	
+	@Resource(name = "wikidataService")
+	WikidataService wikidataService;
+
 	
     /**
      * 	 * This method represents the /enrichment/wikidata end point,
@@ -114,4 +123,63 @@ public class WikidataController extends BaseRest {
 			throw e;
 		}
 	} 
+	
+	
+	
+	
+	
+	
+	@ApiOperation(value = "Get places from Wikidata", nickname = "getPlacesFromWikidata")
+	@RequestMapping(value = "/enrichment/places", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getPlacesFromWikidata(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "query", required = true) String query,
+			@RequestParam(value = "type", required = false) String type,
+			@RequestParam(value = "lang", required = false) String lang,
+			@RequestParam(value = "pageSize", required = false) String pageSize,
+			@RequestParam(value = "page", required = false) String page
+			) throws Exception, HttpException, SolrNamedEntityServiceException {
+		try {
+
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+
+			if(pageSize==null || pageSize.isEmpty())
+			{	
+				pageSize="5";
+			}
+			
+			if(page==null || page.isEmpty())
+			{	
+				page="0";
+			}
+
+			List<WikidataEntity> items = new ArrayList<WikidataEntity>();
+
+			List<String> wikidataIDs = new ArrayList<String>();
+			
+			wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(query, lang);
+			
+			String URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;
+			String URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;
+			URLPage+="&page="+ page +"&pageSize=" + pageSize;
+			
+			for(String wikiId : wikidataIDs)
+			{
+				items.add(wikidataService.getWikidataEntity(wikiId, type));
+			}
+						
+			//ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+					
+			//return response;
+
+			return null;
+					
+		} catch (HttpException e) {
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			throw e;
+		}
+	}
 }
