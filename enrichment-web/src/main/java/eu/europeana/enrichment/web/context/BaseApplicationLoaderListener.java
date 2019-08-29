@@ -49,7 +49,7 @@ public abstract class BaseApplicationLoaderListener {
 			EncodedResource propsResource = new EncodedResource( new ClassPathResource(propsLocation), "UTF-8");
 			PropertiesLoaderUtils.fillProperties(getProps(), propsResource);
 		} catch (IOException e) {
-			logger.warn("Cannot read properties from classath: " + propsLocation, e);		
+			logger.warn("Cannot read properties from classath: " + propsLocation, e);	
 		}
 	}
 

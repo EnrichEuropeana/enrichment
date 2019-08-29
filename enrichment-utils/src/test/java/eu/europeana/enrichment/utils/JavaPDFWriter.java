@@ -50,7 +50,7 @@ public class JavaPDFWriter
 	/*
 	 * translationOrOriginalText=0 -> write translated text in a pdf; translationOrOriginalText=1 -> write original text to pdf
 	 */
-	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText)
+	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText) throws Exception
 	{
 		outputText=addSpecialCharactersToString(outputText, NERNamedEntities, translationOrOriginalText);
 		
@@ -111,6 +111,7 @@ public class JavaPDFWriter
 		} catch (Exception e)
 		{
 		    e.printStackTrace();
+		    throw e;
 		}
 	}
 	

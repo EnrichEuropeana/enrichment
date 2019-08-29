@@ -1,8 +1,11 @@
 package eu.europeana.enrichment.ner.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
@@ -33,10 +36,11 @@ public interface NERService {
 	 * 
 	 * @param text					translated text in English
 	 * @return 						a TreeMap based on the classification type
-	 * 								including all named entities findings
+	 * 								including all named entities findings 
+	 * @throws IOException 
 	 * @throws NERAnnotateException	
 	 */
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text);
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException;
 	
 	/**
 	 * This methods is the default implementation for getting the positions of the NER entities

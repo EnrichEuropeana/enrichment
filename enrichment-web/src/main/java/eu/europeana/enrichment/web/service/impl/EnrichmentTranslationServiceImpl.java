@@ -20,6 +20,7 @@ import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
+import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
@@ -217,7 +218,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}*/
 			
 			return returnValue;
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | TranslationException | InterruptedException e) {
 			throw new InternalServerException(e);
 		}
 	}

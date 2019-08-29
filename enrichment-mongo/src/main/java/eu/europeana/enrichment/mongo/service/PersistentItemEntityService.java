@@ -37,7 +37,7 @@ public interface PersistentItemEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveItemEntity(ItemEntity entity);
+	public void saveItemEntity(ItemEntity entity) throws Exception;
 	/*
 	 * This method saves and updates a list of story item entities into the Mongo database
 	 * 
@@ -45,7 +45,7 @@ public interface PersistentItemEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveStoryItemEntities(List<ItemEntity> entities);
+	public void saveStoryItemEntities(List<ItemEntity> entities) throws Exception;
 	/*
 	 * This method deletes story item entities from the Mongo database
 	 * 

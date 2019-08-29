@@ -63,7 +63,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	private String credentialPwd;
 
 	public ETranslationEuropaServiceImpl(String credentialFilePath, String domain,
-			String requesterCallback, String errorCallback, String emailDestination) {
+			String requesterCallback, String errorCallback, String emailDestination) throws Exception {
 		readCredentialFile(credentialFilePath);
 		this.domain = domain;
 		this.requesterCallback = requesterCallback;
@@ -75,8 +75,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * This method reads the necessary eTranslation credentials 
 	 * 
 	 * @param credentialFilePath		is the path to the credential file
+	 * @throws Exception 
 	 */
-	private void readCredentialFile(String credentialFilePath) {
+	private void readCredentialFile(String credentialFilePath)  {
 				
 		//try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
@@ -96,7 +97,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 
 	@Override
-	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException {
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException, UnsupportedEncodingException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
 		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
@@ -151,9 +152,10 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @param sourceLanguage			is the original language of transcribed text
 	 * @return							a stringified JSON including the transcribed
 	 * 									text as a base64 string
+	 * @throws UnsupportedEncodingException 
 	 */
 	
-	private String createTranslationBody(String text, String sourceLanguage) {
+	private String createTranslationBody(String text, String sourceLanguage) throws UnsupportedEncodingException {
 		String base64content = "";
 		try {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
@@ -161,6 +163,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		}catch(UnsupportedEncodingException ex) {
 			logger.error("Exception by creating translation request body: " + ex.getMessage());
 			System.out.println(ex.getMessage());
+			throw ex;
 		}
 
 		// .put("externalReference", "123")
@@ -188,8 +191,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @param externalReference			a number sent to indicate the request (a kind of request id)
 	 * @return							a stringified JSON including the transcribed
 	 * 									text as a base64 string
+	 * @throws UnsupportedEncodingException 
 	 */
-	private String createTranslationBodyForDirectCallback(String text, String sourceLanguage, String externalReference) {
+	private String createTranslationBodyForDirectCallback(String text, String sourceLanguage, String externalReference) throws UnsupportedEncodingException {
 		String base64content = "";
 		try {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
@@ -197,6 +201,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		}catch(UnsupportedEncodingException ex) {
 			logger.error("Exception by creating translation request body: " + ex.getMessage());
 			System.out.println(ex.getMessage());
+			throw ex;
 		}
 
 		// .put("externalReference", "123")
@@ -250,7 +255,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 		
 	@Override
-	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference)
+	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference) throws UnsupportedEncodingException
 	{
 		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" .");
 		
@@ -262,6 +267,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw e;
 			}
 			logger.info("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
 			createdRequests.put(externalReference, URLDecodedTranslatedText);

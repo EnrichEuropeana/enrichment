@@ -30,12 +30,12 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) {
+	public void saveItemEntity(ItemEntity entity) throws Exception {
 		ItemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
-	public void saveStoryItemEntities(List<ItemEntity> entities) {
+	public void saveStoryItemEntities(List<ItemEntity> entities) throws Exception {
 		for(ItemEntity entity : entities) {
 			saveItemEntity(entity);
 		}

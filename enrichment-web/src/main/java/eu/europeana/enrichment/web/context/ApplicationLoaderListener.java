@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.context;
 
+import java.io.IOException;
+
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -13,7 +15,9 @@ public class ApplicationLoaderListener extends BaseApplicationLoaderListener imp
 	
 	@Override
 	public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-		registerSocksProxy();
+
+			registerSocksProxy();
+		
 	}
 
 	protected String getAppConfigFile() {

@@ -427,7 +427,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 	
 	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, String fieldUsedForNER,
-			String storyId, String itemId, String originalLanguage, TranslationEntity dbTranslationEntity) throws ParamValidationException{
+			String storyId, String itemId, String originalLanguage, TranslationEntity dbTranslationEntity) throws ParamValidationException, IOException{
 		TreeMap<String, List<NamedEntity>> mapResult = new TreeMap<>();
 		for(String tool_string : tools) {
 			NERService tmpTool;
@@ -626,7 +626,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String uploadItems(ItemEntity[] items) throws HttpException {
+	public String uploadItems(ItemEntity[] items) throws Exception {
 		
 		for (ItemEntity item : items) {
 			if(item.getStoryId() == null)
@@ -675,7 +675,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 	@SuppressWarnings("finally")
 	@Override
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws Exception {
 		
 		/*
 		 * reading stories and items from json

@@ -57,7 +57,7 @@ public class NERPythonServiceImpl implements NERService{
 	 * @see eu.europeana.enrichment.ner.service.NERService#identifyNER(java.lang.String)
 	 */
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) {
 		TreeMap<String, List<List<String>>> map = new TreeMap<>();
 		Process process;
 		try {

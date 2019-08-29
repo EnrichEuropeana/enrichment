@@ -13,7 +13,7 @@ public interface ItemEntityDao {
 	public ItemEntity findItemEntityFromStory (String storyId, String itemId);
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
-	public void saveItemEntity(ItemEntity entity);
+	public void saveItemEntity(ItemEntity entity) throws Exception;
 	public void deleteItemEntity(ItemEntity entity);
 	public void deleteItemEntityByStoryItemId(String key);
 	public void updateNerToolsForItem(String itemId, String nerTool);

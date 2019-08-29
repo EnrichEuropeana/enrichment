@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
@@ -385,8 +386,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		SolrDocumentList docListAllPages = rspAllPages.getResults();
 			
 		URLPage+="&page="+ page +"&pageSize=" + pageSize;
-		totalResultsPerPage = Integer.valueOf(pageSize);
 		totalResultsAll = docListAllPages.size();
+		totalResultsPerPage = (totalResultsAll < Integer.valueOf(pageSize)) ? totalResultsAll : Integer.valueOf(pageSize);
 		
 		log.info("Analysing Solr data for NamedEntity types.");
 		
@@ -428,9 +429,9 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			}
 			
 			//adjust for languages, i.e. remove the fields for other not required languages
-			removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
-			removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
-			removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
+			HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
+			HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
+			HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
 		}
 		
 		log.info("Serializing Solr data using Jackson to JSON string.");
@@ -448,29 +449,4 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
     	return serializedNamedEntityCollection;
 	}
 	
-	private void removeDataForLanguages (Map<String,List<String>> data, String stringForDenormalization, String languages)
-	{
-		List<String> keysToRemove = new ArrayList<String>();
-		for (String key : data.keySet())
-		{
-			String denormalizedString = key.substring(stringForDenormalization.length()+1);
-			if(!languages.contains(denormalizedString)) keysToRemove.add(key);
-		}
-		
-		for (String key : keysToRemove)
-		{
-			data.remove(key);
-		}
-		
-		//this is added to avoid NoSuchElementException in case we remove all fields from the data
-		//TODO: find another better solution
-		if(data.isEmpty())
-		{
-			List<String> addEmptyElem = new ArrayList<String>();
-			addEmptyElem.add(null);
-			data.put(stringForDenormalization+".en", addEmptyElem);
-		}
-
-	}
-
 }

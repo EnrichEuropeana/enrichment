@@ -44,7 +44,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 	 * This class constructor loads a model for the Stanford named
 	 * entity recognition and classification
 	 */
-	public NERStanfordServiceItalianImpl() {
+	public NERStanfordServiceItalianImpl() throws IOException {
 
 		// Initialize the Tint pipeline
 		pipeline = new TintPipeline();
@@ -56,6 +56,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 				
 		// Add a custom property
