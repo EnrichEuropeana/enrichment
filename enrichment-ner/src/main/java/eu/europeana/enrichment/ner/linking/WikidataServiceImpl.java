@@ -5,22 +5,19 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import org.apache.commons.lang3.text.translate.AggregateTranslator;
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -341,52 +338,60 @@ public class WikidataServiceImpl implements WikidataService {
 		}
 			
 	}
-
-	private void saveWikidataJsonToFile (String directory, String wikidataURL, String content) throws IOException
-	{
-		String result=null;
-		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		BufferedWriter bw = null;
-	    try 
-	    {
-		 
-	    	//Specify the file name and path here
-	    	File file = new File(directory + "/" + "wikidata-" + "entity-" + fileName + ".json");
-
-	    	/* This logic will make sure that the file 
-			 * gets created if it is not present at the
-			 * specified location
-		    */
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			else
-			{
-				return;
-			}
 	
-			FileWriter fw = new FileWriter(file);
-			
-			bw = new BufferedWriter(fw);
-			
+	private void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
+	{
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		String pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+		
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathName))))
+	    {			
+	    	
 			bw.write(content);
 			
 		    logger.info("Wikidata JSON File is written successfully!");
 			    
 		} catch (IOException ioe) 
 	    {
-			logger.error("Error in writting to a file: " + result);
+			logger.error("Error in writting to a file: " + pathName);
 			throw ioe;
-	    }
-		finally
-		{ 
-		    try{
-			   if(bw!=null) bw.close();
-		    } catch(Exception ex){
-			   logger.error("Error in closing the BufferedWriter!");
-			   throw ex;
-		    }
+	    }	    
+	}
+
+	
+	private String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
+	{
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		String pathName = null;
+
+    	//Specify the file name and path here
+    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+    	File file = new File(pathName);
+
+    	/* This logic will make sure that the file 
+		 * gets created if it is not present at the
+		 * specified location
+	    */
+		if (!file.exists()) {
+			return null;
 		}
+		else
+		{
+			//String path = pathName.replace("/", "\\\\");
+			String contentJsonFile = null;
+
+			try {
+	            
+				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+	            
+	        } catch (IOException e) {
+	        	logger.error("Error in reading a file: " + pathName);
+				throw e;
+	        }
+
+			return contentJsonFile;
+		}
+
 	    
 	}
 	
@@ -416,10 +421,15 @@ public class WikidataServiceImpl implements WikidataService {
 	@Override
 	public WikidataEntity getWikidataEntity(String wikidataURL, String type) throws IOException {
 		
-		String WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
-		
-		//saving wikidata to a local json file for further usage
-		saveWikidataJsonToFile(wikidataDirectory, wikidataURL, WikidataJSON);
+		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
+		String WikidataJSON = getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
+		if(WikidataJSON==null) 	
+		{
+			logger.info("Wikidata place found does not exist in a local file cache!");
+			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
+			saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
+			logger.info("Wikidata place is successfully saved to a local file cache!");			
+		}
 		
 		List<List<String>> jsonElement;
 		
@@ -434,9 +444,19 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
+			/*this is added because jackson has problems with serializing null values (version 2.9.4 that we use)
+			 * TODO: find a better fix
+			 */			
+			if(altLabelMap==null)
+			{
+				altLabelMap = new HashMap<String, List<String>>();
+				List<String> altLabelMapList = new ArrayList<String>();
+				altLabelMapList.add("-");
+				altLabelMap.put("en", altLabelMapList);
+			}
 			newWikidataAgent.setAltLabel(altLabelMap);
 
-			String country = null;
+			String country = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
@@ -445,7 +465,7 @@ public class WikidataServiceImpl implements WikidataService {
 			newWikidataAgent.setCountry(country);
 
 			String [] dateBirthArray = new String [1];
-			dateBirthArray[0] = null;
+			dateBirthArray[0] = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{				
@@ -453,7 +473,8 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			newWikidataAgent.setDateOfBirth(dateBirthArray);
 			
-			String [] dateDeathArray = null;
+			String [] dateDeathArray = new String [1];
+			dateDeathArray[0] = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfDeath_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
@@ -465,7 +486,7 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			newWikidataAgent.setDateOfDeath(dateDeathArray);
 			
-			String depiction = null;
+			String depiction = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
@@ -479,6 +500,13 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
+			if(descriptionsMap==null)
+			{
+				descriptionsMap = new HashMap<String, List<String>>();
+				List<String> descriptionsMapList = new ArrayList<String>();
+				descriptionsMapList.add("-");
+				altLabelMap.put("en", descriptionsMapList);
+			}
 			newWikidataAgent.setDescription(descriptionsMap);
 			
 			newWikidataAgent.setEntityId(wikidataURL);			
@@ -486,7 +514,7 @@ public class WikidataServiceImpl implements WikidataService {
 			newWikidataAgent.setInternalType(type);
 			
 			
-			String modificationDate = null;
+			String modificationDate = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getModificationDate_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -495,7 +523,8 @@ public class WikidataServiceImpl implements WikidataService {
 			newWikidataAgent.setModificationDate(modificationDate);
 			
 			
-			String [] occupationArray = null;
+			String [] occupationArray = new String [1];
+			occupationArray[0] = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -514,10 +543,18 @@ public class WikidataServiceImpl implements WikidataService {
 			{ 
 				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
+			if(prefLabelMap==null)
+			{
+				prefLabelMap = new HashMap<String, List<String>>();
+				List<String> prefLabelMapList = new ArrayList<String>();
+				prefLabelMapList.add("-");
+				altLabelMap.put("en", prefLabelMapList);
+			}
 			newWikidataAgent.setPrefLabel(prefLabelMap);
 			
 			
-			String [] sameAsArray=null;
+			String [] sameAsArray=new String [1];
+			sameAsArray[0]="-";			
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getSameAs_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())	
 			{
@@ -544,9 +581,16 @@ public class WikidataServiceImpl implements WikidataService {
 				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 				
 			}
+			if(altLabelMap==null)
+			{
+				altLabelMap = new HashMap<String, List<String>>();
+				List<String> altLabelMapList = new ArrayList<String>();
+				altLabelMapList.add("-");
+				altLabelMap.put("en", altLabelMapList);
+			}
 			newWikidataPlace.setAltLabel(altLabelMap);
 			
-			String country = null;
+			String country = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -571,7 +615,7 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			newWikidataPlace.setLongitude(longitude);
 
-			String depiction = null;
+			String depiction = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -585,13 +629,20 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
+			if(descriptionsMap==null)
+			{
+				descriptionsMap = new HashMap<String, List<String>>();
+				List<String> descriptionsMapList = new ArrayList<String>();
+				descriptionsMapList.add("-");
+				altLabelMap.put("en", descriptionsMapList);
+			}
 			newWikidataPlace.setDescription(descriptionsMap);
 			
 			newWikidataPlace.setEntityId(wikidataURL);
 			
 			newWikidataPlace.setInternalType(type);
 			
-			String modificationDate = null;
+			String modificationDate = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getModificationDate_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -600,7 +651,7 @@ public class WikidataServiceImpl implements WikidataService {
 			newWikidataPlace.setModificationDate(modificationDate);
 		
 			
-			String logo = null;
+			String logo = "-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLogo_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -614,9 +665,17 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
+			if(prefLabelMap==null)
+			{
+				prefLabelMap = new HashMap<String, List<String>>();
+				List<String> prefLabelMapList = new ArrayList<String>();
+				prefLabelMapList.add("-");
+				altLabelMap.put("en", prefLabelMapList);
+			}
 			newWikidataPlace.setPrefLabel(prefLabelMap);
 			
-			String [] sameAsArray = null;
+			String [] sameAsArray = new String [1];
+			sameAsArray[0]="-";
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{

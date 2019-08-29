@@ -50,7 +50,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
     }
     
 	@Override
-	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException {
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException {
 		
 		if(translate == null) {
 			//TODO: throws exception
@@ -85,6 +85,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw e;
 			}
 		}
 

@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.translation.service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import eu.europeana.enrichment.translation.exception.TranslationException;
@@ -16,8 +17,10 @@ public interface TranslationService {
 	 * @return 							the English translation of the
 	 * 									original transcribed text
 	 * @throws TranslationException	
+	 * @throws InterruptedException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	public String translateText(List<String> textArray, String sourceLanguage, String targetLanguage) throws TranslationException;
+	public String translateText(List<String> textArray, String sourceLanguage, String targetLanguage) throws TranslationException, InterruptedException, UnsupportedEncodingException;
 
 	/**
 	 * Called when eTranslation returns the translated text back to our application.
@@ -29,6 +32,7 @@ public interface TranslationService {
 	 * @param translatedText
 	 * @param requestId
 	 * @param externalReference
+	 * @throws UnsupportedEncodingException 
 	 */
-	void eTranslationResponse(String targetLanguage, String translatedText, String requestId, String externalReference);
+	void eTranslationResponse(String targetLanguage, String translatedText, String requestId, String externalReference) throws UnsupportedEncodingException;
 }

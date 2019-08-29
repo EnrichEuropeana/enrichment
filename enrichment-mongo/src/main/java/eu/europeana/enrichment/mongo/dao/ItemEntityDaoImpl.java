@@ -86,7 +86,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) {
+	public void saveItemEntity(ItemEntity entity) throws Exception {
 		ItemEntity dbItemEntity = findItemEntity(entity.getItemId());
 		if(dbItemEntity!=null)
 		{
@@ -108,6 +108,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					throw e;
 				}
 			}
 			if(tmp != null)

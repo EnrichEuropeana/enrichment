@@ -6,7 +6,7 @@ public class WikidataEntitySolrDenormalizationFields {
 	 * these fields are the fields that are removed from the name 
 	 * of the corresponding solr fields during serialization to json
 	 */
-	
+
     public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";
     
     public static final String ALT_LABEL_DENORMALIZED = "skos_altLabel";

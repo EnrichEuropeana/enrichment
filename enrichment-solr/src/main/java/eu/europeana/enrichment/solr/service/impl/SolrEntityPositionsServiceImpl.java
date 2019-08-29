@@ -143,7 +143,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	}
 
 	
-	public SolrEntityPositionsServiceImpl(String translatedEntities) {
+	public SolrEntityPositionsServiceImpl(String translatedEntities) throws IOException {
 		
 		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");
 		
@@ -155,6 +155,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				throw e;
 			}
 			String[] entities = data.split(",");
 			for(int i=0;i<entities.length;i++)

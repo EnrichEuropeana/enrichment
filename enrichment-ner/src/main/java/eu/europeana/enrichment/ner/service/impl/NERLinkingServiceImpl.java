@@ -25,7 +25,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	 */
 	
 	@Override
-	public void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage) {
+	public void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage) throws IOException {
 		if(linkingTools == null || linkingTools.size() == 0)
 			return;
 		
@@ -70,6 +70,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+						throw e;
 					}
 				}
 			}

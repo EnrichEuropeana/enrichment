@@ -23,7 +23,7 @@ public interface EnrichmentNERService {
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required item parameters are null or empty
 	 */	
-	public String uploadItems (ItemEntity [] items) throws HttpException;  
+	public String uploadItems (ItemEntity [] items) throws HttpException, Exception;  
 
 	/*
 	 * This method uploads an array of stories to the Mongo database
@@ -64,8 +64,9 @@ public interface EnrichmentNERService {
 	 * 
 	 * @param jsonStoriesImport
 	 * @param jsonItemsImport
+	 * @throws Exception 
 	 */
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws Exception;
 	
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.

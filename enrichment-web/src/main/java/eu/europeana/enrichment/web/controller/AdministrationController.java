@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.EnableCaching;
@@ -58,7 +60,7 @@ public class AdministrationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
 			@RequestParam(value = "jsonFileItems", required = true) String jsonItems
-			) throws HttpException {
+			) throws Exception {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -68,7 +70,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
 		
 			return response;
-		} catch (HttpException e) {
+		} catch (Exception e) {
 			throw e;
 		}	
 	}
@@ -121,7 +123,7 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody ItemEntityImpl [] body) throws HttpException {
+			@RequestBody ItemEntityImpl [] body) throws Exception {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -131,7 +133,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
 		
 			return response;
-		} catch (HttpException e) {
+		} catch (Exception e) {
 			throw e;
 		}	
 	}
@@ -141,7 +143,7 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest body) throws HttpException {
+			@RequestBody EnrichmentTranslationRequest body) throws Exception {
 		try {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -150,7 +152,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
 			return response;
-		} catch (HttpException e) {
+		} catch (Exception e) {
 			throw e;
 		}	
 	}
@@ -173,7 +175,7 @@ public class AdministrationController extends BaseRest {
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
 			@RequestParam(value = "external-reference", required = false) String externalReference
-			) 
+			) throws UnsupportedEncodingException 
 	{
 		
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);

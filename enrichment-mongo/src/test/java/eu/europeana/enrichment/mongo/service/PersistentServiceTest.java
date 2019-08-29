@@ -111,7 +111,7 @@ public class PersistentServiceTest {
 			if(newDbStoryEntity != null)
 				fail("Story entity could not be deleted!");
 			*/
-		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -121,7 +121,7 @@ public class PersistentServiceTest {
 	 * mechanism for translation entities works
 	 */
 	@Test
-	public void translationEntityPersistentTest(){
+	public void translationEntityPersistentTest() throws Exception{
 		try {
 			StoryEntity tmpStoryEntity = new DBStoryEntityImpl(); 
 			tmpStoryEntity.setStoryId("testStory");

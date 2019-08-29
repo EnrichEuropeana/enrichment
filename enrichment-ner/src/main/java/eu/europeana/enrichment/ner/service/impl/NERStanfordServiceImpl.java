@@ -37,7 +37,7 @@ public class NERStanfordServiceImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException {
 		TreeMap<String, List<NamedEntity>> map = null;
 		String serializedRequest = null;
 		try {
@@ -45,6 +45,7 @@ public class NERStanfordServiceImpl implements NERService{
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 		if(serializedRequest == null)
 			return null;
@@ -57,6 +58,7 @@ public class NERStanfordServiceImpl implements NERService{
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 		return map;
 		//return processClassifiedResult(classify);
