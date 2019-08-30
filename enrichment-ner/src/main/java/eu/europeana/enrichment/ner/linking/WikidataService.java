@@ -106,6 +106,8 @@ public interface WikidataService {
 	 * @return
 	 */
 	
-	public WikidataEntity getWikidataEntity (String wikidataURL, String type) throws IOException;
+	public WikidataEntity getWikidataEntityUsingLocalCache (String wikidataURL, String type) throws IOException;
+
+	public WikidataEntity getWikidataEntity(String wikidataURL, String WikidataJSON, String type);
 	
 }

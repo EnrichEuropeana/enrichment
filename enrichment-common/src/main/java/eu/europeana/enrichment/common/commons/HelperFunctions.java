@@ -1,5 +1,9 @@
 package eu.europeana.enrichment.common.commons;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,7 +12,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class HelperFunctions {
+	
+	static Logger logger = LogManager.getLogger(HelperFunctions.class);
 
 	public static String generateHashFromText(String text) throws NoSuchAlgorithmException {
 		//generate key for the translation based on the original text
@@ -92,6 +102,63 @@ public class HelperFunctions {
 
 
 	}
+	
+	public static void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
+	{
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		String pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+		
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathName))))
+	    {			
+	    	
+			bw.write(content);
+			
+		    logger.info("Wikidata JSON File is written successfully!");
+			    
+		} catch (IOException ioe) 
+	    {
+			logger.error("Error in writting to a file: " + pathName);
+			throw ioe;
+	    }	    
+	}
+
+	
+	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
+	{
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		String pathName = null;
+
+    	//Specify the file name and path here
+    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+    	File file = new File(pathName);
+
+    	/* This logic will make sure that the file 
+		 * gets created if it is not present at the
+		 * specified location
+	    */
+		if (!file.exists()) {
+			return null;
+		}
+		else
+		{
+			//String path = pathName.replace("/", "\\\\");
+			String contentJsonFile = null;
+
+			try {
+	            
+				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+	            
+	        } catch (IOException e) {
+	        	logger.error("Error in reading a file: " + pathName);
+				throw e;
+	        }
+
+			return contentJsonFile;
+		}
+
+	    
+	}
+
 
 
 }
