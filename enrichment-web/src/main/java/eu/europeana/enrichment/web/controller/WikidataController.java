@@ -192,7 +192,7 @@ public class WikidataController extends BaseRest {
 				if(i>=startIndex && i<endIndex)
 				{
 					//getting WikidataEntity, either from local cache or from the wikidata
-					WikidataEntity wikidataEntity = wikidataService.getWikidataEntity(wikidataIDs.get(i), type);
+					WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
 					items.add(wikidataEntity);
 					
 					logger.info("Wikidata place found is: ");

@@ -48,7 +48,11 @@
   			<artifactId>enrichment-solr</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-web</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
 		
 		<!-- Other -->
 		<dependency>

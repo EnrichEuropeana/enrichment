@@ -27,7 +27,7 @@
 	
 	<import resource="../../src/main/resources/enrichment-web-context.xml" />
 	
-	<bean id="europeanaReadWriteFiles" class="eu.europeana.enrichment.utils.ReadWriteFiles">
+	<!-- bean id="europeanaReadWriteFiles" class="eu.europeana.enrichment.utils.ReadWriteFiles">
 		<constructor-arg type="String" value="${enrich.web.book.dumitru}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.original}"/>
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output}"/>
@@ -35,7 +35,7 @@
 		<constructor-arg type="String" value="${enrich.web.book.dumitru.output.formatted.originalText.pdf}"/>
 		<constructor-arg type="String" value="${enrich.stories.import}"/>
 		<constructor-arg type="String" value="${enrich.items.import}"/>
-	</bean>
+	</bean-->
 	
 	<bean id="solrBaseClientService" name="entity_solr_entity_service"
 		class="eu.europeana.enrichment.solr.service.impl.SolrBaseClientServiceImpl"
@@ -68,8 +68,8 @@
 	
 	
 	
-	<bean id="europeanaEnrichmentNERRequest" class="eu.europeana.enrichment.web.model.EnrichmentNERRequest" />
+	<!-- bean id="europeanaEnrichmentNERRequest" class="eu.europeana.enrichment.web.model.EnrichmentNERRequest" /-->
 	
-	<bean id="europeanaJavaPDFWriter" class="eu.europeana.enrichment.utils.JavaPDFWriter" />
+	<!-- bean id="europeanaJavaPDFWriter" class="eu.europeana.enrichment.utils.JavaPDFWriter" /-->
 	
 </beans>

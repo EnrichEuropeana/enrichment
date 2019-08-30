@@ -89,7 +89,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	@Override
 	public void storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
-		WikidataEntity entity = wikidataService.getWikidataEntity(wikidataURL, type);
+		WikidataEntity entity = wikidataService.getWikidataEntityUsingLocalCache(wikidataURL, type);
 
 		store(solrCore, entity, true);
 		

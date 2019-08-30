@@ -1,18 +1,13 @@
 package eu.europeana.enrichment.ner.linking;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
@@ -24,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
@@ -339,61 +335,6 @@ public class WikidataServiceImpl implements WikidataService {
 			
 	}
 	
-	private void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
-	{
-		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
-		
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathName))))
-	    {			
-	    	
-			bw.write(content);
-			
-		    logger.info("Wikidata JSON File is written successfully!");
-			    
-		} catch (IOException ioe) 
-	    {
-			logger.error("Error in writting to a file: " + pathName);
-			throw ioe;
-	    }	    
-	}
-
-	
-	private String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
-	{
-		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = null;
-
-    	//Specify the file name and path here
-    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
-    	File file = new File(pathName);
-
-    	/* This logic will make sure that the file 
-		 * gets created if it is not present at the
-		 * specified location
-	    */
-		if (!file.exists()) {
-			return null;
-		}
-		else
-		{
-			//String path = pathName.replace("/", "\\\\");
-			String contentJsonFile = null;
-
-			try {
-	            
-				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-	            
-	        } catch (IOException e) {
-	        	logger.error("Error in reading a file: " + pathName);
-				throw e;
-	        }
-
-			return contentJsonFile;
-		}
-
-	    
-	}
 	
 	private Map<String, List<String>> convertListOfListOfStringToMapOfStringAndListOfString (List<List<String>> jsonElement)
 	{
@@ -419,18 +360,26 @@ public class WikidataServiceImpl implements WikidataService {
 
 	
 	@Override
-	public WikidataEntity getWikidataEntity(String wikidataURL, String type) throws IOException {
+	public WikidataEntity getWikidataEntityUsingLocalCache(String wikidataURL, String type) throws IOException {
 		
 		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
-		String WikidataJSON = getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
+		String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
 		if(WikidataJSON==null) 	
 		{
 			logger.info("Wikidata place found does not exist in a local file cache!");
 			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
-			saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
+			if(WikidataJSON==null || WikidataJSON.isEmpty()) return null;
+			HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
 			logger.info("Wikidata place is successfully saved to a local file cache!");			
 		}
 		
+		return getWikidataEntity(wikidataURL,WikidataJSON,type);
+		
+	}
+	
+	@Override
+	public WikidataEntity getWikidataEntity (String wikidataURL, String WikidataJSON, String type)
+	{
 		List<List<String>> jsonElement;
 		
 		if(type.compareToIgnoreCase("agent")==0)
@@ -690,6 +639,5 @@ public class WikidataServiceImpl implements WikidataService {
 			return newWikidataPlace;
 			
 		}	
-		
 	}
 }

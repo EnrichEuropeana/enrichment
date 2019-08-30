@@ -63,6 +63,13 @@
 	<beans:bean id="solrWikidataEntityService" class="eu.europeana.enrichment.solr.service.impl.SolrWikidataEntityServiceImpl" >
 	</beans:bean>
 	
+	<beans:bean id="storyEntitySerializer" class="eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer" >
+	</beans:bean>
+	
+	<beans:bean id="jacksonSerializer" class="eu.europeana.enrichment.solr.commons.JacksonSerializer" >
+	</beans:bean>	
+		
+	
 	<beans:bean id="javaJSONParser" class="eu.europeana.enrichment.solr.commons.JavaJSONParser" />
 	
 	<beans:bean id="levenschteinDistance" class="eu.europeana.enrichment.solr.commons.LevenschteinDistance" />
@@ -86,7 +93,11 @@
 	<beans:bean id="europeanaEntityService" class="eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.ner.linking.europeana.apikey}"/>
 	</beans:bean>
-	<beans:bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
+	
+	<beans:bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" >
+		<beans:constructor-arg type="String" value="${enrich.wikidata.directory}"/>
+	</beans:bean>
+		
 	<beans:bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
 	
 	<beans:bean id="stanfordNerService" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
@@ -103,7 +114,8 @@
     
 	<!-- Translation service beans -->
 	<beans:bean id="googleTranslationService" class="eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl">
-		<beans:constructor-arg type="String" value="enrich.translation.google.credentials"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.google.credentials}"/>
+		<beans:constructor-arg type="String" value="${enrich.translation.google.waittime}"/>
 	</beans:bean>
 	<beans:bean id="eTranslationService" class="eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl">
 		<beans:constructor-arg type="String" value="${enrich.translation.eTranslation.credentials}"/>
