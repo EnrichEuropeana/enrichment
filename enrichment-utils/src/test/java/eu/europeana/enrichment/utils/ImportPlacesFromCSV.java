@@ -63,23 +63,44 @@ public class ImportPlacesFromCSV {
 			    
 				while ((line = br.readLine()) != null) {
 			        
-					String[] values = line.split("\\s*,\\s*");			        
-					wikidataIDs.add(values[2]);
-					labels.add(values[1]);
+					String[] values = line.split("\\s*,\\s*");	
+					
+					if(line.contains("\""))
+					{
+						for(int m=2;m<values.length;m++)
+						{
+							if(values[m].contains("www.wikidata.org")) 
+							{ 
+								wikidataIDs.add(values[m]);
+								break;
+							}
+						}
+						
+						int start_pos = line.indexOf("\"") + 1;
+						int end_pos = line.indexOf("\"", start_pos);
+						labels.add(line.substring(start_pos, end_pos));
+						
+					}
+					else
+					{
+						wikidataIDs.add(values[2]);
+						labels.add(values[1]);
+						
+					}
 					
 			    }
 				
 				for(int j=0;j<wikidataIDs.size();j++)
 				{
 					
-					String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataIDs.get(j));
+					boolean fileexists = HelperFunctions.checkWikidataJSONFileExistance(wikidataDirectory, wikidataIDs.get(j));
 					
-					if(WikidataJSON==null) 	
+					if(fileexists==false) 	
 					{						
-						WikidataJSON = wikidataService.getWikidataJSONFromWikidataID(wikidataIDs.get(j));
+						String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID(wikidataIDs.get(j));
 						if(WikidataJSON==null || WikidataJSON.isEmpty()) 
 						{
-							try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathFileNotFoundEntities))))
+							try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathFileNotFoundEntities), true)))
 						    {					    	
 								bw.append(wikidataIDs.get(j)+ "," + labels.get(j));
 								    
@@ -92,6 +113,7 @@ public class ImportPlacesFromCSV {
 						else
 						{
 							HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataIDs.get(j), WikidataJSON);
+							System.out.print("Analyzed wikidata entity number: " + j + " .\n");
 						}
 						
 					}

@@ -159,6 +159,26 @@ public class HelperFunctions {
 	    
 	}
 
+	public static boolean checkWikidataJSONFileExistance (String directory, String wikidataURL) throws IOException
+	{
+		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
+		String pathName = null;
 
+    	//Specify the file name and path here
+    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+    	File file = new File(pathName);
+
+    	/* This logic will make sure that the file 
+		 * gets created if it is not present at the
+		 * specified location
+	    */
+		if (file.exists()) {
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
 }
