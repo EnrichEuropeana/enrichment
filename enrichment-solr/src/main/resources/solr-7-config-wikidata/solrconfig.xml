@@ -93,6 +93,8 @@
   all required dependencies--> 
   <lib path="${solr.install.dir:../../../..}/server/solr-enrichment/enrichment/lib/PositionsSolrHighlighter.jar" />
   
+  <lib dir="${solr.install.dir:../../../..}/contrib/dataimporthandler-extras/lib/" regex=".*\.jar" />
+  
   <!-- an exact 'path' can be used instead of a 'dir' to specify a
        specific jar file.  This will cause a serious error to be logged
        if it can't be loaded.
@@ -806,6 +808,17 @@
       -->
     </lst>
   </initParams>
+
+
+  <!--
+  Srdjan: configuring data import handler to import data from .xml file
+  -->
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+  <lst name="defaults">
+    <!--str name="config">/path/to/my/DIHconfigfile.xml</str-->
+	<str name="config">dih-config.xml</str>
+  </lst>
+  </requestHandler>
 
   <!-- Solr Cell Update Request Handler
 
