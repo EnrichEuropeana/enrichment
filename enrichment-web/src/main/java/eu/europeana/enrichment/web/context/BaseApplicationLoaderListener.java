@@ -16,7 +16,7 @@ public abstract class BaseApplicationLoaderListener {
 	Properties props = new Properties();
 	Logger logger = LogManager.getLogger(getClass());
 	
-	public BaseApplicationLoaderListener(){
+	public BaseApplicationLoaderListener() throws IOException{
 		System.out.println("instantiation of ApplicationLoaderListener");
 		loadProperties();		
 	}
@@ -43,13 +43,14 @@ public abstract class BaseApplicationLoaderListener {
 		
 	}
 
-	protected void loadProperties(){
+	protected void loadProperties() throws IOException{
 		String propsLocation = getAppConfigFile();
 		try {
 			EncodedResource propsResource = new EncodedResource( new ClassPathResource(propsLocation), "UTF-8");
 			PropertiesLoaderUtils.fillProperties(getProps(), propsResource);
 		} catch (IOException e) {
-			logger.warn("Cannot read properties from classath: " + propsLocation, e);	
+			//logger.warn("Cannot read properties from classath: " + propsLocation, e);	
+			throw e;
 		}
 	}
 

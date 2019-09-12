@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -30,7 +32,7 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) throws Exception {
+	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		ItemEntityDao.saveItemEntity(entity);
 	}
 

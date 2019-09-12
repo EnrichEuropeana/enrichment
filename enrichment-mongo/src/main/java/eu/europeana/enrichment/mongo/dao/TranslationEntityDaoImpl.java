@@ -87,7 +87,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) {
+	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		DBTranslationEntityImpl tmp = null;
 		if(entity instanceof DBTranslationEntityImpl)
 			tmp = (DBTranslationEntityImpl) entity;
@@ -95,8 +95,8 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			try {
 				tmp = new DBTranslationEntityImpl(entity);
 			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				
+				throw e;
 			}
 		}
 		if(tmp != null)

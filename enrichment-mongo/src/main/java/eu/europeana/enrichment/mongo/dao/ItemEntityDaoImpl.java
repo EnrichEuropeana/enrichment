@@ -86,7 +86,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) throws Exception {
+	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		ItemEntity dbItemEntity = findItemEntity(entity.getItemId());
 		if(dbItemEntity!=null)
 		{
@@ -106,8 +106,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 				try {
 					tmp = new DBItemEntityImpl(entity);
 				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
 					throw e;
 				}
 			}

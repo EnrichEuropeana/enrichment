@@ -19,6 +19,7 @@ import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
+import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
@@ -60,8 +61,8 @@ public class AdministrationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
 			@RequestParam(value = "jsonFileItems", required = true) String jsonItems
-			) throws Exception {
-		try {
+			) throws ApplicationAuthenticationException {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -70,9 +71,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
 		
 			return response;
-		} catch (Exception e) {
-			throw e;
-		}	
+		
 	}
 	
 	/*
@@ -92,7 +91,7 @@ public class AdministrationController extends BaseRest {
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestBody StoryEntityImpl [] body) throws HttpException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -101,9 +100,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
 		
 			return response;
-		} catch (HttpException e) {
-			throw e; 
-		}	
+			
 	}
 	
 	/*
@@ -123,8 +120,8 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody ItemEntityImpl [] body) throws Exception {
-		try {
+			@RequestBody ItemEntityImpl [] body) throws HttpException, Exception {
+	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -133,9 +130,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
 		
 			return response;
-		} catch (Exception e) {
-			throw e;
-		}	
+	
 	}
 	
 	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation")
@@ -143,8 +138,8 @@ public class AdministrationController extends BaseRest {
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest body) throws Exception {
-		try {
+			@RequestBody EnrichmentTranslationRequest body) throws HttpException  {
+
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -152,9 +147,7 @@ public class AdministrationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 		
 			return response;
-		} catch (Exception e) {
-			throw e;
-		}	
+
 	}
 	
 	/*

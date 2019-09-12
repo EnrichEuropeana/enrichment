@@ -64,9 +64,8 @@ public interface EnrichmentNERService {
 	 * 
 	 * @param jsonStoriesImport
 	 * @param jsonItemsImport
-	 * @throws Exception 
 	 */
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws Exception;
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
 	
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.

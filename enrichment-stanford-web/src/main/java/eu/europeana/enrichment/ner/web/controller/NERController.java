@@ -41,16 +41,12 @@ public class NERController {
 	@RequestMapping(value = "namedEntityRecognition", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntities(
-			@RequestBody StanfordRequest requestBody) throws Exception {
-		try {
+			@RequestBody StanfordRequest requestBody) {
 			
 			String jsonLd = enrichmentNerService.getEntities(requestBody.getText());
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+
 	}
 }

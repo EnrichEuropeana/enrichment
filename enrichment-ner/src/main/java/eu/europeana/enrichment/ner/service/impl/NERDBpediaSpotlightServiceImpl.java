@@ -197,7 +197,6 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 		} catch (Exception ex) {
 			logger.error("Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage());
-			System.err.println(ex.getMessage());
 			return "";
 		}
 	}

@@ -58,7 +58,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -75,15 +75,7 @@ public class NERController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	}
 	
 	@ApiOperation(value = "Get named entities for a story", nickname = "getEntitiesStory")
@@ -96,7 +88,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -113,15 +105,7 @@ public class NERController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	}
 	
 	/*
@@ -137,7 +121,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -153,15 +137,7 @@ public class NERController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	}
 	
 	@ApiOperation(value = "Get named entities for an item", nickname = "getEntitiesItem")
@@ -174,7 +150,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -191,14 +167,6 @@ public class NERController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	}
 }
