@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationListener;
 
 public class ApplicationLoaderListener extends BaseApplicationLoaderListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>{
 
-	public ApplicationLoaderListener(){
+	public ApplicationLoaderListener() throws IOException{
 		super();
 		onApplicationEvent(null);
 	}

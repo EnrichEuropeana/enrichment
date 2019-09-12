@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -626,7 +628,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String uploadItems(ItemEntity[] items) throws Exception {
+	public String uploadItems(ItemEntity[] items) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		for (ItemEntity item : items) {
 			if(item.getStoryId() == null)
@@ -675,7 +677,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 	@SuppressWarnings("finally")
 	@Override
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws Exception {
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
 		
 		/*
 		 * reading stories and items from json
@@ -811,26 +813,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				
 			}
 			
+			
 			String uploadItemsStatus = uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
+			
 			
 			logger.info("Stories and Items are saved to the database from the JSON file!");
 			resultString = "Done!";
 		}
 		catch (FileNotFoundException e) {
-		    e.printStackTrace();
+
 		    resultString = "Fail! File not found!";
 		} catch (HttpException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			resultString = "Fail! Http Exception!";
+		} catch (NoSuchAlgorithmException e) {
+			resultString = "Fail! No Such Algorithm for setting the security key for the item!";
+		} catch (UnsupportedEncodingException e) {
+			resultString = "Fail! Unsupported encoding for setting the security key of the item!";
 		} finally {
 			  if (brStories != null) {
 				  try {
 					  brStories.close();
 				  } catch (IOException e) {
-		    		// TODO Auto-generated catch block
-		    		e.printStackTrace();
-		    		resultString = "Fail!";
+
+		    		resultString = "Fail! Cannot close the file!";
 				  }
 				 
 			  }
@@ -838,9 +843,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				  try {
 					  brItems.close();
 				  } catch (IOException e) {
-		    		// TODO Auto-generated catch block
-		    		e.printStackTrace();
-		    		resultString = "Fail!";
+
+		    		resultString = "Fail! Cannot close the file!";
 				  }
 			  }
 			  //TODO: throw httpexception

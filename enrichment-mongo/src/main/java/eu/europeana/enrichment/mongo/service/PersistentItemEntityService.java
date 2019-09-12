@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;
@@ -37,7 +39,7 @@ public interface PersistentItemEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveItemEntity(ItemEntity entity) throws Exception;
+	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 	/*
 	 * This method saves and updates a list of story item entities into the Mongo database
 	 * 

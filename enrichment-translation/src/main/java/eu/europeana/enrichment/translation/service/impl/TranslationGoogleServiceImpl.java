@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.translation.service.impl;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +34,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
      * 									credential file
      * @return
      */
-    public TranslationGoogleServiceImpl(String credentialFilePath, String waittime) {
+    public TranslationGoogleServiceImpl(String credentialFilePath, String waittime) throws IOException {
     	try {
     		// You can specify a credential file by providing a path to GoogleCredentials.
     		// Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
@@ -42,10 +43,8 @@ public class TranslationGoogleServiceImpl implements TranslationService{
         	translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
         	this.waittime = Integer.parseInt(waittime);
     	}
-    	catch (Exception e) {
-			// TODO: handle exception
-    		logger.error("Exception raised during reading and setting Google credentials" + e.getMessage());
-    		System.err.println(e.getMessage());
+    	catch (IOException e) {
+			throw e;
 		}
     }
     

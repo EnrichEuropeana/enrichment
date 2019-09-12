@@ -26,8 +26,6 @@ public class HelperFunctions {
 		try {
 			digest = MessageDigest.getInstance("SHA-256");
 		} catch (NoSuchAlgorithmException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
 			throw e1;
 		}
 		String textWithoutWithespace = text.replaceAll("\\s+","");
@@ -117,7 +115,6 @@ public class HelperFunctions {
 			    
 		} catch (IOException ioe) 
 	    {
-			logger.error("Error in writting to a file: " + pathName);
 			throw ioe;
 	    }	    
 	}
@@ -149,7 +146,6 @@ public class HelperFunctions {
 				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 	            
 	        } catch (IOException e) {
-	        	logger.error("Error in reading a file: " + pathName);
 				throw e;
 	        }
 

@@ -54,8 +54,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 		try {
 			pipeline.loadDefaultProperties();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 			throw e;
 		}
 				

@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -31,7 +33,7 @@ public interface PersistentTranslationEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveTranslationEntity(TranslationEntity entity);
+	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 	/*
 	 * This method saves and updates a list of translation entries into the Mongo database
 	 * 
@@ -39,7 +41,7 @@ public interface PersistentTranslationEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveTranslationEntities(List<TranslationEntity> entities);
+	public void saveTranslationEntities(List<TranslationEntity> entities) throws Exception;
 	/*
 	 * This method deletes translation entries from the Mongo database
 	 * 

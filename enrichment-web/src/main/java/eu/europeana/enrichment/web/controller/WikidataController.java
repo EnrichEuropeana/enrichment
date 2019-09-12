@@ -66,7 +66,7 @@ public class WikidataController extends BaseRest {
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "wikidataId", required = true) String wikidataId) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -77,12 +77,7 @@ public class WikidataController extends BaseRest {
 					
 			return response;
 		
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	} 
 	
 	/**
@@ -116,7 +111,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page
 			) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -127,12 +122,7 @@ public class WikidataController extends BaseRest {
 					
 			return response;
 		
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	} 
 	
 	
@@ -146,7 +136,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page
 			) throws Exception, HttpException, SolrNamedEntityServiceException {
-		try {
+		
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -217,11 +207,6 @@ public class WikidataController extends BaseRest {
 
 			return response;
 					
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			throw e;
-		}
+		
 	}
 }

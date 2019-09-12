@@ -1,18 +1,14 @@
 package eu.europeana.enrichment.translation.service.impl;
 
-import eu.europeana.enrichment.translation.exception.TranslationException;
-import eu.europeana.enrichment.translation.service.TranslationService;
-
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
@@ -29,6 +25,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import eu.europeana.enrichment.translation.exception.TranslationException;
+import eu.europeana.enrichment.translation.service.TranslationService;
 
 public class ETranslationEuropaServiceImpl implements TranslationService {
 
@@ -75,12 +74,14 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * This method reads the necessary eTranslation credentials 
 	 * 
 	 * @param credentialFilePath		is the path to the credential file
+	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	private void readCredentialFile(String credentialFilePath)  {
+	private void readCredentialFile(String credentialFilePath) throws IOException  {
 				
 		//try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
+			
 			String line;
 			while ((line = br.readLine()) != null) {
 				String[] splitString = line.split("=");
@@ -89,11 +90,11 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 				else if (splitString[0].equals("pwd"))
 					credentialPwd = splitString[1];
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			logger.error("Exception raised by reading eTranslation credentials!" + e.getMessage());
-			System.err.println(e.getMessage());
-		}
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		} 
 	}
 
 	@Override
@@ -118,8 +119,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			try {
 				Thread.sleep(sleepingTime);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw e;
 			}
 			waitingTime += sleepingTime;
 		}
@@ -161,8 +161,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);
 		}catch(UnsupportedEncodingException ex) {
-			logger.error("Exception by creating translation request body: " + ex.getMessage());
-			System.out.println(ex.getMessage());
+
 			throw ex;
 		}
 
@@ -199,8 +198,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);
 		}catch(UnsupportedEncodingException ex) {
-			logger.error("Exception by creating translation request body: " + ex.getMessage());
-			System.out.println(ex.getMessage());
+
 			throw ex;
 		}
 
@@ -249,7 +247,6 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		} catch (Exception ex) {
 			//TODO: proper exception handling
 			logger.error("Exception raised during the creation of eTranslation request: " + ex.getMessage());
-			System.err.println(ex.getMessage());
 			return "";
 		}
 	}
@@ -265,8 +262,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			try {
 				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 				throw e;
 			}
 			logger.info("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);

@@ -277,15 +277,19 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		}
 		
 		try {
+			
 			dbTranslationEntity.setKey(originalText);
+
+			dbTranslationEntity.setTranslatedText(translatedText);
+			
+			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling
 			e.printStackTrace();
 			return "";
 		}
-		dbTranslationEntity.setTranslatedText(translatedText);
 		
-		persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
 		return "Done";
 	}
 	

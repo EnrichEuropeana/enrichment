@@ -96,7 +96,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	}
 	
 	@Override
-	public String searchByWikidataURL(String wikidataURL) {
+	public String searchByWikidataURL(String wikidataURL) throws SolrNamedEntityServiceException {
 		
 		log.debug("Search wikidata entity by its URL: " + wikidataURL);
 
@@ -113,6 +113,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 	    SolrDocumentList docs = rsp.getResults();
 
@@ -211,7 +212,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public String searchByWikidataURL_usingJackson(String wikidataURL) {
+	public String searchByWikidataURL_usingJackson(String wikidataURL) throws SolrNamedEntityServiceException, IOException {
 		
 		SolrQuery query = new SolrQuery();
 		
@@ -223,6 +224,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 
 		//ResultSet<T> resultSet = new ResultSet<>();		
@@ -258,6 +260,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				throw e1;
 			}
 	    	
 	    	return serializedUserSetJsonLdStr;
@@ -275,6 +278,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				throw e1;
 			}
 	    	
 	    	return serializedUserSetJsonLdStr;
@@ -288,7 +292,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) {
+	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrNamedEntityServiceException, IOException {
 		
 		//forming required properties for the class to be serialized
 		String URLPage = "";
@@ -376,6 +380,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			throw e;
 		}
 
 		log.info("Getting results from Solr in the form of SolrDocumentList.");
@@ -435,6 +440,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		}
 		
 		log.info("Serializing Solr data using Jackson to JSON string.");
+			
 		
 		NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);
 		
@@ -444,6 +450,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			throw e1;
 		}
     	
     	return serializedNamedEntityCollection;

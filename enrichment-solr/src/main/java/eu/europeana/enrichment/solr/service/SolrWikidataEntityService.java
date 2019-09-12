@@ -10,8 +10,8 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public interface SolrWikidataEntityService {
 	
-	public String searchByWikidataURL_usingJackson (String wikidataURL);
-	public String searchByWikidataURL (String wikidataURL);
+	public String searchByWikidataURL_usingJackson (String wikidataURL) throws SolrNamedEntityServiceException, IOException;
+	public String searchByWikidataURL (String wikidataURL) throws SolrNamedEntityServiceException;
 
 	/**
 	 * Storing a single WikidataEntity to the Solr server 
@@ -36,7 +36,7 @@ public interface SolrWikidataEntityService {
 	public void storeWikidataFromURL (String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException;
 	
 	String searchNamedEntities_usingJackson(String wskey, String query, String type, String lang, String solrQuery, String solrSort,
-			String pageSize, String page);
+			String pageSize, String page) throws SolrNamedEntityServiceException, IOException;
 	
 	
 	

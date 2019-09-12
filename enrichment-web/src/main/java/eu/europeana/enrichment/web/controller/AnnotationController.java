@@ -48,7 +48,7 @@ public class AnnotationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
-		try {
+
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -58,11 +58,7 @@ public class AnnotationController extends BaseRest {
 					
 			return response;
 		
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
+		
 	}
 	
     /**
@@ -85,7 +81,7 @@ public class AnnotationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
-		try {
+
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -95,11 +91,7 @@ public class AnnotationController extends BaseRest {
 					
 			return response;
 		
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
+		
 	}
 	
    /**
@@ -121,7 +113,7 @@ public class AnnotationController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@PathVariable("wikidataIdentifier") String wikidataIdentifier) throws Exception, HttpException {
-		try {
+		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -131,10 +123,6 @@ public class AnnotationController extends BaseRest {
 					
 			return response;
 		
-		} catch (HttpException e) {
-			throw e;
-		} catch (Exception e) {
-			throw e;
-		}
+		
 	} 
 } 

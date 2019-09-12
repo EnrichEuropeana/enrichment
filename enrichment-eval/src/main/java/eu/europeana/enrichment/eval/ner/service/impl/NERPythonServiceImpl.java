@@ -8,9 +8,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,15 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
-
-import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
+import eu.europeana.enrichment.ner.service.NERService;
 
 public class NERPythonServiceImpl implements NERService{
 
@@ -57,11 +54,13 @@ public class NERPythonServiceImpl implements NERService{
 	 * @see eu.europeana.enrichment.ner.service.NERService#identifyNER(java.lang.String)
 	 */
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) {
+	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException {
 		TreeMap<String, List<List<String>>> map = new TreeMap<>();
 		Process process;
 		try {
+			
 			process = Runtime.getRuntime().exec(pythonCommand);
+			
 
 			OutputStream stdin = process.getOutputStream();
 			InputStream stderr = process.getErrorStream();
@@ -101,9 +100,8 @@ public class NERPythonServiceImpl implements NERService{
 			writer.close();
 			reader.close();
 			// mProcess -> terminate or close
-		} catch (Exception e) {
-			logger.error("Exception raised during Python NER processing: " + e.toString());
-			System.out.println("Exception Raised" + e.toString());
+		} catch (IOException e) {
+			throw e;
 		}
 		
 		return null;

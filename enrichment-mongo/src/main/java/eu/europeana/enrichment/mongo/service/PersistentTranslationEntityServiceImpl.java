@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.mongo.service;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -33,12 +35,12 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) {
+	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		translationEntityDao.saveTranslationEntity(entity);
 	}
 
 	@Override
-	public void saveTranslationEntities(List<TranslationEntity> entities) {
+	public void saveTranslationEntities(List<TranslationEntity> entities) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		for (TranslationEntity translationEntity : entities) {
 			saveTranslationEntity(translationEntity);
 		}

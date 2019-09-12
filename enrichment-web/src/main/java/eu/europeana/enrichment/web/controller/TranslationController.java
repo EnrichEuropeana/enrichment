@@ -55,7 +55,7 @@ public class TranslationController extends BaseRest {
 			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
-		try {
+	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -69,9 +69,7 @@ public class TranslationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		}
+	
 	}
 	
 	@ApiOperation(value = "Get translated text (Google, eTranslation)", nickname = "getTranslation")
@@ -82,7 +80,7 @@ public class TranslationController extends BaseRest {
 			@RequestParam(value = "itemId", required = true) String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
-		try {
+	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
@@ -96,9 +94,7 @@ public class TranslationController extends BaseRest {
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
 			
 			return response;
-		} catch (HttpException e) {
-			throw e;
-		}
+		
 	} 
 
 }
