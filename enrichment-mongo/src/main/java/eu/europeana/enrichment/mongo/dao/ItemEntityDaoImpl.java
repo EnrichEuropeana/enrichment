@@ -16,6 +16,7 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
+import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 
 public class ItemEntityDaoImpl implements ItemEntityDao{
 
@@ -52,6 +53,24 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 			return dbEntity;
 		}
 	}
+	
+	@Override
+	public List<ItemEntity> findAllItemEntities() {
+		Query<DBItemEntityImpl> persistentItemEntities = datastore.createQuery(DBItemEntityImpl.class);		
+		List<DBItemEntityImpl> result = persistentItemEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else
+		{
+			List<ItemEntity> tmpResult = new ArrayList<>();
+			for(int index = result.size()-1; index >= 0; index--) {
+				ItemEntity dbEntity = result.get(index);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
+	}
+	
 	@Override
 	public ItemEntity findItemEntityFromStory(String storyId, String itemId)
 	{

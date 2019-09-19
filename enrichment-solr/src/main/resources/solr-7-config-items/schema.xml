@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Solr managed schema - automatically generated - DO NOT EDIT -->
-<schema name="enrichment" version="0.1">
-  <uniqueKey>story_id</uniqueKey>
+<schema name="items" version="0.1">
+  <uniqueKey>item_id</uniqueKey>
   <fieldType name="boolean" class="solr.BoolField" omitNorms="true" sortMissingLast="true"/>
   <fieldType name="date" class="solr.DatePointField" omitNorms="true"/>
   <fieldType name="double" class="solr.DoublePointField"/>
@@ -88,10 +88,12 @@
   </fieldType>
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
   <field name="story_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="story_text" type="text_general_experiment" multiValued="true" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="story_summary" type="text_general_experiment" multiValued="true" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="story_description" type="text_general_experiment" multiValued="true" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
+  <field name="item_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="transcription" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="description" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
   
   <dynamicField name="text.*" type="text" multiValued="true" indexed="true" stored="false"/>
 </schema>

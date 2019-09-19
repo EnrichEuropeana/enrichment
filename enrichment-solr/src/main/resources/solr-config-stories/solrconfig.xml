@@ -86,8 +86,9 @@
 
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
+  
+  <lib dir="${solr.install.dir:../../../..}/contrib/dataimporthandler-extras/lib/" regex=".*\.jar" />
 
-  <!-- Srdjan: introduced a new .jar file -->
   <!-- lib path="C:/Users/stevanetics/Downloads/solr-positionshighlighter.jar" /--> 
   <lib path="C:/Users/stevanetics/Downloads/PositionsSolrHighlighter.jar" /> 
    
@@ -959,6 +960,18 @@
        </lst>
   </requestHandler>
   -->
+  
+  <!--
+  Srdjan: configuring data import handler to import data from .xml file
+  -->
+  <requestHandler name="/dataimport" class="org.apache.solr.handler.dataimport.DataImportHandler">
+  <lst name="defaults">
+    <!--str name="config">/path/to/my/DIHconfigfile.xml</str-->
+	<str name="config">dih-config.xml</str>
+  </lst>
+  </requestHandler>
+  
+  
 
   <!-- Solr Cell Update Request Handler
 

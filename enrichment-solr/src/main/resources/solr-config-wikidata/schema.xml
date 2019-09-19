@@ -49,7 +49,7 @@
   <dynamicField name="label.*" type="proper_name" indexed="true" stored="true" multiValued="true"/>
 
   <field name="skos_prefLabel" type="proper_name" indexed="false" stored="true" multiValued="true"/>
-  <dynamicField name="skos_prefLabel.*" type="string" indexed="false" stored="true" multiValued="false"/>
+  <dynamicField name="skos_prefLabel.*" type="string" indexed="false" stored="true" multiValued="true"/>
   <copyField source="skos_prefLabel.*" dest="label" />
   <copyField source="skos_prefLabel.*" dest="label.*" />
   <copyField source="skos_prefLabel.*" dest="text.*" />
@@ -62,21 +62,21 @@
   <copyField source="skos_altLabel.*" dest="text.*" />
   <copyField source="skos_altLabel.*" dest="text" />  
   
-  <field name="foaf_depiction" type="string" indexed="false" stored="true" multiValued="true"/>
+  <field name="foaf_depiction" type="string" indexed="false" stored="true" multiValued="false"/>
   
   <dynamicField name="dc_description.*" type="string" indexed="false" stored="true"/>
   <copyField source="dc_description.*" dest="text.*" />
   <copyField source="dc_description.*" dest="text" />
   
   <field name="rdagr2_dateOfBirth" type="string" indexed="false" stored="true" multiValued="true"/>  
-  <dynamicField name="rdagr2_dateOfBirth.*" type="string" indexed="false" stored="true" multiValued="false"/>
+  <dynamicField name="rdagr2_dateOfBirth.*" type="string" indexed="false" stored="true" multiValued="true"/>
   <copyField source="rdagr2_dateOfBirth.*" dest="rdagr2_dateOfBirth" />
   <!--  BEGIN FIELD -->
   <field name="begin" type="string" indexed="true" stored="false" multiValued="true" />
   <!--  Index all begin related dates -->
   <copyField source="rdagr2_dateOfBirth.*" dest="begin" />
   
-  <dynamicField name="rdagr2_dateOfDeath.*" type="string" indexed="false" stored="true" multiValued="false"/>
+  <dynamicField name="rdagr2_dateOfDeath.*" type="string" indexed="false" stored="true" multiValued="true"/>
   <field name="rdagr2_dateOfDeath" type="string" indexed="false" stored="true" multiValued="true"/>
   <copyField source="rdagr2_dateOfDeath.*" dest="rdagr2_dateOfDeath"/>
   <!--  END FIELD -->

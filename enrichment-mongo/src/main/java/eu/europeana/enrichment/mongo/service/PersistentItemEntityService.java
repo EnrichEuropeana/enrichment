@@ -27,11 +27,11 @@ public interface PersistentItemEntityService {
 	
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	/*
-	 * This method retrieves all story item entities from the Mongo database
+	 * This method retrieves all item entities from the Mongo database
 	 * 
-	 * @return							list of database story item entities
+	 * @return							list of database item entities
 	 */
-	public List<ItemEntity> getAllStoryItemEntities();
+	public List<ItemEntity> getAllItemEntities();
 	/*
 	 * This method saves and updates story item entities into the Mongo database
 	 * 
