@@ -342,7 +342,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		SolrQuery query = new SolrQuery();
 
 		query.setRequestHandler("/select");		
-		query.set("hl.fl",StoryEntitySolrFields.TEXT);
+		query.set("hl.fl",StoryEntitySolrFields.TRANSCRIPTION);
 		query.set("hl","on");		
 		query.set("indent","on");
 		
@@ -356,7 +356,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				
 				for (int i=0;i<searchTermWords.length;i++)
 				{				
-					adaptedTerm += StoryEntitySolrFields.TEXT+":"+ searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold);
+					adaptedTerm += StoryEntitySolrFields.TRANSCRIPTION+":"+ searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold);
 					//adaptedTerm += StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[i] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
 					if(i<searchTermWords.length-1)
 					{
@@ -366,14 +366,14 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			}
 			else
 			{
-				adaptedTerm = StoryEntitySolrFields.TEXT+":"+ searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold);
+				adaptedTerm = StoryEntitySolrFields.TRANSCRIPTION+":"+ searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold);
 				//adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTermWords[0] + "~" + String.valueOf(LevenschteinDistanceThreshold) + "\"";
 				
 			}
 		}
 		else
 		{
-			adaptedTerm = StoryEntitySolrFields.TEXT+":"+ "\"" + searchTerm + "\"";
+			adaptedTerm = StoryEntitySolrFields.TRANSCRIPTION+":"+ "\"" + searchTerm + "\"";
 		}
 		
 		for (String param : params.keySet()) {

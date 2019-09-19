@@ -11,6 +11,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -27,6 +29,8 @@ import eu.europeana.enrichment.ner.service.model.StanfordNamedEntityImpl;
 public class NERStanfordServiceImpl implements NERService{
 
 	private String endpoint;
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * This class constructor loads a model for the Stanford named
@@ -54,6 +58,7 @@ public class NERStanfordServiceImpl implements NERService{
 		ObjectMapper mapper = new ObjectMapper();
 		TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>> typeRef = new TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>>() {};
 		try {
+			logger.info("\n The response from the StanfordNER service is: " + response + "\n");
 			map = mapper.readValue(response, typeRef);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

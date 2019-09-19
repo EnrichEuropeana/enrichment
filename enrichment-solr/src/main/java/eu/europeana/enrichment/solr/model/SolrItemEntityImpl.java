@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.solr.model;
 
 import org.apache.solr.client.solrj.beans.Field;
-import org.bson.types.ObjectId;
 
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
@@ -10,10 +9,13 @@ import eu.europeana.enrichment.solr.model.vocabulary.ItemEntitySolrFields;
 public class SolrItemEntityImpl extends DBItemEntityImpl implements ItemEntity {
 	
 	public SolrItemEntityImpl (ItemEntity copy) {
-		this.setStoryId(copy.getStoryEntity().getStoryId());
+		this.setStoryId(copy.getStoryId());
 		this.setItemId(copy.getItemId());
 		this.setLanguage(copy.getLanguage());
 		this.setTranscription(copy.getTranscription());
+		this.setDescription(copy.getDescription());
+		this.setSource(copy.getSource());
+		this.setTitle(copy.getTitle());
 	}
 
 	@Override
@@ -37,9 +39,27 @@ public class SolrItemEntityImpl extends DBItemEntityImpl implements ItemEntity {
 
 	
 	@Override
-	@Field(ItemEntitySolrFields.TEXT)
+	@Field(ItemEntitySolrFields.TRANSCRIPTION)
 	public void setTranscription(String text) {
 		super.setTranscription(text);
 	}
 	
+	@Override
+	@Field(ItemEntitySolrFields.DESCRIPTION)
+	public void setDescription(String description) {
+		super.setDescription(description);
+	}
+
+	@Override
+	@Field(ItemEntitySolrFields.SOURCE)
+	public void setSource(String source) {
+		super.setSource(source);
+	}
+
+	@Override
+	@Field(ItemEntitySolrFields.TITLE)
+	public void setTitle(String title) {
+		super.setTitle(title);
+	}
+
 }

@@ -13,6 +13,9 @@ public class SolrStoryEntityImpl extends DBStoryEntityImpl implements StoryEntit
 		this.setTranscription(copy.getTranscription());
 		this.setDescription(copy.getDescription());
 		this.setSummary(copy.getSummary());
+		this.setSource(copy.getSource());
+		this.setTitle(copy.getTitle());
+		this.setLanguage(copy.getLanguage());
 	}
 	
 	
@@ -36,10 +39,27 @@ public class SolrStoryEntityImpl extends DBStoryEntityImpl implements StoryEntit
 	}
 	
 	@Override
-	@Field(StoryEntitySolrFields.TEXT)
+	@Field(StoryEntitySolrFields.TRANSCRIPTION)
 	public void setTranscription(String text) {
 		super.setTranscription(text);
 	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.SOURCE)
+	public void setSource(String source) {
+		super.setSource(source);
+	}
 
+	@Override
+	@Field(StoryEntitySolrFields.TITLE)
+	public void setTitle(String title) {
+		super.setTitle(title);
+	}
+
+	@Override
+	@Field(StoryEntitySolrFields.LANGUAGE)
+	public void setLanguage(String language) {
+		super.setLanguage(language);
+	}
 
 }

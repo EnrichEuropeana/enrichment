@@ -48,7 +48,9 @@ public class NERController extends BaseRest {
 	 * @throws HttpException
 	 * @throws SolrNamedEntityServiceException
 	 */
-	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory")
+	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
+			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
+			+ "it should be first translated using the given API.")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,

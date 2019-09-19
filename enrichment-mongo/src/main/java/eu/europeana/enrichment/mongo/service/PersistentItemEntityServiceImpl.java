@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
 public class PersistentItemEntityServiceImpl implements PersistentItemEntityService {
@@ -26,9 +27,10 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public List<ItemEntity> getAllStoryItemEntities() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<ItemEntity> getAllItemEntities() {
+
+		return ItemEntityDao.findAllItemEntities();
+
 	}
 
 	@Override

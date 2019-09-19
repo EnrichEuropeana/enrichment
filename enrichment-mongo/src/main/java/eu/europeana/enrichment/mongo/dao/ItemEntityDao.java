@@ -13,6 +13,7 @@ public interface ItemEntityDao {
 
 	public ItemEntity findItemEntity(String key);
 	public ItemEntity findItemEntityFromStory (String storyId, String itemId);
+	public List<ItemEntity> findAllItemEntities ();
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
 	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
