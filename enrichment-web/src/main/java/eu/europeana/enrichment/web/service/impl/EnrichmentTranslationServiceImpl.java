@@ -229,7 +229,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String tmpString = "";
 		for (String tmpSentence : sentences) {
 			tmpString += tmpSentence + " ";
-			if(tmpString.length() > 50000) {
+			if(tmpString.length() > 4000) {
 				textArray.add(tmpString);
 				tmpString = "";
 			}
