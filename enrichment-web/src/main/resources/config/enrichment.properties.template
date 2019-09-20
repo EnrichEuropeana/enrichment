@@ -27,7 +27,7 @@ enrich.ner.linking.europeana.apikey=apidemo
 # Translation Google configuration
 #enrich.translation.google.credentials=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\EU-Europeana-enrichment-d92edee4115a.json
 enrich.translation.google.credentials=/home/denis/config/enricheuropeana-3df22ae9c69d.json
-enrich.translation.google.waittime=60
+enrich.translation.google.waittime=2
 # Translation eTranslation configuration
 # enrich.translation.eTranslation.credentials=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\eTranslation.txt
 enrich.translation.eTranslation.credentials=/home/denis/config/eTranslation.txt
