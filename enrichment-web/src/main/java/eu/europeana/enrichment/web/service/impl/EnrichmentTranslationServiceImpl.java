@@ -290,7 +290,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return "";
 		}
 		
-		return "Done";
+		return "{\"info\": \"Done successfully!\"}";
 	}
 	
 }
