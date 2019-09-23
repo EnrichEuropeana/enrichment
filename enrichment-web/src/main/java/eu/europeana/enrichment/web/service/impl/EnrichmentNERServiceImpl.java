@@ -133,7 +133,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * Output preparation
 		 */
 		if(resultMap == null || resultMap.isEmpty()) {
-			return "";
+			return "{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
 		}
 		else
 		{
@@ -248,6 +248,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			if(!original) {
 				dbTranslationEntity = persistentTranslationEntityService.
 						findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
+				
+				if(dbTranslationEntity==null) continue;
 			}
 		
 			
@@ -624,7 +626,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			persistentStoryEntityService.saveStoryEntity(story);
 			
 		}
-		return "Done!";
+		return "{\"info\": \"Done successfully!\"}";
 	}
 
 	@Override
@@ -672,7 +674,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			persistentItemEntityService.saveItemEntity(item);
 			
 		}
-		return "Done!";
+		return "{\"info\": \"Done successfully!\"}";
 	}
 
 	@SuppressWarnings("finally")
@@ -683,7 +685,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * reading stories and items from json
 		 */
 		
-		String resultString = "Done!";
+		String resultString = "{\"info\" : \"Done successfully!\"}";
 		
 		BufferedReader brStories = null;
 		BufferedReader brItems = null;
@@ -818,24 +820,24 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			
 			logger.info("Stories and Items are saved to the database from the JSON file!");
-			resultString = "Done!";
+			resultString = "{\"info\" : \"Done successfully!\"}";
 		}
 		catch (FileNotFoundException e) {
 
-		    resultString = "Fail! File not found!";
+		    resultString = "{\"info\":\"Fail! File not found!\"}";
 		} catch (HttpException e) {
-			resultString = "Fail! Http Exception!";
+			resultString = "{\"info\":\"Fail! Http Exception!\"}";
 		} catch (NoSuchAlgorithmException e) {
-			resultString = "Fail! No Such Algorithm for setting the security key for the item!";
+			resultString = "{\"info\":\"Fail! No Such Algorithm for setting the security key for the item!\"}";
 		} catch (UnsupportedEncodingException e) {
-			resultString = "Fail! Unsupported encoding for setting the security key of the item!";
+			resultString = "{\"info\":\"Fail! Unsupported encoding for setting the security key of the item!\"}";
 		} finally {
 			  if (brStories != null) {
 				  try {
 					  brStories.close();
 				  } catch (IOException e) {
 
-		    		resultString = "Fail! Cannot close the file!";
+		    		resultString = "{\"info\":\"Fail! Cannot close the file!\"}";
 				  }
 				 
 			  }
@@ -844,7 +846,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					  brItems.close();
 				  } catch (IOException e) {
 
-		    		resultString = "Fail! Cannot close the file!";
+		    		resultString = "{\"info\":\"Fail! Cannot close the file!\"}";
 				  }
 			  }
 			  //TODO: throw httpexception
@@ -922,7 +924,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else
 			{
 				logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
-				return "";
+				return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 			}
 			
 		}
@@ -979,7 +981,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else
 			{
 				logger.info("No valid entries found! There are no entries for the given storyId to be generated.");
-				return "";
+				return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated.\"}";
 			}
 		}
 		
@@ -997,7 +999,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		else
 		{
 			logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
-			return "";
+			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 		}
 	}
 }

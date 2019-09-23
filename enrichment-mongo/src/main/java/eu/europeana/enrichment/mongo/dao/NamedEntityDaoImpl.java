@@ -111,7 +111,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		List<NamedEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
 			NamedEntity dbEntity = result.get(index);
-			addAdditonalInformation(dbEntity);
+			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
+			//addAdditonalInformation(dbEntity);
 			tmpResult.add(dbEntity);
 		}
 		return tmpResult;

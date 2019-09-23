@@ -173,7 +173,7 @@ public class AdministrationController extends BaseRest {
 		
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);
 		
-		ResponseEntity<String> response = new ResponseEntity<String>("eTranslation callback has been executed!", HttpStatus.OK);
+		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
 		
 		return response;
 	}
