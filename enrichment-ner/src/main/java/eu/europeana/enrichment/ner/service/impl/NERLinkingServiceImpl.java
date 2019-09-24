@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.DBpediaSpotlight;
@@ -16,6 +19,8 @@ import eu.europeana.enrichment.ner.service.NERLinkingService;
 
 public class NERLinkingServiceImpl implements NERLinkingService {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Resource(name = "europeanaEntityService")
 	EuropeanaEntityService europeanaEntityService;
 	@Resource(name = "wikidataService")
@@ -63,10 +68,11 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 					DBpediaSpotlight dbpediaSpotlight = new DBpediaSpotlight();
 					try {
 						DBpediaResponse response = dbpediaSpotlight.getDBpediaResponse(dbpediaUri);
-						if(response != null) {
-							for(String id : response.getWikidataUrls())
-								namedEntity.addDbpediaWikidataId(id);
+						if(response != null)
+						{
+							for(String id : response.getWikidataUrls()) namedEntity.addDbpediaWikidataId(id);
 						}
+							
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
