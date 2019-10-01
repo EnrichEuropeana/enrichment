@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
 
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -32,6 +36,8 @@ public class TranslationController extends BaseRest {
 	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
 
+	@Resource(name = "persistentItemEntityService")
+	PersistentItemEntityService persistentItemEntityService;
 	
 	/**
 	 * This method represents the /enrichment/translation/{story} end point,
@@ -131,10 +137,35 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			String translation = enrichmentTranslationService.translate(body, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			String translation;
 			
-			return response;
+			if(storyId.compareTo("all")==0 && itemId.compareTo("all")==0)
+			{
+				List<ItemEntity> allItems = persistentItemEntityService.getAllItemEntities();
+				for(ItemEntity item : allItems)
+				{
+					body.setStoryId(item.getStoryId());
+					body.setItemId(item.getItemId());
+					body.setTranslationTool(translationTool);
+					body.setType("description");
+					translation = enrichmentTranslationService.translate(body, true);
+					
+					body.setType("transcription");
+					translation = enrichmentTranslationService.translate(body, true);
+				}
+				
+				ResponseEntity<String> response = new ResponseEntity<String>("{result: Done!}", HttpStatus.OK);
+				return response;
+				
+			}
+			else
+			{
+				translation = enrichmentTranslationService.translate(body, true);
+				ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+				return response;
+			}
+			
+			
 	
 	}
 	

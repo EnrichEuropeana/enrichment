@@ -145,6 +145,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
 			}
 			
+			
+			if(originalText == null || originalText.isEmpty())
+				return "";
+				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
+
+			
 			/*
 			 * Check if story / storyItem already exist and
 			 * if there is a translation
@@ -164,10 +170,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				throw new HttpException(null, "The translation of the required property was not performed yet. Please invoke the POST method, using the same parameters first.", HttpStatus.PRECONDITION_REQUIRED);
 				
 			}
-			
-			if(originalText == null || originalText.isEmpty())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
-			
 			
 			TranslationEntity tmpTranslationEntity = new DBTranslationEntityImpl();
 			tmpTranslationEntity.setStoryEntity(dbStoryEntity);
