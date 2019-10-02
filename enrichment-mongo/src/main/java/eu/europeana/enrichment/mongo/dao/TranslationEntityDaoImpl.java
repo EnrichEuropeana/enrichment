@@ -81,7 +81,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			return null;
 		else{
 			DBTranslationEntityImpl dbEntity = result.get(0);
-			addItemEntity(dbEntity);
+			//addItemEntity(dbEntity);
 			return dbEntity;
 		}
 	}

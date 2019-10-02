@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -38,6 +42,11 @@ public class TranslationController extends BaseRest {
 
 	@Resource(name = "persistentItemEntityService")
 	PersistentItemEntityService persistentItemEntityService;
+	
+	@Resource(name = "persistentTranslationEntityService")
+	PersistentTranslationEntityService persistentTranslationEntityService;
+
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/**
 	 * This method represents the /enrichment/translation/{story} end point,
@@ -144,14 +153,38 @@ public class TranslationController extends BaseRest {
 				List<ItemEntity> allItems = persistentItemEntityService.getAllItemEntities();
 				for(ItemEntity item : allItems)
 				{
-					body.setStoryId(item.getStoryId());
-					body.setItemId(item.getItemId());
-					body.setTranslationTool(translationTool);
-					body.setType("description");
-					translation = enrichmentTranslationService.translate(body, true);
+					TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
+							findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, "en", "description");
+					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getDescription()!=null && !item.getDescription().isEmpty())
+					{
+						body.setStoryId(item.getStoryId());
+						body.setItemId(item.getItemId());
+						body.setTranslationTool(translationTool);
+						body.setType("description");
+						translation = enrichmentTranslationService.translate(body, true);
+					}
+					else
+					{
+						logger.info("The TranslationEntity (property:description) for storyId: " + item.getStoryId() + " and itemId: " + item.getItemId() + "already exists in the db.");
+					}
+
+					dbTranslationEntity = persistentTranslationEntityService.
+							findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, "en", "transcription");
+					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getTranscription()!=null && !item.getTranscription().isEmpty())
+					{
+						body.setStoryId(item.getStoryId());
+						body.setItemId(item.getItemId());
+						body.setTranslationTool(translationTool);
+						body.setType("transcription");
+						translation = enrichmentTranslationService.translate(body, true);
+					}
+					else
+					{
 					
-					body.setType("transcription");
-					translation = enrichmentTranslationService.translate(body, true);
+						logger.info("The TranslationEntity (property:transcription) for storyId: " + item.getStoryId() + " and itemId: " + item.getItemId() + "already exists in the db.");
+					
+					}
+						
 				}
 				
 				ResponseEntity<String> response = new ResponseEntity<String>("{result: Done!}", HttpStatus.OK);
