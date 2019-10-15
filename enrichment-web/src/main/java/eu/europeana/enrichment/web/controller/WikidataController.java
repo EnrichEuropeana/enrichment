@@ -61,7 +61,8 @@ public class WikidataController extends BaseRest {
      * @throws SolrNamedEntityServiceException
      */
 	
-	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity")
+	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
+			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677).")
 	@RequestMapping(value = "/enrichment/resolve", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -99,7 +100,10 @@ public class WikidataController extends BaseRest {
 	 * @throws SolrNamedEntityServiceException
 	 */
 	
-	@ApiOperation(value = "Get named entities from Solr", nickname = "getNamedEntitiesFromSolr")
+	@ApiOperation(value = "Get named entities from Solr", nickname = "getNamedEntitiesFromSolr", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
+			+ "based on the provided input parameters: \"query\"= query word to search for (e.g. London, Lond*, etc.), \"type\"= comma separated list used to indicate which entity types (i.e. place,person)"
+			+ " will be included in the result, \"qf\" = Solr specific query for filtering the results, \"sort\" = sorting criteria according to solr specifications, "
+			+ "\"pageSize\" = the number of results returned, if not provided defaults to 5, \"page\" = the results page, if not provided defaults to 0.")
 	@RequestMapping(value = "/enrichment/search", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNamedEntitiesFromSolr(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -126,7 +130,10 @@ public class WikidataController extends BaseRest {
 	} 
 	
 	
-	@ApiOperation(value = "Get places from Wikidata", nickname = "getPlacesFromWikidata")
+	@ApiOperation(value = "Get places from Wikidata", nickname = "getPlacesFromWikidata", notes = "This method retrives the wikidata places (including their wikidata ids, labels, etc.)"
+			+ "based on the provided input parameters: \"query\"= query word to search for (e.g. London, Lond*, etc.), \"type\"= entity type (i.e. \"place\"), "
+			+ "\"lang\" = the language filtration for the place labels and other multi-lingual fields, "
+			+ "\"pageSize\" = the number of results returned, if not provided defaults to 5, \"page\" = the results page, if not provided defaults to 0.")
 	@RequestMapping(value = "/enrichment/places", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getPlacesFromWikidata(
 			@RequestParam(value = "wskey", required = false) String wskey,

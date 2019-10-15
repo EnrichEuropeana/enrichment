@@ -42,7 +42,10 @@ public class AnnotationController extends BaseRest {
      * @throws Exception
      * @throws HttpException
      */
-	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollection")
+	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollection", notes = "This method retrieves the annotations of "
+			+ "stories or items, that are stored using the corresponding POST request (/enrichment/annotation/{storyId}/{itemId}). The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
+			+ " The parameter \"itemId\" further restricts retrieving the annotations related to the given story item. If \"itemId\" is set to \"all\", then all annotations"
+			+ " that belong to the given story are retrieved.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollection(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -106,7 +109,9 @@ public class AnnotationController extends BaseRest {
     * @throws HttpException
     */
 	
-	@ApiOperation(value = "Get annotation preview", nickname = "getAnnotation")
+	@ApiOperation(value = "Get annotation preview", nickname = "getAnnotation", notes = "This method retrieves the annotations of "
+			+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}/{itemId}"
+			+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotation(
 			@RequestParam(value = "wskey", required = false) String wskey,

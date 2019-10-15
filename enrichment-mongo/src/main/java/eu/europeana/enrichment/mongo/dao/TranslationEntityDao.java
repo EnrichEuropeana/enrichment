@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import eu.europeana.enrichment.model.TranslationEntity;
 
@@ -11,6 +10,7 @@ import eu.europeana.enrichment.model.TranslationEntity;
 public interface TranslationEntityDao {
 
 	public TranslationEntity findTranslationEntity(String key);
+	public List<TranslationEntity> findAllTranslationEntities();
 	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId, String tool, String language, String type);
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key);
 	//public List<TranslationEntity> getAllTranslationEntities();
