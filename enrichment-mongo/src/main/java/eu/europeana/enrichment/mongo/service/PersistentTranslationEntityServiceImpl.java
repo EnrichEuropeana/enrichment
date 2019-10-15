@@ -31,7 +31,7 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	@Override
 	public List<TranslationEntity> getAllTranslationEntities() {
 		// TODO Auto-generated method stub
-		return null;
+		return translationEntityDao.findAllTranslationEntities();
 	}
 
 	@Override

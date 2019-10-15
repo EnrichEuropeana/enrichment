@@ -2,6 +2,7 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -12,6 +13,7 @@ import org.mongodb.morphia.query.Query;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 
@@ -44,6 +46,24 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			return dbEntity;
 		}
 	}
+	
+	@Override
+	public List<TranslationEntity> findAllTranslationEntities() {
+		Query<DBTranslationEntityImpl> persistentTranslationEntities = datastore.createQuery(DBTranslationEntityImpl.class);		
+		List<DBTranslationEntityImpl> result = persistentTranslationEntities.asList();
+		if(result.size() == 0)
+			return null;
+		else
+		{
+			List<TranslationEntity> tmpResult = new ArrayList<>();
+			for(int index = result.size()-1; index >= 0; index--) {
+				TranslationEntity dbEntity = result.get(index);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
+	}
+
 	@Override
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
 		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);

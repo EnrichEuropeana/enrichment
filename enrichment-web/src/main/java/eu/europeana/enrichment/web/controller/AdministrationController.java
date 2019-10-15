@@ -55,7 +55,8 @@ public class AdministrationController extends BaseRest {
 	 * 
 	 * @return							"Done" if everything ok
 	 */
-	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson")
+	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson", notes = "This method reads the stories and items"
+			+ "from the given JSON files and saves them to the database. The files for reading the stories and items need to be specified as parameters to the request in the form of a proper full path to the files (e.g. C:/java/stories.json)")
 	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.POST} , produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
 			@RequestParam(value = "wskey", required = false) String wskey,
@@ -85,7 +86,19 @@ public class AdministrationController extends BaseRest {
 	 * 
 	 * @return							"Done" if everything ok
 	 */
-	@ApiOperation(value = "Upload StoryEntities to the database", nickname = "uploadStories")
+	@ApiOperation(value = "Upload StoryEntities to the database", nickname = "uploadStories", notes = "This method enables uploading a set of stories to the database"
+			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. Example: <br /> "
+			+ "[ <br />" + 
+			"  { <br />" + 
+			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
+			"  \"storyId\":\"1\", <br />" + 
+			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
+			"  \"description\":\"The story about Franz Joseph I Emperor\", <br />" + 
+			"  \"summary\":\"\", <br />" + 
+			"  \"language\":\"en\" <br /> " + 
+			"  } <br />" + 
+			"  ] <br />")
 	@RequestMapping(value = "/administration/uploadStories", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadStories(
@@ -115,7 +128,20 @@ public class AdministrationController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	
-	@ApiOperation(value = "Upload ItemEntities to the database", nickname = "uploadItems")
+	@ApiOperation(value = "Upload ItemEntities to the database", nickname = "uploadItems", notes = "This method enables uploading a set of items to the database"
+			+ "directly from the HTTP request, meaning that the item fields are specified as an array of JSON formatted objects directly in the request body. Example: <br /> "
+			+ "[ <br />" + 
+			"  { <br />" + 
+			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
+			"  \"storyId\":\"1\", <br />" + 
+			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
+			"  \"itemsId\":\"1\", <br />" + 
+			"  \"description\":\"The story about Franz Joseph I Emperor\", <br />" + 
+			"  \"type\":\"text\", <br />" + 
+			"  \"language\":\"en\" <br /> " + 
+			"  } <br />" + 
+			"  ] <br />")
 	@RequestMapping(value = "/administration/uploadItems", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadItems(
@@ -133,7 +159,19 @@ public class AdministrationController extends BaseRest {
 	
 	}
 	
-	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation")
+	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation", notes = "This method enables uploading already translated text of the story or item"
+			+ "to the database, by specifying the required translation fields directly in the request body. Example: <br /> "
+			+ "[ <br />" + 
+			"  { <br />" + 
+			"  \"originalText\":\"Franz Joseph I., Kaiser von Österreich, zusammen mit seiner Frau : Kaiserin Elisabeth von Österreich, Königin von Ungarn.\", <br />" +
+			"  \"translatedText\":\"Franz Joseph I, an Emperor of Austria, along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" +  
+			"  \"storyId\":\"1\", <br />" + 
+			"  \"itemsId\":\"1\", <br />" + 
+			"  \"tool\":\"Google\", (the tool used for the translation: Google or eTranslation) <br />" + 
+			"  \"type\":\"transcription\", (the corresponding part of the story or item that is translated: summary, description, transcription) <br />" + 
+			"  \"language\":\"en\" <br /> " + 
+			"  } <br />" + 
+			"  ] <br />")
 	@RequestMapping(value = "/administration/uploadTranslation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
@@ -160,7 +198,8 @@ public class AdministrationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation")
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
+			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
 	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getETranslation(
