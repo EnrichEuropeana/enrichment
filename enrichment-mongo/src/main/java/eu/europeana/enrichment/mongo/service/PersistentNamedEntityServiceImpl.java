@@ -24,6 +24,12 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	}
 
 	@Override
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {
+		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, translation);
+	}
+
+
+	@Override
 	public List<NamedEntity> getAllNamedEntities() {
 		return namedEntityDao.findAllNamedEntities();
 	}
@@ -46,9 +52,16 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	}
 	
 	@Override
+	public void deleteListNamedEntity(String storyId,String itemId, String fieldUsedForNER) {
+		namedEntityDao.deleteListNamedEntity(storyId,itemId,fieldUsedForNER);
+	}
+
+	
+	@Override
 	public void deleteAllNamedEntities() {
 		namedEntityDao.deleteAllNamedEntities();
 		
 	}
+
 
 }

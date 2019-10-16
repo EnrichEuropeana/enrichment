@@ -32,7 +32,9 @@ public class DBItemEntityImpl extends ItemEntityImpl{
 		setType(entity.getType());
 		setTranscription(entity.getTranscription());
 		setTitle(entity.getTitle());
-		setKey(entity.getKey());
+		setDescription(entity.getDescription());
+		setSource(entity.getSource());
+		//setKey(entity.getKey());
 		setStoryId(entity.getStoryId());
 	}
 	
