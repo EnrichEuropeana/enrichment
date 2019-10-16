@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;
@@ -143,10 +144,14 @@ public class PositionEntityImpl implements PositionEntity{
           
         // typecast pe to PositionEntity so that we can compare data members  
         PositionEntity pe_new = (PositionEntity) pe; 
-          
+        
+        Collections.sort(offsetsTranslatedText);
+        Collections.sort(pe_new.getOffsetsTranslatedText());
+        
         // Compare the data members and return accordingly  
         return pe_new.getStoryId().compareTo(storyId)==0
                 && pe_new.getItemId().compareTo(itemId)==0
+                && pe_new.getOffsetsTranslatedText().equals(offsetsTranslatedText) //compare the 2 lists including the order of elements, that is why we first sorted them
                 && pe_new.getFieldUsedForNER().compareTo(fieldUsedForNER)==0;
     } 
     

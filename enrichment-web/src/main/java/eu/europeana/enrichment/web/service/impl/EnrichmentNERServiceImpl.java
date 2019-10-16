@@ -192,17 +192,39 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		if(invalidLinkinParams.size() > 0)
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
+		
+		/*
+		 * This part from here down only executes for POST requests.
+		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
+		 */
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 		
-		//Named entities should also get the type where it was found
-		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
-		
+		List<String> allNERFieldTypes = new ArrayList<String>();
+		if(itemId == "all")
+		{
+			allNERFieldTypes.add(type);
+			//Named entities should also get the type where it was found
+			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
+
+		}
+		else
+		{
+			allNERFieldTypes.add("transcription");
+			allNERFieldTypes.add("description");
+			allNERFieldTypes.add("summary");
+			//Named entities should also get the type where it was found
+			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, false));
+
+		}
+	
 			
-		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued
-		boolean allNerToolsAnalysisComplete = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, tools, tmpNamedEntities);
+		int numberNERTools = tools.size();
+		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued, returned is the number of 
+		//ner tools for which the analysis is done
+		int numberNERToolsFound = checkAllNerToolsAlreadyCompleted(tools, tmpNamedEntities);
 		
 		//TODO: check if update is need (e.g.: linking tools)
-		if(tmpNamedEntities.size() > 0 && allNerToolsAnalysisComplete) {
+		if(tmpNamedEntities.size() > 0 && numberNERToolsFound > 0) {
 			//TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
 			for(int index = tmpNamedEntities.size()-1; index >=0; index--) {
 				NamedEntity tmpNamedEntity = tmpNamedEntities.get(index);
@@ -214,31 +236,15 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					classificationNamedEntities.add(tmpNamedEntity);
 				}
 			}
-			return resultMap;
 		}
-		if(!process) {
+		
+		if(!process || numberNERToolsFound==numberNERTools) {
 			//TODO: throw exception 404
 			//throw new HttpException("");
 			return resultMap;
 		}
 
 		
-		/*
-		 * This part from here down only executes for POST requests.
-		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
-		 */
-		
-		List<String> allNERFieldTypes = new ArrayList<String>();
-		if(itemId == "all")
-		{
-			allNERFieldTypes.add(type);
-		}
-		else
-		{
-			allNERFieldTypes.add("transcription");
-			allNERFieldTypes.add("description");
-			allNERFieldTypes.add("summary");
-		}
 		
 		for(String typeNERField : allNERFieldTypes)
 		{
@@ -302,82 +308,99 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				/*
 				 * Get all named entities
 				 */
-				TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(tools, textForNer, type, storyId, itemId, originalLanguage, dbTranslationEntity);
 				
-				/*
-				 * finding the positions of the entities in the original text using Solr 
-				 */			
-				//solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity,translationLanguage,text, tmpResult);
-				
-				for (String classificationType : tmpResult.keySet()) {
-					
-					List<NamedEntity> tmpClassificationList = new ArrayList<>();
+				for(String NERTool : tools)
+				{
 					/*
-					 * Check if already named entities exists from the previous story item
+					 * Here for each ner tool the analysis is done separately because different tools may find
+					 * the same entities on different positions in the text and we would like to separate those results,
+					 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
+					 * belong to which ner tool analyser.
 					 */
-					if(resultMap.containsKey(classificationType))
-						tmpClassificationList = resultMap.get(classificationType);
-					else
-						resultMap.put(classificationType, tmpClassificationList);
+					List<String> newNERTools = new ArrayList<String>();
+					newNERTools.add(NERTool);
 					
-					for (NamedEntity tmpNamedEntity : tmpResult.get(classificationType)) {
-						NamedEntity dbEntity;
-						/*
-						 * Check if named entity with the same label was found in the
-						 * previous story item or in the database
-						 */
-						List<NamedEntity> tmpResultNamedEntityList = tmpClassificationList.stream().
-								filter(x -> x.getKey().equals(tmpNamedEntity.getKey())).collect(Collectors.toList());
-						if(tmpResultNamedEntityList.size() > 0)
-							dbEntity = tmpResultNamedEntityList.get(0);
-						else
-							dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getKey());
+					TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(newNERTools, textForNer, type, storyId, itemId, originalLanguage, dbTranslationEntity);
 					
+					/*
+					 * finding the positions of the entities in the original text using Solr 
+					 */			
+					//solrEntityService.findEntitiyOffsetsInOriginalText(true, dbStoryEntity,translationLanguage,text, tmpResult);
+					
+					for (String classificationType : tmpResult.keySet()) {
 						
-						if(dbEntity != null) {
-							//check if there are new position entities to be added
-							int addPositionEntitiesCheck = 1;
-							for(PositionEntity pe : dbEntity.getPositionEntities())
-							{
-								if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+						List<NamedEntity> tmpClassificationList = new ArrayList<>();
+						/*
+						 * Check if already named entities exists from the previous story item
+						 */
+						if(resultMap.containsKey(classificationType))
+							tmpClassificationList = resultMap.get(classificationType);
+						else
+							resultMap.put(classificationType, tmpClassificationList);
+						
+						for (NamedEntity tmpNamedEntity : tmpResult.get(classificationType)) {
+							NamedEntity dbEntity;
+							/*
+							 * Check if named entity with the same label was found in the
+							 * previous story item or in the database
+							 */
+							List<NamedEntity> tmpResultNamedEntityList = tmpClassificationList.stream().
+									filter(x -> x.getKey().equals(tmpNamedEntity.getKey())).collect(Collectors.toList());
+							if(tmpResultNamedEntityList.size() > 0)
+								dbEntity = tmpResultNamedEntityList.get(0);
+							else
+								dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getKey());
+						
+							
+							if(dbEntity != null) {
+								//check if there are new position entities to be added
+								int addPositionEntitiesCheck = 1;
+								for(PositionEntity pe : dbEntity.getPositionEntities())
 								{
-									addPositionEntitiesCheck = 0;
-									break;
+									if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+									{
+										addPositionEntitiesCheck = 0;
+										/*
+										 * only if all fields of the position entities are the same including the positions in the translated text
+										 * 2 or more ner tools are added to the same position entity
+										 */
+										pe.getNERTools().add(NERTool);
+										break;
+									}
 								}
-							}
-							if(addPositionEntitiesCheck==1) dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
-							
-							
-							
-							for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
-								int tmpIndex = dbpediaIndex;
-								boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
-								if(!found){
-									dbEntity.addDBpediaId(tmpNamedEntity.getDBpediaIds().get(tmpIndex));
+								if(addPositionEntitiesCheck==1) dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+								
+								
+								
+								for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
+									int tmpIndex = dbpediaIndex;
+									boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
+									if(!found){
+										dbEntity.addDBpediaId(tmpNamedEntity.getDBpediaIds().get(tmpIndex));
+									}
 								}
+								
+						
+								
+								/*
+								 * Check if named entity is already at the TreeSet
+								 */
+								if(tmpResultNamedEntityList.size() == 0)
+									tmpClassificationList.add(dbEntity);
+							}
+							else {
+								dbEntity = tmpNamedEntity;
+								
+								tmpClassificationList.add(dbEntity);
 							}
 							
-					
 							
 							/*
-							 * Check if named entity is already at the TreeSet
+							 * Add linking information to named entity
 							 */
-							if(tmpResultNamedEntityList.size() == 0)
-								tmpClassificationList.add(dbEntity);
+							nerLinkingService.addLinkingInformation(dbEntity, linking, originalLanguage);
 						}
-						else {
-							dbEntity = tmpNamedEntity;
-							
-							tmpClassificationList.add(dbEntity);
-						}
-						
-						
-						/*
-						 * Add linking information to named entity
-						 */
-						nerLinkingService.addLinkingInformation(dbEntity, linking, originalLanguage);
 					}
-	
 				}
 			}
 		}
@@ -402,18 +425,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return resultMap;
 	}
 	
-	private boolean checkAllNerToolsAlreadyCompleted (String storyId, String itemId, String fieldForNER, List<String> tools, List<NamedEntity> tmpNamedEntities)
-	{
-		boolean allNerToolsAnalysisComplete = true;
+	/*
+	 * This function returns the number of NER-tools that are present in the found NamedEntities  
+	 */
+	private int checkAllNerToolsAlreadyCompleted (List<String> tools, List<NamedEntity> tmpNamedEntities)
+	{		
 		Set<String> nerToolsForStoryOrItem = new HashSet<String>();
 		for (NamedEntity ne : tmpNamedEntities)
 		{
 			for(PositionEntity pe : ne.getPositionEntities())
 			{
-				if(pe.getStoryId().compareTo(storyId)==0 && pe.getItemId().compareTo(itemId)==0 && pe.getFieldUsedForNER().compareTo(fieldForNER)==0)
-				{
-					nerToolsForStoryOrItem.addAll(pe.getNERTools());
-				}
+				
+				nerToolsForStoryOrItem.addAll(pe.getNERTools());
+				
 			}
 			
 		}
@@ -425,9 +449,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		
 		tools.removeAll(toolsToRemove);
-		if(!tools.isEmpty()) allNerToolsAnalysisComplete=false;
-
-		return allNerToolsAnalysisComplete;
+		
+		return toolsToRemove.size();
 	}
 	
 	private TreeMap<String, List<NamedEntity>> applyNERTools(List<String> tools, String text, String fieldUsedForNER,
@@ -622,7 +645,25 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			//some stories have html markup in the description 
 			String storyDescriptionText = parseHTMLWithJsoup(story.getDescription());
 			story.setDescription(storyDescriptionText);
-
+			
+			//comparing the new and the already existing story and deleting old NamedEntities if there are changes
+			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(story.getStoryId());
+			if (dbStoryEntity!=null)
+			{
+				if(dbStoryEntity.getDescription().compareTo(story.getDescription())!=0)
+				{
+					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "description");
+				}
+				if(dbStoryEntity.getSummary().compareTo(story.getSummary())!=0)
+				{
+					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "summary");
+				}
+				if(dbStoryEntity.getTranscription().compareTo(story.getTranscription())!=0)
+				{
+					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "transcription");
+				}				
+			}
+			
 			persistentStoryEntityService.saveStoryEntity(story);
 			
 		}
@@ -648,10 +689,28 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 			
 			
-			//remove html markup from the transcription text
+			//remove html markup from the transcription and decription texts
 			String itemTranscriptionText = parseHTMLWithJsoup(item.getTranscription());
 			item.setTranscription(itemTranscriptionText);
 			
+			String itemDescriptionText = parseHTMLWithJsoup(item.getDescription());
+			item.setDescription(itemDescriptionText);
+			
+			//comparing the new and the already existing item and deleting old NamedEntities if there are changes
+			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity(item.getItemId());			
+			if (dbItemEntity!=null)
+			{
+				if(dbItemEntity.getDescription().compareTo(item.getDescription())!=0)
+				{
+					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "description");
+				}
+				if(dbItemEntity.getTranscription().compareTo(item.getTranscription())!=0)
+				{
+					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
+				}				
+			}
+
+			persistentItemEntityService.saveItemEntity(item);
 			
 			//add item's transcription text to the story's transcription
 			if(item.getStoryId()!=null && item.getTranscription()!=null)
@@ -661,17 +720,22 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(dbStoryEntity!=null)
 				{
 					String storyTranscription = dbStoryEntity.getTranscription();
-					if(storyTranscription==null || !storyTranscription.contains(item.getTranscription()))
+					if(dbItemEntity==null)
 					{
-						storyTranscription += " " + item.getTranscription();				
-						dbStoryEntity.setTranscription(storyTranscription);
-						persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
+						storyTranscription += " " + item.getTranscription();
 					}
+					else
+					{
+						storyTranscription = storyTranscription.replace(dbItemEntity.getTranscription(), item.getTranscription());
+					}
+					
+					dbStoryEntity.setTranscription(storyTranscription);
+					persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
 				}
 				
 			}
 
-			persistentItemEntityService.saveItemEntity(item);
+			
 			
 		}
 		return "{\"info\": \"Done successfully!\"}";

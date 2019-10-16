@@ -114,6 +114,9 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 			dbItemEntity.setTranscription(entity.getTranscription());
 			dbItemEntity.setType(entity.getType());
 			dbItemEntity.setStoryId(entity.getStoryId());
+			dbItemEntity.setItemId(entity.getItemId());
+			dbItemEntity.setSource(entity.getSource());
+			dbItemEntity.setDescription(entity.getDescription());
 			this.datastore.save(dbItemEntity);
 		}
 		else

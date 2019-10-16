@@ -90,7 +90,7 @@ public class AdministrationController extends BaseRest {
 			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 
-			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"transcription\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
 			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
 			"  \"storyId\":\"1\", <br />" + 
 			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
@@ -129,10 +129,11 @@ public class AdministrationController extends BaseRest {
 	 */
 	
 	@ApiOperation(value = "Upload ItemEntities to the database", nickname = "uploadItems", notes = "This method enables uploading a set of items to the database"
-			+ "directly from the HTTP request, meaning that the item fields are specified as an array of JSON formatted objects directly in the request body. Example: <br /> "
+			+ "directly from the HTTP request, meaning that the item fields are specified as an array of JSON formatted objects directly in the request body. Please "
+			+ "note that to upload new items, a story with the given storyId must exist. Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 
-			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"transcription\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
 			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
 			"  \"storyId\":\"1\", <br />" + 
 			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
@@ -160,7 +161,8 @@ public class AdministrationController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation", notes = "This method enables uploading already translated text of the story or item"
-			+ "to the database, by specifying the required translation fields directly in the request body. Example: <br /> "
+			+ "to the database, by specifying the required translation fields directly in the request body. In case the translation of the given story or item does not exist in the system at all, "
+			+ "please first translate the story or item using the given translation API (i.e. either /enrichment/translation/{storyId}/{itemId} or /enrichment/translation/{storyId}). Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 
 			"  \"originalText\":\"Franz Joseph I., Kaiser von Österreich, zusammen mit seiner Frau : Kaiserin Elisabeth von Österreich, Königin von Ungarn.\", <br />" +

@@ -11,7 +11,7 @@ public class StoryEntityImpl implements StoryEntity {
 	private String description;
 	private String summary;
 	private String language;
-	private String transcriptionText;
+	private String transcription;
 	
 	
 	@Override
@@ -84,12 +84,12 @@ public class StoryEntityImpl implements StoryEntity {
 
 	@Override
 	public String getTranscription() {
-		return transcriptionText;
+		return transcription;
 	}
 
 	@Override
 	public void setTranscription(String storyTranscription) {
-		this.transcriptionText=storyTranscription;
+		this.transcription=storyTranscription;
 	}
 
 }

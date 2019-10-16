@@ -15,6 +15,8 @@ public interface PersistentNamedEntityService {
 	 */
 	public NamedEntity findNamedEntity(String key);
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation);
+
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation);
 	/*
 	 * This method retrieves all named entities from the Mongo database
 	 * 
@@ -49,5 +51,7 @@ public interface PersistentNamedEntityService {
 	 * Deletes all NamedEntities form the Mongo db
 	 */
 	public void deleteAllNamedEntities ();
+	
+	public void deleteListNamedEntity(String storyId,String itemId, String fieldUsedForNER);
 
 }

@@ -118,6 +118,33 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		return tmpResult;
 	}
 	
+	
+	@Override
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {
+		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
+		if(translation) {
+			persistentNamedEntities.disableValidation();
+			persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId);
+					
+		} else {
+			persistentNamedEntities.disableValidation().and(
+					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
+					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId)
+					);
+		}
+
+		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
+		List<NamedEntity> tmpResult = new ArrayList<>();
+		for(int index = result.size()-1; index >= 0; index--) {
+			NamedEntity dbEntity = result.get(index);
+			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
+			//addAdditonalInformation(dbEntity);
+			tmpResult.add(dbEntity);
+		}
+		return tmpResult;
+	}
+	
+
 
 
 	/*@Override
@@ -151,6 +178,17 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public void deleteAllNamedEntities() {
 		datastore.delete(datastore.find(DBNamedEntityImpl.class));		
+	}
+
+	@Override
+	public void deleteListNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
+		Query<DBNamedEntityImpl> persistentNamedEntitiesQuery = datastore.createQuery(DBNamedEntityImpl.class);
+		persistentNamedEntitiesQuery.disableValidation();
+		persistentNamedEntitiesQuery.filter("positionEntities.storyId", storyId);
+		persistentNamedEntitiesQuery.filter("positionEntities.itemId", itemId);
+		persistentNamedEntitiesQuery.filter("positionEntities.fieldUsedForNER", fieldUsedForNER);
+		datastore.delete(persistentNamedEntitiesQuery);
+		
 	}
 
 
