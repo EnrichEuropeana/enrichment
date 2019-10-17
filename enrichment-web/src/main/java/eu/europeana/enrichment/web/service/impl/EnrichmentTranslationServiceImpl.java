@@ -98,9 +98,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					//Reuse of StoryEntity text if original text is not given
 					if(originalText == null || originalText.isEmpty())
 					{
-						if(type.toLowerCase().equals("transcription") && !(dbStoryEntity.getTranscription() == null || dbStoryEntity.getTranscription().isEmpty())) {
+						if(type.toLowerCase().equals("transcription") && !(dbStoryEntity.getTranscriptionText() == null || dbStoryEntity.getTranscriptionText().isEmpty())) {
 							
-							originalText = dbStoryEntity.getTranscription();
+							originalText = dbStoryEntity.getTranscriptionText();
 						}
 						else if(type.toLowerCase().equals("summary") && !(dbStoryEntity.getSummary() == null || dbStoryEntity.getSummary().isEmpty())) {
 							
@@ -128,9 +128,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					//Reuse of ItemEntity text if original text is not given
 					if(originalText == null || originalText.isEmpty())
 					{
-						if(type.toLowerCase().equals("transcription") && !(dbItemEntity.getTranscription() == null || dbItemEntity.getTranscription().isEmpty())) {
+						if(type.toLowerCase().equals("transcription") && !(dbItemEntity.getTranscriptionText() == null || dbItemEntity.getTranscriptionText().isEmpty())) {
 							
-							originalText = dbItemEntity.getTranscription();
+							originalText = dbItemEntity.getTranscriptionText();
 						}
 						else if(type.toLowerCase().equals("description") && !(dbItemEntity.getDescription() == null || dbItemEntity.getDescription().isEmpty())) {
 							

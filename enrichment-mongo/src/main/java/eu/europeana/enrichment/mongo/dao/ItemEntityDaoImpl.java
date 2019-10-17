@@ -111,7 +111,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 		{
 			dbItemEntity.setLanguage(entity.getLanguage());
 			dbItemEntity.setTitle(entity.getTitle());
-			dbItemEntity.setTranscription(entity.getTranscription());
+			dbItemEntity.setTranscriptionText(entity.getTranscriptionText());
 			dbItemEntity.setType(entity.getType());
 			dbItemEntity.setStoryId(entity.getStoryId());
 			dbItemEntity.setItemId(entity.getItemId());

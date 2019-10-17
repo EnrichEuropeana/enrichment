@@ -46,7 +46,7 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 			dbStoryEntity.setSource(entity.getSource());
 			dbStoryEntity.setSummary(entity.getSummary());
 			dbStoryEntity.setTitle(entity.getTitle());
-			dbStoryEntity.setTranscription(entity.getTranscription());
+			dbStoryEntity.setTranscriptionText(entity.getTranscriptionText());
 			this.datastore.save(dbStoryEntity);
 		}
 		else

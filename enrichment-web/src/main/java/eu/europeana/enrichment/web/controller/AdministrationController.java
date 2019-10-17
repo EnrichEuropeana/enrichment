@@ -90,7 +90,7 @@ public class AdministrationController extends BaseRest {
 			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 
-			"  \"transcription\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
 			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
 			"  \"storyId\":\"1\", <br />" + 
 			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
@@ -133,7 +133,7 @@ public class AdministrationController extends BaseRest {
 			+ "note that to upload new items, a story with the given storyId must exist. Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 
-			"  \"transcription\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
+			"  \"transcriptionText\":\"Franz Joseph I was Emperor of Austria along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" + 
 			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
 			"  \"storyId\":\"1\", <br />" + 
 			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 

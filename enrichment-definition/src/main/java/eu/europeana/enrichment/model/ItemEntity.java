@@ -26,8 +26,8 @@ public interface ItemEntity {
 	void setLanguage(String language);
 	String getType();
 	void setType(String textType);
-	String getTranscription();
-	void setTranscription(String transcriptionText);
+	String getTranscriptionText();
+	void setTranscriptionText(String transcriptionText);
 	
 	String getDescription();
 	void setDescription(String descriptionText);

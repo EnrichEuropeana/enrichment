@@ -23,7 +23,7 @@ public class DBStoryEntityImpl extends StoryEntityImpl {
 		setDescription(entity.getDescription());
 		setSummary(entity.getSummary());
 		setLanguage(entity.getLanguage());
-		setTranscription(entity.getTranscription());
+		setTranscriptionText(entity.getTranscriptionText());
 	}
 	
 	@Override

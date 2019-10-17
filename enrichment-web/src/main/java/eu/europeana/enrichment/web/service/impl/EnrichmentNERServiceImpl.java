@@ -294,8 +294,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			else
 			{
-				if(tmpStoryEntity!=null) textForNer = tmpStoryEntity.getTranscription();
-				else textForNer = tmpItemEntity.getTranscription();
+				if(tmpStoryEntity!=null) textForNer = tmpStoryEntity.getTranscriptionText();
+				else textForNer = tmpItemEntity.getTranscriptionText();
 			}
 			
 			if(tmpStoryEntity!=null) originalLanguage=tmpStoryEntity.getLanguage();
@@ -663,7 +663,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "summary");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "summary");
 				}
-				if(dbStoryEntity.getTranscription().compareTo(story.getTranscription())!=0)
+				if(dbStoryEntity.getTranscriptionText().compareTo(story.getTranscriptionText())!=0)
 				{
 					someStoryPartChanged=true;
 					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "transcription");
@@ -692,7 +692,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_LANGUAGE, null);
 			if(item.getTitle() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TITLE, null);
-			if(item.getTranscription() == null)
+			if(item.getTranscriptionText() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_TRANSCRIPTION, null);
 			if(item.getItemId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_ITEM_ID, null);
@@ -702,8 +702,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			
 			//remove html markup from the transcription and decription texts
-			String itemTranscriptionText = parseHTMLWithJsoup(item.getTranscription());
-			item.setTranscription(itemTranscriptionText);
+			String itemTranscriptionText = parseHTMLWithJsoup(item.getTranscriptionText());
+			item.setTranscriptionText(itemTranscriptionText);
 			
 			String itemDescriptionText = parseHTMLWithJsoup(item.getDescription());
 			item.setDescription(itemDescriptionText);
@@ -719,7 +719,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "description");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), "description");
 				}
-				if(dbItemEntity.getTranscription().compareTo(item.getTranscription())!=0)
+				if(dbItemEntity.getTranscriptionText().compareTo(item.getTranscriptionText())!=0)
 				{
 					someItemPartChanged = true;
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
@@ -735,23 +735,23 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			persistentItemEntityService.saveItemEntity(item);
 			
 			//add item's transcription text to the story's transcription
-			if(item.getStoryId()!=null && item.getTranscription()!=null)
+			if(item.getStoryId()!=null && item.getTranscriptionText()!=null)
 			{
 				StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(item.getStoryId());
 			
 				if(dbStoryEntity!=null)
 				{
-					String storyTranscription = dbStoryEntity.getTranscription();
+					String storyTranscription = dbStoryEntity.getTranscriptionText();
 					if(dbItemEntity==null)
 					{
-						storyTranscription += " " + item.getTranscription();
+						storyTranscription += " " + item.getTranscriptionText();
 					}
 					else
 					{
-						storyTranscription = storyTranscription.replace(dbItemEntity.getTranscription(), item.getTranscription());
+						storyTranscription = storyTranscription.replace(dbItemEntity.getTranscriptionText(), item.getTranscriptionText());
 					}
 					
-					dbStoryEntity.setTranscription(storyTranscription);
+					dbStoryEntity.setTranscriptionText(storyTranscription);
 					persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
 				}
 				
@@ -823,7 +823,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				newStoryEntity.setStoryId("");
 				newStoryEntity.setLanguage("");
 				newStoryEntity.setSummary("");
-				newStoryEntity.setTranscription("");
+				newStoryEntity.setTranscriptionText("");
 				newStoryEntity.setLanguage(storyLanguage);
 				
 				if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
@@ -871,7 +871,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					newItemEntity.setStoryId("");
 					newItemEntity.setLanguage("");
 					newItemEntity.setDescription("");
-					newItemEntity.setTranscription("");	
+					newItemEntity.setTranscriptionText("");	
 					newItemEntity.setType("");	
 					newItemEntity.setItemId("");
 					newItemEntity.setSource("");
@@ -879,7 +879,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					
 					if(items.get(i).get("title")!=null) newItemEntity.setTitle((String) items.get(i).get("title"));
 					if(items.get(i).get("story_id")!=null) newItemEntity.setStoryId((String) items.get(i).get("story_id"));
-					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscription((String) items.get(i).get("transcription"));
+					if(items.get(i).get("transcription")!=null) newItemEntity.setTranscriptionText((String) items.get(i).get("transcription"));
 					if(items.get(i).get("description")!=null) newItemEntity.setDescription((String) items.get(i).get("description"));
 					if(items.get(i).get("source")!=null) newItemEntity.setSource((String) items.get(i).get("source"));
 					

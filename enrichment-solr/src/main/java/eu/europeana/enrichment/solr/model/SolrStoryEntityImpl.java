@@ -10,7 +10,7 @@ public class SolrStoryEntityImpl extends DBStoryEntityImpl implements StoryEntit
 
 	public SolrStoryEntityImpl (StoryEntity copy) {
 		this.setStoryId(copy.getStoryId());
-		this.setTranscription(copy.getTranscription());
+		this.setTranscriptionText(copy.getTranscriptionText());
 		this.setDescription(copy.getDescription());
 		this.setSummary(copy.getSummary());
 		this.setSource(copy.getSource());
@@ -40,8 +40,8 @@ public class SolrStoryEntityImpl extends DBStoryEntityImpl implements StoryEntit
 	
 	@Override
 	@Field(StoryEntitySolrFields.TRANSCRIPTION)
-	public void setTranscription(String text) {
-		super.setTranscription(text);
+	public void setTranscriptionText(String text) {
+		super.setTranscriptionText(text);
 	}
 	
 	@Override
