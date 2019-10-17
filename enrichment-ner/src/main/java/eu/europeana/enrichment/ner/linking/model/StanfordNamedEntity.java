@@ -14,8 +14,8 @@ public class StanfordNamedEntity extends NamedEntityImpl {
 		super.setType(classificationtype);
 	}
 	
-	public void setKey(String key) {
-		super.setKey(key);
+	public void setLabel(String key) {
+		super.setLabel(key);
 	}
 	
 	public void setPositionEntities(List<PositionEntity> positions) {

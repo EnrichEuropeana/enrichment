@@ -50,4 +50,6 @@ public interface PersistentTranslationEntityService {
 	 */
 	public void deleteTranslationEntity(TranslationEntity entity);
 	
+	public void deleteTranslationEntity(String storyId,String itemId, String type);
+	
 }

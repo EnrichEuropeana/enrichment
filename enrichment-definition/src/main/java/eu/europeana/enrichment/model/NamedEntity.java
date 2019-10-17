@@ -16,8 +16,8 @@ public interface NamedEntity {
 	/*
 	 * Named entity label (e.g. Vienna, Max Mustermann, ..)
 	 */
-	String getKey();
-	void setKey(String key);
+	String getLabel();
+	void setLabel(String key);
 	/*
 	 * Named entity position at the original text
 	 */

@@ -19,8 +19,8 @@ public class SolrNamedEntityImpl extends DBNamedEntityImpl implements NamedEntit
 
 	@Override
 	@Field(NamedEntitySolrFields.KEY)
-	public void setKey(String key) {
-		super.setKey(key);
+	public void setLabel(String key) {
+		super.setLabel(key);
 	}
 
 	@Override

@@ -15,8 +15,8 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	NamedEntityDaoImpl namedEntityDao;
 	
 	@Override
-	public NamedEntity findNamedEntity(String key) {
-		return namedEntityDao.findNamedEntity(key);
+	public NamedEntity findNamedEntity(String label) {
+		return namedEntityDao.findNamedEntity(label);
 	}
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {

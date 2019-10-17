@@ -49,10 +49,10 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			/*
 			 * Agents with only first name or last name will not be searched
 			 */
-			if((namedEntity.getType() == NERClassification.AGENT.toString() && namedEntity.getKey().split(" ").length > 1) ||
+			if((namedEntity.getType() == NERClassification.AGENT.toString() && namedEntity.getLabel().split(" ").length > 1) ||
 					namedEntity.getType() != NERClassification.AGENT.toString())
 			{
-				List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getKey(), "all", "en");//classification);
+				List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getLabel(), "all", "en");//classification);
 				if(europeanaIDs != null && europeanaIDs.size() > 0) {
 					for(String europeanaID : europeanaIDs) {
 						namedEntity.addEuopeanaId(europeanaID);
@@ -85,15 +85,15 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			if(namedEntity.getWikidataIds().size() == 0) {
 				//TODO: implement information retrieval from Wikidata
 				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
-					String namedEntityKey = namedEntity.getKey();
+					String namedEntityKey = namedEntity.getLabel();
 					/*
 					 * Agents with only first name or last name will not be searched
 					 */
 					if(namedEntityKey.split(" ").length > 1)
-						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getKey(), "en");
+						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), "en");
 				}
 				else if(namedEntity.getType().equals(NERClassification.PLACE.toString()))
-					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getKey(), sourceLanguage);
+					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
 			}
 			
 			if(namedEntity.getPreferredWikidataIds().size() == 0) {

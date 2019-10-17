@@ -87,12 +87,17 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 
 	@Override
-	public void storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
+	public int storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
 		WikidataEntity entity = wikidataService.getWikidataEntityUsingLocalCache(wikidataURL, type);
 
-		store(solrCore, entity, true);
+		if(entity!=null)
+		{
+			store(solrCore, entity, true);
+			return 1;
+		}
 		
+		return 0;
 	}
 	
 	@Override
@@ -212,35 +217,58 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public String searchByWikidataURL_usingJackson(String wikidataURL) throws SolrNamedEntityServiceException, IOException {
+	public String searchByWikidataURL_usingJackson(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
 		SolrQuery query = new SolrQuery();
 		
 		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
 		
-	    QueryResponse rsp = null;
-		try {
-			rsp = solrBaseClientService.query(solrCore, query);
-		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw e;
+		
+		SolrDocumentList docList;
+		DocumentObjectBinder binder;
+		
+		//try to fetch the wikidata entity if there is not one in solr
+		while(true)
+		{
+		    QueryResponse rsp = null;
+			try {
+				rsp = solrBaseClientService.query(solrCore, query);
+			} catch (SolrNamedEntityServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw e;
+			}
+	
+			//ResultSet<T> resultSet = new ResultSet<>();		
+			binder = new DocumentObjectBinder();
+			docList = rsp.getResults();
+			
+			if(docList.size()==0)
+			{
+				if(storeWikidataFromURL(wikidataURL,type)==0) break;
+			}
+			else
+			{
+				break;
+			}
 		}
 
-		//ResultSet<T> resultSet = new ResultSet<>();		
-		DocumentObjectBinder binder = new DocumentObjectBinder();
-		SolrDocumentList docList = rsp.getResults();
-		String type;
 		
-		
-		if(docList.size() != 1)
+		if(docList.size() > 1)
 		{
 			log.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
 			return null;
 		}
+		else if(docList.size() == 0)
+		{
+			log.error("There are heither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			return null;
+		}
 		
 		SolrDocument doc = docList.get(0);		
-		type = (String) doc.get(EntitySolrFields.INTERNAL_TYPE);
+		//String type = (String) doc.get(EntitySolrFields.INTERNAL_TYPE);
+		
+		
 		//entityClass = (Class<T>) EntityObjectFactory.getInstance().getClassForType(type);
 		/*
 		 * TODO: create a class of types as in the entity-api EntityTypes and check there for the 

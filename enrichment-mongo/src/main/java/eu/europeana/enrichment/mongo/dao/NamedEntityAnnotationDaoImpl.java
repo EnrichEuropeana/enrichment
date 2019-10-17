@@ -10,6 +10,7 @@ import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.mongo.model.DBNamedEntityAnnotationImpl;
+import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 
 public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 
@@ -106,6 +107,16 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	public void deleteNamedEntityAnnotationById(String id) {
 		datastore.delete(datastore.find(DBNamedEntityAnnotationImpl.class).filter("id", id));		
 	}
+	
+	@Override
+	public void deleteNamedEntityAnnotation(String storyId, String itemId) {
+		Query<DBNamedEntityAnnotationImpl> persistentNamedEntitiesAnnotationQuery = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
+		persistentNamedEntitiesAnnotationQuery.disableValidation();
+		persistentNamedEntitiesAnnotationQuery.filter("storyId", storyId);
+		persistentNamedEntitiesAnnotationQuery.filter("itemId", itemId);
+		datastore.delete(persistentNamedEntitiesAnnotationQuery);		
+	}
+
 
 	@Override
 	public void deleteAllNamedEntityAnnotation() {

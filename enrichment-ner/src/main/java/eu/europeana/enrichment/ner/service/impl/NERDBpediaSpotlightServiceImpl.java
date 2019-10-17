@@ -149,7 +149,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		
 		NamedEntity alreadyExistNamedEntity = null;
 		for(int index = 0; index < tmp.size(); index++) {
-			if(tmp.get(index).getKey().equals(namedEntity.getKey())) {
+			if(tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
 				alreadyExistNamedEntity = tmp.get(index);
 				break;
 			}

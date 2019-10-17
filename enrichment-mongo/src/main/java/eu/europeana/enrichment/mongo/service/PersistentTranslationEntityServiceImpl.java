@@ -51,4 +51,9 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 		translationEntityDao.deleteTranslationEntity(entity);
 	}
 
+	@Override
+	public void deleteTranslationEntity(String storyId,String itemId, String type) {
+		translationEntityDao.deleteTranslationEntity(storyId,itemId,type);
+	}
+
 }
