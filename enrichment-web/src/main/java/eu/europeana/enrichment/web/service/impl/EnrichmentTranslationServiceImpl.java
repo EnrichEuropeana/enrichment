@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.springframework.http.HttpStatus;
 
@@ -37,6 +39,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	TranslationService googleTranslationService;
 	@Resource(name = "eTranslationService")
 	TranslationService eTranslationService;
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * Defining the available tools for translation
@@ -147,10 +151,13 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			
 			
 			if(originalText == null || originalText.isEmpty())
+			{
+				logger.info("The original text is empty or null");
 				return "";
+			}
 				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 
-			
+			logger.info("The original text is NOT empty or null.");
 			/*
 			 * Check if story / storyItem already exist and
 			 * if there is a translation
@@ -197,6 +204,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			case eTranslationToolName:
 				if(sendRequest) {
 					List<String> textArray = textSplitter(originalText);
+					logger.info("Callling eTranslation translateText method.");
 					returnValue = eTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
 				}
 				//tmpTranslationEntity.setKey(returnValue);

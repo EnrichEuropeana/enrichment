@@ -256,6 +256,12 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	{
 		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" .");
 		
+		if(translatedText==null)
+		{
+			logger.info("eTranslation obtained translated text: null");
+			createdRequests.put(externalReference, "-");
+		}
+		
 		if(createdRequests.containsKey(externalReference))
 		{	
 			String URLDecodedTranslatedText = "";
