@@ -232,7 +232,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(!resultMap.containsKey(classificationType))
 					resultMap.put(classificationType, new ArrayList<>());
 				List<NamedEntity> classificationNamedEntities = resultMap.get(classificationType);
-				if(!classificationNamedEntities.stream().anyMatch(x -> x.getKey().equals(tmpNamedEntity.getKey()))) {
+				if(!classificationNamedEntities.stream().anyMatch(x -> x.getLabel().equals(tmpNamedEntity.getLabel()))) {
 					classificationNamedEntities.add(tmpNamedEntity);
 				}
 			}
@@ -345,11 +345,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 							 * previous story item or in the database
 							 */
 							List<NamedEntity> tmpResultNamedEntityList = tmpClassificationList.stream().
-									filter(x -> x.getKey().equals(tmpNamedEntity.getKey())).collect(Collectors.toList());
+									filter(x -> x.getLabel().equals(tmpNamedEntity.getLabel())).collect(Collectors.toList());
 							if(tmpResultNamedEntityList.size() > 0)
 								dbEntity = tmpResultNamedEntityList.get(0);
 							else
-								dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getKey());
+								dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel());
 						
 							
 							if(dbEntity != null) {
@@ -527,7 +527,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				NamedEntity tmpNamedEntity = tmpCategoryValues.get(index);
 				boolean foundNamedEntityInPreviousResults = false;
 				for(int resultIndex = 0; resultIndex < endResultCategoryValues.size(); resultIndex++) {
-					if(endResultCategoryValues.get(resultIndex).getKey().equals(tmpNamedEntity.getKey())) {
+					if(endResultCategoryValues.get(resultIndex).getLabel().equals(tmpNamedEntity.getLabel())) {
 						NamedEntity resultNamedEntity = endResultCategoryValues.get(resultIndex);
 						PositionEntity pos = resultNamedEntity.getPositionEntities().get(0);
 						pos.setStoryId(storyId);
@@ -646,22 +646,34 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			String storyDescriptionText = parseHTMLWithJsoup(story.getDescription());
 			story.setDescription(storyDescriptionText);
 			
-			//comparing the new and the already existing story and deleting old NamedEntities if there are changes
+			//comparing the new and the already existing story and deleting old NamedEntities, TranslationEntities and NamedEntityAnnotations if there are changes
 			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(story.getStoryId());
 			if (dbStoryEntity!=null)
 			{
+				boolean someStoryPartChanged = false;
 				if(dbStoryEntity.getDescription().compareTo(story.getDescription())!=0)
 				{
+					someStoryPartChanged=true;
 					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "description");
+					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "description");
 				}
 				if(dbStoryEntity.getSummary().compareTo(story.getSummary())!=0)
 				{
+					someStoryPartChanged=true;
 					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "summary");
+					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "summary");
 				}
 				if(dbStoryEntity.getTranscription().compareTo(story.getTranscription())!=0)
 				{
+					someStoryPartChanged=true;
 					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "transcription");
-				}				
+					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "transcription");
+				}		
+				
+				if(someStoryPartChanged)
+				{
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), "all");
+				}
 			}
 			
 			persistentStoryEntityService.saveStoryEntity(story);
@@ -700,14 +712,24 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity(item.getItemId());			
 			if (dbItemEntity!=null)
 			{
+				boolean someItemPartChanged = false;
 				if(dbItemEntity.getDescription().compareTo(item.getDescription())!=0)
 				{
+					someItemPartChanged = true;
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "description");
+					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), "description");
 				}
 				if(dbItemEntity.getTranscription().compareTo(item.getTranscription())!=0)
 				{
+					someItemPartChanged = true;
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
-				}				
+					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId() , "transcription");
+				}		
+				
+				if(someItemPartChanged)
+				{
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId());
+				}
 			}
 
 			persistentItemEntityService.saveItemEntity(item);
@@ -1028,7 +1050,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				//in case of annotations for a specific item take into account additionally all named entities labels found by Stanford_NER
 				if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
 				{
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getKey(), source); 
+					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source); 
 					namedEntityAnnoList.add(tmpNamedEntityAnnotation);
 					
 					//saving the entity to the db

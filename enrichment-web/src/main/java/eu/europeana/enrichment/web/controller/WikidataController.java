@@ -62,17 +62,18 @@ public class WikidataController extends BaseRest {
      */
 	
 	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
-			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677).")
+			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677) and its type (agent or place) from the Solr local storage.")
 	@RequestMapping(value = "/enrichment/resolve", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestParam(value = "wikidataId", required = true) String wikidataId) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wikidataId", required = true) String wikidataId,
+			@RequestParam(value = "type", required = true) String type) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
 			//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
-			String solrResponse = solrWikidataEntityService.searchByWikidataURL_usingJackson(wikidataId);
+			String solrResponse = solrWikidataEntityService.searchByWikidataURL_usingJackson(wikidataId,type);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
 					

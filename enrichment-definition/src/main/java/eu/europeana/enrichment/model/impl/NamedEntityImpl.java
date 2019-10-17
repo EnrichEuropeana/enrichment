@@ -10,7 +10,7 @@ import eu.europeana.enrichment.model.PositionEntity;
 public class NamedEntityImpl implements NamedEntity{
 
 	protected String type;
-	protected String key;
+	protected String label;
 	protected List<String> europeanaIds;
 	protected List<String> wikidataIds;
 	protected List<String> dbpediaIds;
@@ -26,11 +26,11 @@ public class NamedEntityImpl implements NamedEntity{
 	
 	public NamedEntityImpl(String key) {
 		init();
-		this.key = key;
+		this.label = key;
 	}
 	
 	void init() {
-		key = "";
+		label = "";
 		positionEntities = new ArrayList<>();
 		europeanaIds = new ArrayList<>();
 		wikidataIds = new ArrayList<>();
@@ -48,7 +48,7 @@ public class NamedEntityImpl implements NamedEntity{
 	
 	@Override
 	public String toString() {
-		return key;
+		return label;
 	}
 	@Override
 	public String getType() {
@@ -59,12 +59,12 @@ public class NamedEntityImpl implements NamedEntity{
 		this.type = classificationtype;
 	}
 	@Override
-	public String getKey() {
-		return key;
+	public String getLabel() {
+		return label;
 	}
 	@Override
-	public void setKey(String key) {
-		this.key = key;
+	public void setLabel(String key) {
+		this.label = key;
 	}
 
 	@Override

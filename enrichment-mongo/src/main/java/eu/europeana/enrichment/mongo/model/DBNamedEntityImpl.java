@@ -19,7 +19,7 @@ public class DBNamedEntityImpl extends NamedEntityImpl{
 	public DBNamedEntityImpl(NamedEntity entity) {
 		super();
 		setType(entity.getType());
-		setKey(entity.getKey());
+		setLabel(entity.getLabel());
 		setEuropeanaIds(entity.getEuropeanaIds());
 		setWikidataIds(entity.getWikidataIds());
 		setDbpediaWikidataIds(entity.getDbpediaWikidataIds());

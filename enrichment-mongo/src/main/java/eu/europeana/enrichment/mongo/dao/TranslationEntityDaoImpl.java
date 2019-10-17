@@ -132,6 +132,18 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	public void deleteTranslationEntityByKey(String key) {
 		datastore.delete(datastore.find(DBTranslationEntityImpl.class).filter("key", key));
 	}
+	
+	@Override
+	public void deleteTranslationEntity(String storyId, String itemId, String type) {
+		Query<DBTranslationEntityImpl> persistentTranslationEntitiesQuery = datastore.createQuery(DBTranslationEntityImpl.class);
+		persistentTranslationEntitiesQuery.disableValidation();
+		persistentTranslationEntitiesQuery.filter("storyId", storyId);
+		persistentTranslationEntitiesQuery.filter("itemId", itemId);
+		persistentTranslationEntitiesQuery.filter("type", type);
+		datastore.delete(persistentTranslationEntitiesQuery);
+		
+	}
+
 
 	
 

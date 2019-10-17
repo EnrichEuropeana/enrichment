@@ -19,8 +19,8 @@ public class StanfordNamedEntityImpl extends NamedEntityImpl {
 
 	@JsonSetter("key")
 	@Override
-	public void setKey(String key) {
-		this.key = key;
+	public void setLabel(String key) {
+		this.label = key;
 	}
 	
 	

@@ -17,5 +17,6 @@ public interface TranslationEntityDao {
 	public void saveTranslationEntity(TranslationEntity entity) throws Exception;
 	public void deleteTranslationEntity(TranslationEntity entity);
 	public void deleteTranslationEntityByKey(String key);
+	public void deleteTranslationEntity(String storyId, String itemId, String type);
 	
 }

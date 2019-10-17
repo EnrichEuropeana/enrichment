@@ -57,9 +57,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 	
 	@Override
-	public NamedEntity findNamedEntity(String key) {
+	public NamedEntity findNamedEntity(String label) {
 		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
-		persistentNamedEntities.field("key").equal(key);
+		persistentNamedEntities.field("label").equal(label);
 		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
 		if(result.size() == 0)
 			return null;
@@ -167,12 +167,12 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void deleteNamedEntity(NamedEntity entity) {
-		deleteNamedEntityByKey(entity.getKey());
+		deleteNamedEntityByKey(entity.getLabel());
 	}
 
 	@Override
-	public void deleteNamedEntityByKey(String key) {
-		datastore.delete(datastore.find(DBNamedEntityImpl.class).filter("key", key));
+	public void deleteNamedEntityByKey(String label) {
+		datastore.delete(datastore.find(DBNamedEntityImpl.class).filter("label", label));
 	}
 
 	@Override

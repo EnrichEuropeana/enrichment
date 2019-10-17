@@ -41,5 +41,12 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 		
 		namedEntityAnnotationDao.deleteNamedEntityAnnotationById(id);		
 	}
+	
+	@Override
+	public void deleteNamedEntityAnnotation(String storyId,String itemId) {
+		namedEntityAnnotationDao.deleteNamedEntityAnnotation(storyId,itemId);
+	}
+
+
 
 }

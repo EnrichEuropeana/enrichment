@@ -97,7 +97,7 @@ public interface NERService {
 				posEntity = positions.get(0);
 			}
 		}
-		String entityKey = namedEntity.getKey();
+		String entityKey = namedEntity.getLabel();
 		int index = text.indexOf(entityKey);
 		while(index >= 0) {
 			posEntity.addOfssetsTranslatedText(index);

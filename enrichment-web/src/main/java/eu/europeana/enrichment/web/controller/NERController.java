@@ -57,11 +57,11 @@ public class NERController extends BaseRest {
 	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
-			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -89,11 +89,11 @@ public class NERController extends BaseRest {
 	public ResponseEntity<String> getEntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
-			@RequestParam(value = "translationTool", required = false) String translationTool,
+			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -128,9 +128,9 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
-			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -159,9 +159,9 @@ public class NERController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
