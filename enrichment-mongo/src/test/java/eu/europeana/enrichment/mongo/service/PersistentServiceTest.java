@@ -58,7 +58,7 @@ public class PersistentServiceTest {
 			tmpItemEntity.setLanguage("de");
 			tmpItemEntity.setType("test");
 			tmpItemEntity.setKey("test");
-			tmpItemEntity.setTranscription("test");
+			tmpItemEntity.setTranscriptionText("test");
 			persistentItemEntityService.saveItemEntity(tmpItemEntity);
 			
 			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("testStoryItem");
@@ -138,7 +138,7 @@ public class PersistentServiceTest {
 			tmpItemEntity.setLanguage("de");
 			tmpItemEntity.setType("test");
 			tmpItemEntity.setKey(testText);
-			tmpItemEntity.setTranscription(testText);
+			tmpItemEntity.setTranscriptionText(testText);
 			persistentItemEntityService.saveItemEntity(tmpItemEntity);
 			
 			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity("testStoryItem2");

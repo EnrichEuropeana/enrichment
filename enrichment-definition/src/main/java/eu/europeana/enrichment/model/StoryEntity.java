@@ -28,7 +28,7 @@ public interface StoryEntity {
 	String getLanguage();
 	void setLanguage(String storyLanguage);
 
-	String getTranscription();
-	void setTranscription(String storyTranscription);
+	String getTranscriptionText();
+	void setTranscriptionText(String storyTranscription);
 	
 }

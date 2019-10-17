@@ -13,7 +13,7 @@ public class ItemEntityImpl implements ItemEntity{
 	private String itemId;
 	private String language;
 	private String type;
-	private String transcription;
+	private String transcriptionText;
 	private String description;
 	private String hashKey;
 	private String storyId;
@@ -61,13 +61,13 @@ public class ItemEntityImpl implements ItemEntity{
 	}
 
 	@Override
-	public String getTranscription() {
-		return transcription;
+	public String getTranscriptionText() {
+		return transcriptionText;
 	}
 
 	@Override
-	public void setTranscription(String transcriptionText) {
-		this.transcription = transcriptionText;
+	public void setTranscriptionText(String transcriptionText) {
+		this.transcriptionText = transcriptionText;
 	}
 	@Override
 	public String getKey() {

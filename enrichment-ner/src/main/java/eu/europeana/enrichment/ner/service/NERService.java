@@ -56,7 +56,7 @@ public interface NERService {
 		
 		String text;
 		if(storyEntity != null)
-			text = storyEntity.getTranscription();
+			text = storyEntity.getTranscriptionText();
 		else if(translationEntity != null)
 			text = translationEntity.getTranslatedText();
 		else {

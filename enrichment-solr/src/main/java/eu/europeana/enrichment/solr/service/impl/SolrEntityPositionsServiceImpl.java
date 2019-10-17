@@ -925,7 +925,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 */
 		store(solrCore, dbStoryEntity, true);
 		
-		storyOriginalText=dbStoryEntity.getTranscription();
+		storyOriginalText=dbStoryEntity.getTranscriptionText();
 		storyTranslatedText=translatedText;
 		storyOriginalLanguage=dbStoryEntity.getLanguage();
 		storyTranslatedLanguage=targetLanguage;

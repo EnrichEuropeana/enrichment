@@ -12,7 +12,7 @@ public class SolrItemEntityImpl extends DBItemEntityImpl implements ItemEntity {
 		this.setStoryId(copy.getStoryId());
 		this.setItemId(copy.getItemId());
 		this.setLanguage(copy.getLanguage());
-		this.setTranscription(copy.getTranscription());
+		this.setTranscriptionText(copy.getTranscriptionText());
 		this.setDescription(copy.getDescription());
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
@@ -40,8 +40,8 @@ public class SolrItemEntityImpl extends DBItemEntityImpl implements ItemEntity {
 	
 	@Override
 	@Field(ItemEntitySolrFields.TRANSCRIPTION)
-	public void setTranscription(String text) {
-		super.setTranscription(text);
+	public void setTranscriptionText(String text) {
+		super.setTranscriptionText(text);
 	}
 	
 	@Override

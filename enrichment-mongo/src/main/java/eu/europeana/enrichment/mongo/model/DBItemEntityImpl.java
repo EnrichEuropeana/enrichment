@@ -30,7 +30,7 @@ public class DBItemEntityImpl extends ItemEntityImpl{
 		setItemId(entity.getItemId());
 		setLanguage(entity.getLanguage());
 		setType(entity.getType());
-		setTranscription(entity.getTranscription());
+		setTranscriptionText(entity.getTranscriptionText());
 		setTitle(entity.getTitle());
 		setDescription(entity.getDescription());
 		setSource(entity.getSource());

@@ -172,7 +172,7 @@ public class TranslationController extends BaseRest {
 
 					dbTranslationEntity = persistentTranslationEntityService.
 							findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, "en", "transcription");
-					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getTranscription()!=null && !item.getTranscription().isEmpty())
+					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getTranscriptionText()!=null && !item.getTranscriptionText().isEmpty())
 					{
 						body.setStoryId(item.getStoryId());
 						body.setItemId(item.getItemId());

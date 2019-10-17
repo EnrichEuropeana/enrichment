@@ -65,7 +65,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			String requesterCallback, String errorCallback, String emailDestination) throws Exception {
 		readCredentialFile(credentialFilePath);
 		this.domain = domain;
-		this.requesterCallback = requesterCallback;
+		//this.requesterCallback = requesterCallback;
 		this.errorCallback = errorCallback;
 		this.emailDestination = emailDestination;
 	}
