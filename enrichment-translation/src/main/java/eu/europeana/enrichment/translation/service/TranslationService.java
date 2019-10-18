@@ -34,5 +34,5 @@ public interface TranslationService {
 	 * @param externalReference
 	 * @throws UnsupportedEncodingException 
 	 */
-	void eTranslationResponse(String targetLanguage, String translatedText, String requestId, String externalReference) throws UnsupportedEncodingException;
+	void eTranslationResponse(String targetLanguage, String translatedText, String requestId, String externalReference, String body) throws UnsupportedEncodingException;
 }

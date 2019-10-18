@@ -107,7 +107,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		
 		//TODO: handle textArray with more then one request
 		String contentBody = createTranslationBodyForDirectCallback(textArray.get(0), sourceLanguage, externalReference);
-		//String contentBody =  createTranslationBody (text, sourceLanguage);
+		//String contentBody =  createTranslationBody (textArray.get(0), sourceLanguage);
+		
+		
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);
 		
@@ -213,8 +215,8 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 				.put("domain", domain)
 				.put("destinations",
 						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://dsi-demo.ait.ac.at/enrichment-web")))
-				.put("documentToTranslateBase64", new JSONObject().put("format", fileFormat).put("content", base64content));
-		//.put("textToTranslate", text)
+				//.put("documentToTranslateBase64", new JSONObject().put("format", fileFormat).put("content", base64content));
+		        .put("textToTranslate", text);
 
 		return jsonBody.toString();
 	}
@@ -252,9 +254,9 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	}
 		
 	@Override
-	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference) throws UnsupportedEncodingException
+	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference, String body) throws UnsupportedEncodingException
 	{
-		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" .");
+		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" ." + ", body="+body+" .");
 		
 		if(translatedText==null)
 		{
@@ -264,15 +266,23 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		
 		if(createdRequests.containsKey(externalReference))
 		{	
-			String URLDecodedTranslatedText = "";
-			try {
-				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-
-				throw e;
-			}
-			logger.info("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
-			createdRequests.put(externalReference, URLDecodedTranslatedText);
+			logger.info("eTranslation obtained translated text original: " + translatedText);
+			
+//			byte[] bytesEncoded = Base64.decodeBase64(translatedText);
+//			String base64DecodedContent = new String(bytesEncoded);
+//			
+//			logger.info("eTranslation obtained translated text (base64 decoded): " + base64DecodedContent);
+			
+//			String URLDecodedTranslatedText = "";
+//			try {
+//				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
+//			} catch (UnsupportedEncodingException e) {
+//
+//				throw e;
+//			}
+//			logger.info("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
+			
+			createdRequests.put(externalReference, translatedText);
 			
 		}
 	}

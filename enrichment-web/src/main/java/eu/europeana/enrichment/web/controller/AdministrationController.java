@@ -203,16 +203,17 @@ public class AdministrationController extends BaseRest {
 	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
 			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
 	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
-			consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+			produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getETranslation(
 			@RequestParam(value = "target-language", required = false) String targetLanguage,
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
-			@RequestParam(value = "external-reference", required = false) String externalReference
-			) throws UnsupportedEncodingException 
+			@RequestParam(value = "external-reference", required = false) String externalReference,
+			@RequestBody String body) throws UnsupportedEncodingException 
 	{
 		
-		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference);
+		
+		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,body);
 		
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
 		

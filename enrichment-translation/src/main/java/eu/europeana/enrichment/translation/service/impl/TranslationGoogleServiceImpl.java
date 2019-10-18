@@ -93,7 +93,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 
 	@Override
 	public void eTranslationResponse(String targetLanguage, String translatedText, String requestId,
-			String externalReference) {
+			String externalReference, String body) {
 				
 	}
 	
