@@ -43,20 +43,22 @@ public interface EnrichmentNERService {
 	 * @param requestParam				contains information about story, story item,
 	 * 									translation and linking tools which are
 	 * 									used to retrieve story items from DB and to
-	 * 									apply NER on this specific data. 						
+	 * 									apply NER on this specific data. 
+	 * @text							new text provided by the user that can be different
+	 * 									from the existing text of the given property of a story or item
 	 * @return 							all named entities which were found on the 
 	 * 									translated text including their positions
 	 * 									at the original text
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required requestParam is null or empty
 	 */
-	public String getEntities(EnrichmentNERRequest requestParam, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;  
+	public String getEntities(EnrichmentNERRequest requestParam, String text, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;  
 	
 	/*
 	 * This method does the same as {@link eu.europeana.enrichment.web.service.EnrichmentNERService#getEntities(EnrichmentNERRequest)
 	 * but returns the list of NamedEntity instead of a JSON String  
 	 */
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, String text, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;
 	
 	/**
 	 * Reads stories and items from the given json file and stores them
