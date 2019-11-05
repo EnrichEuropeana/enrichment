@@ -13,12 +13,62 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class HelperFunctions {
 	
 	static Logger logger = LogManager.getLogger(HelperFunctions.class);
+	
+	/**
+	 * This method creates a Http request.
+	 */
+	
+	public static String createHttpRequest(String content, String baseUrl) {
+		try {
+//			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+//		    credsProvider.setCredentials(AuthScope.ANY,
+//		      new UsernamePasswordCredentials(credentialUsername, credentialPwd));
+//			CloseableHttpClient httpClient = HttpClientBuilder.create()
+//					.setDefaultCredentialsProvider(credsProvider).build();
+
+			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+			HttpResponse result;
+			
+			if(content!=null && !content.isEmpty())
+			{
+				HttpPost request = new HttpPost(baseUrl);
+				request.addHeader("content-type", "application/json");
+				StringEntity params = new StringEntity(content, "UTF-8");
+				request.setEntity(params);
+				result = httpClient.execute(request);
+			}
+			else
+			{
+				HttpGet request = new HttpGet(baseUrl);
+				result = httpClient.execute(request);
+			}
+
+			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
+
+			logger.info("Http reponse: " + responeString);
+			return responeString;
+		} catch (Exception ex) {
+			//TODO: proper exception handling
+			logger.error("Exception raised during the creation of the Http request to: " + baseUrl);
+			logger.error("Exception raised during the creation of the Http request: " + ex.getMessage());			
+			return "";
+		}
+	}
+
 
 	public static String generateHashFromText(String text) throws NoSuchAlgorithmException {
 		//generate key for the translation based on the original text

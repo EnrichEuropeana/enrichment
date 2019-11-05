@@ -44,7 +44,7 @@ public class GoogleTranslator {
 	  System.out.println(word);
 	 }
 	 
-	 
+	  
 	 public String callUrlAndParseResult(String langFrom, String langTo,
 	                                             String word) throws Exception 
 	 {
