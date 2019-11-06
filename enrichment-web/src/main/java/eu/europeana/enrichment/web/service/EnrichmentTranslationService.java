@@ -18,7 +18,7 @@ public interface EnrichmentTranslationService {
 	 * 									a ID will be returned
 	 * @throws							HttpException
 	 */
-	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException;  
+	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException, Exception;  
 	
 	/*
 	 * This method uploads the translation text to a TranslationEntity.

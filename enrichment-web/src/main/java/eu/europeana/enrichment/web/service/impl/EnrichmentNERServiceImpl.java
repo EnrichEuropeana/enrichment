@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +20,6 @@ import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,6 +45,7 @@ import eu.europeana.enrichment.model.impl.ItemEntityTranscribathonImpl;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityTranscribathonImpl;
 import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
@@ -123,7 +122,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
     }
     
     //Transcribathon URL for getting the item information
-    private static final String transcribathonBaseURL = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
+    private static final String transcribathonBaseURLItems = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
+    private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
+    
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -452,7 +453,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 * This function checks if the given story or item is present in the db and if not it fetches it from the Transcribathon platform.
 	 * Additionally, if there is not proper translation, it is first done here and the translated text is returned for the NER analysis.
 	 */
-	private String [] updateStoryOrItem (String newText, boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type, TranslationEntity returnTranslationEntity) throws JsonParseException, JsonMappingException, IOException, HttpException, NoSuchAlgorithmException
+	private String [] updateStoryOrItem (String newText, boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type, TranslationEntity returnTranslationEntity) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
@@ -467,21 +468,29 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			tmpStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);
 			if(tmpStoryEntity == null )
 			{
-				String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURL+itemId);
+				String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLStories+storyId);
 				ObjectMapper objectMapper = new ObjectMapper();		
-				List<ItemEntityTranscribathonImpl> listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
+				List<StoryEntityTranscribathonImpl> listStoryTranscribathon = objectMapper.readValue(response, new TypeReference<List<StoryEntityTranscribathonImpl>>(){});
 
-				if(listItemTranscribathon!=null && !listItemTranscribathon.isEmpty())
+				if(listStoryTranscribathon!=null && !listStoryTranscribathon.isEmpty())
 				{
 					StoryEntity [] newStories = new StoryEntity [1];
 					newStories[0] = new StoryEntityImpl();
-					newStories[0].setDescription(listItemTranscribathon.get(0).getStoryDcDescription());
-					newStories[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
+					
+					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setDescription(newText);
+					else newStories[0].setDescription(listStoryTranscribathon.get(0).getDcDescription());
+					
+					newStories[0].setLanguage(listStoryTranscribathon.get(0).getEdmLanguage());
 					newStories[0].setSource("");
 					newStories[0].setStoryId(storyId);
-					newStories[0].setSummary("");
-					newStories[0].setTitle(listItemTranscribathon.get(0).getStoryDcTitle());
-					newStories[0].setTranscriptionText("");
+					
+					if(type.compareToIgnoreCase("summary")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setSummary(newText);
+					else newStories[0].setSummary("");
+					
+					newStories[0].setTitle(listStoryTranscribathon.get(0).getDcTitle());
+					
+					if(type.compareToIgnoreCase("transcription")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setTranscriptionText(newText);
+					else newStories[0].setTranscriptionText("");
 					
 					uploadStories(newStories);
 				}
@@ -565,6 +574,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 				
 		}
+		//for a particular item of the story
 		else
 		{
 			String response=null;
@@ -574,7 +584,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			if(tmpStoryEntity == null )
 			{
-				response = HelperFunctions.createHttpRequest(null, transcribathonBaseURL+itemId);
+				response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
 				ObjectMapper objectMapper = new ObjectMapper();		
 				listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
 
@@ -601,7 +611,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				
 				if(tmpStoryEntity!=null)
 				{
-					response = HelperFunctions.createHttpRequest(null, transcribathonBaseURL+itemId);
+					response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
 					ObjectMapper objectMapper = new ObjectMapper();		
 					listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
 				}
@@ -612,12 +622,18 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					newItems[0] = new ItemEntityImpl();
 					newItems[0].setDescription("");
 					newItems[0].setItemId(itemId);
-					newItems[0].setKey(newText);
+					
+					if(newText!=null && !newText.isEmpty()) newItems[0].setKey(newText);
+					else newItems[0].setKey("");
+					
 					newItems[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
 					newItems[0].setSource("");
 					newItems[0].setStoryId(storyId);
 					newItems[0].setTitle(listItemTranscribathon.get(0).getTitle());
-					newItems[0].setTranscriptionText(newText);
+					
+					if(newText!=null && !newText.isEmpty()) newItems[0].setTranscriptionText(newText);
+					else newItems[0].setTranscriptionText("");
+						
 					newItems[0].setType("");
 					
 					uploadItems(newItems);
@@ -629,15 +645,12 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				ItemEntity [] newItems = new ItemEntity [1];
 				newItems[0] = tmpItemEntity;
 				
+				//newText is only for the type "transcription" and not other types like "description" etc.
 				if(type.compareToIgnoreCase("transcription")==0 && tmpItemEntity.getTranscriptionText().compareTo(newText)!=0)
 				{					
 					newItems[0].setTranscriptionText(newText);
 				}
-				else if(type.compareToIgnoreCase("description")==0 && tmpItemEntity.getDescription().compareTo(newText)!=0)
-				{
-					newItems[0].setDescription(newText);
-				}			
-				
+								
 				uploadItems(newItems);
 			}
 			

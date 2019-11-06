@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -12,12 +13,21 @@ import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.springframework.http.HttpStatus;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.ItemEntityTranscribathonImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityTranscribathonImpl;
 import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
@@ -28,6 +38,7 @@ import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
+import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {
@@ -48,6 +59,11 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	private static final String googleToolName = "Google";
 	private static final String eTranslationToolName = "eTranslation";
 	
+    //Transcribathon URL for getting the item information
+    private static final String transcribathonBaseURLItems = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
+    private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
+
+	
 	@Resource(name = "translationLanguageTool")
 	TranslationLanguageTool translationLanguageTool;
 	
@@ -58,10 +74,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Resource(name = "persistentItemEntityService")
 	PersistentItemEntityService persistentItemEntityService;
 
+	@Resource(name = "enrichmentNerService")
+	EnrichmentNERService enrichmentNerService;
+
 	
 	//@Cacheable("translationResults")
+	@SuppressWarnings("unused")
 	@Override
-	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException{
+	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
 		try {
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
@@ -70,6 +90,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String originalText = requestParam.getText();
 			String translationTool = requestParam.getTranslationTool();
 			String type = requestParam.getType();
+			String newText = requestParam.getText();
 			Boolean sendRequest = true;//requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
 			
 			/*
@@ -91,11 +112,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			ItemEntity dbItemEntity = null;
 			String sourceLanguage = null;
 			
+			
+			Object foundStoryOrItem = fetchItemOrStory(type, newText, storyId, itemId);
+			
 			//TODO: the "if" part below takes into account story and item, can be improved not to hardcode it in if 
 			//translate text for the whole story including all items
 			if(itemId.compareTo("all")==0)
 			{		
-				dbStoryEntity = persistentStoryEntityService.findStoryEntity(storyId);
+				dbStoryEntity = (StoryEntity) foundStoryOrItem;
 				if(dbStoryEntity != null)
 				{
 					sourceLanguage = dbStoryEntity.getLanguage();
@@ -125,7 +149,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			//translate text for the specific item
 			else
 			{
-				dbItemEntity = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+				dbItemEntity = (ItemEntity) foundStoryOrItem;
+				
 				if(dbItemEntity!=null)
 				{
 					sourceLanguage = dbItemEntity.getLanguage();
@@ -231,6 +256,171 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | TranslationException | InterruptedException e) {
 			throw new InternalServerException(e);
 		}
+	}
+
+	/*
+	 * This function checks if the given story or item is in the db and if not it will be fetched from the
+	 * Transcribathon platform.
+	 */
+	private Object fetchItemOrStory(String type, String newText, String storyId, String itemId) throws Exception
+	{
+		ItemEntity item=null;
+		StoryEntity story=null;
+		
+		if(itemId.compareTo("all")==0)
+		{		
+			//first check if the item or story is present in the db and if not fetch it from the Transcribathon platform
+			story = persistentStoryEntityService.findStoryEntity(storyId);
+			if(story == null )
+			{
+				String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLStories+storyId);
+				ObjectMapper objectMapper = new ObjectMapper();		
+				List<StoryEntityTranscribathonImpl> listStoryTranscribathon = objectMapper.readValue(response, new TypeReference<List<StoryEntityTranscribathonImpl>>(){});
+
+				if(listStoryTranscribathon!=null && !listStoryTranscribathon.isEmpty())
+				{
+					StoryEntity [] newStories = new StoryEntity [1];
+					newStories[0] = new StoryEntityImpl();
+					
+					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setDescription(newText);
+					else newStories[0].setDescription(listStoryTranscribathon.get(0).getDcDescription());
+					
+					newStories[0].setLanguage(listStoryTranscribathon.get(0).getEdmLanguage());
+					newStories[0].setSource("");
+					newStories[0].setStoryId(storyId);
+					
+					if(type.compareToIgnoreCase("summary")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setSummary(newText);
+					else newStories[0].setSummary("");
+					
+					newStories[0].setTitle(listStoryTranscribathon.get(0).getDcTitle());
+					
+					if(type.compareToIgnoreCase("transcription")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setTranscriptionText(newText);
+					else newStories[0].setTranscriptionText("");
+					
+					enrichmentNerService.uploadStories(newStories);
+				}
+			}
+			else if (newText!=null && !newText.isEmpty())
+			{
+				StoryEntity [] newStories = new StoryEntity [1];
+				newStories[0] = story;
+				
+				if(type.compareToIgnoreCase("transcription")==0 && story.getTranscriptionText().compareTo(newText)!=0)
+				{					
+					newStories[0].setTranscriptionText(newText);
+				}
+				else if(type.compareToIgnoreCase("description")==0 && story.getDescription().compareTo(newText)!=0)
+				{
+					newStories[0].setDescription(newText);
+				}
+				else if(type.compareToIgnoreCase("summary")==0 && story.getSummary().compareTo(newText)!=0)
+				{
+					newStories[0].setSummary(newText);
+				}
+				
+				enrichmentNerService.uploadStories(newStories);
+			}
+
+			//getting a new story from the db
+			return persistentStoryEntityService.findStoryEntity(storyId);
+		}
+		else
+		{
+			List<ItemEntityTranscribathonImpl> listItemTranscribathon=null;
+			
+			story = persistentStoryEntityService.findStoryEntity(storyId);
+			
+			if(story == null )
+			{
+				String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
+				ObjectMapper objectMapper = new ObjectMapper();		
+				listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
+
+				if(listItemTranscribathon!=null && !listItemTranscribathon.isEmpty())
+				{
+					StoryEntity [] newStories = new StoryEntity [1];
+					newStories[0] = new StoryEntityImpl(); 
+					newStories[0].setDescription(listItemTranscribathon.get(0).getStoryDcDescription());
+					newStories[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
+					newStories[0].setSource("");
+					newStories[0].setStoryId(storyId);
+					newStories[0].setSummary("");
+					newStories[0].setTitle(listItemTranscribathon.get(0).getStoryDcTitle());
+					newStories[0].setTranscriptionText("");
+					
+					enrichmentNerService.uploadStories(newStories);
+				}
+
+			}
+			
+			item = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+			if(item == null )
+			{
+				
+				if(story!=null)
+				{
+					String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
+					ObjectMapper objectMapper = new ObjectMapper();		
+					listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
+				}
+				
+				if(listItemTranscribathon!=null && !listItemTranscribathon.isEmpty())
+				{
+					ItemEntity [] newItems = new ItemEntity [1];
+					newItems[0] = new ItemEntityImpl();
+					
+					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newItems[0].setDescription(newText);
+					else newItems[0].setDescription("");
+					
+					newItems[0].setItemId(itemId);
+					
+					newItems[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
+					newItems[0].setSource("");
+					newItems[0].setStoryId(storyId);
+					newItems[0].setTitle(listItemTranscribathon.get(0).getTitle());
+					
+					if(type.compareToIgnoreCase("transcription")==0 && (newText!=null && !newText.isEmpty()))
+					{
+						newItems[0].setTranscriptionText(newText);
+						newItems[0].setKey(newText);
+					}
+					else 
+					{
+						newItems[0].setTranscriptionText("");
+						newItems[0].setKey("");
+					}
+						
+					newItems[0].setType("");
+					
+					enrichmentNerService.uploadItems(newItems);
+				}
+				
+			}
+			else if (newText!=null && !newText.isEmpty())
+			{
+				ItemEntity [] newItems = new ItemEntity [1];
+				newItems[0] = item;
+				
+				//newText is only for the type "transcription" and not other types like "description" etc.
+				if(type.compareToIgnoreCase("transcription")==0 && item.getTranscriptionText().compareTo(newText)!=0)
+				{					
+					newItems[0].setTranscriptionText(newText);
+				}
+				else if(type.compareToIgnoreCase("description")==0 && item.getDescription().compareTo(newText)!=0)
+				{
+					newItems[0].setDescription(newText);
+				}
+
+								
+				enrichmentNerService.uploadItems(newItems);
+			}
+			
+			//getting a new item from the db
+			return persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+			
+		}
+
+
 	}
 	
 	private List<String> textSplitter(String originaltext){
