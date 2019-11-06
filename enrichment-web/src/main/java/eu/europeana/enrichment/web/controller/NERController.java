@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,7 +54,7 @@ public class NERController extends BaseRest {
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"property\"=summary, description, or transcription, \"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation)."
-			+ "\"text\": new text for the given \"property\" provided by the user to be analysed. If the provided non-empty text string is different from the text of "
+			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of "
 			+ "the given field of the story, it will be changed accordingly.")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
@@ -64,7 +65,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = true) Boolean original,
-			@RequestParam(value = "text", required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -78,6 +79,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
+			if(text.compareToIgnoreCase("{}")==0) text="";
 			String jsonLd = enrichmentNerService.getEntities(body,text, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
@@ -96,8 +98,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original,
-			@RequestParam(value = "text", required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -111,7 +112,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
-			String jsonLd = enrichmentNerService.getEntities(body,text, false);
+			String jsonLd = enrichmentNerService.getEntities(body,null, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
@@ -127,7 +128,7 @@ public class NERController extends BaseRest {
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"property\"=summary, description, or transcription, \"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation)."
-			+ "\"text\": new text for the given \"property\" provided by the user to be analysed. If the provided non-empty text string is different from the text of" 
+			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of" 
 			+ " the given field of the item, it will be changed accordingly.")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesItem(
@@ -137,7 +138,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = true) Boolean original,
-			@RequestParam(value = "text", required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -150,6 +151,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
+			if(text.compareToIgnoreCase("{}")==0) text="";
 			String jsonLd = enrichmentNerService.getEntities(body,text, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
@@ -168,8 +170,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original,
-			@RequestParam(value = "text", required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -183,7 +184,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
-			String jsonLd = enrichmentNerService.getEntities(body,text, false);
+			String jsonLd = enrichmentNerService.getEntities(body,null, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;

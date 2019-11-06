@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
@@ -58,17 +60,20 @@ public class TranslationController extends BaseRest {
 	 * @param translationTool
 	 * @param property
 	 * @return
-	 * @throws HttpException
+	 * @throws Exception 
 	 */
 	@ApiOperation(value = "Translate text (Google, eTranslation) for Stories", nickname = "postTranslationStory", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
 			+ " The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
-			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
+			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\"." 
+			+ "The \"text\" body parameter is a new text for the given \"property\" provided by the user to be translated. If the provided non-empty body is different from the text of" 
+			+ " the given field of the story, it will be changed accordingly.")
 	@RequestMapping(value = "/enrichment/translation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslationStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
-			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property,
+			@RequestBody(required = false) String text) throws Exception {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -78,6 +83,8 @@ public class TranslationController extends BaseRest {
 			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setType(property);
+			if(text.compareToIgnoreCase("{}")==0) text="";
+			body.setText(text);
 			
 			String translation = enrichmentTranslationService.translate(body, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
@@ -94,7 +101,7 @@ public class TranslationController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
-			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws Exception {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -125,19 +132,22 @@ public class TranslationController extends BaseRest {
 	 * @param translationTool
 	 * @param property
 	 * @return
-	 * @throws HttpException
+	 * @throws Exception 
 	 */
 	@ApiOperation(value = "Translate text (Google, eTranslation) for Items", nickname = "postTranslationItem", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
 			" The parameter \"itemId\" further enables considering only specific story item. " +
 			" The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
-			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\".")
+			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\"."
+			+ "The \"text\" body parameter is a new text for the given \"property\" provided by the user to be translated. If the provided non-empty body is different from the text of" 
+			+ " the given field of the item, it will be changed accordingly.")
 	@RequestMapping(value = "/enrichment/translation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslationItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
-			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property,
+			@RequestBody(required = false) String text) throws Exception {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -147,6 +157,8 @@ public class TranslationController extends BaseRest {
 			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setType(property);
+			if(text.compareToIgnoreCase("{}")==0) text="";
+			body.setText(text);
 			
 			String translation;
 			
@@ -163,6 +175,7 @@ public class TranslationController extends BaseRest {
 						body.setItemId(item.getItemId());
 						body.setTranslationTool(translationTool);
 						body.setType("description");
+						body.setText(null);
 						translation = enrichmentTranslationService.translate(body, true);
 					}
 					else
@@ -178,6 +191,7 @@ public class TranslationController extends BaseRest {
 						body.setItemId(item.getItemId());
 						body.setTranslationTool(translationTool);
 						body.setType("transcription");
+						body.setText(null);
 						translation = enrichmentTranslationService.translate(body, true);
 					}
 					else
@@ -213,7 +227,7 @@ public class TranslationController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
-			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws HttpException {
+			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws Exception {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
