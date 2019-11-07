@@ -219,23 +219,9 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
 		 */
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
-		
-		List<String> allNERFieldTypes = new ArrayList<String>();
-		if(itemId == "all")
-		{
-			allNERFieldTypes.add(type);
-			//Named entities should also get the type where it was found
-			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
 
-		}
-		else
-		{
-			allNERFieldTypes.add("transcription");
-			allNERFieldTypes.add("description");
-			//Named entities should also get the type where it was found
-			tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, false));
+		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
 
-		}
 	
 			
 		int numberNERTools = tools.size();
@@ -264,7 +250,20 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			return resultMap;
 		}
 
-		
+		//from this part down only POST method is executed and the NER analysis is done for all story or item fields
+		List<String> allNERFieldTypes = new ArrayList<String>();
+		if(itemId == "all")
+		{
+			allNERFieldTypes.add("transcription");
+			allNERFieldTypes.add("description");
+			allNERFieldTypes.add("summary");
+		}
+		else
+		{
+			allNERFieldTypes.add("transcription");
+			allNERFieldTypes.add("description");
+		}
+
 		
 		for(String typeNERField : allNERFieldTypes)
 		{

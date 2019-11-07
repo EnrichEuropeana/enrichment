@@ -61,7 +61,6 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true) String translationTool,
-			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
 			@RequestParam(value = "original", required = true) Boolean original,
@@ -74,7 +73,6 @@ public class NERController extends BaseRest {
 			body.setStoryId(storyId);
 			body.setItemId("all");
 			body.setTranslationTool(translationTool);
-			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
@@ -97,8 +95,9 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "nerTools", required = true) String nerTools
+			//@RequestParam(value = "original", required = true) Boolean original
+			) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -110,7 +109,7 @@ public class NERController extends BaseRest {
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
-			body.setOriginal(original);
+			body.setOriginal(false);
 			
 			String jsonLd = enrichmentNerService.getEntities(body,null, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
@@ -169,8 +168,9 @@ public class NERController extends BaseRest {
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "nerTools", required = true) String nerTools
+			//@RequestParam(value = "original", required = true) Boolean original
+			) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -182,7 +182,7 @@ public class NERController extends BaseRest {
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
-			body.setOriginal(original);
+			body.setOriginal(false);
 			
 			String jsonLd = enrichmentNerService.getEntities(body,null, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
