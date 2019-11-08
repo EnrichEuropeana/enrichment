@@ -8,6 +8,8 @@ import javax.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.query.Criteria;
+import org.mongodb.morphia.query.CriteriaContainer;
 import org.mongodb.morphia.query.Query;
 
 import eu.europeana.enrichment.model.ItemEntity;
@@ -117,7 +119,38 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		}
 		return tmpResult;
 	}
-	
+
+	@Override
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
+		
+		persistentNamedEntities.disableValidation().and(
+				persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
+				persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
+				persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
+				);
+		
+		//adding the criteria for the nerTools
+		List<Criteria> criteriaList = new ArrayList<Criteria>();
+		for(int i=0;i<nerTools.size();i++)
+		{
+			criteriaList.add(persistentNamedEntities.criteria("positionEntities.nerTools").hasThisOne(nerTools.get(i)));
+		}
+		
+		persistentNamedEntities.disableValidation().or(criteriaList.toArray(new CriteriaContainer[criteriaList.size()]));
+		
+
+		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
+		List<NamedEntity> tmpResult = new ArrayList<>();
+		for(int index = result.size()-1; index >= 0; index--) {
+			NamedEntity dbEntity = result.get(index);
+			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
+			//addAdditonalInformation(dbEntity);
+			tmpResult.add(dbEntity);
+		}
+		return tmpResult;
+	}
+
 	
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {

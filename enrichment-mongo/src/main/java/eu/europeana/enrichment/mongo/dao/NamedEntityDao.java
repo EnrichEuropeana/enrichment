@@ -12,6 +12,8 @@ public interface NamedEntityDao {
 	public NamedEntity findNamedEntity(String key);
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type, boolean translation);
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, boolean translation);
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
+
 	//public List<NamedEntity> getAllNamedEntities();
 	public void saveNamedEntity(NamedEntity entity);
 	public void deleteNamedEntity(NamedEntity entity);
@@ -19,5 +21,5 @@ public interface NamedEntityDao {
 	public void deleteNamedEntityByKey(String key);
 	public List<NamedEntity> findAllNamedEntities();
 	public void deleteAllNamedEntities();
-
+	
 }

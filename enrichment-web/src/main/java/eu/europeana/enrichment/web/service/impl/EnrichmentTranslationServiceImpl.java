@@ -303,7 +303,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			else if (newText!=null && !newText.isEmpty())
 			{
 				StoryEntity [] newStories = new StoryEntity [1];
-				newStories[0] = story;
+				newStories[0] = new StoryEntityImpl(story);
 				
 				if(type.compareToIgnoreCase("transcription")==0 && story.getTranscriptionText().compareTo(newText)!=0)
 				{					
@@ -399,7 +399,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			else if (newText!=null && !newText.isEmpty())
 			{
 				ItemEntity [] newItems = new ItemEntity [1];
-				newItems[0] = item;
+				newItems[0] = new ItemEntityImpl(item);
 				
 				//newText is only for the type "transcription" and not other types like "description" etc.
 				if(type.compareToIgnoreCase("transcription")==0 && item.getTranscriptionText().compareTo(newText)!=0)

@@ -53,5 +53,7 @@ public interface PersistentNamedEntityService {
 	public void deleteAllNamedEntities ();
 	
 	public void deleteListNamedEntity(String storyId,String itemId, String fieldUsedForNER);
+	List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type,
+			List<String> nerTools);
 
 }

@@ -20,6 +20,22 @@ public class ItemEntityImpl implements ItemEntity{
 	private String title;
 	private String source;
 	
+	public ItemEntityImpl(ItemEntity item) {
+		this.itemId = item.getItemId();
+		this.language = item.getLanguage();
+		this.type = item.getType();
+		this.transcriptionText = item.getTranscriptionText();
+		this.description = item.getDescription();
+		this.hashKey = item.getKey();
+		this.storyId = item.getStoryId();
+		this.title = item.getTitle();
+		this.source = item.getSource();
+	}
+
+	public ItemEntityImpl() {
+		
+	}
+
 	@Override
 	public String getStoryId() {
 		return storyId;
