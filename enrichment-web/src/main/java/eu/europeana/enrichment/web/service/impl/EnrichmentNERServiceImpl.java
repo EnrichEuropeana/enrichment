@@ -213,14 +213,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		if(invalidLinkinParams.size() > 0)
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
 		
-		
 		/*
 		 * This part from here down only executes for POST requests.
 		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
 		 */
 		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
 
-		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, false));
+		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, tools));
 
 	
 			
@@ -498,7 +497,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else if (newText!=null && !newText.isEmpty())
 			{
 				StoryEntity [] newStories = new StoryEntity [1];
-				newStories[0] = tmpStoryEntity;
+				newStories[0] = new StoryEntityImpl(tmpStoryEntity);
 				
 				if(type.compareToIgnoreCase("transcription")==0 && tmpStoryEntity.getTranscriptionText().compareTo(newText)!=0)
 				{					
@@ -642,7 +641,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			else if (newText!=null && !newText.isEmpty())
 			{
 				ItemEntity [] newItems = new ItemEntity [1];
-				newItems[0] = tmpItemEntity;
+				newItems[0] = new ItemEntityImpl(tmpItemEntity);
 				
 				//newText is only for the type "transcription" and not other types like "description" etc.
 				if(type.compareToIgnoreCase("transcription")==0 && tmpItemEntity.getTranscriptionText().compareTo(newText)!=0)

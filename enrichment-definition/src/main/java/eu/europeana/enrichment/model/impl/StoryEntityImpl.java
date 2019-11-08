@@ -13,7 +13,21 @@ public class StoryEntityImpl implements StoryEntity {
 	private String language;
 	private String transcriptionText;
 	
+	public StoryEntityImpl (StoryEntity copy)
+	{
+		this.storyId = copy.getStoryId();
+		this.title = copy.getTitle();
+		this.source = copy.getSource();
+		this.description = copy.getDescription();
+		this.summary = copy.getSummary();
+		this.language = copy.getLanguage();
+		this.transcriptionText = copy.getTranscriptionText();
+	}
 	
+	public StoryEntityImpl() {
+		
+	}
+
 	@Override
 	public String getId() {
 		// TODO Auto-generated method stub

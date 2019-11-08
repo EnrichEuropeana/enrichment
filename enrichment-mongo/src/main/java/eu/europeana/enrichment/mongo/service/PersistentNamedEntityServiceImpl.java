@@ -22,6 +22,12 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {
 		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, translation);
 	}
+	
+	@Override
+	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, nerTools);
+	}
+
 
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {
