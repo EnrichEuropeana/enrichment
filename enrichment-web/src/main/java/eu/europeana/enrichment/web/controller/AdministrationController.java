@@ -137,7 +137,7 @@ public class AdministrationController extends BaseRest {
 			"  \"title\":\"Franz Joseph I Emperor\", <br />" + 
 			"  \"storyId\":\"1\", <br />" + 
 			"  \"source\":\"http:\\/\\/www.europeana1914-1918.eu\\/en\\/contributions\\/1494\", <br />" + 
-			"  \"itemsId\":\"1\", <br />" + 
+			"  \"itemId\":\"1\", <br />" + 
 			"  \"description\":\"The story about Franz Joseph I Emperor\", <br />" + 
 			"  \"type\":\"text\", <br />" + 
 			"  \"language\":\"en\" <br /> " + 
@@ -166,26 +166,34 @@ public class AdministrationController extends BaseRest {
 			+ "[ <br />" + 
 			"  { <br />" + 
 			"  \"originalText\":\"Franz Joseph I., Kaiser von Österreich, zusammen mit seiner Frau : Kaiserin Elisabeth von Österreich, Königin von Ungarn.\", <br />" +
-			"  \"translatedText\":\"Franz Joseph I, an Emperor of Austria, along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" +  
+			"  \"text\":\"Franz Joseph I, an Emperor of Austria, along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" +  
 			"  \"storyId\":\"1\", <br />" + 
-			"  \"itemsId\":\"1\", <br />" + 
-			"  \"tool\":\"Google\", (the tool used for the translation: Google or eTranslation) <br />" + 
-			"  \"type\":\"transcription\", (the corresponding part of the story or item that is translated: summary, description, transcription) <br />" + 
-			"  \"language\":\"en\" <br /> " + 
+			"  \"itemId\":\"1\", <br />" + 
+			"  \"translationTool\":\"Google\", <br />" + 
+			"  \"type\":\"transcription\" <br />" +
 			"  } <br />" + 
 			"  ] <br />")
 	@RequestMapping(value = "/administration/uploadTranslation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestBody EnrichmentTranslationRequest body) throws HttpException  {
+			@RequestBody EnrichmentTranslationRequest [] body) throws HttpException  {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String translation = enrichmentTranslationService.uploadTranslation(body);
+			int i=1;
+			String translation = "{info: ";
+			
+			for (EnrichmentTranslationRequest translationRequest : body)
+			{
+				translation += enrichmentTranslationService.uploadTranslation(translationRequest, i);	
+			}
+			
+			translation += "}";
+			
 			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
-		
+			
 			return response;
 
 	}
