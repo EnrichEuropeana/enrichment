@@ -29,5 +29,6 @@ public interface EnrichmentTranslationService {
 	 * 									the upload is complete
 	 * @throws							HttpException
 	 */
-	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException;  
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam, int i) throws HttpException;
+
 }

@@ -225,7 +225,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 		int numberNERTools = tools.size();
 		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued, returned is the number of 
-		//ner tools for which the analysis is done
+		//ner tools for which the analysis is done (please note that the list "tools" is also updated, i.e. only the not analyzed tools remian in the list)
 		int numberNERToolsFound = checkAllNerToolsAlreadyCompleted(tools, tmpNamedEntities);
 		
 		//TODO: check if update is need (e.g.: linking tools)
@@ -242,11 +242,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				}
 			}
 		}
-		
-		if(!process || numberNERToolsFound==numberNERTools) {
+		//in case of GET API (process==FALSE) or POST API where all ner tools have been processed and no new provided text is given
+		if(!process || (numberNERToolsFound==numberNERTools && (text==null || text.isEmpty()))) {
 			//TODO: throw exception 404
 			//throw new HttpException("");
 			return resultMap;
+		}
+		
+		//reset "tools" and "resultMap" since the new text is provided
+		if(text!=null && !text.isEmpty())
+		{
+			tools.clear();
+			tools.addAll(requestParam.getNerTools());
+			resultMap.clear();
 		}
 
 		//from this part down only POST method is executed and the NER analysis is done for all story or item fields
@@ -319,6 +327,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 //			else originalLanguage=tmpItemEntity.getLanguage();
 
 			type=typeNERField;
+			if(type.compareToIgnoreCase("transcription")!=0) text=""; 
 			
 			TranslationEntity dbTranslationEntity = null;
 			String [] textAndLanguage = updateStoryOrItem(text, original, storyId, itemId, translationTool, translationLanguage, type, dbTranslationEntity);
@@ -387,7 +396,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 										 * only if all fields of the position entities are the same including the positions in the translated text
 										 * 2 or more ner tools are added to the same position entity
 										 */
-										pe.getNERTools().add(NERTool);
+										if(pe.getNERTools()!=null && !pe.getNERTools().contains(NERTool)) pe.getNERTools().add(NERTool);
 										break;
 									}
 								}
@@ -758,7 +767,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			
 			TreeMap<String, List<NamedEntity>> tmpResult = tmpTool.identifyNER(text);
 			//comparison and update of previous values
-			mapResult = mapResultCombination(mapResult, tmpResult, storyId, itemId, fieldUsedForNER, dbTranslationEntity, tool_string);
+			if(tmpResult!=null && !tmpResult.isEmpty())
+				mapResult = mapResultCombination(mapResult, tmpResult, storyId, itemId, fieldUsedForNER, dbTranslationEntity, tool_string);
 			
 		}
 		return mapResult;
@@ -908,6 +918,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	@Override
 	public String uploadStories(StoryEntity[] stories) throws HttpException {
 		
+		logger.info("Uploading new stories to the Mongo DB.");
+		
 		for (StoryEntity story : stories) {
 			if(story.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
@@ -967,6 +979,8 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	@Override
 	public String uploadItems(ItemEntity[] items) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
+		logger.info("Uploading new items to the Mongo DB.");
+		
 		for (ItemEntity item : items) {
 			if(item.getStoryId() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
@@ -997,12 +1011,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				boolean someItemPartChanged = false;
 				if(dbItemEntity.getDescription().compareTo(item.getDescription())!=0)
 				{
+					logger.info("Uploading new items : deleting old NamedEntity and TranslationEntity for description.");
 					someItemPartChanged = true;
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "description");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), "description");
 				}
 				if(dbItemEntity.getTranscriptionText().compareTo(item.getTranscriptionText())!=0)
 				{
+					logger.info("Uploading new items : deleting old NamedEntity and TranslationEntity for transcription.");
 					someItemPartChanged = true;
 					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId() , "transcription");
@@ -1358,7 +1374,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	@Override
 	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
-		String wikidataIdGenerated = "http://www.wikidata.org/entity/" + wikidataEntity;
+		String wikidataIdGenerated=null;
+		if(wikidataEntity.startsWith("Q")) wikidataIdGenerated = "http://www.wikidata.org/entity/" + wikidataEntity;
+		else wikidataIdGenerated = wikidataEntity;		
+		
 		NamedEntityAnnotation entityAnno = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
 		if(entityAnno!=null)
 		{

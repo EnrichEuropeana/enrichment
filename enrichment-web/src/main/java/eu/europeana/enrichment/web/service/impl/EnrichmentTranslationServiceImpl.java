@@ -441,7 +441,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	}
 
 	@Override
-	public String uploadTranslation(EnrichmentTranslationRequest requestParam) throws HttpException{
+	public String uploadTranslation(EnrichmentTranslationRequest requestParam, int i) throws HttpException{
 		String storyId = requestParam.getStoryId();
 		String itemId = requestParam.getItemId();			
 		String translatedText = requestParam.getText();		
@@ -473,7 +473,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, language, type);
 		if(dbTranslationEntity == null) {
 			//TODO: proper exception handling
-			return "";
+			return "Item " + i + " failed to be uploaded!";
 		}
 		
 		try {
@@ -487,10 +487,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling
 			e.printStackTrace();
-			return "";
+			return "Item " + i + " failed to be uploaded!";
 		}
 		
-		return "{\"info\": \"Done successfully!\"}";
+		return "Item " + i + " uploaded successfully!";
 	}
 	
 }
