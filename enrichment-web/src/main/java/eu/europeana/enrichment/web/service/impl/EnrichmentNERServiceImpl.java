@@ -440,6 +440,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		/*
 		 * Save and update all named entities
 		 */
+		int numberFoundNamedEntity = 0;
 		for (String key : resultMap.keySet()) {
 			List<NamedEntity> entities = resultMap.get(key);
 			for (NamedEntity entity : entities) {
@@ -451,9 +452,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				}
 				//save the NamedEntity to mongo db
 				persistentNamedEntityService.saveNamedEntity(entity);
+				numberFoundNamedEntity+=1;
 			}
 		}
 
+		logger.info("The NER analysis has been finished. The number of found NamedEntity-ies for storyId: " + storyId +
+				" and itemId: " + itemId + " is: " + Integer.toString(numberFoundNamedEntity));
+		
 		return resultMap;
 	}
 	/*
