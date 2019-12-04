@@ -48,9 +48,9 @@
 //	    String fileNameSchemaItems = "C:/stories_items_solr_xmls/items.xml";
 //	    	    
 //		BufferedWriter bwStories = new BufferedWriter(new FileWriter(new File(fileNameSchemaStories), true));
-//		BufferedWriter bwItems = new BufferedWriter(new FileWriter(new File(fileNameSchemaItems), true));
+////		BufferedWriter bwItems = new BufferedWriter(new FileWriter(new File(fileNameSchemaItems), true));
 //		bwStories.append("<add>" + "\n");
-//		bwItems.append("<add>" + "\n");
+////		bwItems.append("<add>" + "\n");
 //		
 //		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();
 //		List<ItemEntity> items = persistentItemEntityService.getAllItemEntities();
@@ -60,24 +60,17 @@
 //		
 //		for(int i=0;i<stories.size();i++)
 //		{
-//			SolrStoryEntityImpl solrStory = new SolrStoryEntityImpl(stories.get(i));
-//			xml = ClientUtils.toXML(binder.toSolrInputDocument(solrStory));
-//			bwStories.append(xml + "\n");
-//			System.out.print("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
+//			if(stories.get(i).getLanguage().compareToIgnoreCase("en")==0)
+//			{
+//				SolrStoryEntityImpl solrStory = new SolrStoryEntityImpl(stories.get(i));
+//				xml = ClientUtils.toXML(binder.toSolrInputDocument(solrStory));
+//				bwStories.append(xml + "\n");
+//				System.out.print("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
+//			}
 //		}
 //		bwStories.append("</add>" + "\n");
 //		bwStories.close();
 //		
-//		for(int i=0;i<items.size();i++)
-//		{
-//			SolrItemEntityImpl solrItem = new SolrItemEntityImpl(items.get(i));
-//			xml = ClientUtils.toXML(binder.toSolrInputDocument(solrItem));
-//			bwItems.append(xml + "\n");
-//			System.out.print("Currently analysed itemId: " + items.get(i).getItemId() +". \n");
-//		}
-//		bwItems.append("</add>" + "\n");
-//		bwItems.close();		
-//
 //		assertTrue(true);
 //		
 //	}

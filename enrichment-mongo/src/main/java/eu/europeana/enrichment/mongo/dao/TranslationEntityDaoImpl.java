@@ -10,11 +10,8 @@ import javax.annotation.Resource;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.query.Query;
 
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
 import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
 
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
