@@ -82,7 +82,12 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			}
 			
 			List<String> wikidataIDs = new ArrayList<>();
-			if(namedEntity.getWikidataIds().size() == 0) {
+			
+			if(namedEntity.getWikidataIds().size()>0)
+			{
+				wikidataIDs = namedEntity.getWikidataIds();
+			}
+			else if(namedEntity.getWikidataIds().size() == 0) {
 				//TODO: implement information retrieval from Wikidata
 				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
 					String namedEntityKey = namedEntity.getLabel();
@@ -96,12 +101,14 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
 			}
 			
+			
 			if(namedEntity.getPreferredWikidataIds().size() == 0) {
 				if(wikidataIDs != null && wikidataIDs.size() > 0) {
 					for(String wikidataID : wikidataIDs) {
 						if(namedEntity.getDbpediaWikidataIds().contains(wikidataID))
 							namedEntity.addPreferredWikidataId(wikidataID);
-						namedEntity.addWikidataId(wikidataID);
+						
+						if(!namedEntity.getWikidataIds().contains(wikidataID)) namedEntity.addWikidataId(wikidataID);
 					}
 				}
 			}

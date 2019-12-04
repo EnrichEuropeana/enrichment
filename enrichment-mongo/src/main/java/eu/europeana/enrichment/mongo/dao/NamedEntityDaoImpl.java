@@ -96,18 +96,37 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {
 		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
+		
+		Query<DBNamedEntityImpl> elemMatchQuery = datastore.createQuery(DBNamedEntityImpl.class);
+		
+		
+		
 		if(translation) {
-			persistentNamedEntities.disableValidation().and(
-					persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId),
-					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
-					);
+//			persistentNamedEntities.disableValidation().and(
+//					persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId),
+//					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
+//					);
+			
+
+			elemMatchQuery.disableValidation().field("positionEntities.translationKey").equal(storyId);
+			elemMatchQuery.disableValidation().field("positionEntities.fieldUsedForNER").equal(type);
+
+			
+			
 		} else {
-			persistentNamedEntities.disableValidation().and(
-					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
-					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
-					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
-					);
+//			persistentNamedEntities.disableValidation().and(
+//					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
+//					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
+//					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
+//					);
+			
+			elemMatchQuery.disableValidation().field("positionEntities.storyId").equal(storyId);
+			elemMatchQuery.disableValidation().field("positionEntities.itemId").equal(itemId);
+			elemMatchQuery.disableValidation().field("positionEntities.fieldUsedForNER").equal(type);
+
 		}
+		
+		persistentNamedEntities.disableValidation().field("positionEntities").elemMatch(elemMatchQuery);
 
 		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
 		List<NamedEntity> tmpResult = new ArrayList<>();

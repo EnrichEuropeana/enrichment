@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
@@ -44,6 +44,9 @@ public class TranslationController extends BaseRest {
 
 	@Resource(name = "persistentItemEntityService")
 	PersistentItemEntityService persistentItemEntityService;
+	
+	@Resource(name = "persistentStoryEntityService")
+	PersistentStoryEntityService persistentStoryEntityService;
 	
 	@Resource(name = "persistentTranslationEntityService")
 	PersistentTranslationEntityService persistentTranslationEntityService;
