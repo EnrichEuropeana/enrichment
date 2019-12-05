@@ -173,5 +173,37 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		body = bodyParam;
 		
 	}
+	
+	// Overriding equals() to compare two NamedEntityAnnotation objects 
+    @Override
+    public boolean equals(Object nea) {
+  
+        // If the object is compared with itself then return true   
+        if (nea == this) { 
+            return true; 
+        } 
+  
+        if (!(nea instanceof NamedEntityAnnotation)) { 
+            return false; 
+        } 
+          
+        // typecast nea to NamedEntityAnnotation so that we can compare the fields
+        NamedEntityAnnotation nea_new = (NamedEntityAnnotation) nea; 
+       
+        // Compare the data members and return accordingly  
+        return nea_new.getStoryId().compareTo(storyId)==0
+                && nea_new.getItemId().compareTo(itemId)==0
+                && nea_new.getWikidataId().compareTo(wikidataId)==0;
+    } 
+    
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + storyId.hashCode();
+        result = 31 * result + itemId.hashCode();
+        result = 31 * result + wikidataId.hashCode();
+        return result;
+    }
+
 
 }

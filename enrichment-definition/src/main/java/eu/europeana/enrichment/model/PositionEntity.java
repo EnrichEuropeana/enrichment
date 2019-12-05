@@ -45,7 +45,7 @@ public interface PositionEntity {
 	void setOffsetsOriginalText(List<Integer> offsetPositions);
 	void addOfssetsOriginalText(int offsetPosition);
 	
-	boolean equals(PositionEntity pe);
+	public boolean equals(Object pe);
 	int hashCode();
 	
 	List<String> getNERTools();

@@ -129,7 +129,7 @@ public class PositionEntityImpl implements PositionEntity{
 	
 	// Overriding equals() to compare two PositionEntity objects 
     @Override
-    public boolean equals(PositionEntity pe) { 
+    public boolean equals(Object pe){ 
   
         // If the object is compared with itself then return true   
         if (pe == this) { 

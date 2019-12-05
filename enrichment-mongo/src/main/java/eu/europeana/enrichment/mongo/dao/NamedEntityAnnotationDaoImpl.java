@@ -87,6 +87,10 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	
 	@Override
 	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity) {
+		//first check if there is the same entity in the db
+		NamedEntityAnnotation existingNAE = findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(entity.getStoryId(),entity.getItemId(),entity.getWikidataId());
+		if(existingNAE!=null) return;
+		
 		DBNamedEntityAnnotationImpl tmp = null;
 		if(entity instanceof DBNamedEntityAnnotationImpl)
 			tmp = (DBNamedEntityAnnotationImpl) entity;

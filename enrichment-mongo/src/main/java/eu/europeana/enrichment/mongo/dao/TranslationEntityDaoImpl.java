@@ -105,19 +105,35 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		DBTranslationEntityImpl tmp = null;
-		if(entity instanceof DBTranslationEntityImpl)
-			tmp = (DBTranslationEntityImpl) entity;
-		else {
-			try {
-				tmp = new DBTranslationEntityImpl(entity);
-			} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-				
-				throw e;
-			}
+		
+		TranslationEntity dbTranslationEntity = findTranslationEntity(entity.getKey());
+		if(dbTranslationEntity!=null)
+		{
+			dbTranslationEntity.setType(entity.getType());
+			dbTranslationEntity.setTranslatedText(entity.getTranslatedText());
+			dbTranslationEntity.setTool(entity.getTool());
+			dbTranslationEntity.setStoryId(entity.getStoryId());
+			dbTranslationEntity.setLanguage(entity.getLanguage());
+			dbTranslationEntity.setKey(entity.getKey());
+			dbTranslationEntity.setItemId(entity.getItemId());
+			this.datastore.save(dbTranslationEntity);
 		}
-		if(tmp != null)
-			this.datastore.save(tmp);
+		else
+		{
+			DBTranslationEntityImpl tmp = null;
+			if(entity instanceof DBTranslationEntityImpl)
+				tmp = (DBTranslationEntityImpl) entity;
+			else {
+				try {
+					tmp = new DBTranslationEntityImpl(entity);
+				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+					
+					throw e;
+				}
+			}
+			if(tmp != null)
+				this.datastore.save(tmp);
+		}
 	}
 
 	@Override
