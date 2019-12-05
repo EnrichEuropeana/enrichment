@@ -953,19 +953,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(dbStoryEntity.getDescription().compareTo(story.getDescription())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "description");
+					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "description");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "description");
 				}
 				if(dbStoryEntity.getSummary().compareTo(story.getSummary())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "summary");
+					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "summary");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "summary");
 				}
 				if(dbStoryEntity.getTranscriptionText().compareTo(story.getTranscriptionText())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deleteListNamedEntity(story.getStoryId(), "all" , "transcription");
+					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "transcription");
 				}		
 				
@@ -1018,14 +1018,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				{
 					logger.info("Uploading new items : deleting old NamedEntity and TranslationEntity for description.");
 					someItemPartChanged = true;
-					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "description");
+					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(item.getStoryId(), item.getItemId() , "description");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), "description");
 				}
 				if(dbItemEntity.getTranscriptionText().compareTo(item.getTranscriptionText())!=0)
 				{
 					logger.info("Uploading new items : deleting old NamedEntity and TranslationEntity for transcription.");
 					someItemPartChanged = true;
-					persistentNamedEntityService.deleteListNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
+					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId() , "transcription");
 				}		
 				
@@ -1343,10 +1343,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				for(String wikidataId : entity.getPreferredWikidataIds())
 				{				
 					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source); 
-					namedEntityAnnoList.add(tmpNamedEntityAnnotation);
 					
-					//saving the entity to the db
-					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
+					{
+						namedEntityAnnoList.add(tmpNamedEntityAnnotation);					
+						//saving the entity to the db
+						persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+					}
 				}
 				
 				//in case of annotations for the whole story take only cross-checked wikidata and dbpedia entities
@@ -1354,11 +1357,13 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
 				{
 					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source); 
-					namedEntityAnnoList.add(tmpNamedEntityAnnotation);
 					
-					//saving the entity to the db
-					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
-
+					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
+					{
+						namedEntityAnnoList.add(tmpNamedEntityAnnotation);
+						//saving the entity to the db
+						persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+					}
 				}
 			
 			}

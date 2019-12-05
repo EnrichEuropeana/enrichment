@@ -58,8 +58,8 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	}
 	
 	@Override
-	public void deleteListNamedEntity(String storyId,String itemId, String fieldUsedForNER) {
-		namedEntityDao.deleteListNamedEntity(storyId,itemId,fieldUsedForNER);
+	public void deletePositionEntitiesFromNamedEntity(String storyId,String itemId, String fieldUsedForNER) {
+		namedEntityDao.deletePositionEntitiesFromNamedEntity(storyId,itemId,fieldUsedForNER);
 	}
 
 	
