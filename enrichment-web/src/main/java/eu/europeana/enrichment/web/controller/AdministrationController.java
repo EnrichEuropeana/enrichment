@@ -161,7 +161,7 @@ public class AdministrationController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation", notes = "This method enables uploading already translated text of the story or item"
-			+ "to the database, by specifying the required translation fields directly in the request body. In case the translation of the given story or item does not exist in the system at all, "
+			+ "to the database, by specifying the required translation fields directly in the request body. In case of story translation upload, please specify the \"itemId\" field to be \"all\". In case the translation of the given story or item does not exist in the system at all, "
 			+ "please first translate the story or item using the given translation API (i.e. either /enrichment/translation/{storyId}/{itemId} or /enrichment/translation/{storyId}). Example: <br /> "
 			+ "[ <br />" + 
 			"  { <br />" + 

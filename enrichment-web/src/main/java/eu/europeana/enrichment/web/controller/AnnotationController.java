@@ -47,7 +47,7 @@ public class AnnotationController extends BaseRest {
 			+ " The parameter \"itemId\" further restricts retrieving the annotations related to the given story item.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItems(
-			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
@@ -78,7 +78,7 @@ public class AnnotationController extends BaseRest {
 			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item. ")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItemsPOST(
-			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
@@ -108,7 +108,7 @@ public class AnnotationController extends BaseRest {
 			+ "stories or items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionStory(
-			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
@@ -164,12 +164,12 @@ public class AnnotationController extends BaseRest {
     * @throws HttpException
     */
 	
-	@ApiOperation(value = "Get annotation preview", nickname = "getAnnotationItem", notes = "This method retrieves the annotations of "
+	@ApiOperation(value = "Get annotation preview for items", nickname = "getAnnotationItem", notes = "This method retrieves the annotations of "
 			+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}/{itemId}"
 			+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
-	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/annotation/entity/{storyId}/{itemId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationItem(
-			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@PathVariable("wikidataIdentifier") String wikidataIdentifier) throws Exception, HttpException {
@@ -198,12 +198,12 @@ public class AnnotationController extends BaseRest {
 	    * @throws HttpException
 	    */
 		
-		@ApiOperation(value = "Get annotation preview", nickname = "getAnnotationStory", notes = "This method retrieves the annotations of "
+		@ApiOperation(value = "Get annotation preview for stories", nickname = "getAnnotationStory", notes = "This method retrieves the annotations of "
 				+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}"
 				+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
-		@RequestMapping(value = "/enrichment/annotation/{storyId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+		@RequestMapping(value = "/enrichment/annotation/entity/{storyId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 		public ResponseEntity<String> getAnnotationStory(
-				@RequestParam(value = "wskey", required = false) String wskey,
+				@RequestParam(value = "wskey", required = true) String wskey,
 				@PathVariable("storyId") String storyId,
 				@PathVariable("wikidataIdentifier") String wikidataIdentifier) throws Exception, HttpException {
 			
