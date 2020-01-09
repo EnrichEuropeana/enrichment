@@ -49,11 +49,11 @@
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
 		
-		<!-- dependency>
+		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-web</artifactId>
 			<version>${version.enrichmentAPI}</version>
-		</dependency-->
+		</dependency>
 		
 		<!-- Other -->
 		<dependency>
