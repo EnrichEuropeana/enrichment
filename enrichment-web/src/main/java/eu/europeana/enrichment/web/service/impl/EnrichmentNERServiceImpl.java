@@ -1086,7 +1086,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			 * reading stories
 			 */
 			List<Map<String, Object>> stories = null;			
-			List<Map<String, Object>> retMapStories = javaJSONParser.getStoriesAndItemsFromJSON(brStories);
+			List<Map<String, Object>> retMapStories = javaJSONParser.getJSONObjects(brStories);
 			for(int i=0;i<retMapStories.size();i++)				
 			{
 				String type = (String) retMapStories.get(i).get("type");
@@ -1150,7 +1150,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			 * reading items
 			 */
 			List<Map<String, Object>> items = null;
-			List<Map<String, Object>> retMapItems = javaJSONParser.getStoriesAndItemsFromJSON(brItems);
+			List<Map<String, Object>> retMapItems = javaJSONParser.getJSONObjects(brItems);
 			for(int i=0;i<retMapItems.size();i++)				
 			{
 				String type = (String) retMapItems.get(i).get("type");

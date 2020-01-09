@@ -64,7 +64,7 @@ public class JavaJSONParser {
 	}
 	
 	@SuppressWarnings({ "serial", "unchecked" })
-	public List<Map<String, Object>> getStoriesAndItemsFromJSON (Reader reader) {
+	public List<Map<String, Object>> getJSONObjects (Reader reader) {
 			
 		Type collectionType = new TypeToken <List<Map<String, Object>>>() {}.getType();
 		List<Map<String, Object>> results = (List<Map<String, Object>>) new Gson()
