@@ -56,7 +56,7 @@ public class NERController extends BaseRest {
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation)."
 			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of "
 			+ "the given field of the story, it will be changed accordingly.")
-	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
@@ -77,7 +77,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
-			if(text.compareToIgnoreCase("{}")==0) text="";
+			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
 			String jsonLd = enrichmentNerService.getEntities(body,text, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
@@ -129,7 +129,7 @@ public class NERController extends BaseRest {
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation)."
 			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of" 
 			+ " the given field of the item, it will be changed accordingly.")
-	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getNEREntitiesItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
@@ -150,7 +150,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
-			if(text.compareToIgnoreCase("{}")==0) text="";
+			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
 			String jsonLd = enrichmentNerService.getEntities(body,text, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			

@@ -70,7 +70,7 @@ public class TranslationController extends BaseRest {
 			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\"." 
 			+ "The \"text\" body parameter is a new text for the given \"property\" provided by the user to be translated. If the provided non-empty body is different from the text of" 
 			+ " the given field of the story, it will be changed accordingly.")
-	@RequestMapping(value = "/enrichment/translation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/translation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslationStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
@@ -86,7 +86,7 @@ public class TranslationController extends BaseRest {
 			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setType(property);
-			if(text.compareToIgnoreCase("{}")==0) text="";
+			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
 			body.setText(text);
 			
 			String translation = enrichmentTranslationService.translate(body, true);
@@ -143,7 +143,7 @@ public class TranslationController extends BaseRest {
 			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\"."
 			+ "The \"text\" body parameter is a new text for the given \"property\" provided by the user to be translated. If the provided non-empty body is different from the text of" 
 			+ " the given field of the item, it will be changed accordingly.")
-	@RequestMapping(value = "/enrichment/translation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/translation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> postTranslationItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
@@ -160,7 +160,7 @@ public class TranslationController extends BaseRest {
 			body.setItemId(itemId);
 			body.setTranslationTool(translationTool);
 			body.setType(property);
-			if(text.compareToIgnoreCase("{}")==0) text="";
+			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
 			body.setText(text);
 			
 			String translation;
