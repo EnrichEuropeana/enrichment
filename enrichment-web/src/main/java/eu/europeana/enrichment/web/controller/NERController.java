@@ -52,7 +52,7 @@ public class NERController extends BaseRest {
 	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
-			+ "\"property\"=summary, description, or transcription, \"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
+			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation)."
 			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of "
 			+ "the given field of the story, it will be changed accordingly.")
@@ -125,7 +125,7 @@ public class NERController extends BaseRest {
 	@ApiOperation(value = "Get named entities for an item", nickname = "getNEREntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
-			+ "\"property\"=summary, description, or transcription, \"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
+			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation)."
 			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of" 
 			+ " the given field of the item, it will be changed accordingly.")

@@ -5,12 +5,12 @@
   <parent>
     <groupId>eu.europeana.enrich</groupId>
     <artifactId>enrichment-services</artifactId>
-    <version>${version.enrichmentAPI}</version>
+    <!--version>${version.enrichmentAPI}</version-->
+    <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>eu.europeana.enrich</groupId>
   <artifactId>enrichment-stanford-web</artifactId>
   <packaging>war</packaging>
-  <version>${version.enrichmentAPI}</version>
+  <!-- version>${version.enrichmentAPI}</version-->
   <name>enrichment-stanford-web</name>
   <url>http://maven.apache.org</url>
   <properties>

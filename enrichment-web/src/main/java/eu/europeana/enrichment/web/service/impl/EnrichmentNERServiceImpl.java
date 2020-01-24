@@ -26,9 +26,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Whitelist;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.i18n.LanguageCode;
 
@@ -1068,7 +1066,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 	@SuppressWarnings("finally")
 	@Override
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) {
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		/*
 		 * reading stories and items from json
@@ -1214,12 +1212,18 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		catch (FileNotFoundException e) {
 
 		    resultString = "{\"info\":\"Fail! File not found!\"}";
+		    throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, "File not found");
+		    
 		} catch (HttpException e) {
 			resultString = "{\"info\":\"Fail! Http Exception!\"}";
+			throw e;
+			
 		} catch (NoSuchAlgorithmException e) {
 			resultString = "{\"info\":\"Fail! No Such Algorithm for setting the security key for the item!\"}";
+			throw e;
 		} catch (UnsupportedEncodingException e) {
 			resultString = "{\"info\":\"Fail! Unsupported encoding for setting the security key of the item!\"}";
+			throw e;
 		} finally {
 			  if (brStories != null) {
 				  try {
@@ -1321,12 +1325,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		{			
 			String source = null;
 			if(itemId.compareTo("all")==0)
-			{		
-				source = persistentStoryEntityService.findStoryEntity(storyId).getSource();
+			{	
+				StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
+				if(story==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_STORY_ID, storyId);
+				source = story.getSource();				
 			}
 			else
 			{
-				source = persistentItemEntityService.findItemEntityFromStory(storyId, itemId).getSource();
+				ItemEntity item = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+				if(item==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_ITEM_ID, itemId); 
+				source = item.getSource();
 			}
 			
 			
@@ -1395,7 +1403,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		else
 		{
-			logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
+			logger.info("No valid entries found! Please use the POST method first to save the data to the database or provide a valid Wikidata identifier.");
 			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 		}
 	}
