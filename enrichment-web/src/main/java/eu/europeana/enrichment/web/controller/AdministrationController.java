@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.Resource;
 
@@ -20,6 +21,7 @@ import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
@@ -62,7 +64,7 @@ public class AdministrationController extends BaseRest {
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
 			@RequestParam(value = "jsonFileItems", required = true) String jsonItems
-			) throws ApplicationAuthenticationException {
+			) throws ParamValidationException, NoSuchAlgorithmException, UnsupportedEncodingException, HttpException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);

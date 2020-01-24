@@ -261,7 +261,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		}
 		else if(docList.size() == 0)
 		{
-			log.error("There are heither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			log.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
 			return null;
 		}
 		

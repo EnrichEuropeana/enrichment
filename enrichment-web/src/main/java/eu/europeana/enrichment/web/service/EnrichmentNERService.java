@@ -1,6 +1,8 @@
 package eu.europeana.enrichment.web.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -9,6 +11,7 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -66,8 +69,12 @@ public interface EnrichmentNERService {
 	 * 
 	 * @param jsonStoriesImport
 	 * @param jsonItemsImport
+	 * @throws ParamValidationException 
+	 * @throws HttpException 
+	 * @throws NoSuchAlgorithmException 
+	 * @throws UnsupportedEncodingException 
 	 */
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath);
+	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws ParamValidationException, HttpException, NoSuchAlgorithmException, UnsupportedEncodingException;
 	
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.
