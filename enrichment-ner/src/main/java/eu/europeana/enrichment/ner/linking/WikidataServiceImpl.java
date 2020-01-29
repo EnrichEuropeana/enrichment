@@ -24,6 +24,7 @@ import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
+import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 
 //import net.arnx.jsonic.JSONException;
@@ -366,14 +367,26 @@ public class WikidataServiceImpl implements WikidataService {
 		String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
 		if(WikidataJSON==null) 	
 		{
-			logger.info("Wikidata place found does not exist in a local file cache!");
+			logger.info("Wikidata entity does not exist in a local file cache!");
 			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
 			if(WikidataJSON==null || WikidataJSON.isEmpty()) return null;
 			HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
-			logger.info("Wikidata place is successfully saved to a local file cache!");			
+			logger.info("Wikidata entity is successfully saved to a local file cache!");			
 		}
 		
-		return getWikidataEntity(wikidataURL,WikidataJSON,type);
+		//check if the local cache wikidata entity is of the given type
+		WikidataEntity wikiEntity = new WikidataEntityImpl();
+		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getInternalType_jsonProp());
+		if(jsonTypeElement!=null && !jsonTypeElement.isEmpty())
+		{
+			if((jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("place")==0) ||
+					(!jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("agent")==0))	
+			{
+				return getWikidataEntity(wikidataURL,WikidataJSON,type);
+			}
+		}
+		
+		return null;
 		
 	}
 	

@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.solr.service.impl;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -215,14 +216,18 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	public String searchByWikidataURL_usingJackson(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
 		SolrQuery query = new SolrQuery();
 		
-		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
-		
+		//query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		String solrQueryString = "("+EntitySolrFields.ID+ ":\"" + wikidataURL + "\"" + " AND " + EntitySolrFields.INTERNAL_TYPE+ ":" + type + ")"; 
+		query.setQuery(solrQueryString);
+		//query.set("q", solrQueryString);
+		//query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		//query.set("q", EntitySolrFields.INTERNAL_TYPE+ ":" + type);		
 		
 		SolrDocumentList docList;
 		DocumentObjectBinder binder;

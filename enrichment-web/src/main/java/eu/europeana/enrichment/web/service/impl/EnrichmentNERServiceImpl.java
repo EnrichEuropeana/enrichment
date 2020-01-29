@@ -559,7 +559,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			if(returnTranslationEntity!=null)
 			{
 				results[0] = returnTranslationEntity.getTranslatedText();
-				results[1] = newStoryEntity.getLanguage();
+				results[1] = returnTranslationEntity.getLanguage();
 				
 			}
 			else
@@ -574,7 +574,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(returnTranslationEntity!=null)
 				{
 					results[0] = returnTranslationEntity.getTranslatedText();
-					results[1] = newStoryEntity.getLanguage();
+					results[1] = returnTranslationEntity.getLanguage();
 				}
 
 			}			
@@ -692,7 +692,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			if(returnTranslationEntity!=null)
 			{
 				results[0] = returnTranslationEntity.getTranslatedText();
-				results[1] = newItemEntity.getLanguage();
+				results[1] = returnTranslationEntity.getLanguage();
 				
 			}
 			else
@@ -707,7 +707,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(returnTranslationEntity!=null)
 				{
 					results[0] = returnTranslationEntity.getTranslatedText();
-					results[1] = newItemEntity.getLanguage();
+					results[1] = returnTranslationEntity.getLanguage();
 				}
 
 			}			

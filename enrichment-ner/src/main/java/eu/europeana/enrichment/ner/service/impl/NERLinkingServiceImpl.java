@@ -76,7 +76,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-						throw e;
+						//throw e;
 					}
 				}
 			}
