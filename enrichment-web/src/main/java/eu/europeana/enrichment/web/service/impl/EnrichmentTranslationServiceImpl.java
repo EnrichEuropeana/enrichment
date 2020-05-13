@@ -175,7 +175,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 			
 			
-			if(originalText == null || originalText.isEmpty())
+			if(originalText == null || originalText.isEmpty() || originalText.compareToIgnoreCase("-")==0)
 			{
 				logger.info("The original text is empty or null");
 				return "";

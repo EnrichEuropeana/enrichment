@@ -136,9 +136,9 @@ public class WikidataServiceImpl implements WikidataService {
 		// TODO: implement function and add type to distinguish between Place/Location
 		// and Agent/Person
 		List<String> retValue = new ArrayList<>();
-		if (reponse == null || reponse.equals(""))
+		if (reponse == null || reponse.equals("") || !reponse.startsWith("{"))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: null" + "\n");
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is either null or not appropriate (does not start with {)" + "\n");
 			return retValue;
 		}
 				

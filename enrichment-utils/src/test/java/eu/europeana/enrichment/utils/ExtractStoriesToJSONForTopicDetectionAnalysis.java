@@ -38,7 +38,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 * Importing stories and items to the mongo db from a json file
 */
 
-public class GenerateTextFilesForConceptualSearch {
+public class ExtractStoriesToJSONForTopicDetectionAnalysis {
 	
 	
 	@Resource(name = "persistentStoryEntityService")
@@ -96,33 +96,68 @@ public class GenerateTextFilesForConceptualSearch {
 //			}
 //		}
 
+		String keywordsFilePath = "C:/conceptual_search_stopwords/keyword_transcribathon_com.json";
+		BufferedReader keywordsFile = new BufferedReader(new FileReader(keywordsFilePath));
+		List<Map<String, Object>> keywords = null;
+		List<Map<String, Object>> keywordsFileAll = javaJSONParser.getJSONObjects(keywordsFile);//the whole context of the file
+		for(int i=0;i<keywordsFileAll.size();i++)				
+		{
+			String type = (String) keywordsFileAll.get(i).get("type");
+			if(type.compareTo("table")==0) {
+				keywords = (List<Map<String, Object>>) keywordsFileAll.get(i).get("data");
+			}
+		}
+
 		//extracting items in one json file
-//		String fileName = "C:/conceptual_search_documents/allItemTranslations.json";
-//		BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
-//		bwTranslations.write("{\"content\":{");				
-//				
-//		List<TranslationEntity> itemsTranslations = persistentTranslationEntityService.getAllTranslationEntities();
-//		List<String> itemIDs = new ArrayList<String>();
-//		
-//		for(int i=0;i<itemsTranslations.size();i++)
-//		{
-//			if(itemsTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && itemsTranslations.get(i).getItemId().compareToIgnoreCase("all")!=0
-//					&& itemsTranslations.get(i).getTranslatedText()!=null && !itemsTranslations.get(i).getTranslatedText().isEmpty())
-//			{
-//				
-//				String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
-//
-//				bwTranslations.write("\""+Integer.toString(itemIDs.size())+"\":"+"\""+correctedTranslationsForQuotationWithin+"\",\n");
-//				
-//				System.out.print("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
-//			
-//				itemIDs.add(itemsTranslations.get(i).getItemId());
-//				
-//			}
-//		}
-//
-//		bwTranslations.write("}\n}");		
-//		bwTranslations.close();	
+		String fileName = "C:/conceptual_search_documents/allStoryTranslations.json";
+		BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
+		bwTranslations.write("{\"content\":{");				
+				
+		List<StoryEntity> storyTranslations = persistentStoryEntityService.getAllStoryEntities();
+		List<String> storyIDs = new ArrayList<String>();
+		Set<String> storyKeywords = new HashSet<String>();
+		
+		for(int i=0;i<storyTranslations.size();i++)
+		{
+			if(storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			{
+				
+				String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
+
+				String correctedTranslationsForQuotationWithin = storyTranscriptionOneLine.replaceAll("\"", "\\\\\"");
+
+				
+				for(int k=0;k<keywords.size();k++)
+				{
+					String storyID = (String) keywords.get(k).get("StoryId");
+					
+					if(storyID.compareToIgnoreCase(storyTranslations.get(i).getStoryId())==0)
+					{
+						
+						String newKeywordsFromFileString = (String) keywords.get(k).get("Keywords");
+						List<String> newKeywordsFromFile = Arrays.asList(newKeywordsFromFileString.split(","));
+						for(int j=0;j<newKeywordsFromFile.size();j++)
+						{
+							storyKeywords.add(newKeywordsFromFile.get(j));
+						}
+					}
+				}
+				
+				useStoryKeywordsThatComeInMoreThen5Stories(storyTranslations,storyKeywords,keywords);
+
+				bwTranslations.write("\""+correctedTranslationsForQuotationWithin+"\":"+"\""+String.join(", ", storyKeywords) +"\",\n");
+				
+				System.out.print("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
+			
+				storyIDs.add(storyTranslations.get(i).getStoryId());
+				
+				storyKeywords.clear();
+				
+			}
+		}
+
+		bwTranslations.write("}\n}");		
+		bwTranslations.close();	
 		
 		
 		//generate the keywords file for the conceptual search
@@ -164,37 +199,37 @@ public class GenerateTextFilesForConceptualSearch {
 //
 //		bwKeywords.close();	
 
-		//creating a file for the multi-label topic classification
-		String fileNameTopicClassification = "C:/conceptual_search_stopwords/stories_topic_classification.tsv";
-		BufferedWriter bwTopicClassification = new BufferedWriter(new FileWriter(new File(fileNameTopicClassification)));			
-		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
-		List<String> storyIds = new ArrayList<String>();
-		List<String> storyTranscriptions = new ArrayList<String>();//this corresponds to the storyIds list
-		for(int i=0;i<allStories.size();i++)
-		{
-			if(allStories.get(i).getLanguage().compareToIgnoreCase("en")==0 && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
-			{				
-				//String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
-				storyIds.add(allStories.get(i).getStoryId());
-				storyTranscriptions.add(allStories.get(i).getTranscriptionText());
-			}
-		}
-
-		
-		String keywordsFilePath = "C:/conceptual_search_stopwords/keyword_transcribathon_com.json";
-		BufferedReader keywordsFile = new BufferedReader(new FileReader(keywordsFilePath));
-		List<Map<String, Object>> keywords = null;
-		List<Map<String, Object>> keywordsFileAll = javaJSONParser.getJSONObjects(keywordsFile);//the whole context of the file
-		for(int i=0;i<keywordsFileAll.size();i++)				
-		{
-			String type = (String) keywordsFileAll.get(i).get("type");
-			if(type.compareTo("table")==0) {
-				keywords = (List<Map<String, Object>>) keywordsFileAll.get(i).get("data");
-			}
-		}
-
-		Set<String> storyKeywords = new HashSet<String>();
-		
+//		//creating a file for the multi-label topic classification
+//		String fileNameTopicClassification = "C:/conceptual_search_stopwords/stories_topic_classification.tsv";
+//		BufferedWriter bwTopicClassification = new BufferedWriter(new FileWriter(new File(fileNameTopicClassification)));			
+//		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
+//		List<String> storyIds = new ArrayList<String>();
+//		List<String> storyTranscriptions = new ArrayList<String>();//this corresponds to the storyIds list
+//		for(int i=0;i<allStories.size();i++)
+//		{
+//			if(allStories.get(i).getLanguage().compareToIgnoreCase("en")==0 && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
+//			{				
+//				//String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
+//				storyIds.add(allStories.get(i).getStoryId());
+//				storyTranscriptions.add(allStories.get(i).getTranscriptionText());
+//			}
+//		}
+//
+//		
+//		String keywordsFilePath = "C:/conceptual_search_stopwords/keyword_transcribathon_com.json";
+//		BufferedReader keywordsFile = new BufferedReader(new FileReader(keywordsFilePath));
+//		List<Map<String, Object>> keywords = null;
+//		List<Map<String, Object>> keywordsFileAll = javaJSONParser.getJSONObjects(keywordsFile);//the whole context of the file
+//		for(int i=0;i<keywordsFileAll.size();i++)				
+//		{
+//			String type = (String) keywordsFileAll.get(i).get("type");
+//			if(type.compareTo("table")==0) {
+//				keywords = (List<Map<String, Object>>) keywordsFileAll.get(i).get("data");
+//			}
+//		}
+//
+//		Set<String> storyKeywords = new HashSet<String>();
+//		
 //		String previousStoryId = (String) keywords.get(0).get("StoryId");
 //		String newKeywordsFromFileString = (String) keywords.get(0).get("Keywords");
 //		List<String> newKeywordsFromFile = Arrays.asList(newKeywordsFromFileString.split(","));
@@ -202,37 +237,35 @@ public class GenerateTextFilesForConceptualSearch {
 //		{
 //			storyKeywords.add(newKeywordsFromFile.get(j));
 //		}
-
-		for(int m=0;m<storyIds.size();m++)
-		{
-			for(int i=0;i<keywords.size();i++)
-			{
-				String storyID = (String) keywords.get(i).get("StoryId");
-				
-				if(storyID.compareToIgnoreCase(storyIds.get(m))==0)
-				{
-					String newKeywordsFromFileString = (String) keywords.get(i).get("Keywords");
-					List<String> newKeywordsFromFile = Arrays.asList(newKeywordsFromFileString.split(","));
-					for(int j=0;j<newKeywordsFromFile.size();j++)
-					{
-						storyKeywords.add(newKeywordsFromFile.get(j));
-					}
-	
-				}
-			}
-			
-			useStoryKeywordsThatComeInMoreThen5Stories(allStories,storyKeywords,keywords);
-			
-			String storyTranscriptionOneLine = storyTranscriptions.get(m).replaceAll("[\r\n\t]+", " ");
-			if(m<storyIds.size()-1) bwTopicClassification.write(String.join(",", storyKeywords) + "\t" + storyTranscriptionOneLine+"\t");
-			else bwTopicClassification.write(String.join(",", storyKeywords) + "\t" + storyTranscriptionOneLine);
-			storyKeywords.clear();
-		}
-		
-		keywordsFile.close();
-		bwTopicClassification.close();
-
-		assertTrue(true);
+//
+//		for(int m=0;m<storyIds.size();m++)
+//		{
+//			for(int i=0;i<keywords.size();i++)
+//			{
+//				String storyID = (String) keywords.get(i).get("StoryId");
+//				
+//				if(storyID.compareToIgnoreCase(storyIds.get(m))==0)
+//				{
+//					newKeywordsFromFileString = (String) keywords.get(i).get("Keywords");
+//					newKeywordsFromFile = Arrays.asList(newKeywordsFromFileString.split(","));
+//					for(int j=0;j<newKeywordsFromFile.size();j++)
+//					{
+//						storyKeywords.add(newKeywordsFromFile.get(j));
+//					}
+//	
+//				}
+//			}
+//			
+//			String storyTranscriptionOneLine = storyTranscriptions.get(m).replaceAll("[\r\n\t]+", " ");
+//			if(m<storyIds.size()-1) bwTopicClassification.write(String.join(",", storyKeywords) + "\t" + storyTranscriptionOneLine+"\t");
+//			else bwTopicClassification.write(String.join(",", storyKeywords) + "\t" + storyTranscriptionOneLine);
+//			storyKeywords.clear();
+//		}
+//		
+//		keywordsFile.close();
+//		bwTopicClassification.close();
+//
+//		assertTrue(true);
 		
 	}
 	private void useStoryKeywordsThatComeInMoreThen5Stories(List<StoryEntity> storyTranslations, Set<String> storyKeywords, List<Map<String, Object>> keywords)
