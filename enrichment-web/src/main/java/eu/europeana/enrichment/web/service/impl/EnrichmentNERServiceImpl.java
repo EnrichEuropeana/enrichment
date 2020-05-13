@@ -266,7 +266,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		else
 		{
 			allNERFieldTypes.add("transcription");
-			allNERFieldTypes.add("description");
+			//allNERFieldTypes.add("description");
 		}
 
 		

@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -16,6 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -32,6 +37,9 @@ public class NERController extends BaseRest {
 	@Resource
 	EnrichmentNERService enrichmentNerService;
 	
+	@Resource(name = "persistentTranslationEntityService")
+	PersistentTranslationEntityService persistentTranslationEntityService;
+
 	/**
 	 * This method represents the /enrichment/ner/{storyId} end point,
 	 * where a request with a translated text is send and the named entities based on this text are retrieved.
@@ -69,19 +77,58 @@ public class NERController extends BaseRest {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			EnrichmentNERRequest body = new EnrichmentNERRequest();
-			body.setStoryId(storyId);
-			body.setItemId("all");
-			body.setTranslationTool(translationTool);
-			body.setLinking(Arrays.asList(linking.split(",")));
-			body.setNerTools(Arrays.asList(nerTools.split(",")));
-			body.setOriginal(original);
+//			if(storyId.compareToIgnoreCase("nerallitems")==0)
+//			{
+//				EnrichmentNERRequest body = new EnrichmentNERRequest();
+//				String linking_local = "Wikidata";
+//				String nerTools_local = "Stanford_NER,DBpedia_Spotlight";
+//				String jsonLd;
+//				
+//				//deleting all ItemEntities in the db for testing the input from a json file
+//				List<TranslationEntity> all_translation_entities = persistentTranslationEntityService.getAllTranslationEntities();
+//
+//				if(all_translation_entities!=null)
+//				{
+//					for(TranslationEntity tr_entity : all_translation_entities) {	
+//						
+//						if(tr_entity.getItemId().compareToIgnoreCase("all")!=0)
+//						{
+//						
+//							body.setStoryId(tr_entity.getStoryId());
+//							body.setItemId(tr_entity.getItemId());
+//							body.setTranslationTool("Google");
+//							body.setLinking(Arrays.asList(linking_local.split(",")));
+//							body.setNerTools(Arrays.asList(nerTools_local.split(",")));
+//							body.setOriginal(false);
+//												
+//							if(tr_entity.getTranslatedText()!=null && tr_entity.getTranslatedText().compareToIgnoreCase("")!=0)
+//							{
+//								jsonLd = enrichmentNerService.getEntities(body,null,true);
+//							}
+//						}				
+//					}
+//				}
+//				
+//				ResponseEntity<String> response = new ResponseEntity<String>("all-items-ner-done", HttpStatus.OK);
+//				return response;
+//			}
+//			else
+//			{
 			
-			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
-			String jsonLd = enrichmentNerService.getEntities(body,text, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-			
-			return response;
+				EnrichmentNERRequest body = new EnrichmentNERRequest();
+				body.setStoryId(storyId);
+				body.setItemId("all");
+				body.setTranslationTool(translationTool);
+				body.setLinking(Arrays.asList(linking.split(",")));
+				body.setNerTools(Arrays.asList(nerTools.split(",")));
+				body.setOriginal(original);
+				
+				if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
+				String jsonLd = enrichmentNerService.getEntities(body,text, true);
+				ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+				
+				return response;
+//			}
 		
 	}
 	

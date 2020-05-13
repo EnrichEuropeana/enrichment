@@ -51,7 +51,11 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 		xmlMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
 		 
 		DBpediaResponseHeader value = xmlMapper.readValue(response, DBpediaResponseHeader.class);
+		
+		if(value==null) return null;
+		
 		return value.getResult();
+		
 	}
 	
 	private String createRequest(String dbpediaUrl) {
