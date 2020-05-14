@@ -1350,7 +1350,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 				for(String wikidataId : entity.getPreferredWikidataIds())
 				{				
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source); 
+					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source, entity.getLabel()); 
 					
 					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
 					{
@@ -1364,7 +1364,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				//in case of annotations for a specific item take into account additionally all named entities labels found by Stanford_NER
 				if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
 				{
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source); 
+					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source, entity.getLabel()); 
 					
 					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
 					{

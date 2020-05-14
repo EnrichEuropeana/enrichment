@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.model;
 
+import java.util.Map;
+
 public interface NamedEntityAnnotation {
 	
 	/**
@@ -48,8 +50,8 @@ public interface NamedEntityAnnotation {
 	String getMotivation ();
 	void setMotivation (String motivationParam);
 	
-	String getBody ();
-	void setBody (String bodyParam);
+	Map<String,Object> getBody ();
+	void setBody (Map<String,Object> bodyParam);
 
 	String getWikidataId ();
 

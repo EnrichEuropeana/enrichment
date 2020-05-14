@@ -1,5 +1,9 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,12 +16,17 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
 	private final String idBase = "http://dsi-demo.ait.ac.at/enrichment-web/enrichment/annotation/";
+	private final String targetBase = "https://europeana.transcribathon.eu/documents/story/item/?";
+	
+	
 	private String annoId;
 	private String source;
 	private String target;
 	private String type;
 	private String motivation;
-	private String body;
+	
+	private Map<String,Object> body;
+
 	private String wikidataId;
 	private String storyId;
 	private String itemId;
@@ -52,7 +61,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		annoId = "";
 		type = "";
 		motivation = "";
-		body = "";
+		body = new HashMap<String, Object>();
 		wikidataId = "";
 		storyId = "";
 		itemId = "";		
@@ -60,21 +69,27 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	
 	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
 		this.source = entity.getWikidataId();
-		this.target = entity.getTarget();
+		this.target = targetBase + "story="+entity.getStoryId()+"&item="+entity.getItemId();
 		this.annoId = entity.getAnnoId();
 		this.type = "Annotation";
 		this.motivation = "tagging";
-		this.body = this.source;
+		this.body = new HashMap<String, Object> ();
+		this.body.put("id", entity.getWikidataId());
+		Map<String,String> bodyPrefLabel = new HashMap<String, String>();
+		@SuppressWarnings("unchecked")
+		Map<String,String> bodyPrefLableOld = (Map<String,String>)entity.getBody().get("prefLabel");
+		bodyPrefLabel.put("en",bodyPrefLableOld.get("en"));
+		this.body.put("prefLabel", bodyPrefLabel);
 		this.wikidataId = entity.getWikidataId();
 		this.storyId = entity.getStoryId();
 		this.itemId = entity.getItemId();
 
 	}
 
-	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource) {
+	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityLabel) {
 
 		this.source = wikidataId;
-		this.target = storyOrItemSource;	
+		this.target = targetBase + "story="+storyId+"&item="+itemId;	
 		if(itemId.compareTo("all")==0)
 		{
 			this.annoId = idBase + storyId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
@@ -85,7 +100,12 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		}
 		this.type = "Annotation";
 		this.motivation = "tagging";
-		this.body = this.source;
+		this.body = new HashMap<String, Object> ();
+		this.body.put("id", wikidataId);
+		Map<String,String> bodyPrefLabel = new HashMap<String, String>();
+		bodyPrefLabel.put("en", entityLabel);
+		this.body.put("prefLabel", bodyPrefLabel);
+		
 		this.wikidataId = wikidataId;
 		this.storyId = storyId;
 		this.itemId = itemId;
@@ -163,13 +183,13 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
 	@Override
 	@JsonProperty("body")
-	public String getBody() {
+	public Map<String,Object> getBody() {
 		
 		return body;
 	}
 
 	@Override
-	public void setBody(String bodyParam) {
+	public void setBody(Map<String,Object> bodyParam) {
 		body = bodyParam;
 		
 	}
