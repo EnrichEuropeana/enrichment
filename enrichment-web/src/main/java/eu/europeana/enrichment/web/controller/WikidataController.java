@@ -45,7 +45,6 @@ public class WikidataController extends BaseRest {
 	@Resource(name = "jacksonSerializer")
 	JacksonSerializer jacksonSerializer;
 
-
 	
     /**
      * 	 * This method represents the /enrichment/wikidata end point,

@@ -25,8 +25,7 @@ public class GoogleTranslator {
 		   start = end, end = iterator.next()) {
 		  System.out.println(source.substring(start,end));
 		 }
-		 
-		 
+		 		 
 
 	  GoogleTranslator http = new GoogleTranslator();
 	  //String word = http.callUrlAndParseResult("ro", "en", "Iară eu, sărmanul de mine, de acestea de toate am fost închis și părăsit, am fost silit în loc de acestea de toate să mă mulțămesc cu sbierătele sălbatece ale Arabilor și a Chinezilor, ce auzindu-le te înfiora până la oase, aceasta era muzica mea și a consoldaților mei de pe vapor");

@@ -232,7 +232,7 @@ public class TranslationController extends BaseRest {
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property) throws Exception {
 	
-			// Check client access (a valid “wskey” must be provided)
+			// Check client access (a valid “wskey” must be provided) 
 			validateApiKey(wskey);
 			
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
