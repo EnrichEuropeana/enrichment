@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -46,6 +49,8 @@ public class ItemEntityTranscribathonImpl implements ItemEntityTranscribathon {
 	private String timestamp;
 	private String lockedTime;
 	private int lockedUser;
+	private String description;
+	private List<Map<String,Object>> transcriptions;
 	
 	/*
 	 * story related fields
@@ -85,6 +90,28 @@ public class ItemEntityTranscribathonImpl implements ItemEntityTranscribathon {
 	/*
 	 * item getters and setters
 	 */
+	@Override
+	@JsonProperty("Description")
+	public String getDescription() {
+		return description;
+	}
+	@Override
+	public void setDescription(String desc) {
+		this.description=desc;
+	}
+	
+	@Override
+	@JsonProperty("Transcriptions")
+	public List<Map<String,Object>> getTranscriptions() {
+		return transcriptions;
+	}
+	
+	@Override
+	public void setTranscriptions(List<Map<String,Object>> trans) {
+		this.transcriptions=trans;
+	}
+
+	
 	@Override
 	@JsonProperty("Manifest")
 	public String getManifest() {

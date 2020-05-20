@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -346,7 +347,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					newStories[0].setStoryId(storyId);
 					newStories[0].setSummary("");
 					newStories[0].setTitle(listItemTranscribathon.get(0).getStoryDcTitle());
-					newStories[0].setTranscriptionText("");
+					//getting the transcription text
+					List<Map<String,Object>> transcriptions = listItemTranscribathon.get(0).getTranscriptions();
+					for (Map<String,Object> transc : transcriptions) {
+						if(transc.containsKey("TextNoTags"))
+						{
+							newStories[0].setTranscriptionText((String)transc.get("TextNoTags"));
+						}
+					}
 					
 					enrichmentNerService.uploadStories(newStories);
 				}
@@ -362,6 +370,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
 					ObjectMapper objectMapper = new ObjectMapper();		
 					listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<ItemEntityTranscribathonImpl>>(){});
+					//getting the transcription text
+					List<Map<String,Object>> transcriptions = listItemTranscribathon.get(0).getTranscriptions();
+					for (Map<String,Object> transc : transcriptions) {
+						if(transc.containsKey("TextNoTags"))
+						{
+							story.setTranscriptionText(story.getTranscriptionText() + " " + (String)transc.get("TextNoTags"));
+						}
+					}
+					StoryEntity [] updateStories = new StoryEntity [1];
+					updateStories[0]=story;
+					enrichmentNerService.uploadStories(updateStories);
+
 				}
 				
 				if(listItemTranscribathon!=null && !listItemTranscribathon.isEmpty())
@@ -370,7 +390,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					newItems[0] = new ItemEntityImpl();
 					
 					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newItems[0].setDescription(newText);
-					else newItems[0].setDescription("");
+					else newItems[0].setDescription(listItemTranscribathon.get(0).getDescription());
 					
 					newItems[0].setItemId(itemId);
 					
@@ -386,7 +406,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					}
 					else 
 					{
-						newItems[0].setTranscriptionText("");
+						//getting the transcription text
+						List<Map<String,Object>> transcriptions = listItemTranscribathon.get(0).getTranscriptions();
+						for (Map<String,Object> transc : transcriptions) {
+							if(transc.containsKey("TextNoTags"))
+							{
+								newItems[0].setTranscriptionText((String)transc.get("TextNoTags"));
+							}
+						}
 						newItems[0].setKey("");
 					}
 						
