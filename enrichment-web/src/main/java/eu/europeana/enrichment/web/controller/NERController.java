@@ -84,7 +84,6 @@ public class NERController extends BaseRest {
 //				String nerTools_local = "Stanford_NER,DBpedia_Spotlight";
 //				String jsonLd;
 //				
-//				//deleting all ItemEntities in the db for testing the input from a json file
 //				List<TranslationEntity> all_translation_entities = persistentTranslationEntityService.getAllTranslationEntities();
 //
 //				if(all_translation_entities!=null)
@@ -112,8 +111,6 @@ public class NERController extends BaseRest {
 //				ResponseEntity<String> response = new ResponseEntity<String>("all-items-ner-done", HttpStatus.OK);
 //				return response;
 //			}
-//			else
-//			{
 			
 				EnrichmentNERRequest body = new EnrichmentNERRequest();
 				body.setStoryId(storyId);
@@ -128,7 +125,6 @@ public class NERController extends BaseRest {
 				ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 				
 				return response;
-//			}
 		
 	}
 	

@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ItemEntityTranscribathon {
 
 
@@ -154,5 +157,9 @@ public interface ItemEntityTranscribathon {
 	String getTitle();
 	void setItemId(int itemId);
 	int getItemId();
+	String getDescription();
+	void setDescription(String description);
+	List<Map<String,Object>> getTranscriptions();
+	void setTranscriptions(List<Map<String,Object>> transcriptions);
 
 }

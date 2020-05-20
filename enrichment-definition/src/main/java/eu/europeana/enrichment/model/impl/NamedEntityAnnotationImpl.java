@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -69,7 +68,14 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	
 	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
 		this.source = entity.getWikidataId();
-		this.target = targetBase + "story="+entity.getStoryId()+"&item="+entity.getItemId();
+		if(entity.getItemId().compareToIgnoreCase("all")!=0)
+		{
+			this.target = targetBase + "story="+entity.getStoryId()+"&item="+entity.getItemId();
+		}
+		else
+		{
+			this.target = targetBase + "story="+entity.getStoryId();
+		}
 		this.annoId = entity.getAnnoId();
 		this.type = "Annotation";
 		this.motivation = "tagging";
@@ -89,7 +95,14 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityLabel) {
 
 		this.source = wikidataId;
-		this.target = targetBase + "story="+storyId+"&item="+itemId;	
+		if(itemId.compareToIgnoreCase("all")!=0)
+		{
+			this.target = targetBase + "story="+storyId+"&item="+itemId;	
+		}
+		else
+		{
+			this.target = targetBase + "story="+storyId;
+		}
 		if(itemId.compareTo("all")==0)
 		{
 			this.annoId = idBase + storyId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
