@@ -88,7 +88,7 @@ public interface EnrichmentNERService {
 	 * @throws HttpException
 	 * @throws IOException
 	 */
-	public String getStoryOrItemAnnotationCollection (String storyId, String itemId, boolean save) throws HttpException, IOException;
+	public String getStoryOrItemAnnotationCollection (String storyId, String itemId, boolean save, boolean crosschecked) throws HttpException, IOException;
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of a single WikidataEntity using the NamedEntityAnnotation class.
 	 * 

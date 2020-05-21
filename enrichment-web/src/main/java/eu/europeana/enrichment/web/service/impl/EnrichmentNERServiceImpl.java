@@ -1298,7 +1298,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity) throws HttpException, IOException {
+	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked) throws HttpException, IOException {
 		
 		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
 		//just retrieve the entities from the db
@@ -1309,7 +1309,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			{
 				for(NamedEntityAnnotation anno : entities )
 				{
-					namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
+					if(!crosschecked || (crosschecked && anno.getWikidataId().contains("www.wikidata.org")))
+					{
+						namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
+					}
+
 				}
 				
 				return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
@@ -1366,12 +1370,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				{
 					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source, entity.getLabel()); 
 					
-					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
+					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation) && !crosschecked)
 					{
 						namedEntityAnnoList.add(tmpNamedEntityAnnotation);
-						//saving the entity to the db
-						persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
 					}
+					
+					//saving the entity to the db
+					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+
 				}
 			
 			}

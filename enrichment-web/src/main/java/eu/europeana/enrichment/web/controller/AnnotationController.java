@@ -39,17 +39,19 @@ public class AnnotationController extends BaseRest {
      */
 	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionItems", notes = "This method retrieves the annotations of "
 			+ "items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"itemId\" further restricts retrieving the annotations related to the given story item.")
+			+ " The parameter \"itemId\" further restricts retrieving the annotations related to the given story item."
+			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItems(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@PathVariable("storyId") String storyId,
+			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
+			@PathVariable("storyId") String storyId,			
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, false);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, false, crosschecked);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
@@ -70,17 +72,19 @@ public class AnnotationController extends BaseRest {
      */
 	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionItemsPOST", notes = "This method stores the annotations of "
 			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item. ")
+			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item. "
+			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItemsPOST(
 			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, true);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, true, crosschecked);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
@@ -100,16 +104,18 @@ public class AnnotationController extends BaseRest {
      * @throws HttpException
      */
 	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionStory", notes = "This method retrieves the annotations of "
-			+ "stories or items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story.")
+			+ "stories or items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
+			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
 			@PathVariable("storyId") String storyId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", false);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", false,crosschecked);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
@@ -129,16 +135,18 @@ public class AnnotationController extends BaseRest {
      * @throws HttpException
      */
 	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionStoryPOST", notes = "This method stores the annotations of "
-			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story.")
+			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
+			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionStoryPOST(
 			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
 			@PathVariable("storyId") String storyId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", true);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", true,crosschecked);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
