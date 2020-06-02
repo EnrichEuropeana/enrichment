@@ -1,5 +1,5 @@
 # enrichment services
-API powering the automatic semantic enrichments within the [https://europeana.transcribathon.eu/](Transcribathon Platform)
+API powering the automatic semantic enrichments within the [Transcribathon Platform](https://europeana.transcribathon.eu) 
 
 ## License
 
