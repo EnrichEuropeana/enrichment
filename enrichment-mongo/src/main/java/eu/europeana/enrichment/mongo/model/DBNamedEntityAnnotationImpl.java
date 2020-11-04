@@ -16,8 +16,8 @@ public class DBNamedEntityAnnotationImpl extends NamedEntityAnnotationImpl {
 		super();
 	}
 
-	public DBNamedEntityAnnotationImpl(String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityLabel) {
-		super(storyId, itemId, wikidataId, storyOrItemSource, entityLabel);
+	public DBNamedEntityAnnotationImpl(String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityHiddenLabel, String entityPrefLabel, String property, String entityType) {
+		super(storyId, itemId, wikidataId, storyOrItemSource, entityHiddenLabel, entityPrefLabel, property, entityType);
 	}
 
 	public DBNamedEntityAnnotationImpl(NamedEntityAnnotation entity) {

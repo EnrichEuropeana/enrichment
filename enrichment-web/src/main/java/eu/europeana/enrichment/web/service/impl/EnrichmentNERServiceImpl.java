@@ -38,6 +38,7 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.ItemEntityTranscribathonImpl;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
@@ -55,6 +56,8 @@ import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
@@ -1298,99 +1301,110 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked) throws HttpException, IOException {
+	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked, String property) throws HttpException, IOException, SolrNamedEntityServiceException {
 		
 		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
-		//just retrieve the entities from the db
-		if(!saveEntity)
+		
+		//try first to retrieve the entities from the db
+		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryItemIdAndProperty(storyId, itemId, property);
+		if(entities!=null && !entities.isEmpty())
 		{
-			List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryAndItemId(storyId, itemId);
-			if(entities!=null && !entities.isEmpty())
+			for(NamedEntityAnnotation anno : entities )
 			{
-				for(NamedEntityAnnotation anno : entities )
+				if(!crosschecked || (crosschecked && anno.getWikidataId().contains("www.wikidata.org")))
 				{
-					if(!crosschecked || (crosschecked && anno.getWikidataId().contains("www.wikidata.org")))
-					{
-						namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
-					}
-
+					namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
 				}
-				
-				return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
-			}
-			else
-			{
-				logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
-				return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
+
 			}
 			
+			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
+		}
+		else if(!saveEntity)
+		{
+			logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
+			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
+		}
+			
+		
+		String source = null;
+		if(itemId.compareTo("all")==0)
+		{	
+			StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
+			if(story==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_STORY_ID, storyId);
+			source = story.getSource();				
 		}
 		else
-		{			
-			String source = null;
-			if(itemId.compareTo("all")==0)
-			{	
-				StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
-				if(story==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_STORY_ID, storyId);
-				source = story.getSource();				
-			}
-			else
-			{
-				ItemEntity item = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
-				if(item==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_ITEM_ID, itemId); 
-				source = item.getSource();
-			}
-			
-			
-			Set<NamedEntity> NESet = new HashSet<NamedEntity>();
-			
-			//taking NamedEntitiy-ies for the story "description" and "transcription" 
-			NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,itemId, "description", false));
-			NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,itemId,"transcription", false));
-			
-			for (NamedEntity entity : NESet)
-			{
-				
+		{
+			ItemEntity item = persistentItemEntityService.findItemEntityFromStory(storyId, itemId);
+			if(item==null) throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_ITEM_ID, itemId); 
+			source = item.getSource();
+		}
+	
+		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
+	
+		String allPropertyFields [] = {"description","transcription","summary"}; 
+		
+		for (String propertyField : allPropertyFields)
+		{
+			//taking NamedEntitiy-ies for the given field
+			NESet.clear();
+			NESet.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId,itemId, propertyField, false));
 
-				for(String wikidataId : entity.getPreferredWikidataIds())
-				{				
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source, entity.getLabel()); 
+			if(NESet!=null && !NESet.isEmpty())
+			{
+				for (NamedEntity entity : NESet)
+				{
+
+					for(String wikidataId : entity.getPreferredWikidataIds())
+					{				
+						//getting Solr WikidataEntity prefLabel
+						WikidataEntity wikiEntity = solrWikidataEntityService.getWikidataEntity(wikidataId, entity.getType());
+						String entityPrefLabel = entity.getLabel();
+						if(wikiEntity!=null)
+						{
+							Map<String, List<String>> prefLabelMap = wikiEntity.getPrefLabel();
+							entityPrefLabel = prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").get(0);
+						}
+												
+						NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, wikidataId, source, entity.getLabel(),entityPrefLabel, propertyField, entity.getType()); 
+						
+						if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
+						{
+							namedEntityAnnoList.add(tmpNamedEntityAnnotation);					
+							//saving the entity to the db
+							persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+						}
+					}
 					
-					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation))
+					//in case of annotations for the whole story take only cross-checked wikidata and dbpedia entities
+					//in case of annotations for a specific item take into account additionally all named entities labels found by Stanford_NER
+					if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
 					{
-						namedEntityAnnoList.add(tmpNamedEntityAnnotation);					
+						NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source, entity.getLabel(), entity.getLabel(), propertyField, entity.getType()); 
+						
+						if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation) && !crosschecked)
+						{
+							namedEntityAnnoList.add(tmpNamedEntityAnnotation);
+						}
+						
 						//saving the entity to the db
 						persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
+	
 					}
-				}
 				
-				//in case of annotations for the whole story take only cross-checked wikidata and dbpedia entities
-				//in case of annotations for a specific item take into account additionally all named entities labels found by Stanford_NER
-				if(itemId.compareTo("all")!=0 && (entity.getDBpediaIds().isEmpty() || entity.getDBpediaIds()==null))
-				{
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(storyId,itemId, entity.getLabel(), source, entity.getLabel()); 
-					
-					if(!namedEntityAnnoList.contains(tmpNamedEntityAnnotation) && !crosschecked)
-					{
-						namedEntityAnnoList.add(tmpNamedEntityAnnotation);
-					}
-					
-					//saving the entity to the db
-					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
-
 				}
-			
 			}
-			
-			if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
-			{
-				return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
-			}
-			else
-			{
-				logger.info("No valid entries found! There are no entries for the given storyId to be generated.");
-				return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated.\"}";
-			}
+		}
+		
+		if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
+		{
+			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
+		}
+		else
+		{
+			logger.info("No valid entries found! There are no entries for the given storyId to be generated.");
+			return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated.\"}";
 		}
 		
 	}

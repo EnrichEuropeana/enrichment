@@ -23,6 +23,13 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 		
 		return namedEntityAnnotationDao.findNamedEntityAnnotationWithStoryAndItemId(storyId, itemId);
 	}
+	
+	@Override
+	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property) {
+		
+		return namedEntityAnnotationDao.findNamedEntityAnnotationWithStoryItemIdAndProperty(storyId, itemId, property);
+	}
+
 
 	@Override
 	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) {

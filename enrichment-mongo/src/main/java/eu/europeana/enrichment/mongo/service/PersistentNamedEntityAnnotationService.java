@@ -28,6 +28,17 @@ public interface PersistentNamedEntityAnnotationService {
 
 	/**
 	 * This method retrieves an entity from the Mongo 
+	 * database based on the given parameters
+	 * 
+	 * @param storyId
+	 * @param itemId
+	 * @param property
+	 * @return
+	 */
+	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property);
+
+	/**
+	 * This method retrieves an entity from the Mongo 
 	 * database based on their storyId and wikidataId
 	 * 
 	 * @param storyId

@@ -1,10 +1,7 @@
 package eu.europeana.enrichment.solr.service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
@@ -38,6 +35,7 @@ public interface SolrWikidataEntityService {
 	
 	String searchNamedEntities_usingJackson(String wskey, String query, String type, String lang, String solrQuery, String solrSort,
 			String pageSize, String page) throws SolrNamedEntityServiceException, IOException;
+	WikidataEntity getWikidataEntity(String wikidataURL, String type) throws SolrNamedEntityServiceException;
 	
 	
 	

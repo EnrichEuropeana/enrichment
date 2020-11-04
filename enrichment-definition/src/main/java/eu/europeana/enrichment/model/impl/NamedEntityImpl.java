@@ -39,7 +39,6 @@ public class NamedEntityImpl implements NamedEntity{
 		dbpediaWikidataIds = new ArrayList<>();
 	}
 	
-
 	@Override
 	public String getId() {
 		// TODO Auto-generated method stub
