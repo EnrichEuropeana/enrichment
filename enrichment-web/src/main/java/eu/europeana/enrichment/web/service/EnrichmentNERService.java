@@ -86,11 +86,9 @@ public interface EnrichmentNERService {
 	 * @param save
 	 * @param property
 	 * @return
-	 * @throws HttpException
-	 * @throws IOException
-	 * @throws SolrNamedEntityServiceException 
+	 * @throws Exception
 	 */
-	public String getStoryOrItemAnnotationCollection (String storyId, String itemId, boolean save, boolean crosschecked, String property) throws HttpException, IOException, SolrNamedEntityServiceException;
+	public String getStoryOrItemAnnotationCollection (String storyId, String itemId, boolean save, boolean crosschecked, String property) throws Exception;
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of a single WikidataEntity using the NamedEntityAnnotation class.
 	 * 
