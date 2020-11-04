@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -17,9 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;

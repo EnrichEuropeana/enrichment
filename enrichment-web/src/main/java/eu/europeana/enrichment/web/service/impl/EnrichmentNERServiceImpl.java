@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -125,7 +126,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
     //Transcribathon URL for getting the item information
     private static final String transcribathonBaseURLItems = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
     private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
-    
+    private static int cascadeCall = 0;
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -1301,11 +1302,11 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	}
 
 	@Override
-	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked, String property) throws HttpException, IOException, SolrNamedEntityServiceException {
+	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked, String property) throws Exception {
 		
 		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
 		
-		//try first to retrieve the entities from the db
+		//try first to retrieve the entities from the db in case of the GET request (if NO entries are found the POST must be called first)
 		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryItemIdAndProperty(storyId, itemId, property);
 		if(entities!=null && !entities.isEmpty())
 		{
@@ -1403,8 +1404,31 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		}
 		else
 		{
-			logger.info("No valid entries found! There are no entries for the given storyId to be generated.");
-			return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated.\"}";
+			
+			//calling the enrichment NER service for doing the NER analysis first
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setItemId(itemId);
+			body.setTranslationTool("Google");
+			body.setProperty(property);
+			String linking = "Wikidata";
+			String nerTools = "Stanford_NER,DBpedia_Spotlight";
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(false);
+			
+			getEntities(body,null, true);
+			
+			//calling the NER analysis first but just once
+			cascadeCall += 1;
+			if(cascadeCall>1) {
+				logger.info("No valid entries found! There are no entries for the given storyId to be generated even after doing the NER analysis first.");
+				return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated even after doing the NER analysis first.\"}";
+			}
+			else
+			{
+				return getStoryOrItemAnnotationCollection(storyId, itemId, true, crosschecked, null);
+			}
 		}
 		
 	}
