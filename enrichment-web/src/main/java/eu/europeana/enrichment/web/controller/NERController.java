@@ -69,9 +69,10 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true) String translationTool,
+			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original,
+			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
 			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
@@ -116,6 +117,7 @@ public class NERController extends BaseRest {
 				body.setStoryId(storyId);
 				body.setItemId("all");
 				body.setTranslationTool(translationTool);
+				body.setProperty(property);
 				body.setLinking(Arrays.asList(linking.split(",")));
 				body.setNerTools(Arrays.asList(nerTools.split(",")));
 				body.setOriginal(original);
@@ -177,9 +179,10 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
+			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = true) Boolean original,
+			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original,
 			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
@@ -189,6 +192,7 @@ public class NERController extends BaseRest {
 			body.setStoryId(storyId);
 			body.setItemId(itemId);
 			body.setTranslationTool("Google");
+			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);

@@ -129,5 +129,34 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 
+	@Override
+	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property) {
+		
+		Query<DBNamedEntityAnnotationImpl> persistentNamedEntityAnnotations = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
+		
+		persistentNamedEntityAnnotations.disableValidation().and(
+				persistentNamedEntityAnnotations.criteria("storyId").equal(storyId),
+				persistentNamedEntityAnnotations.criteria("itemId").equal(itemId),
+				persistentNamedEntityAnnotations.criteria("property").equal(property)
+			);
+
+		List<DBNamedEntityAnnotationImpl> result = persistentNamedEntityAnnotations.asList();
+		if(result.size() == 0)
+			return null;
+		else
+		{
+
+			List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
+			for(int index = result.size()-1; index >= 0; index--) {
+				NamedEntityAnnotation dbEntity = result.get(index);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
+
+
+	}
+
+
 
 }

@@ -31,6 +31,18 @@ public interface NamedEntityAnnotation {
 	void setSource (String source);
 	
 	/**
+	 * Getting property (can be description, transcription, or summary) 
+	 * @return
+	 */
+	String getProperty ();
+	/**
+	 * Setting property 
+	 * @param property
+	 */
+	void setProperty (String property);
+
+	
+	/**
 	 * Getting target which is a "source" field 
 	 * in the corresponding story entity 
 	 * @return
@@ -62,5 +74,9 @@ public interface NamedEntityAnnotation {
 	
 	int hashCode();
 	public boolean equals(Object nea);
+
+	String getEntityType();
+
+	void setEntityType(String type);
 
 }

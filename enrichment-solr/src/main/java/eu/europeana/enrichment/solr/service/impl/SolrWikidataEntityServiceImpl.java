@@ -215,6 +215,66 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    }
 		
 	}
+	
+	@Override
+	public WikidataEntity getWikidataEntity (String wikidataURL, String type) throws SolrNamedEntityServiceException
+	{
+		SolrQuery query = new SolrQuery();
+		String solrQueryString = "("+EntitySolrFields.ID+ ":\"" + wikidataURL + "\"" + " AND " + EntitySolrFields.INTERNAL_TYPE+ ":" + type + ")"; 
+		query.setQuery(solrQueryString);
+		
+		SolrDocumentList docList;
+		DocumentObjectBinder binder;
+		
+	    QueryResponse rsp = null;
+		try {
+			rsp = solrBaseClientService.query(solrCore, query);
+		} catch (SolrNamedEntityServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw e;
+		}	
+		binder = new DocumentObjectBinder();
+		docList = rsp.getResults();
+				
+		if(docList.size() > 1)
+		{
+			log.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
+			return null;
+		}
+		else if(docList.size() == 0)
+		{
+			log.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			return null;
+		}
+		
+		SolrDocument doc = docList.get(0);		
+
+		if(type.compareToIgnoreCase("agent")==0)
+		{
+			SolrWikidataAgentImpl entity;
+			Class<SolrWikidataAgentImpl> entityClass = null;
+			entityClass = SolrWikidataAgentImpl.class;
+			entity = (SolrWikidataAgentImpl) binder.getBean(entityClass, doc);
+				    	
+	    	return entity;
+		}
+		else if(type.compareToIgnoreCase("place")==0) 
+		{
+			SolrWikidataPlaceImpl entity;
+			Class<SolrWikidataPlaceImpl> entityClass = null;
+			entityClass = SolrWikidataPlaceImpl.class;
+			entity = (SolrWikidataPlaceImpl) binder.getBean(entityClass, doc);
+	    	
+	    	return entity;
+		}
+		else
+		{
+			log.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
+			return null;
+		}
+		
+	}
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override

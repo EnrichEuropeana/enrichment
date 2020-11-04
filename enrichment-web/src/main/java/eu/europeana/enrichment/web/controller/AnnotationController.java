@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import io.swagger.annotations.Api;
@@ -26,6 +27,8 @@ public class AnnotationController extends BaseRest {
 
 	@Resource
 	EnrichmentNERService enrichmentNerService;
+	@Resource(name = "persistentItemEntityService")
+	PersistentItemEntityService persistentItemEntityService;
 	
     /**
      * This method represents the /enrichment/annotation/{storyId}/{itemId} end point,
@@ -44,14 +47,14 @@ public class AnnotationController extends BaseRest {
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItems(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
+			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
 			@PathVariable("storyId") String storyId,			
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, false, crosschecked);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, false, crosschecked, "transcription");
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
@@ -77,18 +80,37 @@ public class AnnotationController extends BaseRest {
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionItemsPOST(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
+			@RequestParam(value = "crosschecked", required = false,defaultValue = "true") boolean crosschecked,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, true, crosschecked);
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
-					
+//			if(storyId.compareToIgnoreCase("all")==0 && itemId.compareToIgnoreCase("all")==0)
+//			{
+//				List<ItemEntity> all_item_entities = persistentItemEntityService.getAllItemEntities();
+//
+//				if(all_item_entities!=null)
+//				{
+//					for(ItemEntity item_entity : all_item_entities) {
+//						
+//						enrichmentNerService.getStoryOrItemAnnotationCollection(item_entity.getStoryId(), item_entity.getItemId(), true, crosschecked, null);
+//					}
+//				}
+//				
+//				ResponseEntity<String> response = new ResponseEntity<String>("Annotations have been generated for all items!", HttpStatus.OK);
+//				return response;
+//
+//			}
+
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, true, crosschecked, null);
+			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 			return response;
+		
+						
+					
+			
 		
 		
 	}
@@ -109,13 +131,14 @@ public class AnnotationController extends BaseRest {
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
+			@RequestParam(value = "property", required = true, defaultValue = "transcription") String property,
+			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
 			@PathVariable("storyId") String storyId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", false,crosschecked);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", false,crosschecked, property);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
@@ -140,13 +163,13 @@ public class AnnotationController extends BaseRest {
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotationCollectionStoryPOST(
 			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestParam(value = "crosschecked", required = true) boolean crosschecked,
+			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
 			@PathVariable("storyId") String storyId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", true,crosschecked);
+			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", true,crosschecked, null);
 						
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 					
