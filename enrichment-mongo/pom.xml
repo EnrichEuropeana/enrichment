@@ -49,6 +49,12 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>${version.annotation-api}</version>
+		</dependency>
+
 		
 		<!-- Test dependencies -->
 		<dependency>
