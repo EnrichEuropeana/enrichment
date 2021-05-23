@@ -9,7 +9,11 @@ import java.util.Locale;
 import org.languagetool.JLanguageTool;
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.rules.RuleMatch;
+import org.springframework.stereotype.Component;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+
+@Component(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_LANGUAGE_TOOL)
 public class TranslationLanguageTool {
 
 	JLanguageTool langTool;

@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.ner.web.controller;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,8 +21,8 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = "NER get entities service", description=" ")
 public class NERController {
 
-	@Resource
-	NERStanfordServiceImpl enrichmentNerService;
+	@Autowired
+	NERStanfordServiceImpl nerStanfordServiceOrigin;
 	
 	/*
 	 * This method represents the /enrichment/entities end point,
@@ -43,7 +42,7 @@ public class NERController {
 	public ResponseEntity<String> getNEREntities(
 			@RequestBody StanfordRequest requestBody) {
 			
-			String jsonLd = enrichmentNerService.getEntities(requestBody.getText());
+			String jsonLd = nerStanfordServiceOrigin.getEntities(requestBody.getText());
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;

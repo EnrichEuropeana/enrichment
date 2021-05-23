@@ -2,14 +2,17 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.dao.StoryEntityDao;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE)
 public class PersistentStoryEntityServiceImpl implements PersistentStoryEntityService {
 
-	@Resource(name = "storyEntityDao")
+	@Autowired
 	StoryEntityDao storyEntityDao;
 	
 	@Override

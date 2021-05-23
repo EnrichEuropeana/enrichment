@@ -1,7 +1,16 @@
 package eu.europeana.enrichment.model.impl;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.StoryEntity;
 
+@Entity(value="StoryEntityImpl")
 public class StoryEntityImpl implements StoryEntity {
 
 	//public String language;
@@ -12,6 +21,14 @@ public class StoryEntityImpl implements StoryEntity {
 	private String summary;
 	private String language;
 	private String transcriptionText;
+	
+	@Id
+    private String _id = new ObjectId().toString();
+	
+	@Override
+	public String getId() {
+		return _id;
+	}
 	
 	public StoryEntityImpl (StoryEntity copy)
 	{
@@ -26,12 +43,6 @@ public class StoryEntityImpl implements StoryEntity {
 	
 	public StoryEntityImpl() {
 		
-	}
-
-	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

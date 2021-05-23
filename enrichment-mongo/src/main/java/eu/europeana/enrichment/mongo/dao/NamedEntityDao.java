@@ -18,8 +18,8 @@ public interface NamedEntityDao {
 	public void saveNamedEntity(NamedEntity entity);
 	public void deleteNamedEntity(NamedEntity entity);
 	public void deletePositionEntitiesFromNamedEntity(String storyId,String itemId, String fieldUsedForNER);
-	public void deleteNamedEntityByKey(String key);
+	public long deleteNamedEntityByKey(String key);
 	public List<NamedEntity> findAllNamedEntities();
-	public void deleteAllNamedEntities();
+	public long deleteAllNamedEntities();
 	
 }

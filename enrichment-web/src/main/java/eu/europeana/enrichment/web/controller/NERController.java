@@ -2,8 +2,7 @@ package eu.europeana.enrichment.web.controller;
 
 import java.util.Arrays;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,22 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
-import eu.europeana.enrichment.web.service.EnrichmentNERService;
+import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-@SwaggerSelect
+//@SwaggerSelect
 @Api(tags = "Enrichment service", description=" ")
 public class NERController extends BaseRest { 
 
-	@Resource
-	EnrichmentNERService enrichmentNerService;
+	@Autowired
+	EnrichmentNERServiceImpl enrichmentNerService;
 	
-	@Resource(name = "persistentTranslationEntityService")
+	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
 
 	/**

@@ -1,44 +1,44 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import static dev.morphia.query.experimental.filters.Filters.eq;
+
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
-
+import dev.morphia.Datastore;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
+@Repository(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO)
 public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
-	@Resource(name = "storyEntityDao")
+	@Autowired
 	StoryEntityDao storyEntityDao;
 	
-	private Datastore datastore; 
+	@Autowired
+	private Datastore enrichmentDatastore; 
 	
-	public TranslationEntityDaoImpl(Datastore datastore) {
-		this.datastore = datastore;
-	}
-	
-	private void addItemEntity(DBTranslationEntityImpl dbEntity) {
+	private void addItemEntity(TranslationEntityImpl dbEntity) {
 		StoryEntity dbItemEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
 		dbEntity.setStoryEntity(dbItemEntity);
 	}
 	
 	@Override
 	public TranslationEntity findTranslationEntity(String key) {
-		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
-		persistentNamedEntities.field("key").equal(key);
-		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
-		if(result.size() == 0)
+		TranslationEntityImpl dbEntity = enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.KEY, key))
+                .first();
+		if(dbEntity==null)
 			return null;
 		else {
-			DBTranslationEntityImpl dbEntity = result.get(0);
 			addItemEntity(dbEntity);
 			return dbEntity;
 		}
@@ -46,15 +46,14 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	
 	@Override
 	public List<TranslationEntity> findAllTranslationEntities() {
-		Query<DBTranslationEntityImpl> persistentTranslationEntities = datastore.createQuery(DBTranslationEntityImpl.class);		
-		List<DBTranslationEntityImpl> result = persistentTranslationEntities.asList();
-		if(result.size() == 0)
+		List<TranslationEntityImpl> queryResult = enrichmentDatastore.find(TranslationEntityImpl.class).iterator().toList();
+		if(queryResult == null)
 			return null;
 		else
 		{
 			List<TranslationEntity> tmpResult = new ArrayList<>();
-			for(int index = result.size()-1; index >= 0; index--) {
-				TranslationEntity dbEntity = result.get(index);
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				TranslationEntity dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
 			}
 			return tmpResult;
@@ -63,44 +62,28 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
-		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
-		persistentNamedEntities.and(
-				persistentNamedEntities.criteria("storyId").equal(storyId),
-				persistentNamedEntities.criteria("itemId").equal(itemId),
-				persistentNamedEntities.criteria("tool").equal(tool),
-				persistentNamedEntities.criteria("language").equal(language),
-				persistentNamedEntities.criteria("type").equal(type),
-				persistentNamedEntities.criteria("key").equal(key)
-				);
-		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
-		if(result.size() == 0)
-			return null;
-		else{
-			DBTranslationEntityImpl dbEntity = result.get(0);
-			addItemEntity(dbEntity);
-			return dbEntity;
-		}
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.TOOL, tool),
+                eq(EntityFields.LANGUAGE, language),
+                eq(EntityFields.TYPE, type),
+                eq(EntityFields.KEY, key)
+                )
+                .first();
 	}
 	
 	@Override
 	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId,
 			String tool, String language, String type) {
-		Query<DBTranslationEntityImpl> persistentNamedEntities = datastore.createQuery(DBTranslationEntityImpl.class);
-		persistentNamedEntities.and(
-				persistentNamedEntities.criteria("storyId").equal(storyId),
-				persistentNamedEntities.criteria("itemId").equal(itemId),
-				persistentNamedEntities.criteria("tool").equal(tool),
-				persistentNamedEntities.criteria("language").equal(language),
-				persistentNamedEntities.criteria("type").equal(type)
-				);
-		List<DBTranslationEntityImpl> result = persistentNamedEntities.asList();
-		if(result.size() == 0)
-			return null;
-		else{
-			DBTranslationEntityImpl dbEntity = result.get(0);
-			//addItemEntity(dbEntity);
-			return dbEntity;
-		}
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.TOOL, tool),
+                eq(EntityFields.LANGUAGE, language),
+                eq(EntityFields.TYPE, type)
+                )
+                .first();
 	}
 
 	@Override
@@ -116,23 +99,18 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			dbTranslationEntity.setLanguage(entity.getLanguage());
 			dbTranslationEntity.setKey(entity.getKey());
 			dbTranslationEntity.setItemId(entity.getItemId());
-			this.datastore.save(dbTranslationEntity);
+			this.enrichmentDatastore.save(dbTranslationEntity);
 		}
 		else
 		{
-			DBTranslationEntityImpl tmp = null;
-			if(entity instanceof DBTranslationEntityImpl)
-				tmp = (DBTranslationEntityImpl) entity;
+			TranslationEntityImpl tmp = null;
+			if(entity instanceof TranslationEntityImpl)
+				tmp = (TranslationEntityImpl) entity;
 			else {
-				try {
-					tmp = new DBTranslationEntityImpl(entity);
-				} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-					
-					throw e;
-				}
+				tmp = new TranslationEntityImpl(entity);
 			}
 			if(tmp != null)
-				this.datastore.save(tmp);
+				this.enrichmentDatastore.save(tmp);
 		}
 	}
 
@@ -142,18 +120,22 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 
 	@Override
-	public void deleteTranslationEntityByKey(String key) {
-		datastore.delete(datastore.find(DBTranslationEntityImpl.class).filter("key", key));
+	public long deleteTranslationEntityByKey(String key) {
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.KEY,key))
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();
 	}
 	
 	@Override
-	public void deleteTranslationEntity(String storyId, String itemId, String type) {
-		Query<DBTranslationEntityImpl> persistentTranslationEntitiesQuery = datastore.createQuery(DBTranslationEntityImpl.class);
-		persistentTranslationEntitiesQuery.disableValidation();
-		persistentTranslationEntitiesQuery.filter("storyId", storyId);
-		persistentTranslationEntitiesQuery.filter("itemId", itemId);
-		persistentTranslationEntitiesQuery.filter("type", type);
-		datastore.delete(persistentTranslationEntitiesQuery);
+	public long deleteTranslationEntity(String storyId, String itemId, String type) {
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID,storyId),
+                eq(EntityFields.ITEM_ID,itemId),
+                eq(EntityFields.TYPE,type)
+                )
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();
 		
 	}
 

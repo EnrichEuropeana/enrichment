@@ -3,15 +3,18 @@ package eu.europeana.enrichment.solr.commons;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import ioinformarics.oss.jackson.module.jsonld.JsonldModule;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResource;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResourceBuilder;
 
+@Component(AppConfigConstants.BEAN_ENRICHMENT_JACKSON_SERIALIZER)
 public class JacksonSerializer {
 
 	public static final String SET_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";

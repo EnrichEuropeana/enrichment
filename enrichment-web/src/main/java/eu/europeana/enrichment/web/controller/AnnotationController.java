@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,20 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
-import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-@SwaggerSelect
+//@SwaggerSelect
 @Api(tags = "Enrichment service", description=" ")
 public class AnnotationController extends BaseRest {
 
-	@Resource
+	@Autowired
 	EnrichmentNERService enrichmentNerService;
-	@Resource(name = "persistentItemEntityService")
+	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
 	
     /**

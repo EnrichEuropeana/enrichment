@@ -3,10 +3,18 @@ package eu.europeana.enrichment.model.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 
-
+@Entity(value="NamedEntityImpl")
 public class NamedEntityImpl implements NamedEntity{
 
 	protected String type;
@@ -16,10 +24,29 @@ public class NamedEntityImpl implements NamedEntity{
 	protected List<String> dbpediaIds;
 	protected List<String> dbpediaWikidataIds;
 	protected List<String> preferredWikidataIds;
+	
 	protected List<PositionEntity> positionEntities;
 
+	//id will be used for storing MongoDB _id
+	@Id
+    public String _id = new ObjectId().toString();
 	
-
+	@Override
+	public String getId() {
+		return _id;
+	}
+	
+	public NamedEntityImpl (NamedEntity copy)
+	{
+		this.type=copy.getType();
+		this.label=copy.getLabel();
+		this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
+		this.wikidataIds = new ArrayList<String>(copy.getWikidataIds());
+		this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
+		this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
+		this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
+	}
+	
 	public NamedEntityImpl() {
 		init();
 	}
@@ -38,13 +65,7 @@ public class NamedEntityImpl implements NamedEntity{
 		preferredWikidataIds = new ArrayList<>();
 		dbpediaWikidataIds = new ArrayList<>();
 	}
-	
-	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
+
 	@Override
 	public String toString() {
 		return label;

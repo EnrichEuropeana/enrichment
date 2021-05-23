@@ -1,12 +1,7 @@
 package eu.europeana.enrichment.solr.service.impl;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,36 +10,27 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.solr.commons.GoogleTranslator;
-import eu.europeana.enrichment.solr.commons.JavaJSONParser;
-import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
-import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
-import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
-import eu.europeana.enrichment.translation.service.TranslationService;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE)
 public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 
-	@Resource
+	@Autowired
 	SolrClient solrServer;
 	
 	private final Logger log = LogManager.getLogger(getClass());
 
 	//private Jyandex clientJyandex;
 
-	public void setSolrServer(SolrClient solrServer) {
-		this.solrServer = solrServer;
-	}
-
 	@Override
 	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrNamedEntityServiceException {
-
-
 		return null;
 	}
 	

@@ -4,24 +4,29 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.entity.client.web.WebEntityProtocolApi;
 import eu.europeana.entity.definitions.model.Entity;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_EUROPEANA_ENTITY_SERVICE)
 public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 
 	/*
 	 * Europeana API key
 	 */
 	private String key;
-	@Resource(name= "europeanaApiClient")
+	
+	@Autowired
 	private WebEntityProtocolApi europeanaApiClient;
 	
-	public EuropeanaEntityServiceImpl(String key) {
-		this.key = key;
+	@Autowired
+	public EuropeanaEntityServiceImpl(EnrichmentConfiguration enrichmentConfiguration) {
+		this.key = enrichmentConfiguration.getNerLinkingEuropeanaApikey();
 	}
 	
 	@Override
