@@ -1,42 +1,42 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import static dev.morphia.query.experimental.filters.Filters.all;
+import static dev.morphia.query.experimental.filters.Filters.elemMatch;
+import static dev.morphia.query.experimental.filters.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Criteria;
-import org.mongodb.morphia.query.CriteriaContainer;
-import org.mongodb.morphia.query.Query;
-import org.mongodb.morphia.query.UpdateResults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import dev.morphia.Datastore;
+import dev.morphia.query.Query;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
-import eu.europeana.enrichment.mongo.model.DBPositionEntityImpl;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
+@Repository(AppConfigConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
-	@Resource(name = "storyEntityDao")
+	@Autowired
 	StoryEntityDao storyEntityDao;
-	@Resource(name = "ItemEntityDao")
-	ItemEntityDao ItemEntityDao;
-
-	@Resource(name = "translationEntityDao")
+	@Autowired
+	ItemEntityDao itemEntityDao;
+	@Autowired
 	TranslationEntityDao translationEntityDao;
-	private Datastore datastore; 
+	
+	@Autowired
+	private Datastore enrichmentDatastore; 
 	
 	Logger logger = LogManager.getLogger(getClass());
-	
-	public NamedEntityDaoImpl( Datastore datastore) {
-		this.datastore = datastore;
-	}
 	
 	private void addAdditonalInformation(NamedEntity dbEntity) {
 		List<PositionEntity> positions = dbEntity.getPositionEntities();
@@ -50,7 +50,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 				dbPositionEntity.setStoryEntity(dbStoryEntity);
 			}
 			if(itemId != null && !itemId.isEmpty()) {
-				ItemEntity dbItemEntity = ItemEntityDao.findItemEntityFromStory(itemId, storyId);
+				ItemEntity dbItemEntity = itemEntityDao.findItemEntityFromStory(itemId, storyId);
 				dbPositionEntity.setItemEntity(dbItemEntity);
 			}
 			if(translationKey != null && !translationKey.isEmpty()) {
@@ -62,119 +62,77 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	@Override
 	public NamedEntity findNamedEntity(String label) {
-		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
-		persistentNamedEntities.field("label").equal(label);
-		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
-		if(result.size() == 0)
-			return null;
-		else
-		{
-			NamedEntity dbEntity = result.get(0);
-			addAdditonalInformation(dbEntity);
-			return dbEntity;
-		}
+		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+                eq(EntityFields.LABEL, label))
+                .first();
 	}
 	
 	@Override
 	public List<NamedEntity> findAllNamedEntities() {
-		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);		
-		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
-		if(result.size() == 0)
+		List<NamedEntityImpl> queryResult = enrichmentDatastore.find(NamedEntityImpl.class).iterator().toList();
+		if(queryResult == null)
 			return null;
 		else
 		{
 			List<NamedEntity> tmpResult = new ArrayList<>();
-			for(int index = result.size()-1; index >= 0; index--) {
-				NamedEntity dbEntity = result.get(index);
-				addAdditonalInformation(dbEntity);
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				NamedEntity dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
-				logger.info("NamedEntity found is: " + String.valueOf(index));
 			}
 			return tmpResult;
 		}
-	}
-	
+	}	
 
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {
-		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
-		
-		Query<DBPositionEntityImpl> elemMatchQueryPositionEntity = datastore.createQuery(DBPositionEntityImpl.class);
-		
-		
-		
+		List<NamedEntityImpl> queryResult = null;
 		if(translation) {
-//			persistentNamedEntities.disableValidation().and(
-//					persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId),
-//					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
-//					);
-			
-
-			elemMatchQueryPositionEntity.field("translationKey").equal(storyId);
-			elemMatchQueryPositionEntity.field("fieldUsedForNER").equal(type);
-
-			
-			
+			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+					elemMatch(EntityFields.POSITION_ENTITIES,
+	                eq(EntityFields.TRANSLATION_KEY, storyId),
+	                eq(EntityFields.FIELD_USED_FOR_NER, type)	            
+					))
+					.iterator()
+					.toList();
 		} else {
-//			persistentNamedEntities.disableValidation().and(
-//					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
-//					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
-//					persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
-//					);
-			
-			elemMatchQueryPositionEntity.field("storyId").equal(storyId);
-			elemMatchQueryPositionEntity.field("itemId").equal(itemId);
-			elemMatchQueryPositionEntity.field("fieldUsedForNER").equal(type);
-
+			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+					elemMatch(EntityFields.POSITION_ENTITIES,
+	                eq(EntityFields.STORY_ID, storyId),
+	                eq(EntityFields.ITEM_ID, itemId),
+	                eq(EntityFields.FIELD_USED_FOR_NER, type)	            
+					))
+					.iterator()
+					.toList();
 		}
 		
-		persistentNamedEntities.field("positionEntities").elemMatch(elemMatchQueryPositionEntity);
-
-		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
-		List<NamedEntity> tmpResult = new ArrayList<>();
-		for(int index = result.size()-1; index >= 0; index--) {
-			NamedEntity dbEntity = result.get(index);
-			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
-			//addAdditonalInformation(dbEntity);
-			tmpResult.add(dbEntity);
-		}
-		return tmpResult;
+		if(queryResult == null)
+			return null;
+		else
+		{
+			List<NamedEntity> tmpResult = new ArrayList<>();
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				NamedEntity dbEntity = queryResult.get(index);
+				//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
+				//addAdditonalInformation(dbEntity);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}	
 	}
 
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
-		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
-		
-		Query<DBPositionEntityImpl> elemMatchQueryPositionEntity = datastore.createQuery(DBPositionEntityImpl.class);
-		elemMatchQueryPositionEntity.field("storyId").equal(storyId);
-		elemMatchQueryPositionEntity.field("itemId").equal(itemId);
-		elemMatchQueryPositionEntity.field("fieldUsedForNER").equal(type);
-		List<Criteria> criteriaList = new ArrayList<Criteria>();
-		for(int i=0;i<nerTools.size();i++)
-		{
-			criteriaList.add(elemMatchQueryPositionEntity.criteria("nerTools").hasThisOne(nerTools.get(i)));
-		}		
-		elemMatchQueryPositionEntity.disableValidation().or(criteriaList.toArray(new CriteriaContainer[criteriaList.size()]));
-		
-		persistentNamedEntities.field("positionEntities").elemMatch(elemMatchQueryPositionEntity);
-		
-//		persistentNamedEntities.disableValidation().and(
-//				persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
-//				persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId),
-//				persistentNamedEntities.criteria("positionEntities.fieldUsedForNER").equal(type)
-//				);
-		
-		//adding the criteria for the nerTools
-//		List<Criteria> criteriaList = new ArrayList<Criteria>();
-//		for(int i=0;i<nerTools.size();i++)
-//		{
-//			criteriaList.add(persistentNamedEntities.criteria("positionEntities.nerTools").hasThisOne(nerTools.get(i)));
-//		}
-//		
-//		persistentNamedEntities.disableValidation().or(criteriaList.toArray(new CriteriaContainer[criteriaList.size()]));
-		
 
-		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
+		List<NamedEntityImpl> result = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+				elemMatch(EntityFields.POSITION_ENTITIES,
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.FIELD_USED_FOR_NER, type),
+                all(EntityFields.NER_TOOLS, nerTools)
+				))
+				.iterator()
+				.toList();
+		
 		List<NamedEntity> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
 			NamedEntity dbEntity = result.get(index);
@@ -188,46 +146,38 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	@Override
 	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {
-		Query<DBNamedEntityImpl> persistentNamedEntities = datastore.createQuery(DBNamedEntityImpl.class);
-		
-		Query<DBPositionEntityImpl> elemMatchQueryPositionEntity = datastore.createQuery(DBPositionEntityImpl.class);
-
+		List<NamedEntityImpl> queryResult = null;
 		if(translation) {
-//			persistentNamedEntities.disableValidation();
-//			persistentNamedEntities.criteria("positionEntities.translationKey").equal(storyId);
-			elemMatchQueryPositionEntity.field("translationKey").equal(storyId);
-					
+			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+					elemMatch(EntityFields.POSITION_ENTITIES,
+	                eq(EntityFields.TRANSLATION_KEY, storyId)
+					))
+					.iterator()
+					.toList();
 		} else {
-//			persistentNamedEntities.disableValidation().and(
-//					persistentNamedEntities.criteria("positionEntities.storyId").equal(storyId),
-//					persistentNamedEntities.criteria("positionEntities.itemId").equal(itemId)
-//					);
-			elemMatchQueryPositionEntity.field("storyId").equal(storyId);
-			elemMatchQueryPositionEntity.field("itemId").equal(itemId);
-
+			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+					elemMatch(EntityFields.POSITION_ENTITIES,
+	                eq(EntityFields.STORY_ID, storyId),
+	                eq(EntityFields.ITEM_ID, itemId)
+					))
+					.iterator()
+					.toList();
 		}
 		
-		persistentNamedEntities.field("positionEntities").elemMatch(elemMatchQueryPositionEntity);
-
-		List<DBNamedEntityImpl> result = persistentNamedEntities.asList();
-		List<NamedEntity> tmpResult = new ArrayList<>();
-		for(int index = result.size()-1; index >= 0; index--) {
-			NamedEntity dbEntity = result.get(index);
-			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
-			//addAdditonalInformation(dbEntity);
-			tmpResult.add(dbEntity);
+		if(queryResult == null)
+			return null;
+		else
+		{
+			List<NamedEntity> tmpResult = new ArrayList<>();
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				NamedEntity dbEntity = queryResult.get(index);
+				//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
+				//addAdditonalInformation(dbEntity);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
 		}
-		return tmpResult;
 	}
-	
-
-
-
-	/*@Override
-	public List<NamedEntity> getAllNamedEntities() {
-		//return this.mongoOps.findAll(NamedEntity.class, NAMEDENTITY_COLLECTION);
-		return null;
-	}*/
 
 	@Override
 	public void saveNamedEntity(NamedEntity entity) {
@@ -242,18 +192,18 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			dbNamedEntity.setPreferredWikidataIds(entity.getPreferredWikidataIds());
 			dbNamedEntity.setType(entity.getType());
 			dbNamedEntity.setWikidataIds(entity.getWikidataIds());
-			this.datastore.save(dbNamedEntity);
+			this.enrichmentDatastore.save(dbNamedEntity);
 		}
 		else
 		{	
-			DBNamedEntityImpl tmp = null;
-			if(entity instanceof DBNamedEntityImpl)
-				tmp = (DBNamedEntityImpl) entity;
+			NamedEntityImpl tmp = null;
+			if(entity instanceof NamedEntityImpl)
+				tmp = (NamedEntityImpl) entity;
 			else {
-				tmp = new DBNamedEntityImpl(entity);
+				tmp = new NamedEntityImpl(entity);
 			}
 			if(tmp != null)
-				this.datastore.save(tmp);
+				this.enrichmentDatastore.save(tmp);
 		}
 	}
 
@@ -263,33 +213,35 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 
 	@Override
-	public void deleteNamedEntityByKey(String label) {
-		datastore.delete(datastore.find(DBNamedEntityImpl.class).filter("label", label));
+	public long deleteNamedEntityByKey(String label) {
+		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+                eq(EntityFields.LABEL, label)
+                )
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();
 	}
 
 	@Override
-	public void deleteAllNamedEntities() {
-		datastore.delete(datastore.find(DBNamedEntityImpl.class));		
+	public long deleteAllNamedEntities() {
+		return enrichmentDatastore.find(NamedEntityImpl.class)
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();
 	}
 
 	@Override
 	public void deletePositionEntitiesFromNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
-		
+		List<NamedEntityImpl> queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+				elemMatch(EntityFields.POSITION_ENTITIES,
+		                eq(EntityFields.STORY_ID, storyId),
+		                eq(EntityFields.ITEM_ID, itemId),
+		                eq(EntityFields.FIELD_USED_FOR_NER, fieldUsedForNER)
+						))
+						.iterator()
+						.toList();	
 
-		
-		Query<DBNamedEntityImpl> persistentNamedEntitiesQuery = datastore.createQuery(DBNamedEntityImpl.class);
-		
-		Query<DBPositionEntityImpl> elemMatchQueryPositionEntity = datastore.createQuery(DBPositionEntityImpl.class);
-		elemMatchQueryPositionEntity.field("storyId").equal(storyId);
-		elemMatchQueryPositionEntity.field("itemId").equal(itemId);
-		elemMatchQueryPositionEntity.field("fieldUsedForNER").equal(fieldUsedForNER);
-		
-		persistentNamedEntitiesQuery.field("positionEntities").elemMatch(elemMatchQueryPositionEntity);
-		
 		//fetching the PositionEntity-ies to be deleted from the NamedEntity-ies
-		List<DBNamedEntityImpl> result = persistentNamedEntitiesQuery.asList();
-		for(int index = result.size()-1; index >= 0; index--) {
-			List<PositionEntity> positionEntityList = result.get(index).getPositionEntities();
+		for(int index = queryResult.size()-1; index >= 0; index--) {
+			List<PositionEntity> positionEntityList = queryResult.get(index).getPositionEntities();
 			int posIndex = 0;
 			while(posIndex<positionEntityList.size())
 			{
@@ -305,9 +257,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			}
 		}
 
-		for(int i=0;i<result.size();i++)
+		for(int i=0;i<queryResult.size();i++)
 		{
-			saveNamedEntity(result.get(i));
+			saveNamedEntity(queryResult.get(i));
 		}
 		
 		

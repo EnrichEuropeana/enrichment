@@ -7,20 +7,22 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
-import eu.europeana.enrichment.ner.service.NERService;
 
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN)
 public class NERStanfordServiceImpl{
 
 	private CRFClassifier<CoreLabel> classifier;
@@ -30,13 +32,14 @@ public class NERStanfordServiceImpl{
 	 * This class constructor loads a model for the Stanford named
 	 * entity recognition and classification
 	 */
-	public NERStanfordServiceImpl(String model) {
-		if(model == null || model.isEmpty()) {
+	@Autowired
+	public NERStanfordServiceImpl(EnrichmentConfiguration enrichmentConfiguration) {
+		if(enrichmentConfiguration.getNerStanfordModel() == null || enrichmentConfiguration.getNerStanfordModel().isEmpty()) {
 			logger.error("NERStanfordServiceImp: No model for classifier defined!");
 			System.err.println("NERStanfordServiceImp: No model for classifier defined");
 		}
 		else {
-			classifier = CRFClassifier.getClassifierNoExceptions(model);
+			classifier = CRFClassifier.getClassifierNoExceptions(enrichmentConfiguration.getNerStanfordModel());
 		}
 	}
 	

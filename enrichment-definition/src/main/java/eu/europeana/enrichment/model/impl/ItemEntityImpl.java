@@ -5,10 +5,27 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.Indexes;
+import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
+import dev.morphia.annotations.*;
 
+@Entity(value="ItemEntityImpl")
 public class ItemEntityImpl implements ItemEntity{
+
+	//id will be used for storing MongoDB _id
+	@Id
+    public String _id = new ObjectId().toString();
+	
+	@Transient
+	private StoryEntity storyEntity;
 
 	private String itemId;
 	private String language;
@@ -106,24 +123,6 @@ public class ItemEntityImpl implements ItemEntity{
 	}
 
 	@Override
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public StoryEntity getStoryEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity storyEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public String getDescription() {
 		return description;
 	}
@@ -144,7 +143,25 @@ public class ItemEntityImpl implements ItemEntity{
 		this.source = sourceParam;
 		
 	}
+	
+	@Override
+	public String getId() {
+		return _id;
+	}
+	
+	@Override
+	public StoryEntity getStoryEntity() {
+		return storyEntity;
+	}
 
+	@Override
+	public void setStoryEntity(StoryEntity storyEntity) {
+		this.storyEntity = storyEntity;
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
+		else
+			setStoryId(null);
+	}
 
 	
 }

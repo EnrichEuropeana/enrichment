@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -20,11 +19,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.service.NERService;
 
+@Service
 public class NERPythonServiceImpl implements NERService{
 
 	private String pythonCommand;
@@ -33,17 +36,30 @@ public class NERPythonServiceImpl implements NERService{
 	/*
 	 * This class constructor is used to create the required python command
 	 */
-	public NERPythonServiceImpl(String pythonPath, String scriptPath, String spaCyModel) throws IOException {
-		File resource = new ClassPathResource(scriptPath).getFile();
+	@Autowired
+	public NERPythonServiceImpl(EnrichmentConfiguration enrichmentConfiguraion) throws IOException {
+		File resource = new ClassPathResource(enrichmentConfiguraion.getNerPythonScript()).getFile();
 		StringBuilder cmdBuilder = new StringBuilder();
-		cmdBuilder.append(pythonPath);
+		cmdBuilder.append(enrichmentConfiguraion.getNerPythonPath());
 		cmdBuilder.append(" -u ");
 		cmdBuilder.append(resource.getAbsolutePath());
 		cmdBuilder.append(" --spaCy \"");
-		cmdBuilder.append(spaCyModel);
+		cmdBuilder.append(enrichmentConfiguraion.getNerPythonSpacyModel());
 		cmdBuilder.append("\"");
 		pythonCommand = cmdBuilder.toString();
 	}
+	
+//	public NERPythonServiceImpl(String pythonPath, String scriptPath, String spaCyModel) throws IOException {
+//		File resource = new ClassPathResource(scriptPath).getFile();
+//		StringBuilder cmdBuilder = new StringBuilder();
+//		cmdBuilder.append(pythonPath);
+//		cmdBuilder.append(" -u ");
+//		cmdBuilder.append(resource.getAbsolutePath());
+//		cmdBuilder.append(" --spaCy \"");
+//		cmdBuilder.append(spaCyModel);
+//		cmdBuilder.append("\"");
+//		pythonCommand = cmdBuilder.toString();
+//	}
 
 	/*
 	 * In addition to the inheritance method documentation, this specific method

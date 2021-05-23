@@ -3,10 +3,9 @@ package eu.europeana.enrichment.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,25 +23,24 @@ import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.commons.JacksonSerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
-import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-@SwaggerSelect
+//@SwaggerSelect
 @Api(tags = "Entity preview service", description=" ")
 public class WikidataController extends BaseRest {
 
 	Logger logger = LogManager.getLogger(getClass());
 	
-	@Resource
+	@Autowired
 	SolrWikidataEntityService solrWikidataEntityService;
 	
-	@Resource(name = "wikidataService")
+	@Autowired
 	WikidataService wikidataService;
 	
-	@Resource(name = "jacksonSerializer")
+	@Autowired
 	JacksonSerializer jacksonSerializer;
 
 	

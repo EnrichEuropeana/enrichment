@@ -4,38 +4,41 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE)
 public class PersistentItemEntityServiceImpl implements PersistentItemEntityService {
 
-	@Resource(name = "ItemEntityDao")
-	ItemEntityDao ItemEntityDao;
+	//@Resource(name = "ItemEntityDao")
+	@Autowired
+	ItemEntityDao itemEntityDao;
 	
 	@Override
 	public ItemEntity findItemEntity(String storyItemId) {
-		return ItemEntityDao.findItemEntity(storyItemId);
+		return itemEntityDao.findItemEntity(storyItemId);
 	}
 
 	@Override
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId) {
 		// TODO Auto-generated method stub
-		return ItemEntityDao.findStoryItemEntitiesFromStory(storyId);
+		return itemEntityDao.findStoryItemEntitiesFromStory(storyId);
 	}
 
 	@Override
 	public List<ItemEntity> getAllItemEntities() {
 
-		return ItemEntityDao.findAllItemEntities();
+		return itemEntityDao.findAllItemEntities();
 
 	}
 
 	@Override
 	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		ItemEntityDao.saveItemEntity(entity);
+		itemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
@@ -47,18 +50,18 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 
 	@Override
 	public void deleteItemEntity(ItemEntity entity) {
-		ItemEntityDao.deleteItemEntity(entity);
+		itemEntityDao.deleteItemEntity(entity);
 	}
 
 	@Override
 	public ItemEntity findItemEntityFromStory(String storyId, String itemId) {
 		
-		return ItemEntityDao.findItemEntityFromStory(storyId, itemId);
+		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}
 	
 	@Override
 	public void updateNerToolsForItem(String itemId, String nerTool) {
-		ItemEntityDao.updateNerToolsForItem(itemId, nerTool);
+		itemEntityDao.updateNerToolsForItem(itemId, nerTool);
 	}
 
 //	@Override

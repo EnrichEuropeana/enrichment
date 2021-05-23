@@ -26,12 +26,15 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
 import org.jsoup.safety.Whitelist;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.i18n.LanguageCode;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
@@ -46,8 +49,6 @@ import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityTranscribathonImpl;
-import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
-import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -57,7 +58,6 @@ import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
@@ -70,41 +70,51 @@ import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_SERVICE)
 public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	/*
 	 * Loading Solr service for finding the positions of Entities in the original text
 	 */
-	@Resource(name = "enrichmentTranslationService")
+	//@Resource(name = "enrichmentTranslationService")
+	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
 
-	@Resource(name = "solrEntityService")
+	//@Resource(name = "solrEntityService")
+	@Autowired
 	SolrEntityPositionsService solrEntityService;
 	
-	@Resource(name = "solrWikidataEntityService")
+	//@Resource(name = "solrWikidataEntityService")
+	@Autowired
 	SolrWikidataEntityService solrWikidataEntityService;
 	
 
-	@Resource(name = "storyEntitySerializer")
+	//@Resource(name = "storyEntitySerializer")
+	@Autowired
 	StoryWikidataEntitySerializer storyEntitySerializer;
 	
 	/*
 	 * Loading all translation services
 	 */
-	@Resource(name = "eTranslationService")
+	//@Resource(name = "eTranslationService")
+	@Autowired
 	TranslationService eTranslationService;
 
 	/*
 	 * Loading all NER services
 	 */
-	@Resource(name = "nerLinkingService")
+	//@Resource(name = "nerLinkingService")
+	@Autowired
 	NERLinkingService nerLinkingService;
-	@Resource(name = "stanfordNerService")
-	NERService stanfordNerService;
-	@Resource(name = "dbpediaSpotlightService")
-	NERService dbpediaSpotlightService;
+	//@Resource(name = "stanfordNerService")
+	@Autowired
+	NERService nerStanfordService;
+	//@Resource(name = "dbpediaSpotlightService")
+	@Autowired
+	NERService nerDBpediaSpotlightService;
 	
-	@Resource(name = "javaJSONParser")
+	//@Resource(name = "javaJSONParser")
+	@Autowired
 	JavaJSONParser javaJSONParser;
 	
 	/*
@@ -130,15 +140,20 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
-	@Resource(name = "persistentNamedEntityService")
+	//@Resource(name = "persistentNamedEntityService")
+	@Autowired
 	PersistentNamedEntityService persistentNamedEntityService;
-	@Resource(name = "persistentTranslationEntityService")
+	//@Resource(name = "persistentTranslationEntityService")
+	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-	@Resource(name = "persistentStoryEntityService")
+	//@Resource(name = "persistentStoryEntityService")
+	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
-	@Resource(name = "persistentItemEntityService")
+	//@Resource(name = "persistentItemEntityService")
+	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
-	@Resource(name = "persistentNamedEntityAnnotationService")
+	//@Resource(name = "persistentNamedEntityAnnotationService")
+	@Autowired
 	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
 	
 	//@Cacheable("nerResults")
@@ -758,10 +773,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			NERService tmpTool;
 			switch(tool_string){
 				case stanfordNer:
-					tmpTool = stanfordNerService;
+					tmpTool = nerStanfordService;
 					break;
 				case dbpediaSpotlightName:
-					tmpTool = dbpediaSpotlightService;
+					tmpTool = nerDBpediaSpotlightService;
 					break;
 				default:
 					throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_NER_TOOL, tool_string);
@@ -1098,14 +1113,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				
 			}
 			
-			List<DBStoryEntityImpl> storyEntities = new ArrayList<DBStoryEntityImpl>();
+			List<StoryEntityImpl> storyEntities = new ArrayList<StoryEntityImpl>();
 			
 			
 			for (int i=0;i<stories.size();i++)
 			{
 				String storyId = (String) stories.get(i).get("story_id");
 				boolean found = false;
-				for(DBStoryEntityImpl tmp : storyEntities) {
+				for(StoryEntityImpl tmp : storyEntities) {
 					if(tmp.getStoryId().equals(storyId)) {
 						found = true;
 						break;
@@ -1122,7 +1137,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 						storyLanguage = languageCodes.get(0).toString();
 				}
 				
-				DBStoryEntityImpl newStoryEntity = new DBStoryEntityImpl();
+				StoryEntityImpl newStoryEntity = new StoryEntityImpl();
 				newStoryEntity.setTitle("");
 				newStoryEntity.setDescription("");
 				newStoryEntity.setStoryId("");
@@ -1146,7 +1161,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				storyEntities.add(newStoryEntity);
 			}
 			
-			String uploadStoriesStatus = uploadStories(storyEntities.toArray(new DBStoryEntityImpl[0]));
+			String uploadStoriesStatus = uploadStories(storyEntities.toArray(new StoryEntityImpl[0]));
 			
 			/*
 			 * reading items
@@ -1162,7 +1177,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				
 			}
 			
-			List<DBItemEntityImpl> itemEntities = new ArrayList<DBItemEntityImpl>();
+			List<ItemEntityImpl> itemEntities = new ArrayList<ItemEntityImpl>();
 			for (int i=0;i<items.size();i++)
 			{
 
@@ -1171,7 +1186,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				if(itemTranscription!=null)
 				{
 					
-					DBItemEntityImpl newItemEntity=new DBItemEntityImpl();
+					ItemEntityImpl newItemEntity=new ItemEntityImpl();
 					newItemEntity.setTitle("");
 					newItemEntity.setStoryId("");
 					newItemEntity.setLanguage("");
@@ -1207,7 +1222,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			}
 			
 			
-			String uploadItemsStatus = uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
+			String uploadItemsStatus = uploadItems(itemEntities.toArray(new ItemEntityImpl[0]));
 			
 			
 			logger.info("Stories and Items are saved to the database from the JSON file!");

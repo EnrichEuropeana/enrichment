@@ -18,7 +18,7 @@ public interface ItemEntityDao {
 	//public List<NamedEntity> getAllStoryItemEntities();
 	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 	public void deleteItemEntity(ItemEntity entity);
-	public void deleteItemEntityByStoryItemId(String key);
+	public long deleteItemEntityByStoryItemId(String key);
 	public void updateNerToolsForItem(String itemId, String nerTool);
 	public List<String> getNerToolsForItem(String itemId);
 //	public int getNumerAnalysedNamedEntities(String field);

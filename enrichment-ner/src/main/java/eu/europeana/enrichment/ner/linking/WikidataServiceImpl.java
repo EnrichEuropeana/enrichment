@@ -18,7 +18,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -28,7 +32,7 @@ import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 
 //import net.arnx.jsonic.JSONException;
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_WIKIDATA_SERVICE)
 public class WikidataServiceImpl implements WikidataService {
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -84,9 +88,10 @@ public class WikidataServiceImpl implements WikidataService {
 	
 	private String wikidataDirectory;
 	
-	public WikidataServiceImpl (String wikidataPath)
+	@Autowired
+	public WikidataServiceImpl (EnrichmentConfiguration enrichmentConfiguration)
 	{
-		wikidataDirectory = wikidataPath;
+		wikidataDirectory = enrichmentConfiguration.getEnrichWikidataDirectory();
 	}
 	
 	

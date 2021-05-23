@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.utils;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,22 +12,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:test-ner-config-book-dumitru.xml")
 
 /**
 * 
@@ -37,22 +28,18 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 *
 * Importing stories and items to the mongo db from a json file
 */
-
+@SpringBootTest
 public class ExtractStoriesToJSONForTopicDetectionAnalysis {
-	
-	
-	@Resource(name = "persistentStoryEntityService")
+		
+	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
-	@Resource(name = "persistentItemEntityService")
+	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
-
-	@Resource(name = "persistentTranslationEntityService")
+	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-	
-	@Resource(name = "javaJSONParser")
+	@Autowired
 	JavaJSONParser javaJSONParser;
-	
-	@SuppressWarnings({ "unchecked" })
+
 	@Test
 	public void test() throws Exception {		
    

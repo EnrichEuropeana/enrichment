@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.service;
 
+import org.springframework.stereotype.Service;
+
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 

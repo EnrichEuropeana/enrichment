@@ -9,7 +9,11 @@ import java.text.BreakIterator;
 import java.util.Locale;
 
 import org.json.JSONArray;
+import org.springframework.stereotype.Component;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+
+@Component(AppConfigConstants.BEAN_ENRICHMENT_GOOGLE_TRANSLATOR)
 public class GoogleTranslator {
 
 	 public static void main(String[] args) throws Exception 

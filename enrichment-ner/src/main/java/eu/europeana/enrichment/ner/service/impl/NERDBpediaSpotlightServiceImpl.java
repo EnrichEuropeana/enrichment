@@ -16,7 +16,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
@@ -24,7 +28,7 @@ import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
 public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 	private String baseUrl;
@@ -43,8 +47,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	private static final String offsetKey = "@offset";
 	private static final String uriKey = "@URI";
 	
-	public NERDBpediaSpotlightServiceImpl(String baseUrl) {
-		this.baseUrl = baseUrl;
+	@Autowired
+	public NERDBpediaSpotlightServiceImpl(EnrichmentConfiguration enrichmentConfiguration) {
+		this.baseUrl = enrichmentConfiguration.getNerDbpediaBaseUrl();
 	}
 
 	@Override

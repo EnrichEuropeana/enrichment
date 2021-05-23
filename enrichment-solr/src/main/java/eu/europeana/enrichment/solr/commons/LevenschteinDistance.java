@@ -2,6 +2,11 @@ package eu.europeana.enrichment.solr.commons;
 
 import java.util.Arrays;
 
+import org.springframework.stereotype.Component;
+
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+
+@Component(AppConfigConstants.BEAN_ENRICHMENT_LEVENSCHTEIN_DISTANCE)
 public class LevenschteinDistance {
 
 	public int costOfSubstitution(char a, char b) {

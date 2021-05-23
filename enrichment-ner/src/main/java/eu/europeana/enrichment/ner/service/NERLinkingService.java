@@ -8,8 +8,8 @@ import eu.europeana.enrichment.model.NamedEntity;
 
 public interface NERLinkingService {
 
-	static final String TOOL_WIKIDATA = "Wikidata";
-	static final String TOOL_EUROPEANA = "Europeana";
+	final static String TOOL_WIKIDATA = "Wikidata";
+	final static String TOOL_EUROPEANA = "Europeana";
 	
 	/*
 	 * This method links named entities with Europeana collection or wikidata

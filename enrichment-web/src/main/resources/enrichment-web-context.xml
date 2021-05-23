@@ -66,6 +66,8 @@
 	<beans:bean id="storyEntitySerializer" class="eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer" >
 	</beans:bean>
 	
+	<beans:bean id="solrHTTPRequest" class="eu.europeana.enrichment.solr.service.impl.SolrHTTPRequest" />
+		
 	<beans:bean id="jacksonSerializer" class="eu.europeana.enrichment.solr.commons.JacksonSerializer" >
 	</beans:bean>	
 		

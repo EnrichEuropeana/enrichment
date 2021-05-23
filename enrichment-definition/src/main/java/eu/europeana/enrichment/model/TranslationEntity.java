@@ -48,4 +48,8 @@ public interface TranslationEntity {
 	
 	String getType();
 	void setType(String type);
+	
+	String getETranslationId();	
+	void setETranslationId(String eTranslationId);
+
 }

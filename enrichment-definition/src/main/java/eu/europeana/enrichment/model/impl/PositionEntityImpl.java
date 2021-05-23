@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -17,7 +18,58 @@ public class PositionEntityImpl implements PositionEntity{
 	private String itemId;
 	private List<String> nerTools;
 
-	private String fieldUsedForNER;
+	private String fieldUsedForNER;	
+
+	@Transient
+	private StoryEntity storyEntity;
+	
+	@Transient
+	private ItemEntity itemEntity;
+
+	@Transient
+	private TranslationEntity translationEntity;
+	
+	@Override
+	public StoryEntity getStoryEntity() {
+		return storyEntity;
+	}
+
+	@Override
+	public void setStoryEntity(StoryEntity storyEntity) {
+		this.storyEntity=storyEntity;
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
+		else
+			setStoryId(null);
+	}
+
+	@Override
+	public ItemEntity getItemEntity() {
+		return itemEntity;
+	}
+
+	@Override
+	public void setItemEntity(ItemEntity itemEntity) {
+		this.itemEntity=itemEntity;
+		if(itemEntity != null)
+			setItemId(itemEntity.getItemId());
+		else
+			setItemId(null);
+	}
+
+	@Override
+	public TranslationEntity getTranslationEntity() {
+		return translationEntity;
+	}
+
+	@Override
+	public void setTranslationEntity(TranslationEntity translationEntity) {
+		this.translationEntity = translationEntity;
+		if(translationEntity != null)
+			setTranslationKey(translationEntity.getKey());
+		else
+			setTranslationKey(null);
+	}
 	
 	public String getFieldUsedForNER() {
 		return fieldUsedForNER;
@@ -91,42 +143,6 @@ public class PositionEntityImpl implements PositionEntity{
 		
 	}
 
-	@Override
-	public StoryEntity getStoryEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity ItemEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public TranslationEntity getTranslationEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setTranslationEntity(TranslationEntity translationEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ItemEntity getItemEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setItemEntity(ItemEntity itemEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	// Overriding equals() to compare two PositionEntity objects 
     @Override
     public boolean equals(Object pe){ 
