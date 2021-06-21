@@ -1,15 +1,23 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
+import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
+@Entity(value="TranslationEntityImpl")
 public class TranslationEntityImpl implements TranslationEntity{
 
 	private String key;
@@ -19,6 +27,63 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private String eTranslationId;
 	private String storyId;
 	private String itemId;
+	
+	public TranslationEntityImpl (TranslationEntity copy)
+	{
+		this.key = copy.getKey();
+		this.language = copy.getLanguage();
+		this.translatedText = copy.getTranslatedText();
+		this.tool = copy.getTool();
+		this.eTranslationId = copy.getETranslationId();
+		this.storyId = copy.getStoryId();
+		this.itemId = copy.getItemId();
+	}
+	
+	public TranslationEntityImpl() {
+		
+	}
+	
+	@Id
+    private String _id = new ObjectId().toString();
+	
+	@Transient
+	private StoryEntity storyEntity;
+	
+	@Transient
+	private ItemEntity itemEntity;
+	
+	@Override
+	public String getId() {
+		return _id;
+	}
+
+	@Override
+	public StoryEntity getStoryEntity() {
+		return this.storyEntity;
+	}
+
+	@Override
+	public void setStoryEntity(StoryEntity storyEntity) {
+		this.storyEntity = storyEntity;
+		if(storyEntity != null)
+			setStoryId(storyEntity.getStoryId());
+		else
+			setStoryId(null);
+	}
+	
+	@Override
+	public ItemEntity getItemEntity() {
+		return this.itemEntity;
+	}
+
+	@Override
+	public void setItemEntity(ItemEntity itemEntity) {
+		this.itemEntity = itemEntity;
+		if(itemEntity != null)
+			setItemId(itemEntity.getItemId());
+		else
+			setItemId(null);
+	}
 	
 	@Override
 	public String getItemId() {
@@ -32,17 +97,14 @@ public class TranslationEntityImpl implements TranslationEntity{
 
 	private String type;
 	
+	@Override
 	public String getETranslationId() {
 		return eTranslationId;
 	}
 	
+	@Override
 	public void setETranslationId(String eTranslationId) {
 		this.eTranslationId = eTranslationId;
-	}
-	
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
@@ -117,29 +179,5 @@ public class TranslationEntityImpl implements TranslationEntity{
 	@Override
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
-	}
-
-	@Override
-	public StoryEntity getStoryEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity ItemEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public ItemEntity getItemEntity() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setItemEntity(ItemEntity itemEntity) {
-		// TODO Auto-generated method stub
-		
 	}
 }

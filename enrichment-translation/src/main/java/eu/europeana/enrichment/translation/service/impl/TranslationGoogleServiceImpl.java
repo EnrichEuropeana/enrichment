@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translate;
@@ -15,10 +17,13 @@ import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.common.collect.Lists;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.TranslationService;
 
 //https://cloud.google.com/translate/docs/reference/libraries
+@Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
 public class TranslationGoogleServiceImpl implements TranslationService{
 
     Translate translate;
@@ -34,14 +39,15 @@ public class TranslationGoogleServiceImpl implements TranslationService{
      * 									credential file
      * @return
      */
-    public TranslationGoogleServiceImpl(String credentialFilePath, String waittime) throws IOException {
+    @Autowired
+    public TranslationGoogleServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws IOException {
     	try {
     		// You can specify a credential file by providing a path to GoogleCredentials.
     		// Otherwise credentials are read from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-    		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(credentialFilePath))
+    		GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(enrichmentConfiguration.getTranslationGoogleCredentials()))
     				.createScoped(Lists.newArrayList(credentialScope));
         	translate = TranslateOptions.newBuilder().setCredentials(credentials).build().getService();
-        	this.waittime = Integer.parseInt(waittime);
+        	this.waittime = enrichmentConfiguration.getTranslationGoogleWaittime();
     	}
     	catch (IOException e) {
 			throw e;

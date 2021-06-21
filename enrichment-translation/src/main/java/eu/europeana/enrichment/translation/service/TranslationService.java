@@ -3,8 +3,9 @@ package eu.europeana.enrichment.translation.service;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import eu.europeana.enrichment.translation.exception.TranslationException;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.translation.exception.TranslationException;
 
 public interface TranslationService {
 	

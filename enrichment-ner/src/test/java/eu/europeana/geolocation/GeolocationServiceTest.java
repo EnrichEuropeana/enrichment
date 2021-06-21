@@ -22,8 +22,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.SingleClientConnManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,7 +40,6 @@ import com.google.maps.model.LatLng;
 import fr.dudie.nominatim.client.JsonNominatimClient;
 import fr.dudie.nominatim.model.Address;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class GeolocationServiceTest {
 
@@ -178,9 +178,15 @@ public class GeolocationServiceTest {
 		assertTrue(true);
 	}
 	
-	@Test
+	/*
+	 * TODO: create the proper google_api_key.txt file used in the test
+	 */
+	//@Test
 	public void geocodingGoogleServiceTest() throws IOException, ApiException, InterruptedException {
 		// https://github.com/googlemaps/google-maps-services-java
+		/*
+		 * TODO: create the proper google_api_key.txt file used in the test
+		 */
 		String credentialPath = "C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\google_api_key.txt";
 		// Open the file
 		FileInputStream fstream = new FileInputStream(credentialPath);

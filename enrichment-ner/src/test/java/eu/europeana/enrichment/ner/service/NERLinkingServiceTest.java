@@ -1,25 +1,7 @@
 package eu.europeana.enrichment.ner.service;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.annotation.Resource;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
-
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class NERLinkingServiceTest {
 

@@ -18,29 +18,27 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+       	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 	<dependency>
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-core</artifactId>
-    	<version>2.9.8</version>
+    	<!-- version>2.9.8</version-->
+		<version>${version.jackson}</version>    	
+    	
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
 	<dependency>
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-annotations</artifactId>
-    	<version>2.9.8</version>
+    	<!-- version>2.9.8</version-->
+		<version>${version.jackson}</version>    	
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<dependency>
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-databind</artifactId>
-    	<version>2.9.8</version>
+    	<!-- version>2.9.8</version-->
+		<version>${version.jackson}</version>    	
 	</dependency>
     <!-- https://mvnrepository.com/artifact/com.io-informatics.oss/jackson-jsonld -->
 	<dependency>
@@ -52,7 +50,12 @@
 		<groupId>eu.europeana.enrich</groupId>
  		<artifactId>enrichment-common</artifactId>
 		<version>${version.enrichmentAPI}</version>
-	</dependency>    
+	</dependency>  
+	    <dependency>
+        	<groupId>dev.morphia.morphia</groupId>
+        	<artifactId>morphia-core</artifactId>
+        	<version>${version.morphia}</version>        	
+        </dependency>  
     	
   </dependencies>
 </project>

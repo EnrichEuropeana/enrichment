@@ -2,6 +2,9 @@ package eu.europeana.enrichment.model;
 
 import java.util.List;
 
+import dev.morphia.annotations.Embedded;
+
+@Embedded
 public interface PositionEntity {
 
 	/*

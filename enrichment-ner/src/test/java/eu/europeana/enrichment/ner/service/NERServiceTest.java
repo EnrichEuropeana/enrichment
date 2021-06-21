@@ -1,31 +1,15 @@
 package eu.europeana.enrichment.ner.service;
 
-import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
-import eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl;
-import eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class NERServiceTest {
 

@@ -5,11 +5,15 @@ import static com.google.common.base.Predicates.or;
 import static springfox.documentation.builders.RequestHandlerSelectors.withClassAnnotation;
 import static springfox.documentation.builders.RequestHandlerSelectors.withMethodAnnotation;
 
+import java.util.Collections;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
 
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -40,18 +44,28 @@ public class SwaggerConfig {
 
 	@Bean
 	public Docket customImplementation() {
+//		if (docketConfig == null) {
+//			docketConfig = new Docket(DocumentationType.SWAGGER_2).select()
+//					// Selects controllers annotated with @SwaggerSelect
+//					.apis(withClassAnnotation(SwaggerSelect.class)) // Selection
+//																	// by
+//																	// RequestHandler
+//					.apis(not(or(withMethodAnnotation(SwaggerIgnore.class), 
+//							withClassAnnotation(SwaggerIgnore.class)))) // Selection by RequestHandler
+//					.build().host(getHostAndPort()).apiInfo(apiInfo());
+//			
+//			//user friendly naming of collections and maps with generics
+//			docketConfig.forCodeGeneration(true);
+//		}
+//		return docketConfig;
+		
 		if (docketConfig == null) {
-			docketConfig = new Docket(DocumentationType.SWAGGER_2).select()
-					// Selects controllers annotated with @SwaggerSelect
-					.apis(withClassAnnotation(SwaggerSelect.class)) // Selection
-																	// by
-																	// RequestHandler
-					.apis(not(or(withMethodAnnotation(SwaggerIgnore.class), 
-							withClassAnnotation(SwaggerIgnore.class)))) // Selection by RequestHandler
-					.build().host(getHostAndPort()).apiInfo(apiInfo());
-			
-			//user friendly naming of collections and maps with generics
-			docketConfig.forCodeGeneration(true);
+			docketConfig = new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("eu.europeana.enrichment"))
+                .paths(PathSelectors.any())
+                .build();
 		}
 		return docketConfig;
 	}
@@ -69,7 +83,7 @@ public class SwaggerConfig {
 
 		return new ApiInfo(appTitle, appDescription, version, "http://www.europeana.eu/portal/en/rights.html",
 				 new Contact("Development support", null, "development-core@europeanalabs.eu"),
-				"Creative Commons CC0 1.0 Universal Public Domain Dedication", "http://creativecommons.org/publicdomain/zero/1.0/");
+				"Creative Commons CC0 1.0 Universal Public Domain Dedication", "http://creativecommons.org/publicdomain/zero/1.0/", Collections.emptyList());
 	}
 
 	/*

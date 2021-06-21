@@ -1,39 +1,33 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import static dev.morphia.query.experimental.filters.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import dev.morphia.Datastore;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.mongo.model.DBStoryEntityImpl;
-
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
+@Repository(AppConfigConstants.BEAN_ENRICHMENT_STORY_ENTITY_DAO)
 public class StoryEntityDaoImpl implements StoryEntityDao{
 
-	private Datastore datastore; 
+	@Autowired
+	private Datastore enrichmentDatastore; 
 	
-	private static Map<String, List<String>> nerToolsForStory;
-	
-	
-	public StoryEntityDaoImpl(Datastore datastore) {
-		this.datastore = datastore;
-		nerToolsForStory = new HashMap<String, List<String>>();
-		
-	}
+	private static Map<String, List<String>> nerToolsForStory = new HashMap<String, List<String>>();	
 	
 	@Override
 	public StoryEntity findStoryEntity(String key) {
-		Query<DBStoryEntityImpl> persistentStoryEntities = datastore.createQuery(DBStoryEntityImpl.class);
-		persistentStoryEntities.field("storyId").equal(key);
-		List<DBStoryEntityImpl> result = persistentStoryEntities.asList();
-		if(result.size() == 0)
-			return null;
-		else {
-			return result.get(0);
-		}
+		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID, key))
+                .first();
 	}
 
 	@Override
@@ -47,18 +41,18 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 			dbStoryEntity.setSummary(entity.getSummary());
 			dbStoryEntity.setTitle(entity.getTitle());
 			dbStoryEntity.setTranscriptionText(entity.getTranscriptionText());
-			this.datastore.save(dbStoryEntity);
+			this.enrichmentDatastore.save(dbStoryEntity);
 		}
 		else
 		{
-			DBStoryEntityImpl tmp = null;
-			if(entity instanceof DBStoryEntityImpl)
-				tmp = (DBStoryEntityImpl) entity;
+			StoryEntityImpl tmp = null;
+			if(entity instanceof StoryEntityImpl)
+				tmp = (StoryEntityImpl) entity;
 			else {
-				tmp = new DBStoryEntityImpl(entity);
+				tmp = new StoryEntityImpl(entity);
 			}
 			if(tmp != null)
-				this.datastore.save(tmp);
+				this.enrichmentDatastore.save(tmp);
 		}
 	}
 
@@ -68,21 +62,23 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	}
 
 	@Override
-	public void deleteStoryEntityByStoryId(String key) {
-		datastore.delete(datastore.find(DBStoryEntityImpl.class).filter("storyId", key));
+	public long deleteStoryEntityByStoryId(String key) {
+		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID,key))
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();
 	}
 
 	@Override
 	public List<StoryEntity> findAllStoryEntities() {
-		Query<DBStoryEntityImpl> persistentStoryEntities = datastore.createQuery(DBStoryEntityImpl.class);		
-		List<DBStoryEntityImpl> result = persistentStoryEntities.asList();
-		if(result.size() == 0)
+		List<StoryEntityImpl> queryResult = enrichmentDatastore.find(StoryEntityImpl.class).iterator().toList();
+		if(queryResult == null)
 			return null;
 		else
 		{
 			List<StoryEntity> tmpResult = new ArrayList<>();
-			for(int index = result.size()-1; index >= 0; index--) {
-				StoryEntity dbEntity = result.get(index);
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				StoryEntity dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
 			}
 			return tmpResult;

@@ -5,13 +5,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -27,8 +25,6 @@ import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.translation.service.TranslationService;
-import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
-import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -39,20 +35,20 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-@SwaggerSelect
+//@SwaggerSelect
 @Api(tags = "Administration service", description=" ")
 public class AdministrationController extends BaseRest {
 
-	@Resource
+	@Autowired
 	EnrichmentNERService enrichmentNerService;
-	@Resource
+	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
-	@Resource(name = "persistentTranslationEntityService")
+	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-	@Resource(name = "persistentItemEntityService")
+	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
 	
-	@Resource(name = "eTranslationService")
+	@Autowired
 	TranslationService eTranslationService;
 	
 	/*

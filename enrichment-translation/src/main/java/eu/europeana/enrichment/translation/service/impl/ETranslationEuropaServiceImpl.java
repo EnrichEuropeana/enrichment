@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +24,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.TranslationService;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_E_TRANSLATION_EUROPA_SERVICE)
 public class ETranslationEuropaServiceImpl implements TranslationService {
 
 	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
@@ -61,13 +65,13 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	private String credentialUsername;
 	private String credentialPwd;
 
-	public ETranslationEuropaServiceImpl(String credentialFilePath, String domain,
-			String requesterCallback, String errorCallback, String emailDestination) throws Exception {
-		readCredentialFile(credentialFilePath);
-		this.domain = domain;
+	@Autowired
+	public ETranslationEuropaServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws Exception {
+		readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
+		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
 		//this.requesterCallback = requesterCallback;
-		this.errorCallback = errorCallback;
-		this.emailDestination = emailDestination;
+		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
+		this.emailDestination = enrichmentConfiguration.getTranslationETranslationEmailDestination();
 	}
 	
 	/**

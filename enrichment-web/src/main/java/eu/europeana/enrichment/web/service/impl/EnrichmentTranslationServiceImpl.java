@@ -1,26 +1,24 @@
 package eu.europeana.enrichment.web.service.impl;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -29,27 +27,31 @@ import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.ItemEntityTranscribathonImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityTranscribathonImpl;
-import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_SERVICE)
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {
 
 	/*
 	 * Loading all translation services
 	 */
-	@Resource(name = "googleTranslationService")
+	//@Resource(name = "googleTranslationService")
+	@Autowired
 	TranslationService googleTranslationService;
-	@Resource(name = "eTranslationService")
+	//@Resource(name = "eTranslationService")
+	@Autowired
 	TranslationService eTranslationService;
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -65,17 +67,22 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
     private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
 
 	
-	@Resource(name = "translationLanguageTool")
+	//@Resource(name = "translationLanguageTool")
+    @Autowired
 	TranslationLanguageTool translationLanguageTool;
 	
-	@Resource(name = "persistentTranslationEntityService")
+	//@Resource(name = "persistentTranslationEntityService")
+    @Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-	@Resource(name = "persistentStoryEntityService")
+	//@Resource(name = "persistentStoryEntityService")
+    @Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
-	@Resource(name = "persistentItemEntityService")
+	//@Resource(name = "persistentItemEntityService")
+    @Autowired
 	PersistentItemEntityService persistentItemEntityService;
 
-	@Resource(name = "enrichmentNerService")
+	//@Resource(name = "enrichmentNerService")
+    @Autowired
 	EnrichmentNERService enrichmentNerService;
 
 	
@@ -204,7 +211,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				
 			}
 			
-			TranslationEntity tmpTranslationEntity = new DBTranslationEntityImpl();
+			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
 			tmpTranslationEntity.setStoryEntity(dbStoryEntity);
 			tmpTranslationEntity.setItemEntity(dbItemEntity);
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);

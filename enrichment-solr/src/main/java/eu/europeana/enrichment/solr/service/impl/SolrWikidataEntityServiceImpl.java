@@ -1,14 +1,11 @@
 package eu.europeana.enrichment.solr.service.impl;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +14,10 @@ import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -34,16 +34,20 @@ import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE)
 public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService {
 
-	@Resource(name = "solrBaseClientService")
+	//@Resource(name = "solrBaseClientService")
+	@Autowired
 	SolrBaseClientService solrBaseClientService;
 	
-	@Resource(name = "jacksonSerializer")
+	//@Resource(name = "jacksonSerializer")
+	@Autowired
 	JacksonSerializer jacksonSerializer;
 	
 	
-	@Resource(name = "wikidataService")
+	//@Resource(name = "wikidataService")
+	@Autowired
 	WikidataService wikidataService;	
 
 	private String solrCore = "wikidata";

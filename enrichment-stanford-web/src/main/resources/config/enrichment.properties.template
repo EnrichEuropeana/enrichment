@@ -1,4 +1,0 @@
-
-# Named entity recognition and classification section
-# NER Stanford classifier configuration
-enrich.ner.stanford.model=/home/enrich/model/model.gz

@@ -1,85 +1,70 @@
 package eu.europeana.enrichment.solr.service.impl;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.BreakIterator;
 import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 import org.tartarus.snowball.ext.romanianStemmer;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-
-import co.aurasphere.jyandex.Jyandex;
-import co.aurasphere.jyandex.dto.Language;
-import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
-import eu.europeana.enrichment.solr.commons.Stemmer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.model.SolrItemEntityImpl;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.TranslationService;
-import javassist.expr.Instanceof;
 
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
 
-	@Resource(name = "solrBaseClientService")
+	//@Resource(name = "solrBaseClientService")
+	@Autowired
 	SolrBaseClientService solrBaseClientService;
 	
-	@Resource(name = "javaJSONParser")
+	//@Resource(name = "javaJSONParser")
+	@Autowired
 	JavaJSONParser javaJSONParser;
 
-	@Resource(name = "levenschteinDistance")
+	//@Resource(name = "levenschteinDistance")
+	@Autowired
 	LevenschteinDistance levenschteinDistance;
 	
-	@Resource(name = "googleTranslator")
+	//@Resource(name = "googleTranslator")
+	@Autowired
 	GoogleTranslator googleTranslator;
 
 	
-	@Resource(name = "eTranslationService")
+	//@Resource(name = "eTranslationService")
+	@Autowired
 	TranslationService eTranslationService;
 
 	/*
@@ -117,6 +102,30 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	private int indexByNowOriginal=0;
 	//private Jyandex clientJyandex;
 
+	@Autowired
+	public SolrEntityPositionsServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws IOException {
+		
+		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");
+		
+		if(!enrichmentConfiguration.getSolrTranslatedEntities().isEmpty())
+		{
+			String data = ""; 
+			try {
+				data = new String(Files.readAllBytes(Paths.get(enrichmentConfiguration.getSolrTranslatedEntities())));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				throw e;
+			}
+			String[] entities = data.split(",");
+			for(int i=0;i<entities.length;i++)
+			{
+				String[] entityType = entities[i].split("\\s+",2);
+				entitiesOriginalText.add(entityType[1]); 
+			}			
+		}
+	}
+	
 	@Override
 	public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException {
 		
@@ -141,33 +150,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		solrBaseClientService.storeStoryEntity(solrCollection, solrStoryEntity,doCommit);
 		
 	}
-
-	
-	public SolrEntityPositionsServiceImpl(String translatedEntities) throws IOException {
-		
-		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");
-		
-		if(!translatedEntities.isEmpty())
-		{
-			String data = ""; 
-			try {
-				data = new String(Files.readAllBytes(Paths.get(translatedEntities)));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw e;
-			}
-			String[] entities = data.split(",");
-			for(int i=0;i<entities.length;i++)
-			{
-				String[] entityType = entities[i].split("\\s+",2);
-				entitiesOriginalText.add(entityType[1]); 
-			}
-			
-		}
-
-	}
-	
 
 	@Override
 	public int findTermPositionsInStory(String term, int startAfterOffset, int offsetTranslatedText, int rangeToObserve) throws Exception {

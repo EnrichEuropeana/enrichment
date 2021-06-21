@@ -3,14 +3,18 @@ package eu.europeana.enrichment.web.commons;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
+import org.springframework.stereotype.Component;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import ioinformarics.oss.jackson.module.jsonld.JsonldModule;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResource;
 import ioinformarics.oss.jackson.module.jsonld.JsonldResourceBuilder;
 
+@Component(AppConfigConstants.BEAN_ENRICHMENT_STORY_WIKIDATA_ENTITY_SERIALIZER)
 public class StoryWikidataEntitySerializer {
 	public static final String SET_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	public final static String CONTEXT = "http://www.w3.org/ns/anno.jsonld";

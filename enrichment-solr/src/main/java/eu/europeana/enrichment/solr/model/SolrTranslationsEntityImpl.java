@@ -3,10 +3,10 @@ package eu.europeana.enrichment.solr.model;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.DBTranslationEntityImpl;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TranslationsEntitySolrFields;
 
-public class SolrTranslationsEntityImpl extends DBTranslationEntityImpl implements TranslationEntity {
+public class SolrTranslationsEntityImpl extends TranslationEntityImpl implements TranslationEntity {
 
 	public SolrTranslationsEntityImpl (TranslationEntity copy) {
 		this.setStoryId(copy.getStoryId());
