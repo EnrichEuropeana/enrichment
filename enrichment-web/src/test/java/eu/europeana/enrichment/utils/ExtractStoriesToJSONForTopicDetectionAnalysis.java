@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,6 +29,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 *
 * Importing stories and items to the mongo db from a json file
 */
+//@ContextConfiguration(classes = { EnrichmentApp.class})
 @SpringBootTest
 public class ExtractStoriesToJSONForTopicDetectionAnalysis {
 		
@@ -39,6 +41,34 @@ public class ExtractStoriesToJSONForTopicDetectionAnalysis {
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	@Autowired
 	JavaJSONParser javaJSONParser;
+	
+	@Test
+	public void extractStoriesForTopicDetection_BERT_LDA() throws IOException {
+		//extracting items in one json file
+		String fileName = "C:/conceptual_search_documents/allStoryTranslations-BERT-LDA.csv";
+		BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
+		bwTranslations.write("storyId,text"+"\n");				
+		
+		List<StoryEntity> storyTranslations = persistentStoryEntityService.getAllStoryEntities();
+		
+		for(int i=0;i<storyTranslations.size();i++)
+		{
+			if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			{				
+				String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
+
+				String correctedTranslationsForQuotationWithin = storyTranscriptionOneLine.replaceAll("\"", "");
+				
+				String removedAllNonAsciiCharacters = correctedTranslationsForQuotationWithin.replaceAll("[^\\p{ASCII}]", "");
+
+				bwTranslations.write(storyTranslations.get(i).getStoryId() + ",\"" + removedAllNonAsciiCharacters + "\"\n");
+				
+				System.out.print("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
+			
+			}
+		}		
+		bwTranslations.close();
+	}
 
 	@Test
 	public void test() throws Exception {		
