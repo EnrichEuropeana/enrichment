@@ -1,9 +1,5 @@
 package eu.europeana.enrichment.solr.commons;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -11,12 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.response.QueryResponse;
-
 import org.json.simple.parser.ParseException;
+import org.springframework.stereotype.Component;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+
+@Component(AppConfigConstants.BEAN_ENRICHMENT_JAVA_JSON_PARSER)
 public class JavaJSONParser {
 
 	private Gson gson; 

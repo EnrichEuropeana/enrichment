@@ -13,6 +13,8 @@ import java.util.TreeSet;
 
 import javax.annotation.Resource;
 
+import org.springframework.stereotype.Service;
+
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetBeginAnnotation;
@@ -36,6 +38,7 @@ import eu.fbk.dh.tint.runner.TintRunner;
 /*
  * TODO: improve the code to have one same class for all Stanford models 
  */
+@Service
 public class NERStanfordServiceItalianImpl implements NERService{
 
 	private CRFClassifier<CoreLabel> classifier;

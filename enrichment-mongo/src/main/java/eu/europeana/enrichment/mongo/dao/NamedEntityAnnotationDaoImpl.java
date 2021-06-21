@@ -1,88 +1,66 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import static dev.morphia.query.experimental.filters.Filters.eq;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import dev.morphia.Datastore;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityAnnotationImpl;
-import eu.europeana.enrichment.mongo.model.DBNamedEntityImpl;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
+@Repository(AppConfigConstants.BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO)
 public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 
-	private Datastore datastore; 
+	@Autowired
+	private Datastore enrichmentDatastore; 
 	
 	Logger logger = LogManager.getLogger(getClass());
-	
-	public NamedEntityAnnotationDaoImpl( Datastore datastore) {
-		this.datastore = datastore;
-	}
 
 	@Override
 	public NamedEntityAnnotation findNamedEntityAnnotation(String id) {
-		Query<DBNamedEntityAnnotationImpl> persistentNamedEntityAnnotations = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
-		persistentNamedEntityAnnotations.field("id").equal(id);
-		List<DBNamedEntityAnnotationImpl> result = persistentNamedEntityAnnotations.asList();
-		if(result.size() == 0)
-			return null;
-		else
-		{
-			NamedEntityAnnotation dbEntity = result.get(0);
-			return dbEntity;
-		}
-
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.ID, id))
+                .first();
 	}
 
 	@Override
 	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId) {
-		
-		Query<DBNamedEntityAnnotationImpl> persistentNamedEntityAnnotations = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
-		
-		persistentNamedEntityAnnotations.disableValidation().and(
-				persistentNamedEntityAnnotations.criteria("storyId").equal(storyId),
-				persistentNamedEntityAnnotations.criteria("itemId").equal(itemId)
-			);
-
-		List<DBNamedEntityAnnotationImpl> result = persistentNamedEntityAnnotations.asList();
-		if(result.size() == 0)
+		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId)
+                )			
+				.iterator()
+				.toList();
+		if(queryResult == null)
 			return null;
 		else
 		{
-
 			List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-			for(int index = result.size()-1; index >= 0; index--) {
-				NamedEntityAnnotation dbEntity = result.get(index);
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				NamedEntityAnnotation dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
 			}
 			return tmpResult;
 		}
-
-
 	}
 
 	@Override
 	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) 
 	{
-		Query<DBNamedEntityAnnotationImpl> persistentNamedEntityAnnotations = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
-
-		persistentNamedEntityAnnotations.disableValidation().and(
-			persistentNamedEntityAnnotations.criteria("storyId").equal(storyId),
-			persistentNamedEntityAnnotations.criteria("itemId").equal(itemId),
-			persistentNamedEntityAnnotations.criteria("wikidataId").equal(wikidataId)
-		);
-
-		List<DBNamedEntityAnnotationImpl> result = persistentNamedEntityAnnotations.asList();
-		if(result.size() == 0)
-			return null;
-		else
-		{
-			NamedEntityAnnotation dbEntity = result.get(0);
-			return dbEntity;
-		}
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.WIKIDATA_ID, wikidataId)
+                )
+				.first();
 	}
 	
 	@Override
@@ -91,14 +69,14 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 		NamedEntityAnnotation existingNAE = findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(entity.getStoryId(),entity.getItemId(),entity.getWikidataId());
 		if(existingNAE!=null) return;
 		
-		DBNamedEntityAnnotationImpl tmp = null;
-		if(entity instanceof DBNamedEntityAnnotationImpl)
-			tmp = (DBNamedEntityAnnotationImpl) entity;
+		NamedEntityAnnotationImpl tmp = null;
+		if(entity instanceof NamedEntityAnnotationImpl)
+			tmp = (NamedEntityAnnotationImpl) entity;
 		else {
-			tmp = new DBNamedEntityAnnotationImpl(entity);
+			tmp = new NamedEntityAnnotationImpl(entity);
 		}
 		if(tmp != null)
-			this.datastore.save(tmp);
+			this.enrichmentDatastore.save(tmp);
 		
 	}
 
@@ -108,19 +86,22 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public void deleteNamedEntityAnnotationById(String id) {
-		datastore.delete(datastore.find(DBNamedEntityAnnotationImpl.class).filter("id", id));		
+	public long deleteNamedEntityAnnotationById(String id) {
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.ID, id))
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();	
 	}
 	
 	@Override
-	public void deleteNamedEntityAnnotation(String storyId, String itemId) {
-		Query<DBNamedEntityAnnotationImpl> persistentNamedEntitiesAnnotationQuery = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
-		persistentNamedEntitiesAnnotationQuery.disableValidation();
-		persistentNamedEntitiesAnnotationQuery.filter("storyId", storyId);
-		persistentNamedEntitiesAnnotationQuery.filter("itemId", itemId);
-		datastore.delete(persistentNamedEntitiesAnnotationQuery);		
+	public long deleteNamedEntityAnnotation(String storyId, String itemId) {
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId)
+                )
+                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                .getDeletedCount();	
 	}
-
 
 	@Override
 	public void deleteAllNamedEntityAnnotation() {
@@ -128,35 +109,26 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 		
 	}
 
-
 	@Override
 	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property) {
 		
-		Query<DBNamedEntityAnnotationImpl> persistentNamedEntityAnnotations = datastore.createQuery(DBNamedEntityAnnotationImpl.class);
-		
-		persistentNamedEntityAnnotations.disableValidation().and(
-				persistentNamedEntityAnnotations.criteria("storyId").equal(storyId),
-				persistentNamedEntityAnnotations.criteria("itemId").equal(itemId),
-				persistentNamedEntityAnnotations.criteria("property").equal(property)
-			);
-
-		List<DBNamedEntityAnnotationImpl> result = persistentNamedEntityAnnotations.asList();
-		if(result.size() == 0)
+		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.PROPERTY, property)
+                )			
+				.iterator()
+				.toList();
+		if(queryResult == null)
 			return null;
 		else
 		{
-
 			List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-			for(int index = result.size()-1; index >= 0; index--) {
-				NamedEntityAnnotation dbEntity = result.get(index);
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				NamedEntityAnnotation dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
 			}
 			return tmpResult;
 		}
-
-
 	}
-
-
-
 }

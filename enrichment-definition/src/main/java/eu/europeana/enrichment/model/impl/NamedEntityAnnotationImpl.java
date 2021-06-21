@@ -3,13 +3,22 @@ package eu.europeana.enrichment.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 
+@Entity(value="NamedEntityAnnotationImpl")
 @JsonPropertyOrder({ "id", "type", "motivation","body","target"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
@@ -32,7 +41,15 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	private String storyId;
 	private String itemId;
 	
+	//id will be used for storing MongoDB _id
+	@Id
+    public String _id = new ObjectId().toString();
 
+	@Override
+	@JsonIgnore
+	public String getId() {
+		return _id;
+	}
 	
 	@Override
 	@JsonIgnore
@@ -155,15 +172,6 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.property = prop;
 	}
 
-	
-	@Override
-	@JsonIgnore
-	public String getId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
 	@Override
 	@JsonIgnore
 	public String getSource() {

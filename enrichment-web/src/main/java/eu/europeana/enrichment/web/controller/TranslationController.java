@@ -2,10 +2,9 @@ package eu.europeana.enrichment.web.controller;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,13 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.service.TranslationService;
-import eu.europeana.enrichment.web.config.swagger.SwaggerSelect;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 import io.swagger.annotations.Api;
@@ -32,23 +29,23 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-@SwaggerSelect
+//@SwaggerSelect
 @Api(tags = "Translation service", description=" ")
 public class TranslationController extends BaseRest {
 
-	@Resource
+	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
 	
-	@Resource(name = "eTranslationService")
+	@Autowired
 	TranslationService eTranslationService;
 
-	@Resource(name = "persistentItemEntityService")
+	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
 	
-	@Resource(name = "persistentStoryEntityService")
+	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
 	
-	@Resource(name = "persistentTranslationEntityService")
+	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
 
 	Logger logger = LogManager.getLogger(getClass());

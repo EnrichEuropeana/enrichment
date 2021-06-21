@@ -12,7 +12,7 @@ import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.model.DBPositionEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 
 public interface NERService {
@@ -69,7 +69,7 @@ public interface NERService {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getStoryId()
 					.equals(storyEntity.getStoryId())).collect(Collectors.toList());
 			if(positions.size() == 0) {
-				posEntity = new DBPositionEntityImpl();
+				posEntity = new PositionEntityImpl();
 				posEntity.setStoryEntity(storyEntity);
 				positions.add(posEntity);
 			}
@@ -89,7 +89,7 @@ public interface NERService {
 			List<PositionEntity> positions = namedEntity.getPositionEntities().stream().filter(x -> x.getTranslationKey()
 					.equals(translationEntity.getKey())).collect(Collectors.toList());
 			if(positions.size() == 0) {
-				posEntity = new DBPositionEntityImpl();
+				posEntity = new PositionEntityImpl();
 				posEntity.setTranslationEntity(translationEntity);
 				positions.add(posEntity);
 			}

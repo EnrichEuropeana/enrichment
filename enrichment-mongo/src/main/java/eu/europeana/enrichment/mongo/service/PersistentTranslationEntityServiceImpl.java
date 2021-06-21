@@ -4,15 +4,18 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import javax.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.TranslationEntity;
-import eu.europeana.enrichment.mongo.dao.TranslationEntityDaoImpl;;
+import eu.europeana.enrichment.mongo.dao.TranslationEntityDao;
 
+@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_TRANSLATION_ENTITY_SERVICE)
 public class PersistentTranslationEntityServiceImpl implements PersistentTranslationEntityService {
 
-	@Resource(name = "translationEntityDao")
-	TranslationEntityDaoImpl translationEntityDao;
+	@Autowired
+	TranslationEntityDao translationEntityDao;
 	
 	@Override
 	public TranslationEntity findTranslationEntity(String key) {

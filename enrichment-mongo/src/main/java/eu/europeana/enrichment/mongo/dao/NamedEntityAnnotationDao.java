@@ -12,8 +12,8 @@ public interface NamedEntityAnnotationDao {
 	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property);
 	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity);
 	public void deleteNamedEntityAnnotation(NamedEntityAnnotation entity);
-	public void deleteNamedEntityAnnotationById(String id);
-	public void deleteNamedEntityAnnotation(String storyId,String itemId);
+	public long deleteNamedEntityAnnotationById(String id);
+	public long deleteNamedEntityAnnotation(String storyId,String itemId);
 	public void deleteAllNamedEntityAnnotation();
 
 }

@@ -1,7 +1,9 @@
 package eu.europeana.enrichment.ner.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.http.HttpResponse;
@@ -13,19 +15,21 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.stanford.nlp.ie.crf.CRFClassifier;
-import edu.stanford.nlp.ling.CoreLabel;
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.linking.model.StanfordNerRequest;
 import eu.europeana.enrichment.ner.service.NERService;
 import eu.europeana.enrichment.ner.service.model.StanfordNamedEntityImpl;
 
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE)
 public class NERStanfordServiceImpl implements NERService{
 
 	private String endpoint;
@@ -36,13 +40,14 @@ public class NERStanfordServiceImpl implements NERService{
 	 * This class constructor loads a model for the Stanford named
 	 * entity recognition and classification
 	 */
-	public NERStanfordServiceImpl(String url) {
-		endpoint = url;
+	@Autowired
+	public NERStanfordServiceImpl(EnrichmentConfiguration enrichmentConfiguration) {
+		endpoint = enrichmentConfiguration.getNerStanfordUrl();
 	}
 		
 	@Override
 	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException {
-		TreeMap<String, List<NamedEntity>> map = null;
+		TreeMap<String, List<StanfordNamedEntityImpl>> map = null;
 		String serializedRequest = null;
 		try {
 			serializedRequest = new ObjectMapper().writeValueAsString(new StanfordNerRequest(text));
@@ -65,7 +70,24 @@ public class NERStanfordServiceImpl implements NERService{
 			e.printStackTrace();
 			throw e;
 		}
-		return map;
+		
+		/*
+		 * convert the response from TreeMap<String, List<StanfordNamedEntityImpl>> to TreeMap<String, List<NamedEntity>>
+		 * TODO: improve the code so that we do not need such a conversion
+		 */
+		TreeMap<String, List<NamedEntity>> result = null;
+		if (map.size()>0) result =  new TreeMap<String, List<NamedEntity>>();
+		else return null;
+		for(Map.Entry<String, List<StanfordNamedEntityImpl>> entry : map.entrySet()) {
+			List<NamedEntity> resultValue =  new ArrayList<NamedEntity>();
+			for(StanfordNamedEntityImpl entryValueElem : entry.getValue()) {
+				resultValue.add(entryValueElem);
+			}
+			result.put(entry.getKey(), resultValue);
+		}
+		
+		return result;
+		
 		//return processClassifiedResult(classify);
 	}
 	

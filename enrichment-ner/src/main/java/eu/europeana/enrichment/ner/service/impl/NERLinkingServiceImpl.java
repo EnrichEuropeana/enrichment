@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.DBpediaSpotlight;
@@ -16,14 +17,15 @@ import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.linking.model.DBpediaResponse;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
-
+@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_LINKING_SERVICE)
 public class NERLinkingServiceImpl implements NERLinkingService {
 
 	Logger logger = LogManager.getLogger(getClass());
 	
-	@Resource(name = "europeanaEntityService")
+	@Autowired
 	EuropeanaEntityService europeanaEntityService;
-	@Resource(name = "wikidataService")
+
+	@Autowired
 	WikidataService wikidataService;
 	/*
 	 * Tool names for named entity linking defined 

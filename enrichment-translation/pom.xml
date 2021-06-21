@@ -28,16 +28,16 @@
 	<dependencies>
 	
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>${version.log4j2}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>${version.log4j2}</version>
-		</dependency>
+			<groupId>eu.europeana.enrich</groupId>
+	 		<artifactId>enrichment-common</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>    
 	
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+<!-- 			<version>${version.springBoot}</version> -->
+		</dependency>
 		<!-- Other -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -59,7 +59,45 @@
 			<artifactId>language-en</artifactId>
 			<version>${version.languagetool}</version>
 		</dependency>
+
 		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+<!-- 			<version>${version.spring-boot-starter-test}</version> -->
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+        		<exclusion>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-logging</artifactId>
+        		</exclusion>
+			</exclusions>
+		</dependency>
+		<!--testcontainers for integration testing-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${version.junit-jupiter-api}</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -70,6 +108,7 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${version.spring}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
@@ -83,18 +122,7 @@
 	        <version>2.0.6</version>
 		</dependency>
 		
-		<dependency>
-			<scope>test</scope>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${version.spring}</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${version.junit}</version>
-			<scope>test</scope>
-		</dependency>
+
 	</dependencies>
 	
 	

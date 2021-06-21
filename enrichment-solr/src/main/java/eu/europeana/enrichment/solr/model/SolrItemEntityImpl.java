@@ -3,10 +3,10 @@ package eu.europeana.enrichment.solr.model;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.mongo.model.DBItemEntityImpl;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.ItemEntitySolrFields;
 
-public class SolrItemEntityImpl extends DBItemEntityImpl implements ItemEntity {
+public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 	
 	public SolrItemEntityImpl (ItemEntity copy) {
 		this.setStoryId(copy.getStoryId());
