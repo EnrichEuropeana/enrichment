@@ -83,7 +83,7 @@
 		<version.googleGuava>27.1-jre</version.googleGuava>
 		<version.apacheHttp>4.5.5</version.apacheHttp>
 		<version.mongodb>3.4.1</version.mongodb>
-		<version.commonsApi>0.3.4</version.commonsApi>
+		<version.commonsApi>0.3.5-SNAPSHOT</version.commonsApi>
 		<version.ioinformatics>0.1.1</version.ioinformatics>
 		<version.languagetool>4.3</version.languagetool>
 		<version.entityApi>0.6-SNAPSHOT</version.entityApi>

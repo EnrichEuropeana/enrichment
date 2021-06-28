@@ -54,11 +54,32 @@
   			<artifactId>enrichment-translation</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.api.commons</groupId> -->
+<!-- 			<artifactId>commons-web</artifactId> -->
+<!-- 			<version>${version.commonsApi}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>eu.europeana.api.commons</groupId>
 			<artifactId>commons-web</artifactId>
 			<version>${version.commonsApi}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mongodb</groupId>
+					<artifactId>mongo-java-driver</artifactId>
+				</exclusion>
+				<exclusion>
+                    <groupId>xml-apis</groupId>
+                    <artifactId>xml-apis</artifactId>
+                </exclusion>
+				<exclusion>
+					<groupId>io.springfox</groupId>
+					<artifactId>springfox-swagger2</artifactId>
+				</exclusion>                
+			</exclusions>
 		</dependency>
+
+
 		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
   			<artifactId>enrichment-solr</artifactId>
@@ -118,15 +139,26 @@
 			</exclusions>
 		</dependency-->
 		
+<!-- 		<dependency> -->
+<!-- 			<groupId>io.springfox</groupId> -->
+<!-- 			<artifactId>springfox-swagger2</artifactId> -->
+<!-- 			<version>${version.swagger}</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>com.google.guava</groupId> -->
+<!-- 					<artifactId>guava</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>slf4j-api</artifactId> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
+			<artifactId>springfox-boot-starter</artifactId>
 			<version>${version.swagger}</version>
 			<exclusions>
-				<exclusion>
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
 				<exclusion>
 					<artifactId>slf4j-api</artifactId>
 					<groupId>org.slf4j</groupId>
