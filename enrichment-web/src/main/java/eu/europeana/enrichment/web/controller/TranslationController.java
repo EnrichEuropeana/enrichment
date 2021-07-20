@@ -168,24 +168,8 @@ public class TranslationController extends BaseRest {
 				for(ItemEntity item : allItems)
 				{
 					TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-							findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, "en", "description");
-					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getDescription()!=null && !item.getDescription().isEmpty())
-					{
-						body.setStoryId(item.getStoryId());
-						body.setItemId(item.getItemId());
-						body.setTranslationTool(translationTool);
-						body.setType("description");
-						body.setText(null);
-						translation = enrichmentTranslationService.translate(body, true);
-					}
-					else
-					{
-						logger.info("The TranslationEntity (property:description) for storyId: " + item.getStoryId() + " and itemId: " + item.getItemId() + "already exists in the db.");
-					}
-
-					dbTranslationEntity = persistentTranslationEntityService.
 							findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, "en", "transcription");
-					if(dbTranslationEntity==null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getTranscriptionText()!=null && !item.getTranscriptionText().isEmpty())
+					if(dbTranslationEntity==null && item.getLanguage()!=null && item.getLanguage().compareToIgnoreCase("en")!=0 && item.getTranscriptionText()!=null && !item.getTranscriptionText().isBlank())
 					{
 						body.setStoryId(item.getStoryId());
 						body.setItemId(item.getItemId());
@@ -196,9 +180,7 @@ public class TranslationController extends BaseRest {
 					}
 					else
 					{
-					
-						logger.info("The TranslationEntity (property:transcription) for storyId: " + item.getStoryId() + " and itemId: " + item.getItemId() + "already exists in the db.");
-					
+						logger.info("The TranslationEntity (property:transcription) for storyId: " + item.getStoryId() + " and itemId: " + item.getItemId() + "already exists in the db.");					
 					}
 						
 				}
