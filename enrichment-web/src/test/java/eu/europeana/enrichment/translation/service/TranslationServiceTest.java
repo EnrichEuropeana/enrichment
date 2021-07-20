@@ -1,22 +1,48 @@
 package eu.europeana.enrichment.translation.service;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import eu.europeana.enrichment.EnrichmentApp;
+import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
+import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 
-
-@SpringBootTest(classes = { EnrichmentApp.class })
+@SpringBootTest
 public class TranslationServiceTest {
 
 	@Autowired
 	TranslationService googleTranslationService;
+	
 	@Autowired
 	TranslationService eTranslationService;
+	
+	@Autowired
+	PersistentStoryEntityService persistentStoryEntityService;
+	
+	@Autowired
+	PersistentTranslationEntityService persistentTranslationEntityService;
 	
 	@Autowired
 	TranslationLanguageTool translationLanguageTool;
@@ -24,25 +50,102 @@ public class TranslationServiceTest {
 	private static final String testText = "Die Tagebücher stammen aus dem Nachlass von Eduard Scheer, der Staatsbaumeister in Göppingen war.";
 	private static final String testLanguage = "de";
 	private static final String targetLanguage = "en";
-	private static final String expectedTranslation = "The diaries are from the estate of Eduard Scheer, who was state master builder in Göppingen.";
+	private static final String expectedTranslation = "The diaries come from the estate of Eduard Scheer, who was a state master builder in Göppingen.";
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	@Test
-	public void googleTranslationServiceTest() {
+	public void googleTranslationServiceAllStories() {
+		List<String> translationTexts = new ArrayList<>();
+		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
+		for (StoryEntity story : allStories) {
+			
+			translationTexts.clear();
+			
+			if(story.getLanguage()!=null && story.getLanguage().compareToIgnoreCase("en")!=0) {
+			
+				if (story.getTranscriptionText()!=null && !story.getTranscriptionText().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "transcription") == null) {				
+					translationTexts.add(story.getTranscriptionText());
+					String serviceResult=null;
+					try {
+						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguage(), "en");
+						if(serviceResult!=null && !serviceResult.isBlank()) {
+							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
+							newTranslationEntity.setTranslatedText(serviceResult);
+							newTranslationEntity.setItemId("all");
+							newTranslationEntity.setLanguage("en");
+							newTranslationEntity.setStoryId(story.getStoryId());
+							newTranslationEntity.setTool("Google");
+							newTranslationEntity.setType("transcription");
+							newTranslationEntity.setKey(serviceResult);
+							persistentTranslationEntityService.saveTranslationEntity(newTranslationEntity);
+						}
+					} catch (TranslationException | UnsupportedEncodingException | InterruptedException | NoSuchAlgorithmException e) {
+						logger.info("During the generation of the translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
+					}
+	
+				}
+				
+				if (story.getDescription()!=null && !story.getDescription().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "description") == null) {				
+					translationTexts.add(story.getDescription());
+					String serviceResult=null;
+					try {
+						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguage(), "en");
+						if(serviceResult!=null && !serviceResult.isBlank()) {
+							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
+							newTranslationEntity.setTranslatedText(serviceResult);
+							newTranslationEntity.setItemId("all");
+							newTranslationEntity.setLanguage("en");
+							newTranslationEntity.setStoryId(story.getStoryId());
+							newTranslationEntity.setTool("Google");
+							newTranslationEntity.setType("description");
+							newTranslationEntity.setKey(serviceResult);
+							persistentTranslationEntityService.saveTranslationEntity(newTranslationEntity);
+						}
+					}
+					catch (TranslationException | UnsupportedEncodingException | InterruptedException | NoSuchAlgorithmException e) {
+						logger.info("During the generation of the translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
+					}
+	
+				}
+			}
+		}
+
+	}
+	
+	@Test
+	public void googleTranslationServiceTest1() {
 		assertTrue(true);
 	}
-	/*
+	
 	@Test
-	public void googleTranslationServiceTest() {
-		String serviceResult = googleTranslationService.translateText(testText, testLanguage, targetLanguage);
-		if(!serviceResult.equals(expectedTranslation))
-			fail("Google translation result not equal to expected result!");
+	public void googleTranslationServiceTest2() {
+		List<String> translationTexts = new ArrayList<>();
+		translationTexts.add(testText);
+		String serviceResult;
+		try {
+			serviceResult = googleTranslationService.translateText(translationTexts, testLanguage, targetLanguage);
+			if(!serviceResult.equals(expectedTranslation))
+				fail("Google translation result not equal to expected result!");
+		} catch (TranslationException | UnsupportedEncodingException | InterruptedException e) {
+			fail("Google translation failed with an exception: " + e.getMessage() + "!");
+		}
+		
 	}
 	
 	@Test
 	public void eTranslationServiceTest() {
-		String serviceResult = eTranslationService.translateText(testText, testLanguage, targetLanguage);
-		if(!serviceResult.equals(expectedTranslation))
-			fail("eTranslation result not equal to expected result!");
+		List<String> translationTexts = new ArrayList<>();
+		translationTexts.add(testText);
+		String serviceResult;
+		try {
+			serviceResult = eTranslationService.translateText(translationTexts, testLanguage, targetLanguage);
+			if(!serviceResult.equals(expectedTranslation))
+				fail("eTranslation result not equal to expected result!");
+		} catch (TranslationException | UnsupportedEncodingException | InterruptedException e) {
+			fail("eTranslation translation failed with an exception: " + e.getMessage() + "!");
+		}
+		
 	}
 	
 	@Test
@@ -116,6 +219,6 @@ public class TranslationServiceTest {
 			googlePages.clear();
 		}
 		
-	}*/
+	}
 
 }

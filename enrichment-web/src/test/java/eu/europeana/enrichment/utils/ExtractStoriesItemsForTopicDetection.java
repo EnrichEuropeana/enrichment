@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
@@ -31,7 +32,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 */
 //@ContextConfiguration(classes = { EnrichmentApp.class})
 @SpringBootTest
-public class ExtractStoriesToJSONForTopicDetectionAnalysis {
+public class ExtractStoriesItemsForTopicDetection {
 		
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
@@ -41,6 +42,28 @@ public class ExtractStoriesToJSONForTopicDetectionAnalysis {
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	@Autowired
 	JavaJSONParser javaJSONParser;
+	
+	@Test
+	public void extractItemsForTopicDetection() throws IOException {
+		//extracting items in one json file
+		String fileName = "C:/conceptual_search_documents/allItemTranslations.csv";
+		BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
+		bwTranslations.write("itemId,text"+"\n");				
+		
+		List<TranslationEntity> itemTranslations = persistentTranslationEntityService.getAllTranslationEntities();
+		
+		for(int i=0;i<itemTranslations.size();i++)
+		{
+			if(!itemTranslations.get(i).getItemId().equals("all") && itemTranslations.get(i).getTranslatedText()!=null && !itemTranslations.get(i).getTranslatedText().isBlank())
+			{				
+				String itemTranscriptionOneLine = itemTranslations.get(i).getTranslatedText().replaceAll("[\r\n\t]+", " ");
+				String correctedTranslationsForQuotationWithin = itemTranscriptionOneLine.replaceAll("\"", "");
+				bwTranslations.write(itemTranslations.get(i).getItemId() + ",\"" + correctedTranslationsForQuotationWithin + "\"\n");				
+				System.out.print("Currently analysed item with itemId: " + itemTranslations.get(i).getItemId() +". \n");			
+			}
+		}		
+		bwTranslations.close();
+	}
 	
 	@Test
 	public void extractStoriesForTopicDetection_BERT_LDA() throws IOException {
