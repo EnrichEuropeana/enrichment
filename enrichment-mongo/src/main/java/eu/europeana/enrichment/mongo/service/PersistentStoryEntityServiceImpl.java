@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.dao.StoryEntityDao;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE)
@@ -18,6 +19,11 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	@Override
 	public StoryEntity findStoryEntity(String storyId) {
 		return storyEntityDao.findStoryEntity(storyId);
+	}
+	
+	@Override
+	public List<StoryEntityImpl> findStoryEntities(String storyId) {
+		return storyEntityDao.findStoryEntities(storyId);
 	}
 
 	@Override

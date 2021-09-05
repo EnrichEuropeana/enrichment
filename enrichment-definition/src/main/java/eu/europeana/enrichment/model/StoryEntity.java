@@ -25,8 +25,14 @@ public interface StoryEntity {
 	String getSummary();
 	void setSummary(String storySummary);
 	
-	String getLanguage();
-	void setLanguage(String storyLanguage);
+	String getLanguageTranscription();
+	void setLanguageTranscription(String storyLanguageTranscription);
+	
+	String getLanguageDescription();
+	void setLanguageDescription(String storyLanguageDescription);
+	
+	String getLanguageSummary();
+	void setLanguageSummary(String storyLanguageSummary);
 
 	String getTranscriptionText();
 	void setTranscriptionText(String storyTranscription);

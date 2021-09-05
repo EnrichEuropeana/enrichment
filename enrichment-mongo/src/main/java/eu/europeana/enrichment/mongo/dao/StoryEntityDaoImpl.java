@@ -29,6 +29,13 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
                 eq(EntityFields.STORY_ID, key))
                 .first();
 	}
+	
+	@Override
+	public List<StoryEntityImpl> findStoryEntities(String key) {
+		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID, key))
+				.iterator().toList();
+	}
 
 	@Override
 	public void saveStoryEntity(StoryEntity entity) {
@@ -36,7 +43,9 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 		if(dbStoryEntity!=null)
 		{
 			dbStoryEntity.setDescription(entity.getDescription());
-			dbStoryEntity.setLanguage(entity.getLanguage());
+			dbStoryEntity.setLanguageTranscription(entity.getLanguageTranscription());
+			dbStoryEntity.setLanguageDescription(entity.getLanguageDescription());
+			dbStoryEntity.setLanguageSummary(entity.getLanguageSummary());
 			dbStoryEntity.setSource(entity.getSource());
 			dbStoryEntity.setSummary(entity.getSummary());
 			dbStoryEntity.setTitle(entity.getTitle());
@@ -58,7 +67,9 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 
 	@Override
 	public void deleteStoryEntity(StoryEntity entity) {
-		deleteStoryEntityByStoryId(entity.getStoryId());
+		enrichmentDatastore.find(StoryEntityImpl.class).filter(
+            eq(EntityFields.OBJECT_ID,entity.getId()))
+			.delete();
 	}
 
 	@Override

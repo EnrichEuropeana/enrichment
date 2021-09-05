@@ -10,6 +10,7 @@ public class EntityFields {
     public static final String ITEM_ID = "itemId";
     public static final String STORY_ID = "storyId";
     public static final String ID = "id";
+    public static final String OBJECT_ID = "_id";
     public static final String KEY = "key";
     public static final String TOOL = "tool";
     public static final String LANGUAGE = "language";

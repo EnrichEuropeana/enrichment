@@ -15,6 +15,14 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	private Float latitude;
 	private Float longitude;
 
+	/**
+	 * The identification property if the latitude from the coordinate location in this case
+	 */
+	@Override
+	@JsonIgnore
+	public String getIdentification_jsonProp() {
+		return latitude_jsonProp;
+	}
 	
 	private String country_jsonProp = "claims.P17.mainsnak.datavalue.value.id";
 	

@@ -62,18 +62,10 @@ public class WikidataEntityImpl implements WikidataEntity {
 	public String getSameAs_jsonProp() {
 		return sameAs_jsonProp;
 	}
-	
-	@Override
-	@JsonIgnore
-	public String getInternalType_jsonProp() {
-		return internal_type_jsonProp;
-	}
-
 
 	protected String prefLabel_jsonProp = "labels.*.*";
 	protected String altLabel_jsonProp = "aliases.*.*";
 	protected String depiction_jsonProp = "claims.P18.mainsnak.datavalue.value";
-	protected String internal_type_jsonProp = "claims.P1417.mainsnak.datavalue.value";
 	protected String description_jsonProp = "descriptions.*.*";
 	protected String sameAs_jsonProp = "sitelinks.*.url";
 	
@@ -188,6 +180,16 @@ public class WikidataEntityImpl implements WikidataEntity {
 	@Override
 	public void setSameAs(String[] sameAs) {
 		this.sameAs = sameAs;
+	}
+
+	/**
+	 * This method returns the property specific for the given type of the wikidata entity
+	 * that helps in recognizing it from other entities.
+	 */
+	@Override
+	public String getIdentification_jsonProp() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

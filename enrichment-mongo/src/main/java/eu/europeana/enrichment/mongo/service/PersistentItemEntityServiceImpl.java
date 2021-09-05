@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE)
@@ -19,8 +20,13 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	ItemEntityDao itemEntityDao;
 	
 	@Override
-	public ItemEntity findItemEntity(String storyItemId) {
-		return itemEntityDao.findItemEntity(storyItemId);
+	public ItemEntity findItemEntity(String storyId, String itemId) {
+		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
+	}
+	
+	@Override
+	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId) {
+		return itemEntityDao.findItemEntitiesFromStory(storyId, itemId);
 	}
 
 	@Override

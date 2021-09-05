@@ -153,12 +153,9 @@ public interface WikidataEntity {
 	String getDepiction_jsonProp();
 
 	String getDescription_jsonProp();
-	
-	String getInternalType_jsonProp();
 
 	String getSameAs_jsonProp();
-
 	
-
+	String getIdentification_jsonProp();
 
 }

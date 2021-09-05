@@ -14,6 +14,16 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	private String[] dateOfDeath;
 	private String[] professionOrOccupation;
 	
+	/**
+	 * The identification property if the first name of the person in this case
+	 */
+	private String identification_jsonProp = "claims.P735.mainsnak.datavalue.value.id";
+	@Override
+	@JsonIgnore
+	public String getIdentification_jsonProp() {
+		return identification_jsonProp;
+	}
+	
 	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";
 	@Override
 	@JsonIgnore

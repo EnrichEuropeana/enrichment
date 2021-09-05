@@ -36,16 +36,6 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 	
 	@Override
-	public ItemEntity findItemEntity(String key) {
-		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EntityFields.ITEM_ID, key))
-                .first();
-		if (dbEntity!=null) 
-			addAdditionalInformation(dbEntity);		
-		return dbEntity;
-	}
-	
-	@Override
 	public List<ItemEntity> findAllItemEntities() {
 		List<ItemEntityImpl> queryResult = enrichmentDatastore.find(ItemEntityImpl.class).iterator().toList();
 		if(queryResult == null)
@@ -75,6 +65,15 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 	
 	@Override
+	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId)
+	{
+		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
+            eq(EntityFields.STORY_ID, storyId),
+            eq(EntityFields.ITEM_ID, itemId))
+            .iterator().toList();
+	}
+	
+	@Override
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId){
 		List<ItemEntityImpl> queryResult = enrichmentDatastore.find(ItemEntityImpl.class).filter(
                 eq(EntityFields.STORY_ID, storyId))
@@ -96,7 +95,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Override
 	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		ItemEntity dbItemEntity = findItemEntity(entity.getItemId());
+		ItemEntity dbItemEntity = findItemEntityFromStory(entity.getStoryId(), entity.getItemId());
 		if(dbItemEntity!=null)
 		{
 			dbItemEntity.setLanguage(entity.getLanguage());
@@ -124,7 +123,9 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Override
 	public void deleteItemEntity(ItemEntity entity) {
-		deleteItemEntityByStoryItemId(entity.getItemId());
+		enrichmentDatastore.find(ItemEntityImpl.class).filter(
+            eq(EntityFields.OBJECT_ID,entity.getId()))
+			.delete();
 	}
 
 	@Override

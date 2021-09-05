@@ -19,7 +19,9 @@ public class StoryEntityImpl implements StoryEntity {
 	private String source;
 	private String description;
 	private String summary;
-	private String language;
+	private String languageTranscription;
+	private String languageDescription;
+	private String languageSummary;
 	private String transcriptionText;
 	
 	@Id
@@ -37,7 +39,9 @@ public class StoryEntityImpl implements StoryEntity {
 		this.source = copy.getSource();
 		this.description = copy.getDescription();
 		this.summary = copy.getSummary();
-		this.language = copy.getLanguage();
+		this.languageTranscription = copy.getLanguageTranscription();
+		this.languageDescription = copy.getLanguageDescription();
+		this.languageSummary = copy.getLanguageSummary();
 		this.transcriptionText = copy.getTranscriptionText();
 	}
 	
@@ -98,16 +102,6 @@ public class StoryEntityImpl implements StoryEntity {
 	}
 
 	@Override
-	public String getLanguage() {
-		return language;
-	}
-
-	@Override
-	public void setLanguage(String storyLanguage) {
-		this.language=storyLanguage;
-	}
-
-	@Override
 	public String getTranscriptionText() {
 		return transcriptionText;
 	}
@@ -117,4 +111,33 @@ public class StoryEntityImpl implements StoryEntity {
 		this.transcriptionText=storyTranscription;
 	}
 
+	@Override
+	public String getLanguageDescription() {
+		return languageDescription;
+	}
+
+	@Override
+	public void setLanguageDescription(String storyLanguageDescription) {
+		this.languageDescription=storyLanguageDescription;
+	}
+
+	@Override
+	public String getLanguageSummary() {
+		return languageSummary;
+	}
+
+	@Override
+	public void setLanguageSummary(String storyLanguageSummary) {
+		this.languageSummary=storyLanguageSummary;
+	}
+
+	@Override
+	public String getLanguageTranscription() {
+		return languageTranscription;
+	}
+
+	@Override
+	public void setLanguageTranscription(String storyLanguageTranscription) {
+		this.languageTranscription=storyLanguageTranscription;
+	}
 }

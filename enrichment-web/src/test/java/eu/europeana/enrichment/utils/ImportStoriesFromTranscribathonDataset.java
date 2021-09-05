@@ -3,6 +3,7 @@ package eu.europeana.enrichment.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +31,7 @@ import objects.Transcription;
 */
 //@ContextConfiguration(classes = { EnrichmentApp.class})
 @SpringBootTest
+@Disabled("Excluded from automated runs.")
 public class ImportStoriesFromTranscribathonDataset {
 		
 	@Autowired
@@ -89,7 +91,7 @@ public class ImportStoriesFromTranscribathonDataset {
 			
 			newStories[0].setTranscriptionText(storyTranscription);
 			newStories[0].setDescription(minimalStory.dcDescription);				
-			newStories[0].setLanguage(minimalStory.edmLanguage);
+			newStories[0].setLanguageTranscription(minimalStory.edmLanguage);
 			newStories[0].setSource(minimalStory.dcSource);
 			newStories[0].setStoryId(minimalStory.StoryId.toString());
 			newStories[0].setTitle(minimalStory.dcTitle);
