@@ -188,30 +188,29 @@ public class WikidataController extends BaseRest {
 				{
 					//getting WikidataEntity, either from local cache or from the wikidata
 					WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
-					items.add(wikidataEntity);
 					
-					logger.info("Wikidata place found is: ");
-					
-					
-					//adjust for languages, i.e. remove the fields for other not required languages
-					HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
-					HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
-					HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
+					if (wikidataEntity!=null) { 
+						items.add(wikidataEntity);						
+						logger.info("Wikidata place found is: ");						
+						
+						//adjust for languages, i.e. remove the fields for other not required languages
+						HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
+						HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
+						HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
+					}
 
 				}
 			}
 			
-
-			NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);
-			
 			String serializedNamedEntityCollection=null;
-	    	
-	    	serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
-					
+			
+			if(items.size()>0) {
+				NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);   	
+		    	serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
+			}
 			ResponseEntity<String> response = new ResponseEntity<String>(serializedNamedEntityCollection, HttpStatus.OK);			
 
-			return response;
-					
+			return response;		
 		
 	}
 }

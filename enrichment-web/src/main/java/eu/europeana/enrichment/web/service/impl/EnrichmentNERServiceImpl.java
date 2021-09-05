@@ -509,7 +509,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setDescription(newText);
 					else newStories[0].setDescription(listStoryTranscribathon.get(0).getDcDescription());
 					
-					newStories[0].setLanguage(listStoryTranscribathon.get(0).getEdmLanguage());
+					newStories[0].setLanguageTranscription(listStoryTranscribathon.get(0).getEdmLanguage());
 					newStories[0].setSource("");
 					newStories[0].setStoryId(storyId);
 					
@@ -566,7 +566,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					results[0] = newStoryEntity.getTranscriptionText();
 				}
 				
-				results[1] = newStoryEntity.getLanguage();
+				results[1] = newStoryEntity.getLanguageTranscription();
 				
 				return results;
 			}
@@ -622,7 +622,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 					StoryEntity [] newStories = new StoryEntity [1];
 					newStories[0] = new StoryEntityImpl(); 
 					newStories[0].setDescription(listItemTranscribathon.get(0).getStoryDcDescription());
-					newStories[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
+					newStories[0].setLanguageTranscription(listItemTranscribathon.get(0).getStoryEdmLanguage());
 					newStories[0].setSource("");
 					newStories[0].setStoryId(storyId);
 					newStories[0].setSummary("");
@@ -947,7 +947,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
 			if(story.getDescription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_DESCRIPTION, null);
-			if(story.getLanguage() == null)
+			if(story.getLanguageTranscription() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_LANGUAGE, null);
 			if(story.getSource() == null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_SOURCE, null);
@@ -1027,7 +1027,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			item.setDescription(itemDescriptionText);
 			
 			//comparing the new and the already existing item and deleting old NamedEntities if there are changes
-			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity(item.getItemId());			
+			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity(item.getStoryId(), item.getItemId());			
 			if (dbItemEntity!=null)
 			{
 				boolean someItemPartChanged = false;
@@ -1141,10 +1141,10 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 				newStoryEntity.setTitle("");
 				newStoryEntity.setDescription("");
 				newStoryEntity.setStoryId("");
-				newStoryEntity.setLanguage("");
+				newStoryEntity.setLanguageTranscription("");
 				newStoryEntity.setSummary("");
 				newStoryEntity.setTranscriptionText("");
-				newStoryEntity.setLanguage(storyLanguage);
+				newStoryEntity.setLanguageTranscription(storyLanguage);
 				
 				if(stories.get(i).get("source")!=null) newStoryEntity.setSource((String) stories.get(i).get("source"));
 				

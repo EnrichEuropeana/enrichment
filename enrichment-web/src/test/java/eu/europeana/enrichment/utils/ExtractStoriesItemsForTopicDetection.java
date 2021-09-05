@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +33,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 */
 //@ContextConfiguration(classes = { EnrichmentApp.class})
 @SpringBootTest
+@Disabled("Excluded from automated runs.")
 public class ExtractStoriesItemsForTopicDetection {
 		
 	@Autowired
@@ -76,7 +78,7 @@ public class ExtractStoriesItemsForTopicDetection {
 		
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(storyTranslations.get(i).getLanguageTranscription()!=null && storyTranslations.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{				
 				String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
 
@@ -159,7 +161,7 @@ public class ExtractStoriesItemsForTopicDetection {
 		
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(storyTranslations.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{
 				
 				String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
@@ -313,7 +315,7 @@ public class ExtractStoriesItemsForTopicDetection {
 		Set<String> differentEnglishStoriesIDs = new HashSet<String>();
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(storyTranslations.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{
 				differentEnglishStoriesIDs.add(storyTranslations.get(i).getStoryId());
 			}

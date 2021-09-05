@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.encryption.InvalidPasswordException;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +31,7 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 
 @SpringBootTest
+@Disabled("Excluded from automated runs.")
 public class TranslationServiceTest {
 
 	@Autowired
@@ -62,13 +64,13 @@ public class TranslationServiceTest {
 			
 			translationTexts.clear();
 			
-			if(story.getLanguage()!=null && story.getLanguage().compareToIgnoreCase("en")!=0) {
+			if(story.getLanguageTranscription()!=null && story.getLanguageTranscription().compareToIgnoreCase("en")!=0) {
 			
 				if (story.getTranscriptionText()!=null && !story.getTranscriptionText().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "transcription") == null) {				
 					translationTexts.add(story.getTranscriptionText());
 					String serviceResult=null;
 					try {
-						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguage(), "en");
+						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageTranscription(), "en");
 						if(serviceResult!=null && !serviceResult.isBlank()) {
 							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 							newTranslationEntity.setTranslatedText(serviceResult);
@@ -90,7 +92,7 @@ public class TranslationServiceTest {
 					translationTexts.add(story.getDescription());
 					String serviceResult=null;
 					try {
-						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguage(), "en");
+						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageTranscription(), "en");
 						if(serviceResult!=null && !serviceResult.isBlank()) {
 							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 							newTranslationEntity.setTranslatedText(serviceResult);
@@ -219,6 +221,58 @@ public class TranslationServiceTest {
 			googlePages.clear();
 		}
 		
+	}
+	
+	@Test
+	public void googleTranslationServiceStoryDescriptionAndSummary() {
+		List<String> translationTexts = new ArrayList<>();
+		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
+		for (StoryEntity story : allStories) {			
+			translationTexts.clear();			
+			if(story.getLanguageDescription().compareToIgnoreCase("")!=0 && story.getLanguageDescription().compareToIgnoreCase("en")!=0 && story.getLanguageDescription().length()==2 && story.getDescription().compareToIgnoreCase("")!=0) {
+					translationTexts.add(story.getDescription());
+					String serviceResult=null;
+					try {
+						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageDescription(), "en");
+						if(serviceResult!=null && !serviceResult.isBlank()) {
+							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
+							newTranslationEntity.setTranslatedText(serviceResult);
+							newTranslationEntity.setItemId("all");
+							newTranslationEntity.setLanguage("en");
+							newTranslationEntity.setStoryId(story.getStoryId());
+							newTranslationEntity.setTool("Google");
+							newTranslationEntity.setType("description");
+							newTranslationEntity.setKey(serviceResult);
+							persistentTranslationEntityService.saveTranslationEntity(newTranslationEntity);
+						}
+					} catch (TranslationException | UnsupportedEncodingException | InterruptedException | NoSuchAlgorithmException e) {
+						logger.info("During the generation of the description translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
+					}
+			}
+			if(story.getLanguageSummary().compareToIgnoreCase("")!=0 && story.getLanguageSummary().compareToIgnoreCase("en")!=0 && story.getLanguageSummary().length()==2 && story.getSummary().compareToIgnoreCase("")!=0) {
+				translationTexts.add(story.getSummary());
+				String serviceResult=null;
+				try {
+					serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageSummary(), "en");
+					if(serviceResult!=null && !serviceResult.isBlank()) {
+						TranslationEntity newTranslationEntity = new TranslationEntityImpl();
+						newTranslationEntity.setTranslatedText(serviceResult);
+						newTranslationEntity.setItemId("all");
+						newTranslationEntity.setLanguage("en");
+						newTranslationEntity.setStoryId(story.getStoryId());
+						newTranslationEntity.setTool("Google");
+						newTranslationEntity.setType("summary");
+						newTranslationEntity.setKey(serviceResult);
+						persistentTranslationEntityService.saveTranslationEntity(newTranslationEntity);
+					}
+				}
+				catch (TranslationException | UnsupportedEncodingException | InterruptedException | NoSuchAlgorithmException e) {
+					logger.info("During the generation of the summary translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
+				}
+
+			}
+		}
+
 	}
 
 }

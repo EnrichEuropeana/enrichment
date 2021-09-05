@@ -3,6 +3,7 @@ package eu.europeana.enrichment.mongo.service;
 import java.util.List;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 
 public interface PersistentStoryEntityService {
 	/*
@@ -13,6 +14,8 @@ public interface PersistentStoryEntityService {
 	 * @return							a database story entity 
 	 */
 	public StoryEntity findStoryEntity(String storyId);
+	
+	public List<StoryEntityImpl> findStoryEntities(String storyId);
 	/*
 	 * This method retrieves all story entities from the Mongo database
 	 * 

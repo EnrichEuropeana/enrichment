@@ -30,6 +30,7 @@ import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 
 //import net.arnx.jsonic.JSONException;
 @Service(AppConfigConstants.BEAN_ENRICHMENT_WIKIDATA_SERVICE)
@@ -379,16 +380,26 @@ public class WikidataServiceImpl implements WikidataService {
 			logger.info("Wikidata entity is successfully saved to a local file cache!");			
 		}
 		
-		//check if the local cache wikidata entity is of the given type
-		WikidataEntity wikiEntity = new WikidataEntityImpl();
-		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getInternalType_jsonProp());
+		WikidataEntity wikiEntity = null;
+		/**
+		 * TODO: introduce the EntityObjectFactory class that would do the automatic object creation
+		 */
+		if(EntityTypes.Agent.getEntityType().equalsIgnoreCase(type)) {
+			wikiEntity = new WikidataAgentImpl();
+		}
+		else if(EntityTypes.Place.getEntityType().equalsIgnoreCase(type)) {
+			wikiEntity = new WikidataPlaceImpl();
+		}
+		
+//		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getInternal_type_jsonProp());
+		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getIdentification_jsonProp());
 		if(jsonTypeElement!=null && !jsonTypeElement.isEmpty())
 		{
-			if((jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("place")==0) ||
-					(!jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("agent")==0))	
-			{
+//			if((jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("place")==0) ||
+//					(!jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("agent")==0))	
+//			{
 				return getWikidataEntity(wikidataURL,WikidataJSON,type);
-			}
+//			}
 		}
 		
 		return null;

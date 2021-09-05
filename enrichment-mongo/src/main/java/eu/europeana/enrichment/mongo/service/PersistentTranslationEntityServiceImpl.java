@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.dao.TranslationEntityDao;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_TRANSLATION_ENTITY_SERVICE)
@@ -25,6 +26,12 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
 		return translationEntityDao.findTranslationEntityWithAditionalInformation(storyId, itemId, tool, language, type);
 	}
+	
+	@Override
+	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
+		return translationEntityDao.findTranslationEntitiesWithAditionalInformation(storyId, itemId, tool, language, type);
+	}
+
 	
 	@Override
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {

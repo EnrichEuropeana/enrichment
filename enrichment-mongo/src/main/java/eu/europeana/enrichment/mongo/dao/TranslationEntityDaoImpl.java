@@ -85,6 +85,18 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
                 )
                 .first();
 	}
+	
+	@Override
+	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.TOOL, tool),
+                eq(EntityFields.LANGUAGE, language),
+                eq(EntityFields.TYPE, type)
+                )
+                .iterator().toList();
+	}
 
 	@Override
 	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
@@ -116,7 +128,9 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void deleteTranslationEntity(TranslationEntity entity) {
-		deleteTranslationEntityByKey(entity.getKey());
+		enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+			eq(EntityFields.OBJECT_ID,entity.getId()))
+			.delete();			
 	}
 
 	@Override

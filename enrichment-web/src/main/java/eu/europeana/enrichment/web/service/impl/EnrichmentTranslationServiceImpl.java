@@ -130,7 +130,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				dbStoryEntity = (StoryEntity) foundStoryOrItem;
 				if(dbStoryEntity != null)
 				{
-					sourceLanguage = dbStoryEntity.getLanguage();
+					sourceLanguage = dbStoryEntity.getLanguageTranscription();
 					//Reuse of StoryEntity text if original text is not given
 					if(originalText == null || originalText.isEmpty())
 					{
@@ -293,7 +293,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					if(type.compareToIgnoreCase("description")==0 && (newText!=null && !newText.isEmpty())) newStories[0].setDescription(newText);
 					else newStories[0].setDescription(listStoryTranscribathon.get(0).getDcDescription());
 					
-					newStories[0].setLanguage(listStoryTranscribathon.get(0).getEdmLanguage());
+					newStories[0].setLanguageTranscription(listStoryTranscribathon.get(0).getEdmLanguage());
 					newStories[0].setSource("");
 					newStories[0].setStoryId(storyId);
 					
@@ -349,7 +349,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					StoryEntity [] newStories = new StoryEntity [1];
 					newStories[0] = new StoryEntityImpl(); 
 					newStories[0].setDescription(listItemTranscribathon.get(0).getStoryDcDescription());
-					newStories[0].setLanguage(listItemTranscribathon.get(0).getStoryEdmLanguage());
+					newStories[0].setLanguageTranscription(listItemTranscribathon.get(0).getStoryEdmLanguage());
 					newStories[0].setSource("");
 					newStories[0].setStoryId(storyId);
 					newStories[0].setSummary("");

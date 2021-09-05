@@ -172,7 +172,7 @@ public class GenerateTextFilesForConceptualSearch {
 		List<String> storyTranscriptions = new ArrayList<String>();//this corresponds to the storyIds list
 		for(int i=0;i<allStories.size();i++)
 		{
-			if(allStories.get(i).getLanguage().compareToIgnoreCase("en")==0 && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
+			if(allStories.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
 			{				
 				//String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
 				storyIds.add(allStories.get(i).getStoryId());
@@ -240,7 +240,7 @@ public class GenerateTextFilesForConceptualSearch {
 		Set<String> differentEnglishStoriesIDs = new HashSet<String>();
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(storyTranslations.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{
 				differentEnglishStoriesIDs.add(storyTranslations.get(i).getStoryId());
 			}

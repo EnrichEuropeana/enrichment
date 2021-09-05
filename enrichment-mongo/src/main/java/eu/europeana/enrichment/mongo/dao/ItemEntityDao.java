@@ -5,14 +5,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 
 /*
  * This interface defines database actions for story items
  */
 public interface ItemEntityDao {
 
-	public ItemEntity findItemEntity(String key);
 	public ItemEntity findItemEntityFromStory (String storyId, String itemId);
+	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId);
 	public List<ItemEntity> findAllItemEntities ();
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
