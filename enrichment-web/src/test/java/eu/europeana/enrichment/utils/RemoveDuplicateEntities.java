@@ -3,6 +3,7 @@ package eu.europeana.enrichment.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,6 +19,7 @@ import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 
 @SpringBootTest
+@Disabled("Excluded from automated runs.")
 public class RemoveDuplicateEntities {
 		
 	@Autowired

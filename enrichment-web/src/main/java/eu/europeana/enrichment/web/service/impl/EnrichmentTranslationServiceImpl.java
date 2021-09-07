@@ -306,6 +306,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					else newStories[0].setTranscriptionText("");
 					
 					enrichmentNerService.uploadStories(newStories);
+					return newStories[0];
+				}
+				else {
+					return null;
 				}
 			}
 			else if (newText!=null && !newText.isEmpty())
@@ -327,10 +331,11 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				}
 				
 				enrichmentNerService.uploadStories(newStories);
+				return newStories[0];
 			}
-
-			//getting a new story from the db
-			return persistentStoryEntityService.findStoryEntity(storyId);
+			else {
+				return story;
+			}
 		}
 		else
 		{

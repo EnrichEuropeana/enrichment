@@ -31,7 +31,7 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 
 @SpringBootTest
-@Disabled("Excluded from automated runs.")
+//@Disabled("Excluded from automated runs.")
 public class TranslationServiceTest {
 
 	@Autowired
@@ -229,11 +229,11 @@ public class TranslationServiceTest {
 		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
 		for (StoryEntity story : allStories) {			
 			translationTexts.clear();			
-			if(story.getLanguageDescription().compareToIgnoreCase("")!=0 && story.getLanguageDescription().compareToIgnoreCase("en")!=0 && story.getLanguageDescription().length()==2 && story.getDescription().compareToIgnoreCase("")!=0) {
+			if(!story.getLanguageDescription().isBlank() && story.getLanguageDescription().compareToIgnoreCase("en")!=0 && !story.getDescription().isBlank()) {
 					translationTexts.add(story.getDescription());
 					String serviceResult=null;
 					try {
-						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageDescription(), "en");
+						serviceResult = googleTranslationService.translateText(translationTexts, null, "en");
 						if(serviceResult!=null && !serviceResult.isBlank()) {
 							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 							newTranslationEntity.setTranslatedText(serviceResult);
@@ -249,11 +249,11 @@ public class TranslationServiceTest {
 						logger.info("During the generation of the description translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
 					}
 			}
-			if(story.getLanguageSummary().compareToIgnoreCase("")!=0 && story.getLanguageSummary().compareToIgnoreCase("en")!=0 && story.getLanguageSummary().length()==2 && story.getSummary().compareToIgnoreCase("")!=0) {
+			if(!story.getLanguageSummary().isBlank() && story.getLanguageSummary().compareToIgnoreCase("en")!=0 && !story.getSummary().isBlank()) {
 				translationTexts.add(story.getSummary());
 				String serviceResult=null;
 				try {
-					serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageSummary(), "en");
+					serviceResult = googleTranslationService.translateText(translationTexts, null, "en");
 					if(serviceResult!=null && !serviceResult.isBlank()) {
 						TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 						newTranslationEntity.setTranslatedText(serviceResult);
