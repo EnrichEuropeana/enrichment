@@ -57,7 +57,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 	@Override
 	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException {
 		
-		if(translate == null) {
+		if(translate == null || (targetLang==null || targetLang.isBlank())) {
 			//TODO: throws exception
 			return null;
 		}
@@ -67,9 +67,15 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 		for(int index = 0; index < textArray.size(); index++) {
 			String text = textArray.get(index);
 			try {
-				Translation translation = translate.translate(text, 
-		    		TranslateOption.sourceLanguage(sourceLanguage), 
-		    		TranslateOption.targetLanguage(targetLang));
+				
+				Translation translation = null;
+				if(sourceLanguage!=null && !sourceLanguage.isBlank()) {
+					translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLang));
+				}
+				else {
+					translation= translate.translate(text, TranslateOption.targetLanguage(targetLang));
+				}
+				
 				finalTranslationText += translation.getTranslatedText() + " ";
 				error=0;
 			}
@@ -85,13 +91,13 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 			}
 
 
-			try {
-				TimeUnit.SECONDS.sleep(waittime);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				throw e;
-			}
+//			try {
+//				TimeUnit.SECONDS.sleep(waittime);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//				throw e;
+//			}
 		}
 
 		return finalTranslationText;

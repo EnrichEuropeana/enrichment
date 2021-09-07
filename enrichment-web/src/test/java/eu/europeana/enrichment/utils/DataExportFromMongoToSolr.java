@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.utils;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -9,8 +7,8 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.util.ClientUtils;
-import org.junit.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -26,8 +24,8 @@ import eu.europeana.enrichment.solr.model.SolrTranslationsEntityImpl;
 
 @SpringBootTest
 @Disabled("Excluded from automated runs.")
-public class ImportDataFromMongoToSolr {
-	
+public class DataExportFromMongoToSolr {
+		
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
 	@Autowired
@@ -36,7 +34,7 @@ public class ImportDataFromMongoToSolr {
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	
 	@Test
-	public void importStories() throws Exception {		
+	public void exportStoriesFromMongoToSolr() throws Exception {		
    
 	    String fileNameSchemaStories = "C:/enrichment_solr_import_xmls/stories.xml";
 	    	    
@@ -56,12 +54,11 @@ public class ImportDataFromMongoToSolr {
 			System.out.print("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
 		}
 		bwStories.append("</add>" + "\n");
-		bwStories.close();		
-		assertTrue(true);		
+		bwStories.close();	
 	}
-	
+
 	@Test
-	public void importItems() throws Exception {		
+	public void importItemsFromMongoToSolr() throws Exception {		
    
 	    String fileNameSchemaItems = "C:/enrichment_solr_import_xmls/items.xml";	    	    
 		BufferedWriter bwItems = new BufferedWriter(new FileWriter(new File(fileNameSchemaItems), true));
@@ -81,11 +78,10 @@ public class ImportDataFromMongoToSolr {
 		}
 		bwItems.append("</add>" + "\n");
 		bwItems.close();		
-		assertTrue(true);		
 	}
 	
 	@Test
-	public void importTranslations() throws Exception {		
+	public void importTranslationsFromMongoToSolr() throws Exception {		
    
 	    String fileNameSchemaTranslations = "C:/enrichment_solr_import_xmls/translations.xml";	    	    
 		BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileNameSchemaTranslations), true));
@@ -104,9 +100,6 @@ public class ImportDataFromMongoToSolr {
 			System.out.print("Currently analysed translation with itemId: " + translations.get(i).getItemId() +". \n");
 		}
 		bwTranslations.append("</add>" + "\n");
-		bwTranslations.close();	
-		assertTrue(true);		
+		bwTranslations.close();		
 	}
-
-
 }

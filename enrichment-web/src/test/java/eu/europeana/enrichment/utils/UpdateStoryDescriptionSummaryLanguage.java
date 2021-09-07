@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,7 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 
 @SpringBootTest
+@Disabled("Excluded from automated runs.")
 public class UpdateStoryDescriptionSummaryLanguage {
 	
 	@Autowired
@@ -32,6 +34,20 @@ public class UpdateStoryDescriptionSummaryLanguage {
 			String language = splitStoryIdLanguage[1];
 			StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
 			story.setLanguageDescription(language);
+			persistentStoryEntityService.saveStoryEntity(story);
+		}
+	}
+	
+	@Test
+	public void updateStorySummaryLanguage() throws IOException {		
+		Path path = Paths.get("C:\\tmp\\story_summary_language_non_english.csv");
+		List<String> storyIdLanguage = readSparkLanguageAnnotationStoryFile(path);
+		for (String storyIdLanguageItem : storyIdLanguage) {
+			String[] splitStoryIdLanguage = storyIdLanguageItem.substring(0, storyIdLanguageItem.length()-1).split(",");
+			String storyId = splitStoryIdLanguage[0];
+			String language = splitStoryIdLanguage[1];
+			StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
+			story.setLanguageSummary(language);
 			persistentStoryEntityService.saveStoryEntity(story);
 		}
 	}
