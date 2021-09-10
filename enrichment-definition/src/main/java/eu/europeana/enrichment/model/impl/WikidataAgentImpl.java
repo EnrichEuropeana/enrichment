@@ -17,11 +17,18 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	/**
 	 * The identification property if the first name of the person in this case
 	 */
-	private String identification_jsonProp = "claims.P735.mainsnak.datavalue.value.id";
+	private String identification_jsonProp_identifier = "P735";
+	private String identification_jsonProp = "claims."+ identification_jsonProp_identifier +".mainsnak.datavalue.value.id";
 	@Override
 	@JsonIgnore
 	public String getIdentification_jsonProp() {
 		return identification_jsonProp;
+	}
+	
+	@Override
+	@JsonIgnore
+	public String getIdentification_jsonProp_identifier() {
+		return identification_jsonProp_identifier;
 	}
 	
 	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";

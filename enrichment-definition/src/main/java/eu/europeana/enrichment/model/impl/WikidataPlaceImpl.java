@@ -15,13 +15,23 @@ public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPla
 	private Float latitude;
 	private Float longitude;
 
+	//this property is the latitude property
+	private String identification_jsonProp_identifier = "P625";
+	private String identification_jsonProp = "claims."+ identification_jsonProp_identifier+".mainsnak.datavalue.value.latitude";
+
 	/**
 	 * The identification property if the latitude from the coordinate location in this case
 	 */
 	@Override
 	@JsonIgnore
 	public String getIdentification_jsonProp() {
-		return latitude_jsonProp;
+		return identification_jsonProp;
+	}
+	
+	@Override
+	@JsonIgnore
+	public String getIdentification_jsonProp_identifier() {
+		return identification_jsonProp_identifier;
 	}
 	
 	private String country_jsonProp = "claims.P17.mainsnak.datavalue.value.id";
