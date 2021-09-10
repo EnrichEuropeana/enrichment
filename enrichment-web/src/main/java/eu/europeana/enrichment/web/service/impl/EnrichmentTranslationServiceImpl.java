@@ -196,9 +196,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 * if there is a translation
 			 */
 
-			String translationKey = HelperFunctions.generateHashFromText(originalText);
-
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAllAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type, translationKey);
+			//String translationKey = HelperFunctions.generateHashFromText(originalText);
+			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
+			
 			if(dbTranslationEntity != null) {
 				return dbTranslationEntity.getTranslatedText();
 			}

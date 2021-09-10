@@ -391,16 +391,14 @@ public class WikidataServiceImpl implements WikidataService {
 			wikiEntity = new WikidataPlaceImpl();
 		}
 		
-//		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getInternal_type_jsonProp());
-		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getIdentification_jsonProp());
-		if(jsonTypeElement!=null && !jsonTypeElement.isEmpty())
-		{
-//			if((jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("place")==0) ||
-//					(!jsonTypeElement.get(0).get(0).contains("place") && type.compareToIgnoreCase("agent")==0))	
-//			{
-				return getWikidataEntity(wikidataURL,WikidataJSON,type);
-//			}
-		}
+//		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getIdentification_jsonProp());
+//		if(jsonTypeElement!=null && !jsonTypeElement.isEmpty())
+//		{
+//			return getWikidataEntity(wikidataURL,WikidataJSON,type);
+//		}
+		if(WikidataJSON.contains(wikiEntity.getIdentification_jsonProp_identifier())) {
+			return getWikidataEntity(wikidataURL,WikidataJSON,type);
+		}	
 		
 		return null;
 		

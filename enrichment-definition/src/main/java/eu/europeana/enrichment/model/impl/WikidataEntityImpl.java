@@ -192,6 +192,12 @@ public class WikidataEntityImpl implements WikidataEntity {
 		return null;
 	}
 
+	@Override
+	public String getIdentification_jsonProp_identifier() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 	
 }

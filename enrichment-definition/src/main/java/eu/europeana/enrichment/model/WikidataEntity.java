@@ -157,5 +157,11 @@ public interface WikidataEntity {
 	String getSameAs_jsonProp();
 	
 	String getIdentification_jsonProp();
+	
+	/**
+	 * Returns the identification property which is the one the given Wikidata entity must have for the given type.
+	 * @return
+	 */
+	String getIdentification_jsonProp_identifier();
 
 }
