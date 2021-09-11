@@ -10,5 +10,7 @@ public interface StoryEntitySolrFields {
 	public static final String TITLE = "title";
 	public static final String LANGUAGE_TRANSCRIPTION = "languageTranscription";
 	public static final String LANGUAGE_DESCRIPTION = "languageDescription";
-	public static final String LANGUAGE_SUMMARY = "languageSummary";		
+	public static final String LANGUAGE_SUMMARY = "languageSummary";	
+	public static final String DESCRIPTION_EN = "descriptionEn";
+	public static final String SUMMARY_EN = "summaryEn";
 }

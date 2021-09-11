@@ -46,6 +46,8 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 			dbStoryEntity.setLanguageTranscription(entity.getLanguageTranscription());
 			dbStoryEntity.setLanguageDescription(entity.getLanguageDescription());
 			dbStoryEntity.setLanguageSummary(entity.getLanguageSummary());
+			dbStoryEntity.setDescriptionEn(entity.getDescriptionEn());
+			dbStoryEntity.setSummaryEn(entity.getSummaryEn());
 			dbStoryEntity.setSource(entity.getSource());
 			dbStoryEntity.setSummary(entity.getSummary());
 			dbStoryEntity.setTitle(entity.getTitle());

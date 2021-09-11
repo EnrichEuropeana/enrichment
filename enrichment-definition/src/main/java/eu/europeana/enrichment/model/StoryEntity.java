@@ -36,5 +36,13 @@ public interface StoryEntity {
 
 	String getTranscriptionText();
 	void setTranscriptionText(String storyTranscription);
+
+	String getDescriptionEn();
+
+	void setDescriptionEn(String descriptionEn);
+
+	String getSummaryEn();
+
+	void setSummaryEn(String summaryEn);
 	
 }

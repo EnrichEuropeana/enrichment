@@ -3,11 +3,7 @@ package eu.europeana.enrichment.model.impl;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.StoryEntity;
 
 @Entity(value="StoryEntityImpl")
@@ -23,6 +19,8 @@ public class StoryEntityImpl implements StoryEntity {
 	private String languageDescription;
 	private String languageSummary;
 	private String transcriptionText;
+	private String descriptionEn;
+	private String summaryEn;
 	
 	@Id
     private String _id = new ObjectId().toString();
@@ -43,6 +41,8 @@ public class StoryEntityImpl implements StoryEntity {
 		this.languageDescription = copy.getLanguageDescription();
 		this.languageSummary = copy.getLanguageSummary();
 		this.transcriptionText = copy.getTranscriptionText();
+		this.descriptionEn = copy.getDescriptionEn();
+		this.summaryEn = copy.getSummaryEn();
 	}
 	
 	public StoryEntityImpl() {
@@ -140,4 +140,25 @@ public class StoryEntityImpl implements StoryEntity {
 	public void setLanguageTranscription(String storyLanguageTranscription) {
 		this.languageTranscription=storyLanguageTranscription;
 	}
+	
+	@Override
+	public String getDescriptionEn() {
+		return descriptionEn;
+	}
+
+	@Override
+	public void setDescriptionEn(String descriptionEn) {
+		this.descriptionEn = descriptionEn;
+	}
+
+	@Override
+	public String getSummaryEn() {
+		return summaryEn;
+	}
+
+	@Override
+	public void setSummaryEn(String summaryEn) {
+		this.summaryEn = summaryEn;
+	}
+
 }
