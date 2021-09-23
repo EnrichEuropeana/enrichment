@@ -43,13 +43,13 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 		if(dbStoryEntity!=null)
 		{
 			dbStoryEntity.setDescription(entity.getDescription());
+			dbStoryEntity.setDescriptionEn(entity.getDescriptionEn());
 			dbStoryEntity.setLanguageTranscription(entity.getLanguageTranscription());
 			dbStoryEntity.setLanguageDescription(entity.getLanguageDescription());
 			dbStoryEntity.setLanguageSummary(entity.getLanguageSummary());
-			dbStoryEntity.setDescriptionEn(entity.getDescriptionEn());
-			dbStoryEntity.setSummaryEn(entity.getSummaryEn());
 			dbStoryEntity.setSource(entity.getSource());
 			dbStoryEntity.setSummary(entity.getSummary());
+			dbStoryEntity.setSummaryEn(entity.getSummaryEn());
 			dbStoryEntity.setTitle(entity.getTitle());
 			dbStoryEntity.setTranscriptionText(entity.getTranscriptionText());
 			this.enrichmentDatastore.save(dbStoryEntity);

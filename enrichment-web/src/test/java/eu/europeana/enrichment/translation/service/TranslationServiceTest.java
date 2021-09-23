@@ -31,7 +31,7 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 
 @SpringBootTest
-@Disabled("Excluded from automated runs.")
+//@Disabled("Excluded from automated runs.")
 public class TranslationServiceTest {
 
 	@Autowired
@@ -227,10 +227,10 @@ public class TranslationServiceTest {
 	public void googleTranslationServiceStoryDescriptionAndSummary() {
 		List<String> translationTexts = new ArrayList<>();
 		List<StoryEntity> allStories = persistentStoryEntityService.getAllStoryEntities();
-		for (StoryEntity story : allStories) {			
-			translationTexts.clear();			
-			if(!story.getLanguageDescription().isBlank() && story.getLanguageDescription().compareToIgnoreCase("en")!=0 && !story.getDescription().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "description")==null) {
-					translationTexts.add(story.getDescription());
+		for (StoryEntity story : allStories) {
+			if(story.getLanguageDescription().compareToIgnoreCase("en")!=0 && !story.getDescription().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "description")==null) {
+				translationTexts.clear();	
+				translationTexts.add(story.getDescription());
 					String serviceResult=null;
 					try {
 						serviceResult = googleTranslationService.translateText(translationTexts, null, "en");
@@ -249,7 +249,8 @@ public class TranslationServiceTest {
 						logger.info("During the generation of the description translations for the storyId: "+story.getStoryId()+" the following exception happened: " + e.getMessage() + "!");
 					}
 			}
-			if(!story.getLanguageSummary().isBlank() && story.getLanguageSummary().compareToIgnoreCase("en")!=0 && !story.getSummary().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "summary")==null) {
+			if(story.getLanguageSummary().compareToIgnoreCase("en")!=0 && !story.getSummary().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "summary")==null) {
+				translationTexts.clear();
 				translationTexts.add(story.getSummary());
 				String serviceResult=null;
 				try {

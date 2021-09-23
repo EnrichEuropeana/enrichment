@@ -36,13 +36,13 @@ public class StoryEntityImpl implements StoryEntity {
 		this.title = copy.getTitle();
 		this.source = copy.getSource();
 		this.description = copy.getDescription();
+		this.descriptionEn = copy.getDescriptionEn();
 		this.summary = copy.getSummary();
+		this.summaryEn = copy.getSummaryEn();
 		this.languageTranscription = copy.getLanguageTranscription();
 		this.languageDescription = copy.getLanguageDescription();
 		this.languageSummary = copy.getLanguageSummary();
 		this.transcriptionText = copy.getTranscriptionText();
-		this.descriptionEn = copy.getDescriptionEn();
-		this.summaryEn = copy.getSummaryEn();
 	}
 	
 	public StoryEntityImpl() {
@@ -89,6 +89,16 @@ public class StoryEntityImpl implements StoryEntity {
 	public void setDescription(String description) {
 		this.description=description;
 	}
+	
+	@Override
+	public String getDescriptionEn() {
+		return descriptionEn;
+	}
+
+	@Override
+	public void setDescriptionEn(String descriptionEn) {
+		this.descriptionEn=descriptionEn;
+	}
 
 	@Override
 	public String getSummary() {
@@ -97,8 +107,17 @@ public class StoryEntityImpl implements StoryEntity {
 
 	@Override
 	public void setSummary(String storySummary) {
-		this.summary=storySummary;
-		
+		this.summary=storySummary;	
+	}
+	
+	@Override
+	public String getSummaryEn() {
+		return summaryEn;
+	}
+
+	@Override
+	public void setSummaryEn(String summaryEn) {
+		this.summaryEn=summaryEn;	
 	}
 
 	@Override
@@ -139,26 +158,6 @@ public class StoryEntityImpl implements StoryEntity {
 	@Override
 	public void setLanguageTranscription(String storyLanguageTranscription) {
 		this.languageTranscription=storyLanguageTranscription;
-	}
-	
-	@Override
-	public String getDescriptionEn() {
-		return descriptionEn;
-	}
-
-	@Override
-	public void setDescriptionEn(String descriptionEn) {
-		this.descriptionEn = descriptionEn;
-	}
-
-	@Override
-	public String getSummaryEn() {
-		return summaryEn;
-	}
-
-	@Override
-	public void setSummaryEn(String summaryEn) {
-		this.summaryEn = summaryEn;
 	}
 
 }
