@@ -33,7 +33,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 */
 //@ContextConfiguration(classes = { EnrichmentApp.class})
 @SpringBootTest
-@Disabled("Excluded from automated runs.")
+//@Disabled("Excluded from automated runs.")
 public class ExtractStoriesItemsForTopicDetection {
 		
 	@Autowired
@@ -345,6 +345,5 @@ public class ExtractStoriesItemsForTopicDetection {
 		
 		storyKeywords.removeAll(keywordsToRemove);
 	}
-
 
 }
