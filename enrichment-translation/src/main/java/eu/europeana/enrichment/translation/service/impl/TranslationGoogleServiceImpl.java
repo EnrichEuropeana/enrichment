@@ -73,7 +73,7 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 					translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLang));
 				}
 				else {
-					translation= translate.translate(text, TranslateOption.targetLanguage(targetLang));
+					translation= translate.translate(text);
 				}
 				
 				finalTranslationText += translation.getTranslatedText() + " ";
