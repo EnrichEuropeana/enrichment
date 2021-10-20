@@ -31,13 +31,6 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config-book-dumitru.xml")
 
-/**
-* 
-* @author StevaneticS
-*
-* Importing stories and items to the mongo db from a json file
-*/
-
 public class GenerateTextFilesForConceptualSearch {
 	
 	
