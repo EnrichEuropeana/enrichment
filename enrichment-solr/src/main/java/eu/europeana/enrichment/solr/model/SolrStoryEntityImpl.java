@@ -13,6 +13,8 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 		this.setTranscriptionText(copy.getTranscriptionText());
 		this.setDescription(copy.getDescription());
 		this.setSummary(copy.getSummary());
+		this.setDescriptionEn(copy.getDescriptionEn());
+		this.setSummaryEn(copy.getSummaryEn());		
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
 		this.setLanguageTranscription(copy.getLanguageTranscription());
@@ -31,6 +33,18 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	@Field(StoryEntitySolrFields.SUMMARY)
 	public void setSummary(String storySummary) {
 		super.setSummary(storySummary);
+	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.DESCRIPTION_EN)
+	public void setDescriptionEn(String storyDescriptionEn) {
+		super.setDescriptionEn(storyDescriptionEn);
+	}
+
+	@Override
+	@Field(StoryEntitySolrFields.SUMMARY_EN)
+	public void setSummaryEn(String storySummaryEn) {
+		super.setSummaryEn(storySummaryEn);
 	}
 
 	@Override
