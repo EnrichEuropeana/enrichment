@@ -89,9 +89,8 @@ public class ImportStoriesFromTranscribathonDataset {
 			StoryEntity [] newStories = new StoryEntity [1];
 			newStories[0] = new StoryEntityImpl();
 			
-			newStories[0].setTranscriptionText(storyTranscription);
-			newStories[0].setDescription(minimalStory.dcDescription);				
-			newStories[0].setLanguageTranscription(minimalStory.edmLanguage);
+			if(storyTranscription.compareToIgnoreCase("")!=0) newStories[0].setTranscriptionText(storyTranscription);
+			newStories[0].setDescription(minimalStory.dcDescription);
 			newStories[0].setSource(minimalStory.dcSource);
 			newStories[0].setStoryId(minimalStory.StoryId.toString());
 			newStories[0].setTitle(minimalStory.dcTitle);

@@ -3,15 +3,13 @@
 <schema name="stories" version="0.1">
   <uniqueKey>id</uniqueKey>
   <fieldType name="boolean" class="solr.BoolField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="date" class="solr.DatePointField" omitNorms="true"/>
-  <fieldType name="double" class="solr.DoublePointField"/>
-  <fieldType name="float" class="solr.FloatPointField" />
-  <fieldType name="int" class="solr.IntPointField" />
+  <fieldType name="date" class="solr.TrieDateField" omitNorms="true" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="double" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="float" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="0"/>
   <fieldType name="json" class="solr.StrField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="long" class="solr.LongPointField" />
-  <fieldType name="location"
-			class="solr.LatLonPointSpatialField" docValues="true" />
-  
+  <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coords"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
   
   <fieldType name="text_general_experiment" class="solr.TextField" positionIncrementGap="100"> 
   <analyzer type="index"> 
@@ -86,14 +84,63 @@
       <filter class="solr.KStemFilterFactory"/>
     </analyzer>
   </fieldType>
+  <!--Srdjo: field type for dice plugins for conceptual search-->
+  <fieldType name="top10_title_vector_synonyms" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">
+		<analyzer type="query">
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<!-- MUST HAVE comma's mapped to spaces in here - required by vector and queryboost parsers -->
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+			<filter class="solr.TrimFilterFactory" />
+
+			<filter class="solr.SynonymFilterFactory" synonyms="keyword_synonyms.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			
+			<!-- filter to just tokens in the file above -->
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>
+			
+			<!-- expand to top 10 terms weighted by similarity, at query time only -->
+			<!-- MAKE SURE ignorecase="false" !!!!!! --> 
+			<filter class="solr.SynonymFilterFactory" synonyms="top10_keyword_synonyms.txt" ignoreCase="false" expand="true" />
+			<!-- extract payloads -->
+			<filter class="solr.DelimitedPayloadTokenFilterFactory" encoder="float" delimiter="|"/>
+			<!-- maps payloads to term weights -->
+			<filter class="org.dice.solrenhancements.tokenfilters.PayloadQueryBoostTokenFilterFactory"/>
+			<filter class="solr.LengthFilterFactory" min="1" max="10000000" />
+		</analyzer>
+		
+		<!-- Index time config much simpler - just extract title terms -->
+		<analyzer type="index">
+		
+			<charFilter class="solr.HTMLStripCharFilterFactory" />
+			<!-- MUST HAVE comma's mapped to spaces in here - required by vector and queryboost parsers -->
+			<charFilter class="solr.PatternReplaceCharFilterFactory" pattern="[;:\'\&quot;\*/\),\(\-\|]" replacement=" "/>
+			<tokenizer class="solr.WhitespaceTokenizerFactory"/>
+			<filter class="solr.TrimFilterFactory" />
+
+			<!-- filter to just tokens in the file above -->
+			<filter class="solr.SynonymFilterFactory" synonyms="keyword_synonyms.txt" ignoreCase="true"  tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
+			
+			<filter class="solr.TypeTokenFilterFactory" types="synonym_types.txt" useWhitelist="true"/>
+			<filter class="solr.LengthFilterFactory" min="1" max="10000000" />
+		</analyzer>
+		<similarity class="org.dice.solrenhancements.similarity.PayloadOnlySimilarity"/>
+  </fieldType>
+  
+  
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="transcription" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="summary" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="description" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="transcription" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="summary" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="description" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="summary_en" type="text_general_experiment" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="description_en" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="language_description" type="string" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="language_summary" type="string" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="transcriptionLanguages" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="keywords" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
   
   <dynamicField name="text.*" type="text" multiValued="true" indexed="true" stored="false"/>
 </schema>

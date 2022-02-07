@@ -373,6 +373,14 @@
     	<artifactId>jsoup</artifactId>
     	<version>1.10.2</version>
 	</dependency>
+	
+		<dependency>
+			<groupId>tp-api</groupId>
+			<artifactId>tp-api</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/tp-api.jar</systemPath>
+		</dependency>
 		
 		
 	</dependencies>

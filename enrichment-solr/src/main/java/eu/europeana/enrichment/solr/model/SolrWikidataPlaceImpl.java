@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.solr.model;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,15 +20,15 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		
 	}
 	public SolrWikidataPlaceImpl (WikidataPlace copy) {
-		this.setAltLabel(copy.getAltLabel());
+		if(copy.getAltLabel()!=null) this.setAltLabel(new HashMap<String, List<String>>(copy.getAltLabel()));
 		this.setCountry(copy.getCountry());
 		this.setDepiction(copy.getDepiction());
-		this.setDescription(copy.getDescription());
+		if(copy.getDescription()!=null) this.setDescription(new HashMap<String, List<String>>(copy.getDescription()));
 		this.setEntityId(copy.getEntityId());
 		this.setInternalType(copy.getInternalType());
 		this.setModificationDate(copy.getModificationDate());
-		this.setPrefLabel(copy.getPrefLabel());
-		this.setSameAs(copy.getSameAs());
+		if(copy.getPrefLabel()!=null) this.setPrefLabel(new HashMap<String, List<String>>(copy.getPrefLabel()));
+		if(copy.getSameAs()!=null) this.setSameAs(Arrays.copyOf(copy.getSameAs(), copy.getSameAs().length));
 		this.setLogo(copy.getLogo());
 		this.setLatitude(copy.getLatitude());
 		this.setLongitude(copy.getLongitude());

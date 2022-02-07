@@ -28,7 +28,6 @@ import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
-import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 
@@ -432,25 +431,23 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			newWikidataAgent.setAltLabel(altLabelMap);
 
-			String country = "-";
+			String country = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				country="http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
 			}
-			newWikidataAgent.setCountry(country);
+			if(country!=null) newWikidataAgent.setCountry(country);
 
-			String [] dateBirthArray = new String [1];
-			dateBirthArray[0] = "-";
+			String [] dateBirthArray = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{				
 				dateBirthArray[0]=jsonElement.get(0).get(0);				
 			}
-			newWikidataAgent.setDateOfBirth(dateBirthArray);
+			if(dateBirthArray!=null) newWikidataAgent.setDateOfBirth(dateBirthArray);
 			
-			String [] dateDeathArray = new String [1];
-			dateDeathArray[0] = "-";
+			String [] dateDeathArray = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfDeath_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
@@ -460,15 +457,15 @@ public class WikidataServiceImpl implements WikidataService {
 					dateDeathArray[i]=jsonElement.get(i).get(0);
 				}				
 			}
-			newWikidataAgent.setDateOfDeath(dateDeathArray);
+			if(dateDeathArray!=null) newWikidataAgent.setDateOfDeath(dateDeathArray);
 			
-			String depiction = "-";
+			String depiction = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
 			}
-			newWikidataAgent.setDepiction(depiction);
+			if(depiction!=null) newWikidataAgent.setDepiction(depiction);
 			
 			Map<String,List<String>> descriptionsMap = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDescription_jsonProp());
@@ -476,31 +473,23 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			if(descriptionsMap==null)
-			{
-				descriptionsMap = new HashMap<String, List<String>>();
-				List<String> descriptionsMapList = new ArrayList<String>();
-				descriptionsMapList.add("-");
-				altLabelMap.put("en", descriptionsMapList);
-			}
-			newWikidataAgent.setDescription(descriptionsMap);
+			if(descriptionsMap!=null) newWikidataAgent.setDescription(descriptionsMap);
 			
 			newWikidataAgent.setEntityId(wikidataURL);			
 			
 			newWikidataAgent.setInternalType(type);
 			
 			
-			String modificationDate = "-";
+			String modificationDate = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getModificationDate_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				modificationDate = jsonElement.get(0).get(0);
 			}
-			newWikidataAgent.setModificationDate(modificationDate);
+			if(modificationDate!=null) newWikidataAgent.setModificationDate(modificationDate);
 			
 			
-			String [] occupationArray = new String [1];
-			occupationArray[0] = "-";
+			String [] occupationArray = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -510,7 +499,7 @@ public class WikidataServiceImpl implements WikidataService {
 					occupationArray[i]="http://www.wikidata.org/entity/" + jsonElement.get(i).get(0);
 				}				
 			}
-			newWikidataAgent.setProfessionOrOccupation(occupationArray);
+			if(occupationArray!=null) newWikidataAgent.setProfessionOrOccupation(occupationArray);
 			
 			
 			Map<String,List<String>> prefLabelMap = null;
@@ -519,18 +508,10 @@ public class WikidataServiceImpl implements WikidataService {
 			{ 
 				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			if(prefLabelMap==null)
-			{
-				prefLabelMap = new HashMap<String, List<String>>();
-				List<String> prefLabelMapList = new ArrayList<String>();
-				prefLabelMapList.add("-");
-				altLabelMap.put("en", prefLabelMapList);
-			}
-			newWikidataAgent.setPrefLabel(prefLabelMap);
+			if(prefLabelMap!=null) newWikidataAgent.setPrefLabel(prefLabelMap);
 			
 			
-			String [] sameAsArray=new String [1];
-			sameAsArray[0]="-";			
+			String [] sameAsArray = null;		
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getSameAs_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())	
 			{
@@ -540,7 +521,7 @@ public class WikidataServiceImpl implements WikidataService {
 					sameAsArray[i]=jsonElement.get(i).get(0);
 				}				
 			}
-			newWikidataAgent.setSameAs(sameAsArray);
+			if(sameAsArray!=null) newWikidataAgent.setSameAs(sameAsArray);
 			
 			return newWikidataAgent;
 
@@ -557,22 +538,15 @@ public class WikidataServiceImpl implements WikidataService {
 				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 				
 			}
-			if(altLabelMap==null)
-			{
-				altLabelMap = new HashMap<String, List<String>>();
-				List<String> altLabelMapList = new ArrayList<String>();
-				altLabelMapList.add("-");
-				altLabelMap.put("en", altLabelMapList);
-			}
-			newWikidataPlace.setAltLabel(altLabelMap);
+			if(altLabelMap!=null) newWikidataPlace.setAltLabel(altLabelMap);
 			
-			String country = "-";
+			String country = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				country = "http://www.wikidata.org/entity/" + jsonElement.get(0).get(0);
 			}
-			newWikidataPlace.setCountry(country);
+			if(country!=null) newWikidataPlace.setCountry(country);
 			
 			Float latitude = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLatitude_jsonProp());
@@ -580,7 +554,7 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				latitude = Float.valueOf(jsonElement.get(0).get(0));
 			}
-			newWikidataPlace.setLatitude(latitude);
+			if(latitude!=null) newWikidataPlace.setLatitude(latitude);
 
 			
 			Float longitude = null;
@@ -589,15 +563,15 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				longitude = Float.valueOf(jsonElement.get(0).get(0));
 			}
-			newWikidataPlace.setLongitude(longitude);
+			if(longitude!=null) newWikidataPlace.setLongitude(longitude);
 
-			String depiction = "-";
+			String depiction = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
 			}
-			newWikidataPlace.setDepiction(depiction);
+			if(depiction!=null) newWikidataPlace.setDepiction(depiction);
 		
 			Map<String,List<String>> descriptionsMap = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDescription_jsonProp());
@@ -605,35 +579,28 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			if(descriptionsMap==null)
-			{
-				descriptionsMap = new HashMap<String, List<String>>();
-				List<String> descriptionsMapList = new ArrayList<String>();
-				descriptionsMapList.add("-");
-				altLabelMap.put("en", descriptionsMapList);
-			}
-			newWikidataPlace.setDescription(descriptionsMap);
+			if(descriptionsMap!=null) newWikidataPlace.setDescription(descriptionsMap);
 			
 			newWikidataPlace.setEntityId(wikidataURL);
 			
 			newWikidataPlace.setInternalType(type);
 			
-			String modificationDate = "-";
+			String modificationDate = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getModificationDate_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				modificationDate = jsonElement.get(0).get(0);
 			}
-			newWikidataPlace.setModificationDate(modificationDate);
+			if(modificationDate!=null) newWikidataPlace.setModificationDate(modificationDate);
 		
 			
-			String logo = "-";
+			String logo = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLogo_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				logo = jsonElement.get(0).get(0);
 			}
-			newWikidataPlace.setLogo(logo);
+			if(logo!=null) newWikidataPlace.setLogo(logo);
 		
 			Map<String,List<String>> prefLabelMap = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
@@ -641,17 +608,9 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			if(prefLabelMap==null)
-			{
-				prefLabelMap = new HashMap<String, List<String>>();
-				List<String> prefLabelMapList = new ArrayList<String>();
-				prefLabelMapList.add("-");
-				altLabelMap.put("en", prefLabelMapList);
-			}
-			newWikidataPlace.setPrefLabel(prefLabelMap);
+			if(prefLabelMap!=null) newWikidataPlace.setPrefLabel(prefLabelMap);
 			
-			String [] sameAsArray = new String [1];
-			sameAsArray[0]="-";
+			String [] sameAsArray = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
@@ -661,7 +620,7 @@ public class WikidataServiceImpl implements WikidataService {
 					sameAsArray[i]=jsonElement.get(i).get(0);
 				}		
 			}
-			newWikidataPlace.setSameAs(sameAsArray);
+			if(sameAsArray!=null) newWikidataPlace.setSameAs(sameAsArray);
 
 			return newWikidataPlace;
 			

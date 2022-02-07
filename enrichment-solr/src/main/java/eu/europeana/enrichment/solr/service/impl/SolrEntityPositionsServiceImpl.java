@@ -33,6 +33,7 @@ import org.tartarus.snowball.ext.romanianStemmer;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
@@ -90,11 +91,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String>();
-	private String storyOriginalText="";
-	private String storyTranslatedText="";
-	private String storyOriginalLanguage="";
-	private String storyTranslatedLanguage="";
-	private String storyIdSolr="";
+	private String storyOriginalText;
+	private String storyTranslatedText;
+	private String storyOriginalLanguage;
+	private String storyTranslatedLanguage;
+	private String storyIdSolr;
 	private boolean fuzzyLogicSolr = false;
 	
 	private int sentencesByNowTranslated=1;
@@ -109,7 +110,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		if(!enrichmentConfiguration.getSolrTranslatedEntities().isEmpty())
 		{
-			String data = ""; 
+			String data; 
 			try {
 				data = new String(Files.readAllBytes(Paths.get(enrichmentConfiguration.getSolrTranslatedEntities())));
 			} catch (IOException e) {
@@ -891,7 +892,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * if the original language is the same as the target language, add positions in the original text
 		 * to be the same as in the translated text
 		 */
-		if(dbStoryEntity.getLanguageTranscription().compareTo(targetLanguage)==0)
+		if(ModelUtils.compareSingleTranslationLanguage(dbStoryEntity, targetLanguage))
 		{			
 			for (String classificationType : identifiedNER.keySet()) {
 				for (List<String> entityList : identifiedNER.get(classificationType)) {
@@ -909,7 +910,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		storyOriginalText=dbStoryEntity.getTranscriptionText();
 		storyTranslatedText=translatedText;
-		storyOriginalLanguage=dbStoryEntity.getLanguageTranscription();
 		storyTranslatedLanguage=targetLanguage;
 		storyIdSolr=dbStoryEntity.getStoryId();
 		fuzzyLogicSolr=fuzzyLogic;		

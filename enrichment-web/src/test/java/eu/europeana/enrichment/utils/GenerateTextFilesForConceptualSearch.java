@@ -22,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
@@ -165,7 +165,7 @@ public class GenerateTextFilesForConceptualSearch {
 		List<String> storyTranscriptions = new ArrayList<String>();//this corresponds to the storyIds list
 		for(int i=0;i<allStories.size();i++)
 		{
-			if(allStories.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
+			if(ModelUtils.compareSingleTranslationLanguage(allStories.get(i), "en") && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
 			{				
 				//String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
 				storyIds.add(allStories.get(i).getStoryId());
@@ -233,7 +233,7 @@ public class GenerateTextFilesForConceptualSearch {
 		Set<String> differentEnglishStoriesIDs = new HashSet<String>();
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(storyTranslations.get(i).getLanguageTranscription().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(ModelUtils.compareSingleTranslationLanguage(storyTranslations.get(i), "en") && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{
 				differentEnglishStoriesIDs.add(storyTranslations.get(i).getStoryId());
 			}
