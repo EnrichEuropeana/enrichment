@@ -136,7 +136,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	public StoryEntity fetchAndSaveStoryFromTranscribathon(String storyId) throws Exception
 	{
 		StoryEntity transcribathonStory = fetchMinimalStoryFromTranscribathon(storyId);
-		persistentStoryEntityService.saveStoryEntity(transcribathonStory);
+		if(transcribathonStory!=null) persistentStoryEntityService.saveStoryEntity(transcribathonStory);
 		return transcribathonStory;
 		
 //		StoryEntity existingStory = persistentStoryEntityService.findStoryEntity(storyId);
