@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.solr.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.ItemEntity;
@@ -11,11 +14,11 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 	public SolrItemEntityImpl (ItemEntity copy) {
 		this.setStoryId(copy.getStoryId());
 		this.setItemId(copy.getItemId());
-		this.setLanguage(copy.getLanguage());
 		this.setTranscriptionText(copy.getTranscriptionText());
-		this.setDescription(copy.getDescription());
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
+		if (copy.getKeywords()!=null) this.setKeywords(new ArrayList<>(copy.getKeywords()));
+		if (copy.getTranscriptionLanguages()!=null) this.setTranscriptionLanguages(new ArrayList<>(copy.getTranscriptionLanguages()));
 	}
 
 	@Override
@@ -32,9 +35,9 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 
 
 	@Override
-	@Field(ItemEntitySolrFields.LANGUAGE)
-	public void setLanguage(String language) {
-		super.setLanguage(language);
+	@Field(ItemEntitySolrFields.TRANSCRIPTION_LANGUAGES)
+	public void setTranscriptionLanguages(List<String> transcriptionLanguages) {
+		super.setTranscriptionLanguages(transcriptionLanguages);
 	}
 
 	
@@ -44,12 +47,6 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 		super.setTranscriptionText(text);
 	}
 	
-	@Override
-	@Field(ItemEntitySolrFields.DESCRIPTION)
-	public void setDescription(String description) {
-		super.setDescription(description);
-	}
-
 	@Override
 	@Field(ItemEntitySolrFields.SOURCE)
 	public void setSource(String source) {

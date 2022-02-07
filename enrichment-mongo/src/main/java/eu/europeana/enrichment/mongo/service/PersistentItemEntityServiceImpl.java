@@ -24,6 +24,10 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}
 	
+	public ItemEntity findItemEntity(String itemId) {
+		return itemEntityDao.findItemEntity(itemId);
+	}
+	
 	@Override
 	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId) {
 		return itemEntityDao.findItemEntitiesFromStory(storyId, itemId);

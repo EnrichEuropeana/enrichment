@@ -1,5 +1,10 @@
 package eu.europeana.enrichment.solr.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.model.StoryEntity;
@@ -17,9 +22,12 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 		this.setSummaryEn(copy.getSummaryEn());		
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
-		this.setLanguageTranscription(copy.getLanguageTranscription());
 		this.setLanguageDescription(copy.getLanguageDescription());
 		this.setLanguageSummary(copy.getLanguageSummary());
+		if(copy.getCompletionStatus()!=null) this.setCompletionStatus(new HashMap<String,Integer>(copy.getCompletionStatus()));
+		if(copy.getKeywords()!=null) this.setKeywords(new ArrayList<String> (copy.getKeywords()));
+		if(copy.getTranscriptionLanguages()!=null) this.setTranscriptionLanguages(new ArrayList<String>(copy.getTranscriptionLanguages()));
+		this.setItemCount(copy.getItemCount());
 	}
 	
 	
@@ -72,9 +80,15 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	}
 
 	@Override
-	@Field(StoryEntitySolrFields.LANGUAGE_TRANSCRIPTION)
-	public void setLanguageTranscription(String language) {
-		super.setLanguageTranscription(language);
+	@Field(StoryEntitySolrFields.TRANSCRIPTION_LANGUAGES)
+	public void setTranscriptionLanguages(List<String> transcriptionLanguages) {
+		super.setTranscriptionLanguages(transcriptionLanguages);
+	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.KEYWORDS)
+	public void setKeywords(List<String> keywords) {
+		super.setKeywords(keywords);
 	}
 	
 	@Override
@@ -88,5 +102,16 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	public void setLanguageSummary(String language) {
 		super.setLanguageSummary(language);
 	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.COMPLETION_STATUS)
+	public void setCompletionStatus(Map<String, Integer> completionStatus) {
+		super.setCompletionStatus(getCompletionStatus());
+	}
 
+	@Override
+	@Field(StoryEntitySolrFields.ITEM_COUNT)
+	public void setItemCount(int itemCount) {
+		super.setItemCount(itemCount);
+	}
 }

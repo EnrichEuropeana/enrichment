@@ -60,7 +60,7 @@ public class HelperFunctions {
 
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 
-			logger.info("Http reponse: " + responeString);
+			//logger.info("Http reponse: " + responeString);
 			return responeString;
 		} catch (Exception ex) {
 			//TODO: proper exception handling

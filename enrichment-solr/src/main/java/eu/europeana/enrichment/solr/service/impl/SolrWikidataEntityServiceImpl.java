@@ -392,8 +392,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrNamedEntityServiceException, IOException {
 		
 		//forming required properties for the class to be serialized
-		String URLPage = "";
-		String URLWithoutPage = "";
+		String URLPage;
+		String URLWithoutPage;
 		int totalResultsPerPage;
 		int totalResultsAll;
 		List<WikidataEntity> items = new ArrayList<WikidataEntity>();
@@ -427,8 +427,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			
-			URLPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
-			URLWithoutPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			
 		}
 		else
@@ -436,8 +436,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			
-			URLPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
-			URLWithoutPage += "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
 		}
 		
 		if(solrSortText!=null && !solrSortText.isEmpty())
@@ -531,9 +531,9 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			}
 			
 			//adjust for languages, i.e. remove the fields for other not required languages
-			HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
-			HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
-			HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
+			if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
+			if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
+			if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
 		}
 		
 		log.info("Serializing Solr data using Jackson to JSON string.");

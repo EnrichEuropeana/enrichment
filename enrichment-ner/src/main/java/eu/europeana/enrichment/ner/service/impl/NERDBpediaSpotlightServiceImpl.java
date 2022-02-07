@@ -154,14 +154,15 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		
 		NamedEntity alreadyExistNamedEntity = null;
 		for(int index = 0; index < tmp.size(); index++) {
-			if(tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
+			if(tmp.get(index).getLabel()!=null
+					&& tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
 				alreadyExistNamedEntity = tmp.get(index);
 				break;
 			}
 		}
 		if(alreadyExistNamedEntity == null)
 			tmp.add(namedEntity);
-		else {
+		else if(namedEntity.getDBpediaIds()!=null){
 			for(int dbpediaIndex = 0; dbpediaIndex < namedEntity.getDBpediaIds().size(); dbpediaIndex++) {
 				int tmpIndex = dbpediaIndex;
 				boolean found = alreadyExistNamedEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(namedEntity.getDBpediaIds().get(tmpIndex)));
@@ -169,7 +170,8 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 					alreadyExistNamedEntity.addDBpediaId(namedEntity.getDBpediaIds().get(tmpIndex));
 				}
 			}
-			alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
+			if(alreadyExistNamedEntity.getPositionEntities()!=null && alreadyExistNamedEntity.getPositionEntities().size()>0)
+				alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
 		}
 	}
 	

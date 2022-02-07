@@ -62,7 +62,7 @@ public class NERStanfordServiceImpl{
 		TreeMap<String, List<NamedEntity>> map = new TreeMap<>();
 		
 		String previousWord = "";
-		String previousCategory = "";
+		String previousCategory = null;
 		NamedEntity previousNamedEntity;
 		int previousOffset=-1;
 		
@@ -120,14 +120,15 @@ public class NERStanfordServiceImpl{
 					
 					NamedEntity alreadyExistNamedEntity = null;
 					for(int index = 0; index < tmp.size(); index++) {
-						if(tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
+						if(tmp.get(index).getLabel()!=null
+								&& tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
 							alreadyExistNamedEntity = tmp.get(index);
 							break;
 						}
 					}
 					if(alreadyExistNamedEntity == null)
 						tmp.add(namedEntity);
-					else 
+					else if(alreadyExistNamedEntity.getPositionEntities()!=null && alreadyExistNamedEntity.getPositionEntities().size()>0)
 						alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(wordOffset);
 				}
 			}

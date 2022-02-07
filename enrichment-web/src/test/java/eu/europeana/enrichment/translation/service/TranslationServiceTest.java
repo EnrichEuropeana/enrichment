@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
@@ -64,13 +65,13 @@ public class TranslationServiceTest {
 			
 			translationTexts.clear();
 			
-			if(story.getLanguageTranscription()!=null && story.getLanguageTranscription().compareToIgnoreCase("en")!=0) {
+			if(!ModelUtils.compareSingleTranslationLanguage(story, "en")) {
 			
 				if (story.getTranscriptionText()!=null && !story.getTranscriptionText().isBlank() && persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), "all", "Google", "en", "transcription") == null) {				
 					translationTexts.add(story.getTranscriptionText());
 					String serviceResult=null;
 					try {
-						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageTranscription(), "en");
+						serviceResult = googleTranslationService.translateText(translationTexts, ModelUtils.getSingleTranslationLanguage(story), "en");
 						if(serviceResult!=null && !serviceResult.isBlank()) {
 							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 							newTranslationEntity.setTranslatedText(serviceResult);
@@ -92,7 +93,7 @@ public class TranslationServiceTest {
 					translationTexts.add(story.getDescription());
 					String serviceResult=null;
 					try {
-						serviceResult = googleTranslationService.translateText(translationTexts, story.getLanguageTranscription(), "en");
+						serviceResult = googleTranslationService.translateText(translationTexts, ModelUtils.getSingleTranslationLanguage(story), "en");
 						if(serviceResult!=null && !serviceResult.isBlank()) {
 							TranslationEntity newTranslationEntity = new TranslationEntityImpl();
 							newTranslationEntity.setTranslatedText(serviceResult);

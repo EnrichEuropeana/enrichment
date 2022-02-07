@@ -81,12 +81,6 @@ public class PositionEntityImpl implements PositionEntity{
 
 	private String translationKey;
 	
-	public PositionEntityImpl() {
-		offsetsTranslatedText = new ArrayList<Integer>();
-		offsetsOriginalText = new ArrayList<Integer>();
-		nerTools = new ArrayList<String>();
-	}
-	
 	public String getItemId() {
 		return itemId;
 	}

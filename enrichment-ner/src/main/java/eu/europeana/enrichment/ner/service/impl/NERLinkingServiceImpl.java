@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 
 	@Autowired
 	WikidataService wikidataService;
+	
+	@Autowired
+	DBpediaSpotlight dbpediaSpotlight;
 	/*
 	 * Tool names for named entity linking defined 
 	 */
@@ -47,11 +52,11 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		}
 
 		// TODO: change classification and language from all to specific
-		if(europeana && namedEntity.getEuropeanaIds().size() == 0) {
+		if(europeana && namedEntity.getEuropeanaIds()!=null && namedEntity.getEuropeanaIds().size() == 0) {
 			/*
 			 * Agents with only first name or last name will not be searched
 			 */
-			if((namedEntity.getType() == NERClassification.AGENT.toString() && namedEntity.getLabel().split(" ").length > 1) ||
+			if((namedEntity.getType() == NERClassification.AGENT.toString() && namedEntity.getLabel()!=null && namedEntity.getLabel().split(" ").length > 1) ||
 					namedEntity.getType() != NERClassification.AGENT.toString())
 			{
 				List<String> europeanaIDs = europeanaEntityService.getEntitySuggestions(namedEntity.getLabel(), "all", "en");//classification);
@@ -65,9 +70,8 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		}
 		if(wikidata) {
 			//TODO: check if there are dbpedia links
-			if(namedEntity.getDbpediaWikidataIds().size() == 0) {
+			if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().size() == 0 && namedEntity.getDBpediaIds()!=null) {
 				for(String dbpediaUri : namedEntity.getDBpediaIds()) {
-					DBpediaSpotlight dbpediaSpotlight = new DBpediaSpotlight();
 					try {
 						DBpediaResponse response = dbpediaSpotlight.getDBpediaResponse(dbpediaUri);
 						if(response != null)
@@ -75,7 +79,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 							for(String id : response.getWikidataUrls()) namedEntity.addDbpediaWikidataId(id);
 						}
 							
-					} catch (IOException e) {
+					} catch (JAXBException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						//throw e;
@@ -85,11 +89,11 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			
 			List<String> wikidataIDs = new ArrayList<>();
 			
-			if(namedEntity.getWikidataIds().size()>0)
+			if(namedEntity.getWikidataIds()!=null && namedEntity.getWikidataIds().size()>0)
 			{
 				wikidataIDs = namedEntity.getWikidataIds();
 			}
-			else if(namedEntity.getWikidataIds().size() == 0) {
+			else if(namedEntity.getWikidataIds()!=null && namedEntity.getWikidataIds().size() == 0) {
 				//TODO: implement information retrieval from Wikidata
 				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
 					String namedEntityKey = namedEntity.getLabel();
@@ -104,13 +108,13 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			}
 			
 			
-			if(namedEntity.getPreferredWikidataIds().size() == 0) {
+			if(namedEntity.getPreferredWikidataIds()!=null && namedEntity.getPreferredWikidataIds().size() == 0) {
 				if(wikidataIDs != null && wikidataIDs.size() > 0) {
 					for(String wikidataID : wikidataIDs) {
-						if(namedEntity.getDbpediaWikidataIds().contains(wikidataID))
+						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID))
 							namedEntity.addPreferredWikidataId(wikidataID);
 						
-						if(!namedEntity.getWikidataIds().contains(wikidataID)) namedEntity.addWikidataId(wikidataID);
+						if(namedEntity.getWikidataIds()!=null && !namedEntity.getWikidataIds().contains(wikidataID)) namedEntity.addWikidataId(wikidataID);
 					}
 				}
 			}

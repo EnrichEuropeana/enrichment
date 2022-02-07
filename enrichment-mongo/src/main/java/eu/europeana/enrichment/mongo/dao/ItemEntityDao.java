@@ -24,4 +24,5 @@ public interface ItemEntityDao {
 	public List<String> getNerToolsForItem(String itemId);
 //	public int getNumerAnalysedNamedEntities(String field);
 //	public void setNumerAnalysedNamedEntities(String field, int num);
+	public ItemEntity findItemEntity(String itemId);
 }

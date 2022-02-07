@@ -84,7 +84,6 @@ public class SolrUtils {
 	 * @return normalized content in format Map<String, List<String>>  
 	 */
 	public static Map<String, List<String>> normalizeStringListMap(String fieldNamePrefix, Map<String, List<String>> languageMap){
-		if(languageMap==null) return null;
 		Map<String, List<String>> res;
 		int prefixLen = fieldNamePrefix.length() + 1;
 		if (languageMap.keySet().iterator().next().startsWith(fieldNamePrefix)) {
@@ -106,7 +105,6 @@ public class SolrUtils {
 	 * @return normalized content in format Map<String, String>  
 	 */
 	public static Map<String, String> normalizeToStringMap(String fieldNamePrefix, Map<String, List<String>> languageMap){
-		if(languageMap==null) return null;
 		Map<String, String> res;
 		int prefixLen = fieldNamePrefix.length() + 1;
         	boolean hasPrefix = languageMap.keySet().iterator().next().startsWith(fieldNamePrefix);

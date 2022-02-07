@@ -18,6 +18,8 @@ public interface PersistentItemEntityService {
 	 */
 	public ItemEntity findItemEntity(String storyId, String itemId);
 	
+	public ItemEntity findItemEntity(String itemId);
+	
 	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId);
 	
 	/**

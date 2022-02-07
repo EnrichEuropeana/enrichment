@@ -77,6 +77,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	@JsonProperty("prefLabel")
 	public Map<String, String> getEntityPrefLabel() {
+		if(this.getPrefLabel()==null) return null;
 		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeToStringMap(WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, this.getPrefLabel());
 		return normalizedPrefLabel;
 	}
@@ -95,6 +96,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	@JsonProperty("altLabel")
 	public Map<String, List<String>> getEntityAltLabel() {
+		if(this.getAltLabel()==null) return null;
 		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED, this.getAltLabel());
 		return normalizedAltLabel;
 
@@ -160,6 +162,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 
 	@JsonProperty("description")
 	public Map<String, List<String>> getEntityDescription() {
+		if(this.getDescription()==null) return null;
 		Map<String, List<String>> normalizedDescription = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED, this.getDescription());
 		return normalizedDescription;
 

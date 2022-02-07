@@ -194,9 +194,9 @@ public class WikidataController extends BaseRest {
 						logger.info("Wikidata place found is: ");						
 						
 						//adjust for languages, i.e. remove the fields for other not required languages
-						HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
-						HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
-						HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
+						if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
+						if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
+						if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
 					}
 
 				}

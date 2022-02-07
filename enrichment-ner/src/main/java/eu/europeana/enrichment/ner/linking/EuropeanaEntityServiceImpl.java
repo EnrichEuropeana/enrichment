@@ -32,7 +32,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 	@Override
 	public List<String> getEntitySuggestions(String text, String classificationType, String language) {
 		List<String> entityIDs = new ArrayList<>();
-		String textURIEncoded = "";
+		String textURIEncoded;
 		String sortUrlEncoded = "derived_score+desc";
 		try {
 			StringBuilder strBuilder = new StringBuilder();

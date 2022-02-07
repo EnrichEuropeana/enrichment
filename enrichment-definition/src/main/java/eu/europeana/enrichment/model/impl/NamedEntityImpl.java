@@ -40,30 +40,18 @@ public class NamedEntityImpl implements NamedEntity{
 	{
 		this.type=copy.getType();
 		this.label=copy.getLabel();
-		this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
-		this.wikidataIds = new ArrayList<String>(copy.getWikidataIds());
-		this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
-		this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
-		this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
+		if(copy.getEuropeanaIds()!=null) this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
+		if(copy.getWikidataIds()!=null) this.wikidataIds = new ArrayList<String>(copy.getWikidataIds());
+		if(copy.getDBpediaIds()!=null) this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
+		if(copy.getDbpediaWikidataIds()!=null) this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
+		if(copy.getPreferredWikidataIds()!=null) this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
 	}
 	
 	public NamedEntityImpl() {
-		init();
 	}
 	
 	public NamedEntityImpl(String key) {
-		init();
 		this.label = key;
-	}
-	
-	void init() {
-		label = "";
-		positionEntities = new ArrayList<>();
-		europeanaIds = new ArrayList<>();
-		wikidataIds = new ArrayList<>();
-		dbpediaIds = new ArrayList<>();
-		preferredWikidataIds = new ArrayList<>();
-		dbpediaWikidataIds = new ArrayList<>();
 	}
 
 	@Override

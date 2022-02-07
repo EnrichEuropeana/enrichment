@@ -130,12 +130,11 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 			waitingTime += sleepingTime;
 		}
 		
-		String response;
+		String response = null;
 		
 		if(waitingTime >= maxWaitingTime)
 		{
 			logger.info("Maximum waiting time of: " + String.valueOf(maxWaitingTime) + " for the eTranslation response has elapsed! No response obtained!");
-			response = "";
 		}
 		else
 		{
@@ -162,7 +161,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 */
 	
 	private String createTranslationBody(String text, String sourceLanguage) throws UnsupportedEncodingException {
-		String base64content = "";
+		String base64content;
 		try {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);
@@ -199,7 +198,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 	 * @throws UnsupportedEncodingException 
 	 */
 	private String createTranslationBodyForDirectCallback(String text, String sourceLanguage, String externalReference) throws UnsupportedEncodingException {
-		String base64content = "";
+		String base64content;
 		try {
 			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
 			base64content = new String(bytesEncoded);

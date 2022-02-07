@@ -1,8 +1,6 @@
 package eu.europeana.enrichment.web.service;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -11,7 +9,6 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -39,6 +36,7 @@ public interface EnrichmentNERService {
 	 * 									required story parameters are null or empty
 	 */	
 	public String uploadStories (StoryEntity [] stories) throws HttpException;  
+	
 	/*
 	 * This method applies named entity recognition and classification based
 	 * on the translated text. It also saves the found named entities in the Mongo database
@@ -46,35 +44,20 @@ public interface EnrichmentNERService {
 	 * @param requestParam				contains information about story, story item,
 	 * 									translation and linking tools which are
 	 * 									used to retrieve story items from DB and to
-	 * 									apply NER on this specific data. 
-	 * @text							new text provided by the user that can be different
-	 * 									from the existing text of the given property of a story or item
+	 * 									apply NER on this specific data.
 	 * @return 							all named entities which were found on the 
 	 * 									translated text including their positions
 	 * 									at the original text
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required requestParam is null or empty
 	 */
-	public String getEntities(EnrichmentNERRequest requestParam, String text, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;  
+	public String getEntities(EnrichmentNERRequest requestParam, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;  
 	
 	/*
 	 * This method does the same as {@link eu.europeana.enrichment.web.service.EnrichmentNERService#getEntities(EnrichmentNERRequest)
 	 * but returns the list of NamedEntity instead of a JSON String  
 	 */
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, String text, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;
-	
-	/**
-	 * Reads stories and items from the given json file and stores them
-	 * in the mongo db
-	 * 
-	 * @param jsonStoriesImport
-	 * @param jsonItemsImport
-	 * @throws ParamValidationException 
-	 * @throws HttpException 
-	 * @throws NoSuchAlgorithmException 
-	 * @throws UnsupportedEncodingException 
-	 */
-	public String readStoriesAndItemsFromJson(String jsonStoriesImportPath, String jsonItemsImportPath) throws ParamValidationException, HttpException, NoSuchAlgorithmException, UnsupportedEncodingException;
+	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws HttpException, SolrNamedEntityServiceException, Exception;
 	
 	/**
 	 * Returns a JSON serialization (with the Jackson library) of the story using the NamedEntityAnnotationCollection class.

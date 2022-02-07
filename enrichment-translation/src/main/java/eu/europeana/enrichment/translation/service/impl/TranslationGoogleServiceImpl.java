@@ -100,7 +100,8 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 //			}
 		}
 
-		return finalTranslationText;
+		if(finalTranslationText.compareToIgnoreCase("")==0) return null;
+		else return finalTranslationText;
 	}
 
 	@Override
