@@ -116,14 +116,23 @@ public class AdministrationController extends BaseRest {
 			
 			Instant start = Instant.now();
 			List<CompletableFuture<String>> allFutures = new ArrayList<>();
-			for (int i=0; i<200; i++) {
+			for (int i=0; i<storyIdsList.size(); i++) {
 				allFutures.add(transcribathonConcurrentCallServiceImpl.callStoryMinimalService(storyIdsList.get(i)));
 			}
 			CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).join();
+			//fetching the stories that from some reason failed to be fetched
+			int numberInitiallyNotFetchedStories = 0;
+			for (int i = 0; i < storyIdsList.size(); i++) {
+				if(allFutures.get(i).get()!=null) {
+					enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(allFutures.get(i).get().toString());
+					numberInitiallyNotFetchedStories ++;
+				}				
+			}
 			Instant finish = Instant.now();
 			long timeElapsed = Duration.between(start, finish).getSeconds();
 
-			System.out.println("Total time: " + timeElapsed + " s");			
+			System.out.println("Total time: " + timeElapsed + " s.");
+			System.out.println("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
 			
 			String responseString = "{\"info\": \"Done successfully!\"}";
 			

@@ -39,9 +39,5 @@ public class CommonConfig {
       // args are wrapper classes for Deserializing DBpediaResponse
       return JAXBContext.newInstance(DBpediaResponseHeader.class);
     }
-    
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+
 }
