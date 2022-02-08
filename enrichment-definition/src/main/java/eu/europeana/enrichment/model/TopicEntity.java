@@ -6,8 +6,8 @@ import java.util.Date;
 
 public interface TopicEntity {
 	
-	public String getID();
-	public void setID(String id);
+	public String getTopicID();
+	public void setTopicID(String id);
 	
 	public String getIdentifier();
 	public void setIdentifier(String identifier);
