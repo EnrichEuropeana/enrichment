@@ -7,8 +7,8 @@ public interface TopicModel {
 	public String getURL();
 	public void setURL(String url);
 	
-	public String getID();
-	public void setID(String id);
+	public String getIdentifier();
+	public void setIdentifier(String id);
 	
 	
 	public String getDescription();
@@ -16,5 +16,7 @@ public interface TopicModel {
 	
 	public String getAlgorithm();
 	public void setAlgorithm(String alg) throws UnsupportedEntityTypeException;
+	
+	public String getId();
 	
 }

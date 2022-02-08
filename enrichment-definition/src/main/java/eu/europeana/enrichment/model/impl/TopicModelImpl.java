@@ -1,21 +1,37 @@
 package eu.europeana.enrichment.model.impl;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.model.vocabulary.TopicConst;
 
+
+@Entity(value="TopicModelImpl")
 public class TopicModelImpl implements TopicModel {
 	
 	private String url;
 	// based on a naming convention 
 	// e.g. LDA-K15-IT200-V1.0.0 (method-numOfTopics-maxIter-dataVersion)
-	private String id;
+	private String identifier;
 	private String description;
 	private String algorithm;
+	
+	
+	@Id
+    private String _id = new ObjectId().toString();
+	
+
+	@Override
+	public String getId() {
+		return _id;
+	}
 
 	public TopicModelImpl(String url, String id, String description, String algorithm) {
 		this.url = url;
-		this.id = id;
+		this.identifier = id;
 		this.description = description;
 		this.algorithm = algorithm;
 	}
@@ -31,13 +47,13 @@ public class TopicModelImpl implements TopicModel {
 	}
 
 	@Override
-	public String getID() {
-		return  this.id;
+	public String getIdentifier() {
+		return  this.identifier;
 	}
 
 	@Override
-	public void setID(String id) {
-		this.id = id;
+	public void setIdentifier(String id) {
+		this.identifier = id;
 	}
 
 	@Override

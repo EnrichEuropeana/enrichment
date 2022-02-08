@@ -4,13 +4,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
+import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.TermEntity;
 import eu.europeana.enrichment.model.TopicEntity;
 import eu.europeana.enrichment.model.TopicModel;
 
+
+@Entity(value="TopicEntityImpl")
 public class TopicEntityImpl implements TopicEntity {
 	
-	private String id;
+	//id will be used for storing MongoDB _id
+	@Id
+	public String _id = new ObjectId().toString();
+	
+	
+	private String topicID;
 	private String identifier;
 	private List<String> labels;
 	// language based description
@@ -19,6 +31,7 @@ public class TopicEntityImpl implements TopicEntity {
 	private List<TermEntity> terms;
 	private List<TermEntity> keywords;
 	
+	@Transient
 	private TopicModel model;
 	
 	private Date created;
@@ -28,7 +41,7 @@ public class TopicEntityImpl implements TopicEntity {
 	public TopicEntityImpl(String id, String identifier, List<String> labels, Map<String, String> descriptions,
 			List<TermEntity> terms, List<TermEntity> keywords, TopicModel model, Date created, Date modified) {
 		super();
-		this.id = id;
+		this.topicID = id;
 		this.identifier = identifier;
 		this.labels = labels;
 		this.descriptions = descriptions;
@@ -40,14 +53,14 @@ public class TopicEntityImpl implements TopicEntity {
 	}
 
 	@Override
-	public String getID() {
+	public String getTopicID() {
 		// TODO Auto-generated method stub
-		return this.id;
+		return this.topicID;
 	}
 
 	@Override
-	public void setID(String id) {
-		this.id = id;
+	public void setTopicID(String id) {
+		this.topicID = id;
 
 	}
 
