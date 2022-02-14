@@ -30,10 +30,10 @@ import org.springframework.stereotype.Service;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.translation.exception.TranslationException;
-import eu.europeana.enrichment.translation.service.TranslationService;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_E_TRANSLATION_EUROPA_SERVICE)
-public class ETranslationEuropaServiceImpl implements TranslationService {
+//public class ETranslationEuropaServiceImpl implements TranslationService {
+public class ETranslationEuropaServiceImpl {
 
 	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
 	private String domain;
@@ -101,8 +101,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		} 
 	}
 
-	@Override
-	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException, UnsupportedEncodingException {
+	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException, UnsupportedEncodingException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
 		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
@@ -110,7 +109,7 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		createdRequests.put(externalReference, null);
 		
 		//TODO: handle textArray with more then one request
-		String contentBody = createTranslationBodyForDirectCallback(textArray.get(0), sourceLanguage, externalReference);
+		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
 		//String contentBody =  createTranslationBody (textArray.get(0), sourceLanguage);
 		
 		
@@ -256,7 +255,6 @@ public class ETranslationEuropaServiceImpl implements TranslationService {
 		}
 	}
 		
-	@Override
 	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference, String body) throws UnsupportedEncodingException
 	{
 		logger.info("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" ." + ", body="+body+" .");

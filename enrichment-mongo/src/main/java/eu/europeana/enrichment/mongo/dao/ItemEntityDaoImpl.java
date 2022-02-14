@@ -104,7 +104,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void saveItemEntity(ItemEntity entity) {
 		this.enrichmentDatastore.save(entity);
 	}
 

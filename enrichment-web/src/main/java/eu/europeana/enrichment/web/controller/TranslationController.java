@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 import io.swagger.annotations.Api;
@@ -30,9 +29,6 @@ public class TranslationController extends BaseRest {
 
 	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
-	
-	@Autowired
-	TranslationService eTranslationService;
 
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
@@ -76,8 +72,8 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			String translation = enrichmentTranslationService.translate(body, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			enrichmentTranslationService.translate(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 			
 			return response;
 	
@@ -102,8 +98,8 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			String translation = enrichmentTranslationService.translate(body, false);
-			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			enrichmentTranslationService.translate(body, false);
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 			
 			return response;
 		
@@ -145,8 +141,8 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			String translation = enrichmentTranslationService.translate(body, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			enrichmentTranslationService.translate(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 			return response;
 
 	}
@@ -171,8 +167,9 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			String translation = enrichmentTranslationService.translate(body, false);
-			ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+			enrichmentTranslationService.translate(body, false);
+			
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 			
 			return response;
 		

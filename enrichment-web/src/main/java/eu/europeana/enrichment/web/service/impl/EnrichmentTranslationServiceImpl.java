@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.google.cloud.translate.Translation;
+
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
@@ -26,6 +28,8 @@ import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
 import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
+import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -38,12 +42,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	/*
 	 * Loading all translation services
 	 */
-	//@Resource(name = "googleTranslationService")
+
 	@Autowired
-	TranslationService googleTranslationService;
-	//@Resource(name = "eTranslationService")
+	TranslationGoogleServiceImpl googleTranslationService;
+
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -69,7 +73,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	PersistentItemEntityService persistentItemEntityService;
 
 	@Override
-	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
+	public void translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
 		try {
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
@@ -96,7 +100,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
 			if(dbTranslationEntity != null) {
-				return dbTranslationEntity.getTranslatedText();
+				return;
 			}						
 			else if(!process) {
 				//TODO: proper exception (like EnrichmentNERServiceImpl
@@ -165,18 +169,16 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 			
 			
-			if(textToTranslate == null || textToTranslate.isBlank() || textToTranslate.compareToIgnoreCase("-")==0)
+			if(textToTranslate == null || textToTranslate.isBlank())
 			{
 				logger.info("The original text is empty or null");
-				return "";
+				return;
 			}
 				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 
 			logger.info("The original text is NOT empty or null.");
 			
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
-			tmpTranslationEntity.setStoryEntity(dbStoryEntity);
-			tmpTranslationEntity.setItemEntity(dbItemEntity);
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
 			tmpTranslationEntity.setTool(translationTool);
 			tmpTranslationEntity.setStoryId(storyId);
@@ -184,38 +186,29 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			tmpTranslationEntity.setType(type);
 			tmpTranslationEntity.setKey(textToTranslate);
 			//Empty string because of callback
-			
-			String returnValue = "-1";
-			if(sourceLanguage.compareToIgnoreCase(defaultTargetLanguage)==0) {
-				tmpTranslationEntity.setTranslatedText(textToTranslate);
-				returnValue = textToTranslate;
-			}
-			else {
-				switch (translationTool) {
-				case googleToolName:
-					if(sendRequest) {
-						List<String> textArray = textSplitter(textToTranslate);
-						returnValue = googleTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
-						if(returnValue!=null && !returnValue.isBlank()) {
-							returnValue = Jsoup.parse(returnValue).text();
-							tmpTranslationEntity.setTranslatedText(returnValue);
-						}
+
+			switch (translationTool) {
+			case googleToolName:
+				if(sendRequest) {
+					Translation googleResponse = googleTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
+					if(googleResponse!=null) {
+						String googleResponseText = Jsoup.parse(googleResponse.getTranslatedText()).text();
+						tmpTranslationEntity.setTranslatedText(googleResponseText);
+						tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
 					}
-					break;
-				case eTranslationToolName:
-					if(sendRequest) {
-						List<String> textArray = textSplitter(textToTranslate);
-						logger.info("Callling eTranslation translateText method.");
-						returnValue = eTranslationService.translateText(textArray, sourceLanguage, defaultTargetLanguage);
-						if(returnValue!=null && !returnValue.isBlank())
-							tmpTranslationEntity.setTranslatedText(returnValue);
-					}
-					break;
-				default:
-					throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
 				}
+				break;
+			case eTranslationToolName:
+				if(sendRequest) {
+					String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
+					if(eTranslationResponse!=null)
+						tmpTranslationEntity.setTranslatedText(eTranslationResponse);
+				}
+				break;
+			default:
+				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
 			}
-			
+
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
 
 			/*
@@ -228,8 +221,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				System.out.println("Sentence ratio: " + ratio + " ("+translatedSentence+")");
 				//TODO: save ratio
 			}*/
-			
-			return returnValue;
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | TranslationException | InterruptedException e) {
 			throw new InternalServerException(e);
 		}

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -37,27 +38,32 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     private static final String transcribathonBaseURLStoriesMinimal = "https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal/";
     private static final String transcribathonBaseURLItems = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
 	
-	public StoryEntity fetchMinimalStoryFromTranscribathon(String storyId) throws Exception {
+	public StoryEntity fetchMinimalStoryFromTranscribathon(String storyId) {
 		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, transcribathonBaseURLStoriesMinimal + storyId);
 		ObjectMapper objectMapper = new ObjectMapper();
-		List<Story> storyMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
-		if(storyMinimal!=null && storyMinimal.size()>0) {
-			return convertTranscribathonStoryToLocalStory(storyMinimal.get(0));
-		}
-		else 
+		try {
+			List<Story> storyMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
+			if(storyMinimal!=null && storyMinimal.size()>0) {
+				return convertTranscribathonStoryToLocalStory(storyMinimal.get(0));
+			}
+			else return null;
+		} catch (JsonProcessingException e) {
+			System.out.println("An exception: " + e.toString() + "is thrown during fetching or deserializing the story (minimal profile) from Transcribathon.");
+			e.printStackTrace();
 			return null;
+		}
+		
 	}
 	
-	public StoryEntity convertTranscribathonStoryToLocalStory(Story storyMinimal) {
-		if(storyMinimal==null) return null;		
+	public StoryEntity convertTranscribathonStoryToLocalStory(Story storyMinimal) {	
 		StoryEntity newStory = new StoryEntityImpl();
 		newStory.setStoryId(storyMinimal.StoryId.toString());
 		newStory.setDescription(storyMinimal.dcDescription);
 		newStory.setSummary(storyMinimal.Summary);
 		newStory.setTitle(storyMinimal.dcTitle);
 		newStory.setSource(storyMinimal.dcSource);
-		newStory.setLanguageDescription(storyMinimal.dcLanguage);
-		newStory.setLanguageSummary(storyMinimal.dcLanguage);
+		if(storyMinimal.dcDescription!=null) newStory.setLanguageDescription(storyMinimal.dcLanguage);
+		if(storyMinimal.Summary!=null) newStory.setLanguageSummary(storyMinimal.dcLanguage);
 		List<CompletionStatus> completionStatus = storyMinimal.CompletionStatus;
 		if(completionStatus!=null && completionStatus.size()>0) {
 			Map<String, Integer> completionStatus2 = new HashMap<String, Integer>();
@@ -82,8 +88,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	}
 	
 	private ItemEntity createItemFromTranscribathonOne (Item item) {
-		if(item==null) return null;
-		
+		if(item.Transcriptions==null) return null;
 		ItemEntity newItem = new ItemEntityImpl();
 		boolean foundTranscription = false;
 		for (Transcription trElem : item.Transcriptions) {
@@ -104,28 +109,34 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		return newItem;
 	}
 	
-	public ItemEntity fetchAndSaveItemFromTranscribathon(String storyId, String itemId) throws Exception
-	{
+	public ItemEntity fetchAndSaveItemFromTranscribathon(String storyId, String itemId) {
 		ItemEntity existingItem = persistentItemEntityService.findItemEntity(itemId);
 		if(existingItem == null )
 		{				
 			String response = HelperFunctions.createHttpRequest(null, transcribathonBaseURLItems+itemId);
-			ObjectMapper objectMapper = new ObjectMapper();	
-			List<Item> listItemTranscribathon=objectMapper.readValue(response, new TypeReference<List<Item>>(){});
-			ItemEntity newItem = null;
-			if(listItemTranscribathon!=null && listItemTranscribathon.size()>0) {
-				newItem = createItemFromTranscribathonOne(listItemTranscribathon.get(0));
-				if(newItem!=null) {
-					persistentItemEntityService.saveItemEntity(newItem);
-					//fetch the story if it does not exist
-					StoryEntity existingStory = persistentStoryEntityService.findStoryEntity(storyId);
-					if(existingStory==null) {
-						StoryEntity newStory = fetchMinimalStoryFromTranscribathon(storyId);
-						persistentStoryEntityService.saveStoryEntity(newStory);
+			ObjectMapper objectMapper = new ObjectMapper();
+			try {
+				List<Item> listItemTranscribathon = objectMapper.readValue(response, new TypeReference<List<Item>>(){});
+				ItemEntity newItem = null;
+				if(listItemTranscribathon!=null && listItemTranscribathon.size()>0) {
+					newItem = createItemFromTranscribathonOne(listItemTranscribathon.get(0));
+					if(newItem!=null) {
+						persistentItemEntityService.saveItemEntity(newItem);
+						//fetch the story if it does not exist
+						StoryEntity existingStory = persistentStoryEntityService.findStoryEntity(storyId);
+						if(existingStory==null) {
+							StoryEntity newStory = fetchMinimalStoryFromTranscribathon(storyId);
+							if(newStory!=null) persistentStoryEntityService.saveStoryEntity(newStory);
+						}
 					}
 				}
+				return newItem;
+			} catch (JsonProcessingException e) {
+				System.out.println("An exception: " + e.toString() + "is thrown during fetching or deserializing an item from Transcribathon.");
+				e.printStackTrace();
+				return null;
 			}
-			return newItem;
+			
 		}
 		else  {
 			return existingItem;
@@ -133,21 +144,11 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 
 	}
 
-	public StoryEntity fetchAndSaveStoryFromTranscribathon(String storyId) throws Exception
+	public StoryEntity fetchAndSaveStoryFromTranscribathon(String storyId)
 	{
 		StoryEntity transcribathonStory = fetchMinimalStoryFromTranscribathon(storyId);
 		if(transcribathonStory!=null) persistentStoryEntityService.saveStoryEntity(transcribathonStory);
 		return transcribathonStory;
-		
-//		StoryEntity existingStory = persistentStoryEntityService.findStoryEntity(storyId);
-//		if(existingStory==null) {
-//			persistentStoryEntityService.saveStoryEntity(transcribathonStory);
-//		}
-//		else {
-//			existingStory.copyFromStory(transcribathonStory);
-//			persistentStoryEntityService.saveStoryEntity(existingStory);
-//		}
-//		return transcribathonStory;
 	}
 
 }

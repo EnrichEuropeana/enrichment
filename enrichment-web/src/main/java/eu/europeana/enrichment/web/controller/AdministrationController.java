@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
@@ -113,26 +114,48 @@ public class AdministrationController extends BaseRest {
 			validateApiKey(wskey);
 			
 			List<String> storyIdsList = new ArrayList<String>(Arrays.asList(storiesIds.split(",")));
-			
 			Instant start = Instant.now();
-			List<CompletableFuture<String>> allFutures = new ArrayList<>();
-			for (int i=0; i<storyIdsList.size(); i++) {
-				allFutures.add(transcribathonConcurrentCallServiceImpl.callStoryMinimalService(storyIdsList.get(i)));
-			}
-			CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).join();
-			//fetching the stories that from some reason failed to be fetched
-			int numberInitiallyNotFetchedStories = 0;
+			String notFetchedStoryIds = "";
+			int numberNotFetchedStories = 0;
 			for (int i = 0; i < storyIdsList.size(); i++) {
-				if(allFutures.get(i).get()!=null) {
-					enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(allFutures.get(i).get().toString());
-					numberInitiallyNotFetchedStories ++;
-				}				
+				StoryEntity storyFetchedAgain = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(storyIdsList.get(i));
+				if(storyFetchedAgain==null) {
+					notFetchedStoryIds += " " + storyIdsList.get(i);
+					numberNotFetchedStories ++;
+				}	
 			}
 			Instant finish = Instant.now();
 			long timeElapsed = Duration.between(start, finish).getSeconds();
-
 			System.out.println("Total time: " + timeElapsed + " s.");
-			System.out.println("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+			if(numberNotFetchedStories>0) {
+				System.out.println("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
+				System.out.println("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
+			}
+			/*
+			 * The commented-out code below is for the parallel fetching of stories 
+			 */
+//			Instant start = Instant.now();
+//			List<CompletableFuture<String>> allFutures = new ArrayList<>();
+//			for (int i=0; i<storyIdsList.size(); i++) {
+//				allFutures.add(transcribathonConcurrentCallServiceImpl.callStoryMinimalService(storyIdsList.get(i)));
+//			}
+//			CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).join();
+//			//fetching the stories that from some reason failed to be fetched
+//			int numberInitiallyNotFetchedStories = 0;
+//			int numberFinalNotFetchedStories = 0;
+//			for (int i = 0; i < storyIdsList.size(); i++) {
+//				if(allFutures.get(i).get()!=null) {
+//					StoryEntity storyFetchedAgain = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(allFutures.get(i).get().toString());
+//					if(storyFetchedAgain==null) numberFinalNotFetchedStories++;
+//					numberInitiallyNotFetchedStories ++;
+//				}				
+//			}
+//			Instant finish = Instant.now();
+//			long timeElapsed = Duration.between(start, finish).getSeconds();
+//
+//			System.out.println("Total time: " + timeElapsed + " s.");
+//			System.out.println("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+//			System.out.println("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
 			
 			String responseString = "{\"info\": \"Done successfully!\"}";
 			
