@@ -8,7 +8,7 @@ public interface EnrichmentStoryAndItemStorageService {
 	
 	public StoryEntity convertTranscribathonStoryToLocalStory(Story storyMinimal);
 	
-	public StoryEntity fetchMinimalStoryFromTranscribathon(String storyId) throws Exception;
+	public StoryEntity fetchMinimalStoryFromTranscribathon(String storyId);
 
 	public StoryEntity fetchAndSaveStoryFromTranscribathon(String storyId) throws Exception;
 	

@@ -1,6 +1,8 @@
 package eu.europeana.enrichment.web.service;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -23,7 +25,7 @@ public interface EnrichmentNERService {
 	 * @throws 							ParamValidationException if one of the 
 	 * 									required item parameters are null or empty
 	 */	
-	public String uploadItems (ItemEntity [] items) throws HttpException, Exception;  
+	public String uploadItems (ItemEntity [] items) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException;
 
 	/*
 	 * This method uploads an array of stories to the Mongo database

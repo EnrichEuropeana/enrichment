@@ -2,8 +2,6 @@ package eu.europeana.enrichment.translation.service.impl;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,12 +17,11 @@ import com.google.common.collect.Lists;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
-import eu.europeana.enrichment.translation.exception.TranslationException;
-import eu.europeana.enrichment.translation.service.TranslationService;
 
 //https://cloud.google.com/translate/docs/reference/libraries
 @Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
-public class TranslationGoogleServiceImpl implements TranslationService{
+//public class TranslationGoogleServiceImpl implements TranslationService{
+public class TranslationGoogleServiceImpl {
 
     Translate translate;
     private static final String credentialScope = "https://www.googleapis.com/auth/cloud-platform";
@@ -54,60 +51,68 @@ public class TranslationGoogleServiceImpl implements TranslationService{
 		}
     }
     
-	@Override
-	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException {
-		
-		if(translate == null || (targetLang==null || targetLang.isBlank())) {
-			//TODO: throws exception
+//	@Override
+//	public String translateText(List<String> textArray, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException {
+//		
+//		if(translate == null || targetLang==null || targetLang.isBlank()) {
+//			//TODO: throws exception
+//			return null;
+//		}
+//		
+//		String finalTranslationText = "";
+//		int error = 0;
+//		for(int index = 0; index < textArray.size(); index++) {
+//			String text = textArray.get(index);
+//			try {
+//				
+//				Translation translation = null;
+//				if(sourceLanguage!=null && !sourceLanguage.isBlank()) {
+//					translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLang));
+//				}
+//				else {
+//					translation= translate.translate(text);
+//				}
+//				
+//				finalTranslationText += translation.getTranslatedText() + " ";
+//				error=0;
+//			}
+//			catch(Exception ex) {
+//				logger.error("Exception raised by translating text!" + ex.getMessage());
+//				ex.printStackTrace();
+//				index--;
+//				error++;
+//				if(error == 3)
+//				{
+//					break;
+//				}
+//			}
+//		}
+//
+//		if(finalTranslationText.compareToIgnoreCase("")==0) return null;
+//		else return finalTranslationText;
+//	}
+//
+//	@Override
+//	public void eTranslationResponse(String targetLanguage, String translatedText, String requestId,
+//			String externalReference, String body) {
+//				
+//	}
+	
+	public Translation translateText(String text, String sourceLanguage, String targetLanguage) {
+		try {
+			Translation translation = null;
+			if(sourceLanguage!=null && !sourceLanguage.isBlank()) {
+				translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLanguage));
+			}
+			else {
+				translation= translate.translate(text);
+			}			
+			return translation;
+		}
+		catch(Exception ex) {
+			logger.error("Exception raised by translating text using Google!" + ex.getMessage());
+			ex.printStackTrace();
 			return null;
 		}
-		
-		String finalTranslationText = "";
-		int error = 0;
-		for(int index = 0; index < textArray.size(); index++) {
-			String text = textArray.get(index);
-			try {
-				
-				Translation translation = null;
-				if(sourceLanguage!=null && !sourceLanguage.isBlank()) {
-					translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLang));
-				}
-				else {
-					translation= translate.translate(text);
-				}
-				
-				finalTranslationText += translation.getTranslatedText() + " ";
-				error=0;
-			}
-			catch(Exception ex) {
-				logger.error("Exception raised by translating text!" + ex.getMessage());
-				System.err.println(ex.getMessage());
-				index--;
-				error++;
-				if(error == 3)
-				{
-					break;
-				}
-			}
-
-
-//			try {
-//				TimeUnit.SECONDS.sleep(waittime);
-//			} catch (InterruptedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				throw e;
-//			}
-		}
-
-		if(finalTranslationText.compareToIgnoreCase("")==0) return null;
-		else return finalTranslationText;
-	}
-
-	@Override
-	public void eTranslationResponse(String targetLanguage, String translatedText, String requestId,
-			String externalReference, String body) {
-				
-	}
-	
+	}	
 }
