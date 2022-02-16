@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.google.auth.oauth2.GoogleCredentials;
@@ -20,6 +21,9 @@ import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 
 //https://cloud.google.com/translate/docs/reference/libraries
 @Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
+@ConditionalOnProperty(
+	    value="enrich.translation.google", 
+	    havingValue = "true")
 //public class TranslationGoogleServiceImpl implements TranslationService{
 public class TranslationGoogleServiceImpl {
 

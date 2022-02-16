@@ -43,7 +43,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	 * Loading all translation services
 	 */
 
-	@Autowired
+	@Autowired(required=false)
 	TranslationGoogleServiceImpl googleTranslationService;
 
 	@Autowired
@@ -190,6 +190,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			switch (translationTool) {
 			case googleToolName:
 				if(sendRequest) {
+					if(googleTranslationService==null) {
+						logger.info("The google translation service is currently disabled.");
+						return;
+					}
 					Translation googleResponse = googleTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
 					if(googleResponse!=null) {
 						String googleResponseText = Jsoup.parse(googleResponse.getTranslatedText()).text();

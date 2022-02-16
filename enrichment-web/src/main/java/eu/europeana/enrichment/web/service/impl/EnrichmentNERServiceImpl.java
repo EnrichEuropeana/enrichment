@@ -48,7 +48,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
-import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -86,7 +86,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	 */
 	//@Resource(name = "eTranslationService")
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 
 	/*
 	 * Loading all NER services
