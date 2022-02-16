@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
@@ -28,7 +27,7 @@ import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentNERService;
@@ -54,7 +53,7 @@ public class AdministrationController extends BaseRest {
 	PersistentItemEntityService persistentItemEntityService;
 	
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 	
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;

@@ -42,7 +42,7 @@ import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
-import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
@@ -66,7 +66,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 	//@Resource(name = "eTranslationService")
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 
 	/*
 	 * The "scaleFactorRangeOfCharsToObserve" param below is introduced to make sure we are searching in a range that is big enough to with the matching term
