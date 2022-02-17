@@ -2,8 +2,15 @@ package eu.europeana.enrichment.model;
 
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import eu.europeana.enrichment.model.impl.TopicEntityImpl;
+
 import java.util.Date;
 
+@JsonDeserialize(as = TopicEntityImpl.class)
 public interface TopicEntity {
 	
 	public String getTopicID();
@@ -30,4 +37,9 @@ public interface TopicEntity {
 	
 	public Date getCreatedDate();
 	public Date getModifiedDate();
+	
+	public void setCreatedDate(Date date);
+	public void setModifiedDate(Date date);
+	String getId();
+	public String toJSON() throws JsonProcessingException;
 }

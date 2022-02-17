@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.common.commons;
 
+import org.springframework.core.type.filter.AbstractClassTestingTypeFilter;
+
 public class AppConfigConstants {
 
 	public static final String BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";
@@ -36,5 +38,14 @@ public class AppConfigConstants {
     public static final String BEAN_ENRICHMENT_WEB_ENTITY_PROTOCOL_API = "europeanaApiClient";
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
+    
+    // topic management API
+    public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
+    public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
+    
+    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_MODEL_SERVICE = "persistentTopicModelService";
+    
+    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE = "persistentTopicEntityService";
+    public static final String BEAN_ENRICHMENT_TOPIC_SERVICE = "enrichmentTopicService";
 }
 

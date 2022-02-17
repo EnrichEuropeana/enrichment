@@ -1,7 +1,11 @@
 package eu.europeana.enrichment.model;
 
-import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
+import eu.europeana.enrichment.model.impl.TopicModelImpl;
+
+@JsonDeserialize(as = TopicModelImpl.class)
 public interface TopicModel {
 	
 	public String getURL();

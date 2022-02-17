@@ -2,6 +2,8 @@ package eu.europeana.enrichment.model.impl;
 
 import org.bson.types.ObjectId;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
@@ -21,6 +23,7 @@ public class TopicModelImpl implements TopicModel {
 	
 	
 	@Id
+	@JsonIgnore
     private String _id = new ObjectId().toString();
 	
 
@@ -29,11 +32,24 @@ public class TopicModelImpl implements TopicModel {
 		return _id;
 	}
 
+	
+	public TopicModelImpl()
+	{
+		
+	}
 	public TopicModelImpl(String url, String id, String description, String algorithm) {
 		this.url = url;
 		this.identifier = id;
 		this.description = description;
 		this.algorithm = algorithm;
+	}
+
+	public TopicModelImpl(TopicModel tm) {
+		this._id = tm.getId();
+		this.url = tm.getURL();
+		this.identifier = tm.getIdentifier();
+		this.description = tm.getDescription();
+		this.algorithm = tm.getAlgorithm();
 	}
 
 	@Override
@@ -77,5 +93,7 @@ public class TopicModelImpl implements TopicModel {
 			throw new UnsupportedEntityTypeException("Algorithm must be one of: LDA or LDA2Vec");
 		this.algorithm = alg;
 	}
+
+
 
 }

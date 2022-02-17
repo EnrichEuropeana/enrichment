@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.Date;
+
 import org.springframework.util.StringUtils;
 
 import eu.europeana.enrichment.web.common.config.I18nConstants;
@@ -25,5 +27,20 @@ public abstract class BaseRest {
 		if (!wsKey.equals("apidemo"))
 			throw new ApplicationAuthenticationException(null, I18nConstants.INVALID_APIKEY, new String[]{wsKey});
 	}
+	
+	
+	/**
+     * This method generates etag for response header.
+     * 
+     * @param timestamp The date of the last modification
+     * @param format    The MIME format
+     * 
+     * @return etag value
+     */
+    public String generateETag(Date timestamp, String format) {
+	// add timestamp, format and version to an etag
+	Integer hashCode = (timestamp + format).hashCode();
+	return hashCode.toString();
+    }
 	
 }
