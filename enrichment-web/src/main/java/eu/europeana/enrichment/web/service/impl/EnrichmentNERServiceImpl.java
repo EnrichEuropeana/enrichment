@@ -367,20 +367,17 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 								/*
 								 * Check if named entity is already at the TreeSet
 								 */
-								if(tmpResultNamedEntityList!=null && tmpResultNamedEntityList.size() == 0)
+								if(tmpResultNamedEntityList==null || tmpResultNamedEntityList.size() == 0)
 									tmpClassificationList.add(dbEntity);
 							}
 							else {
-								dbEntity = tmpNamedEntity;
-								
+								dbEntity = tmpNamedEntity;	
+								/*
+								 * Add linking information to named entity
+								 */
+								nerLinkingService.addLinkingInformation(dbEntity, linking, languageForNer);
 								tmpClassificationList.add(dbEntity);
 							}
-							
-							
-							/*
-							 * Add linking information to named entity
-							 */
-							nerLinkingService.addLinkingInformation(dbEntity, linking, languageForNer);
 						}
 					}
 				}

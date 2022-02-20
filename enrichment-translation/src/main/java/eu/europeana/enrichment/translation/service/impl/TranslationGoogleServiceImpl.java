@@ -109,7 +109,7 @@ public class TranslationGoogleServiceImpl {
 				translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLanguage));
 			}
 			else {
-				translation= translate.translate(text);
+				translation= translate.translate(text, TranslateOption.targetLanguage(targetLanguage));
 			}			
 			return translation;
 		}

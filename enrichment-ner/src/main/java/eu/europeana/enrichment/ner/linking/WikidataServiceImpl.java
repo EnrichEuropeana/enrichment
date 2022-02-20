@@ -135,32 +135,33 @@ public class WikidataServiceImpl implements WikidataService {
 	 * 
 	 * @param response is the response body of the Wikidata sparql query
 	 * 
-	 * @return a list of Wikidata entity entity or empty list
+	 * @return a list of Wikidata entity
 	 */
 	private List<String> processResponse(String reponse) {
 		// TODO: implement function and add type to distinguish between Place/Location
 		// and Agent/Person
-		List<String> retValue = new ArrayList<>();
-		if (reponse == null || reponse.equals("") || !reponse.startsWith("{"))
+		if (reponse == null || reponse.isBlank() || !reponse.startsWith("{"))
 		{
 			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is either null or not appropriate (does not start with {)" + "\n");
-			return retValue;
-		}
-				
+			return null;
+		}				
 
 		JSONObject responseJson = new JSONObject(reponse);
 		if(!responseJson.has(wikidataResultKey))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
-			return retValue;
+			logger.info("\n" + this.getClass().getSimpleName() + "The json response to the Wikidata request does not contain the key: " + wikidataResultKey + "\n");
+			return null;
 		}
+		
 		JSONObject resultObj = responseJson.getJSONObject(wikidataResultKey);
 		if(!resultObj.has(wikidataBindingsKey))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
-			return retValue;
+			logger.info("\n" + this.getClass().getSimpleName() + "The json response to the Wikidata request does not contain the key: " + wikidataBindingsKey + "\n");
+			return null;
 		}
+		
 		JSONArray bindingsArray = resultObj.getJSONArray(wikidataBindingsKey);
+		List<String> retValue = new ArrayList<>();
 		for(int index = 0; bindingsArray.length() > index; index++) {
 			JSONObject bindingsObj = bindingsArray.getJSONObject(index);
 			if(!bindingsObj.has(wikidataItemKey))
@@ -171,8 +172,14 @@ public class WikidataServiceImpl implements WikidataService {
 				retValue.add(cityValue);
 		}
 		
-		logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
-		return retValue;
+		if(retValue.size()>0) {
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
+			return retValue;
+		}
+		else {
+			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request does not contain the key: " + wikidataItemKey + "\n");
+			return null;
+		}
 	}
 
 	/*
