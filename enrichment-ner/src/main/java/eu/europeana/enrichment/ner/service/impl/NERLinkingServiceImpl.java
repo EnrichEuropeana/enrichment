@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.NamedEntity;
@@ -69,55 +70,57 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			//TODO: else block if no entry was found then with sourceLanguage flag
 		}
 		if(wikidata) {
-			//TODO: check if there are dbpedia links
-			if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().size() == 0 && namedEntity.getDBpediaIds()!=null) {
-				for(String dbpediaUri : namedEntity.getDBpediaIds()) {
-					try {
-						DBpediaResponse response = dbpediaSpotlight.getDBpediaResponse(dbpediaUri);
-						if(response != null)
-						{
-							for(String id : response.getWikidataUrls()) namedEntity.addDbpediaWikidataId(id);
+			//populate the dbpediaWikidataIds
+			for(String dbpediaUri : namedEntity.getDBpediaIds()) {
+				try {
+					DBpediaResponse response = dbpediaSpotlight.getDBpediaResponse(dbpediaUri);
+					if(response != null && response.getWikidataUrls()!=null && response.getWikidataUrls().size()>0)
+					{
+						List<String> dbpediaWikidataIds = new ArrayList<>();							
+						for(String id : response.getWikidataUrls()) {
+							dbpediaWikidataIds.add(id);
 						}
-							
-					} catch (JAXBException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						//throw e;
+						namedEntity.setDbpediaWikidataIds(dbpediaWikidataIds);
 					}
-				}
-			}
-			
-			List<String> wikidataIDs = new ArrayList<>();
-			
-			if(namedEntity.getWikidataIds()!=null && namedEntity.getWikidataIds().size()>0)
-			{
-				wikidataIDs = namedEntity.getWikidataIds();
-			}
-			else if(namedEntity.getWikidataIds()!=null && namedEntity.getWikidataIds().size() == 0) {
-				//TODO: implement information retrieval from Wikidata
-				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
-					String namedEntityKey = namedEntity.getLabel();
-					/*
-					 * Agents with only first name or last name will not be searched
-					 */
-					if(namedEntityKey.split(" ").length > 1)
-						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), "en");
-				}
-				else if(namedEntity.getType().equals(NERClassification.PLACE.toString()))
-					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-			}
-			
-			
-			if(namedEntity.getPreferredWikidataIds()!=null && namedEntity.getPreferredWikidataIds().size() == 0) {
-				if(wikidataIDs != null && wikidataIDs.size() > 0) {
-					for(String wikidataID : wikidataIDs) {
-						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID))
-							namedEntity.addPreferredWikidataId(wikidataID);
 						
-						if(namedEntity.getWikidataIds()!=null && !namedEntity.getWikidataIds().contains(wikidataID)) namedEntity.addWikidataId(wikidataID);
+				} catch (JAXBException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					//throw e;
+				}
+			}		
+			
+			//populate the wikidataIds
+			List<String> wikidataIDs = null;
+			//TODO: implement information retrieval from Wikidata
+			if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
+				String namedEntityKey = namedEntity.getLabel();
+				/*
+				 * Agents with only first name or last name will not be searched
+				 */
+				if(StringUtils.containsWhitespace(namedEntityKey))
+					wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), "en");
+			}
+			else if(namedEntity.getType().equals(NERClassification.PLACE.toString())) {
+				wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+			}			
+			if(wikidataIDs!=null) {
+				namedEntity.setWikidataIds(wikidataIDs);
+			}
+			
+			//populate the preferredWikidataIds
+			List<String> preferredWikidataIds = new ArrayList<String>();
+			if(wikidataIDs != null && wikidataIDs.size() > 0) {
+				for(String wikidataID : wikidataIDs) {
+					if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+						preferredWikidataIds.add(wikidataID);
 					}
 				}
 			}
+			if(preferredWikidataIds.size()>0) {
+				namedEntity.setPreferredWikidataIds(preferredWikidataIds);
+			}
+
 			// TODO: else block if no entry was found then with sourceLanguage flag
 		}
 	}

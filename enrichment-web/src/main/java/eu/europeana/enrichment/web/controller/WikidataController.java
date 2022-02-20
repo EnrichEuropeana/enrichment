@@ -168,9 +168,10 @@ public class WikidataController extends BaseRest {
 
 			List<WikidataEntity> items = new ArrayList<WikidataEntity>();
 
-			List<String> wikidataIDs = new ArrayList<String>();
-			
-			wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(query, lang);
+			List<String> wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(query, lang);
+			if(wikidataIDs==null) {
+				return new ResponseEntity<>(HttpStatus.OK);			
+			}
 			
 			String URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;
 			String URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;

@@ -100,30 +100,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		
-		TranslationEntity dbTranslationEntity = findTranslationEntity(entity.getKey());
-		if(dbTranslationEntity!=null)
-		{
-			dbTranslationEntity.setType(entity.getType());
-			dbTranslationEntity.setTranslatedText(entity.getTranslatedText());
-			dbTranslationEntity.setTool(entity.getTool());
-			dbTranslationEntity.setStoryId(entity.getStoryId());
-			dbTranslationEntity.setLanguage(entity.getLanguage());
-			dbTranslationEntity.setKey(entity.getKey());
-			dbTranslationEntity.setItemId(entity.getItemId());
-			this.enrichmentDatastore.save(dbTranslationEntity);
-		}
-		else
-		{
-			TranslationEntityImpl tmp = null;
-			if(entity instanceof TranslationEntityImpl)
-				tmp = (TranslationEntityImpl) entity;
-			else {
-				tmp = new TranslationEntityImpl(entity);
-			}
-			if(tmp != null)
-				this.enrichmentDatastore.save(tmp);
-		}
+		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

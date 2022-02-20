@@ -6,11 +6,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.PositionEntity;
 
@@ -99,11 +95,6 @@ public class NamedEntityImpl implements NamedEntity{
 	public void setWikidataIds(List<String> ids) {
 		this.wikidataIds = ids;
 	}
-
-	@Override
-	public void addWikidataId(String id) {
-		wikidataIds.add(id);
-	}
 	
 	@Override
 	public List<String> getDbpediaWikidataIds(){
@@ -116,11 +107,6 @@ public class NamedEntityImpl implements NamedEntity{
 	}
 	
 	@Override
-	public void addDbpediaWikidataId(String id) {
-		dbpediaWikidataIds.add(id);
-	}
-	
-	@Override
 	public List<String> getPreferredWikidataIds(){
 		return preferredWikidataIds;
 	}
@@ -128,11 +114,6 @@ public class NamedEntityImpl implements NamedEntity{
 	@Override
 	public void setPreferredWikidataIds(List<String> ids) {
 		preferredWikidataIds = ids;
-	}
-	
-	@Override
-	public void addPreferredWikidataId(String id) {
-		preferredWikidataIds.add(id);
 	}
 
 	@Override
