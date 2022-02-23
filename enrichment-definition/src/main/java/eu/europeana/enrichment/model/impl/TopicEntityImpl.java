@@ -3,6 +3,7 @@ package eu.europeana.enrichment.model.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
@@ -44,6 +45,7 @@ public class TopicEntityImpl implements TopicEntity {
 	
 	private List<TermEntity> keywords;
 	
+	private String modelId;
 	
 	private Date created;
 	private Date modified;
@@ -64,6 +66,7 @@ public class TopicEntityImpl implements TopicEntity {
 		this.terms = terms;
 		this.keywords = keywords;
 		this.model = model;
+		this.modelId = model.getIdentifier();
 		this.created = created;
 		if (modified == null)
 			this.modified = new Date();
@@ -79,6 +82,7 @@ public class TopicEntityImpl implements TopicEntity {
 		this.terms = topicEntity.getTopicTerms();
 		this.keywords = topicEntity.getTopicKeywords();
 		this.model = topicEntity.getTopicModel();
+		this.modelId = topicEntity.getModelId();
 		this.created = topicEntity.getCreatedDate();
 		if (topicEntity.getModifiedDate()==null)
 			this.modified = new Date();
@@ -189,6 +193,43 @@ public class TopicEntityImpl implements TopicEntity {
 		ObjectMapper mapper = new ObjectMapper();
 		
 		return mapper.writeValueAsString(this);
+	}
+
+	@Override
+	public String getModelId() {
+		return modelId;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(_id, created, descriptions, identifier, keywords, labels, model, modelId, modified, terms,
+				topicID);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TopicEntityImpl other = (TopicEntityImpl) obj;
+		return Objects.equals(_id, other._id) && Objects.equals(created, other.created)
+				&& Objects.equals(descriptions, other.descriptions) && Objects.equals(identifier, other.identifier)
+				&& Objects.equals(keywords, other.keywords) && Objects.equals(labels, other.labels)
+				&& Objects.equals(modelId, other.modelId)
+				&& Objects.equals(modified, other.modified) && Objects.equals(terms, other.terms)
+				&& Objects.equals(topicID, other.topicID);
+	}
+
+	@Override
+	public void setModelId(String modelId) {
+		if (model != null)
+			this.modelId = this.model.getIdentifier();
+		else
+			this.modelId = modelId;
+		
 	}
 
 }

@@ -28,4 +28,6 @@ public class EntityFields {
     public static final String TOPIC_MODEL_ID = "identifier";
     public static final String TOPIC_ENTITY_ID = "topicID";
     public static final String TOPIC_ENTITY_IDENTIFIER = "identifier";
+	public static final String MODEL = "model";
+	public static final String MODEL_ID = "modelId";
 }

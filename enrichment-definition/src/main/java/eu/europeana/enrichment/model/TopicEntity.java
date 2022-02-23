@@ -40,6 +40,9 @@ public interface TopicEntity {
 	
 	public void setCreatedDate(Date date);
 	public void setModifiedDate(Date date);
-	String getId();
+	public String getId();
 	public String toJSON() throws JsonProcessingException;
+	
+	public String getModelId();
+	public void setModelId(String modelId);
 }

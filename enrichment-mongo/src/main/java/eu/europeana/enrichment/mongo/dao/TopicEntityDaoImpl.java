@@ -2,15 +2,20 @@ package eu.europeana.enrichment.mongo.dao;
 
 import static dev.morphia.query.experimental.filters.Filters.eq;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.TopicEntity;
+import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.model.impl.TopicEntityImpl;
+import eu.europeana.enrichment.model.impl.TopicModelImpl;
 
 @Repository(AppConfigConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicEntityDaoImpl implements TopicEntityDao{
@@ -62,6 +67,31 @@ public class TopicEntityDaoImpl implements TopicEntityDao{
                 )
                 .first();		
 		return dbEntity;
+	}
+
+
+	@Override
+	public void updateTopicEntity(TopicEntity dbtopicEntity) {
+		enrichmentDatastore.save(dbtopicEntity);
+	}
+
+
+	@Override
+	public void deleteTopicEntity(TopicEntity dbtopicEntity) {
+		enrichmentDatastore.delete(dbtopicEntity);
+	}
+
+
+	@Override
+	public List<TopicEntity> findTopicEntitiesByTopicModel(String topicModel) {
+		MorphiaCursor<TopicEntityImpl> iter = enrichmentDatastore.find(TopicEntityImpl.class).filter(eq(EntityFields.MODEL_ID,topicModel)).iterator();
+		List<TopicEntity> list = new ArrayList<TopicEntity>();
+		while (iter.hasNext())
+		{
+			list.add(iter.next());
+		}
+		
+		return list ;
 	}
 
 

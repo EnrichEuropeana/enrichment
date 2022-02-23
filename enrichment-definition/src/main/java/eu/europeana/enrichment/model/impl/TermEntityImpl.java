@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Objects;
+
 import dev.morphia.annotations.Embedded;
 import dev.morphia.annotations.Entity;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
@@ -33,6 +35,24 @@ public class TermEntityImpl implements TermEntity {
 		this.rank = rank;
 		this.score = score;
 		this.term = term;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(rank, score, term);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TermEntityImpl other = (TermEntityImpl) obj;
+		return Objects.equals(rank, other.rank) && Objects.equals(score, other.score)
+				&& Objects.equals(term, other.term);
 	}
 
 	@Override
