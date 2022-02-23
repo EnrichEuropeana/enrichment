@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Objects;
+
 import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,6 +28,27 @@ public class TopicModelImpl implements TopicModel {
 	@JsonIgnore
     private String _id = new ObjectId().toString();
 	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(_id, algorithm, description, identifier, url);
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TopicModelImpl other = (TopicModelImpl) obj;
+		return Objects.equals(_id, other._id) && Objects.equals(algorithm, other.algorithm)
+				&& Objects.equals(description, other.description) && Objects.equals(identifier, other.identifier)
+				&& Objects.equals(url, other.url);
+	}
+
 
 	@Override
 	public String getId() {

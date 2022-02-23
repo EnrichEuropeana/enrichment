@@ -9,4 +9,8 @@ public interface EnrichmentTopicService {
 	
 	public TopicEntity createTopic(EnrichmentTopicRequest topicRequest) throws HttpException, UnsupportedEntityTypeException;
 
+	public TopicEntity updateTopic(EnrichmentTopicRequest request);
+
+	public TopicEntity deleteTopic(String topicIdentifier);
+
 }

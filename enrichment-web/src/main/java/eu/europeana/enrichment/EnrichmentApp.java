@@ -6,7 +6,6 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
@@ -18,6 +17,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 
 /**
  * Main application. Allows deploying as a war and logs instance data when deployed in Cloud Foundry
@@ -57,6 +57,8 @@ public class EnrichmentApp extends SpringBootServletInitializer {
         
         SpringApplication.run(EnrichmentApp.class, args);
     }
+    
+ 
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
@@ -89,5 +91,7 @@ public class EnrichmentApp extends SpringBootServletInitializer {
 	private static String getAppConfigFile() {
 		return "config/enrichment.properties";
 	}
+	
+	
 
 }

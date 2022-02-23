@@ -51,4 +51,44 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		return topicEntity;
 	}
 
+	@Override
+	public TopicEntity updateTopic(EnrichmentTopicRequest request) {
+		TopicEntity dbtopicEntity = persistentTopicEntityService.findTopicEntityByIdentifier(request.getTopicIdentifier());
+		if (dbtopicEntity != null)
+		{
+			if (request.topicTerms != null)
+				dbtopicEntity.setTopicTerms(request.topicTerms);
+			if (request.topicKeywords != null)
+				dbtopicEntity.setTopicKeywords(request.topicKeywords);
+			if (request.descriptions != null)
+				dbtopicEntity.setDescription(request.descriptions);
+			if (request.topicID != null)
+				dbtopicEntity.setTopicID(request.topicID);
+			if (request.topicLabels != null)
+				dbtopicEntity.setLabel(request.topicLabels);
+			if (request.getCreated() != null)
+				dbtopicEntity.setCreatedDate(request.created);
+			
+			// we set modified to current date
+			dbtopicEntity.setModifiedDate(new Date());
+			persistentTopicEntityService.updateTopicEntity(dbtopicEntity);
+			return dbtopicEntity;
+		}
+		return null;
+	}
+
+	@Override
+	public TopicEntity deleteTopic(String topicIdentifier) {
+		TopicEntity dbtopiEntity = persistentTopicEntityService.findTopicEntityByIdentifier(topicIdentifier);
+		if (dbtopiEntity == null)
+			return null;
+		
+		List<TopicEntity> otherTopics = persistentTopicEntityService.findTopicEntitiesByTopicModel(dbtopiEntity.getModelId());
+		otherTopics.remove(dbtopiEntity);
+		if (otherTopics.isEmpty())
+			persistentTopicModelService.deleteTopicModel(persistentTopicModelService.findTopicModelByIdentifier(dbtopiEntity.getModelId()));
+		persistentTopicEntityService.deleteTopicEntity(dbtopiEntity);
+		return dbtopiEntity;
+	}
+
 }

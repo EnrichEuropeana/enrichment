@@ -93,7 +93,7 @@ public class TopicController extends BaseRest{
 			//TODO: add apiVersion to the generateETag method
 			String etag = generateETag(te.getModifiedDate(), WebFields.JSON_LD_REST);
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
-		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSONLD);
+		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
 		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
 		    response = new ResponseEntity<String>(te.toJSON(), headers, HttpStatus.OK);
@@ -107,7 +107,95 @@ public class TopicController extends BaseRest{
 		return response;
 		
 	}
+	
+	/**
+	 * This method represents the /enrichment/topic/<topicIdentifier> end point,
+	 * where a topic creation request will be processed.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey, topicIdentifier
+	 * @return 
+	 * @throws Exception 
+	 */
+	@ApiOperation(value = "Update Topic", nickname = "postTopicUpdate", notes = "This method updates the topics in the database\n"
+			+ "Non-updatable fields: identifier, model")
+	@RequestMapping(value = "/enrichment/topic/update", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> postTopicUpdate (@RequestParam(value = "wskey", required = true) String wskey, @RequestParam(value = "topicIdentifier", required = true) String topicIdentifier,
+			@RequestBody(required = false) String text) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
+	{
+		ResponseEntity<String> response = null;
+		try {
+			validateApiKey(wskey);
+		} catch (ApplicationAuthenticationException e) {
+			e.printStackTrace();
+			response = new ResponseEntity<String>("",HttpStatus.UNAUTHORIZED);
+		}
+		
+		// parse JSON 
+		ObjectMapper objectMapper = new ObjectMapper();
+		System.out.println(text);
+		EnrichmentTopicRequest request = objectMapper.readValue(text, EnrichmentTopicRequest.class);
+		request.setTopicIdentifier(topicIdentifier);
+		
+		TopicEntity topicEntity = enrichmentTopicService.updateTopic(request);
+		if (topicEntity == null)
+		{
+			response = new ResponseEntity<String>("", HttpStatus.UNPROCESSABLE_ENTITY);
+			return response;
+		}
+		else
+		{
+			String etag = generateETag(topicEntity.getModifiedDate(), WebFields.JSON_LD_REST);
+			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
+		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
+		    headers.add(HttpHeaders.ETAG, etag);
+		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
+		    response = new ResponseEntity<String>(topicEntity.toJSON(), headers, HttpStatus.OK);
+		}
+				
+		return response;
+	}
 
+	
+	/**
+	 * This method represents the /enrichment/topic/<topicIdentifier> end point,
+	 * where a topic creation request will be processed.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param wskey, topicIdentifier
+	 * @return 
+	 * @throws Exception 
+	 */
+	@ApiOperation(value = "Delete Topic", nickname = "postTopicDelete", notes = "This method deletes topics in the database\n"
+			+ "Mandatory parameter: identifier")
+	@RequestMapping(value = "/enrichment/topic/delete", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> postTopicDelete (@RequestParam(value = "wskey", required = true) String wskey, @RequestParam(value = "topicIdentifier", required = true) String topicIdentifier) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
+	{
+		ResponseEntity<String> response = null;
+		try {
+			validateApiKey(wskey);
+		} catch (ApplicationAuthenticationException e) {
+			e.printStackTrace();
+			response = new ResponseEntity<String>("",HttpStatus.UNAUTHORIZED);
+		}
+		TopicEntity topicEntity = enrichmentTopicService.deleteTopic(topicIdentifier);
+		
+		if (topicEntity == null)
+		{
+			response = new ResponseEntity<String>("", HttpStatus.UNPROCESSABLE_ENTITY);
+			return response;
+		}
+		else
+		{
+			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
+		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
+		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
+		    response = new ResponseEntity<String>(topicEntity.toJSON(), headers, HttpStatus.OK);
+		}
+		
+		return response;
+		
+	}
 	private boolean testNullOrEmpty(Object object) {
 		if (object == null)
 			return true;
