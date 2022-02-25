@@ -52,7 +52,6 @@ public interface PositionEntity {
 	int hashCode();
 	
 	List<String> getNERTools();
-	void addNERTool(String tool);
 	void setNERTools(List<String> tools);
 
 }

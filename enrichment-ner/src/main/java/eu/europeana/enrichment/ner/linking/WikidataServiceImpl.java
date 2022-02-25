@@ -426,17 +426,17 @@ public class WikidataServiceImpl implements WikidataService {
 			{
 				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
-			/*this is added because jackson has problems with serializing null values (version 2.9.4 that we use)
-			 * TODO: find a better fix
-			 */			
-			if(altLabelMap==null)
-			{
-				altLabelMap = new HashMap<String, List<String>>();
-				List<String> altLabelMapList = new ArrayList<String>();
-				altLabelMapList.add("-");
-				altLabelMap.put("en", altLabelMapList);
-			}
-			newWikidataAgent.setAltLabel(altLabelMap);
+//			/*this is added because jackson has problems with serializing null values (version 2.9.4 that we use)
+//			 * TODO: find a better fix
+//			 */			
+//			if(altLabelMap==null)
+//			{
+//				altLabelMap = new HashMap<String, List<String>>();
+//				List<String> altLabelMapList = new ArrayList<String>();
+//				altLabelMapList.add("-");
+//				altLabelMap.put("en", altLabelMapList);
+//			}
+			if(altLabelMap!=null) newWikidataAgent.setAltLabel(altLabelMap);
 
 			String country = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
@@ -449,7 +449,8 @@ public class WikidataServiceImpl implements WikidataService {
 			String [] dateBirthArray = null;
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
-			{				
+			{		
+				dateBirthArray = new String [1];
 				dateBirthArray[0]=jsonElement.get(0).get(0);				
 			}
 			if(dateBirthArray!=null) newWikidataAgent.setDateOfBirth(dateBirthArray);

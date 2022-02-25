@@ -8,13 +8,14 @@
     <!--version>${version.enrichmentAPI}</version-->
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <artifactId>enrichment-stanford-web</artifactId>
+  <artifactId>ROOT</artifactId>
   <packaging>war</packaging>
   <!-- version>${version.enrichmentAPI}</version-->
   <name>enrichment-stanford-web</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.maven-surfire-plugin>2.19.1</version.maven-surfire-plugin>
   </properties>
   <dependencies>
   		<dependency>
@@ -94,30 +95,23 @@
 			<artifactId>servlet-api</artifactId>
 			<scope>provided</scope>
 			<version>2.5</version>
-		</dependency>
-  	
-  
+		</dependency>  
   			<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>${version.spring}</version>
-
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${version.spring}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${version.spring}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-oxm</artifactId>
-			<version>${version.spring}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -130,15 +124,59 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Test dependencies -->
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		    <scope>test</scope>
+		</dependency>		
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
   </dependencies>
+  <build>
+  		<!--  plugins -->
+		<pluginManagement>
+			<plugins>
+				<!--
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</plugin>
+				 -->
+<!-- 			<plugin> -->
+<!-- 				<inherited>true</inherited> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-compiler-plugin</artifactId> -->
+<!-- 				<configuration> -->
+<!-- 					<source>${version.java}</source> -->
+<!-- 					<target>${version.java}</target> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			    <version>${version.maven-surfire-plugin}</version>
+				<configuration>
+	    		<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+			</plugins>
+		</pluginManagement>	
+  <finalName>${project.artifactId}</finalName>
+  </build>
 </project>
