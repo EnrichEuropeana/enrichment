@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -132,18 +133,26 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * return						the map parameter will be changed through this function
 	 */
 	private void setEntityToMap(String entityType, TreeMap<String, List<NamedEntity>> map, JSONObject entity) {
-		int entityOffset = entity.getInt(offsetKey);
-		String entityName = entity.getString(surfaceFormKey);
-		String dbpediaUrl = entity.getString(uriKey);
 		
-		NamedEntity namedEntity = new NamedEntityImpl(entityName);
-		namedEntity.setType(entityType);
-		PositionEntity positionEntity = new PositionEntityImpl();
-		// default: Offset position will be added to the translated 
-		positionEntity.addOfssetsTranslatedText(entityOffset);
-		namedEntity.addPositionEntity(positionEntity);
-		namedEntity.addDBpediaId(dbpediaUrl);
+		int entityOffset = -1;
+		String entityName = null;
+		String dbpediaUrl = null;
+
+		try {
+			entityOffset = entity.getInt(offsetKey);
+			entityName = entity.getString(surfaceFormKey);
+			dbpediaUrl = entity.getString(uriKey);
+		}
+		catch (JSONException e) {
+			System.out.println("An exception: " + e.toString() + "is thrown during the json processing of the dbpedia NER.");
+			e.printStackTrace();
+		}
 		
+		//the name must exist
+		if(entityName==null) {
+			return;
+		}
+				
 		List<NamedEntity> tmp;
 		if(map.containsKey(entityType))
 			tmp = map.get(entityType);
@@ -154,25 +163,70 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		
 		NamedEntity alreadyExistNamedEntity = null;
 		for(int index = 0; index < tmp.size(); index++) {
-			if(tmp.get(index).getLabel()!=null
-					&& tmp.get(index).getLabel().equals(namedEntity.getLabel())) {
+			if(entityName.equals(tmp.get(index).getLabel())) {
 				alreadyExistNamedEntity = tmp.get(index);
 				break;
 			}
 		}
-		if(alreadyExistNamedEntity == null)
-			tmp.add(namedEntity);
-		else if(namedEntity.getDBpediaIds()!=null){
-			for(int dbpediaIndex = 0; dbpediaIndex < namedEntity.getDBpediaIds().size(); dbpediaIndex++) {
-				int tmpIndex = dbpediaIndex;
-				boolean found = alreadyExistNamedEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(namedEntity.getDBpediaIds().get(tmpIndex)));
-				if(!found){
-					alreadyExistNamedEntity.addDBpediaId(namedEntity.getDBpediaIds().get(tmpIndex));
+		
+		if(alreadyExistNamedEntity == null) {
+			NamedEntity newNamedEntity = createNewNamedEntity(entityName, entityType, entityOffset, dbpediaUrl);
+			tmp.add(newNamedEntity);
+		}
+		else {
+			//update the dbpedia ids
+			if(dbpediaUrl!=null) {
+			    if(alreadyExistNamedEntity.getDBpediaIds()==null) {
+					List<String> dbpediaIds = new ArrayList<String>();
+					dbpediaIds.add(dbpediaUrl);
+					alreadyExistNamedEntity.setDBpediaIds(dbpediaIds);
+			    }
+				else if(!alreadyExistNamedEntity.getDBpediaIds().contains(dbpediaUrl)) {
+					alreadyExistNamedEntity.addDBpediaId(dbpediaUrl);
 				}
 			}
-			if(alreadyExistNamedEntity.getPositionEntities()!=null && alreadyExistNamedEntity.getPositionEntities().size()>0)
-				alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
+			//update the offset(position) of the entity
+			if(entityOffset!=-1) {
+				if(alreadyExistNamedEntity.getPositionEntities()==null) {
+					List<Integer> offsetTranslatedText = new ArrayList<Integer>();
+					offsetTranslatedText.add(Integer.valueOf(entityOffset));
+					PositionEntity positionEntity = new PositionEntityImpl();
+					// default: Offset position will be added to the translated
+					positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
+					List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+					positionEntities.add(positionEntity);
+					alreadyExistNamedEntity.setPositionEntities(positionEntities);
+				}
+				else if(!alreadyExistNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText().contains(entityOffset)){
+					alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
+				}
+			}
 		}
+	}
+	
+	private NamedEntity createNewNamedEntity (String label, String type, int offset, String dbpediaUrl) {
+		NamedEntity namedEntity = new NamedEntityImpl(label);
+		
+		namedEntity.setType(type);
+		
+		if(offset!=-1) {
+			List<Integer> offsetTranslatedText = new ArrayList<Integer>();
+			offsetTranslatedText.add(Integer.valueOf(offset));
+			PositionEntity positionEntity = new PositionEntityImpl();
+			// default: Offset position will be added to the translated
+			positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
+			List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+			positionEntities.add(positionEntity);
+			namedEntity.setPositionEntities(positionEntities);
+		}
+
+		if(dbpediaUrl!=null) {
+			List<String> dbpediaIds = new ArrayList<String>();
+			dbpediaIds.add(dbpediaUrl);
+			namedEntity.setDBpediaIds(dbpediaIds);
+		}
+
+		return namedEntity;
 	}
 	
 	/*

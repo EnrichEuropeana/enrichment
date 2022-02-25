@@ -1,27 +1,26 @@
 package eu.europeana.enrichment.ner.web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.enrichment.ner.web.NERStanfordServiceImpl;
-import eu.europeana.enrichment.ner.web.config.swagger.SwaggerSelect;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
+@Validated
 @EnableCaching
-@SwaggerSelect
-@Api(tags = "NER get entities service", description=" ")
 public class NERController {
 
-	@Autowired
+	@Resource
 	NERStanfordServiceImpl nerStanfordServiceOrigin;
 	
 	/*

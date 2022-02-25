@@ -11,6 +11,7 @@ import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 
 public interface EnrichmentNERService {
@@ -84,5 +85,9 @@ public interface EnrichmentNERService {
 	 * @throws HttpException, IOException 
 	 */
 	public String getStoryOrItemAnnotation (String storyId, String itemId, String wikidataEntity) throws HttpException, IOException;
+
+	public void getNamedEntitiesForText(List<String> nerTools, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, TreeMap<String, List<NamedEntity>> result) throws IOException, ParamValidationException;
+
+	public void updateNamedEntities (TreeMap<String, List<NamedEntity>> resultMap, String storyId, String itemId) throws SolrNamedEntityServiceException, IOException;
 
 }

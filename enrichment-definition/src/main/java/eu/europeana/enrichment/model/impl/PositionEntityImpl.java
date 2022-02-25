@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -181,13 +180,8 @@ public class PositionEntityImpl implements PositionEntity{
 	}
 
 	@Override
-	public void addNERTool(String tool) {
-		if(!nerTools.contains(tool)) nerTools.add(tool);
-	}
-
-	@Override
 	public void setNERTools(List<String> tools) {
-		nerTools.addAll(tools);
+		nerTools=tools;
 	}
 
 }
