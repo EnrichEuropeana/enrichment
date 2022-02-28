@@ -12,6 +12,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -22,10 +23,9 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
@@ -54,9 +54,11 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	}
 
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws NERAnnotateException {
+		String response = createRequest(text);
+		if (response==null) return null;
 		
-		TreeMap<String, List<NamedEntity>> map = readJSON(createRequest(text));
+		TreeMap<String, List<NamedEntityImpl>> map = readJSON(response);
 		return map;
 	}
 	
@@ -68,15 +70,14 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * @return						a TreeMap of named entities which are separated
 	 * 								based on their classification type
 	 */
-	private TreeMap<String, List<NamedEntity>> readJSON(String jsonString){
-		TreeMap<String, List<NamedEntity>> map = new TreeMap<>();
+	private TreeMap<String, List<NamedEntityImpl>> readJSON(String jsonString){
 		JSONObject responseJson = new JSONObject(jsonString);
 		//TODO: exception handling 
 		if(!responseJson.has(resourceKey))
-			return null;
-		
+			return null;		
 		JSONArray resourcesList = responseJson.getJSONArray(resourceKey);
-
+		
+		TreeMap<String, List<NamedEntityImpl>> map = new TreeMap<>();
 		processFindings(resourcesList, map);
 
 		return map;
@@ -91,7 +92,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * return						the map parameter will be extended by all findings of
 	 * 								the JSON response
 	 */
-	private void processFindings(JSONArray findings, TreeMap<String, List<NamedEntity>> map){
+	private void processFindings(JSONArray findings, TreeMap<String, List<NamedEntityImpl>> map){
 		for (int index = 0; index < findings.length(); index++) {
 			JSONObject entity = findings.getJSONObject(index);
 			String entityTypes = entity.getString(typeKey);
@@ -132,7 +133,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * 								TreeMap will be extended by the new DBpedia spotlight named entity
 	 * return						the map parameter will be changed through this function
 	 */
-	private void setEntityToMap(String entityType, TreeMap<String, List<NamedEntity>> map, JSONObject entity) {
+	private void setEntityToMap(String entityType, TreeMap<String, List<NamedEntityImpl>> map, JSONObject entity) {
 		
 		int entityOffset = -1;
 		String entityName = null;
@@ -144,8 +145,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			dbpediaUrl = entity.getString(uriKey);
 		}
 		catch (JSONException e) {
-			System.out.println("An exception: " + e.toString() + "is thrown during the json processing of the dbpedia NER.");
-			e.printStackTrace();
+			logger.log(Level.ERROR, "An Exception during the the json rocessing of the dbpedia NER.", e);
 		}
 		
 		//the name must exist
@@ -153,7 +153,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			return;
 		}
 				
-		List<NamedEntity> tmp;
+		List<NamedEntityImpl> tmp;
 		if(map.containsKey(entityType))
 			tmp = map.get(entityType);
 		else {
@@ -161,61 +161,67 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			map.put(entityType, tmp);
 		}
 		
-		NamedEntity alreadyExistNamedEntity = null;
+		NamedEntityImpl alreadyExistNamedEntityImpl = null;
 		for(int index = 0; index < tmp.size(); index++) {
 			if(entityName.equals(tmp.get(index).getLabel())) {
-				alreadyExistNamedEntity = tmp.get(index);
+				alreadyExistNamedEntityImpl = tmp.get(index);
 				break;
 			}
 		}
 		
-		if(alreadyExistNamedEntity == null) {
-			NamedEntity newNamedEntity = createNewNamedEntity(entityName, entityType, entityOffset, dbpediaUrl);
-			tmp.add(newNamedEntity);
+		if(alreadyExistNamedEntityImpl == null) {
+			NamedEntityImpl newNamedEntityImpl = createNewNamedEntityImpl(entityName, entityType, entityOffset, dbpediaUrl);
+			tmp.add(newNamedEntityImpl);
 		}
 		else {
 			//update the dbpedia ids
 			if(dbpediaUrl!=null) {
-			    if(alreadyExistNamedEntity.getDBpediaIds()==null) {
+			    if(alreadyExistNamedEntityImpl.getDBpediaIds()==null) {
 					List<String> dbpediaIds = new ArrayList<String>();
 					dbpediaIds.add(dbpediaUrl);
-					alreadyExistNamedEntity.setDBpediaIds(dbpediaIds);
+					alreadyExistNamedEntityImpl.setDBpediaIds(dbpediaIds);
 			    }
-				else if(!alreadyExistNamedEntity.getDBpediaIds().contains(dbpediaUrl)) {
-					alreadyExistNamedEntity.addDBpediaId(dbpediaUrl);
+				else if(!alreadyExistNamedEntityImpl.getDBpediaIds().contains(dbpediaUrl)) {
+					alreadyExistNamedEntityImpl.addDBpediaId(dbpediaUrl);
 				}
 			}
 			//update the offset(position) of the entity
 			if(entityOffset!=-1) {
-				if(alreadyExistNamedEntity.getPositionEntities()==null) {
+				if(alreadyExistNamedEntityImpl.getPositionEntities()==null) {
 					List<Integer> offsetTranslatedText = new ArrayList<Integer>();
 					offsetTranslatedText.add(Integer.valueOf(entityOffset));
-					PositionEntity positionEntity = new PositionEntityImpl();
+					PositionEntityImpl positionEntity = new PositionEntityImpl();
 					// default: Offset position will be added to the translated
 					positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
-					List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+					List<String> nerTools = new ArrayList<String>();
+					nerTools.add(NERConstants.dbpediaSpotlightName);
+					positionEntity.setNerTools(nerTools);
+					List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
 					positionEntities.add(positionEntity);
-					alreadyExistNamedEntity.setPositionEntities(positionEntities);
+					alreadyExistNamedEntityImpl.setPositionEntities(positionEntities);
 				}
-				else if(!alreadyExistNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText().contains(entityOffset)){
-					alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
+				else if(!alreadyExistNamedEntityImpl.getPositionEntities().get(0).getOffsetsTranslatedText().contains(entityOffset)){
+					alreadyExistNamedEntityImpl.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
 				}
 			}
 		}
 	}
 	
-	private NamedEntity createNewNamedEntity (String label, String type, int offset, String dbpediaUrl) {
-		NamedEntity namedEntity = new NamedEntityImpl(label);
+	private NamedEntityImpl createNewNamedEntityImpl (String label, String type, int offset, String dbpediaUrl) {
+		NamedEntityImpl namedEntity = new NamedEntityImpl(label);
 		
 		namedEntity.setType(type);
 		
 		if(offset!=-1) {
 			List<Integer> offsetTranslatedText = new ArrayList<Integer>();
 			offsetTranslatedText.add(Integer.valueOf(offset));
-			PositionEntity positionEntity = new PositionEntityImpl();
+			PositionEntityImpl positionEntity = new PositionEntityImpl();
 			// default: Offset position will be added to the translated
 			positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
-			List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+			List<String> nerTools = new ArrayList<String>();
+			nerTools.add(NERConstants.dbpediaSpotlightName);
+			positionEntity.setNerTools(nerTools);
+			List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
 			positionEntities.add(positionEntity);
 			namedEntity.setPositionEntities(positionEntities);
 		}
@@ -252,13 +258,11 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			request.setEntity(params);
 			HttpResponse result = httpClient.execute(request);
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
-
-			//System.out.println("(DBpedia spotlight) Http reponse: " + responeString);
 			return responeString;
 
 		} catch (Exception ex) {
 			logger.error("Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage());
-			return "";
+			return null;
 		}
 	}
 

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
-import eu.europeana.enrichment.web.service.EnrichmentNERService;
+import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -24,7 +24,8 @@ import io.swagger.annotations.ApiOperation;
 public class AnnotationController extends BaseRest {
 
 	@Autowired
-	EnrichmentNERService enrichmentNerService;
+	EnrichmentNERServiceImpl enrichmentNerService;
+
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
 	

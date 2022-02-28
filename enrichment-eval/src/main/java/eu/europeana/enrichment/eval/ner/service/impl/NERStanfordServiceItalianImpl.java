@@ -1,39 +1,26 @@
 package eu.europeana.enrichment.eval.ner.service.impl;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
 
 import edu.stanford.nlp.ie.crf.CRFClassifier;
-import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreAnnotations.CharacterOffsetBeginAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.MentionsAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.fbk.dh.tint.runner.TintPipeline;
-import eu.fbk.dh.tint.runner.TintRunner;
 
 /*
  * TODO: improve the code to have one same class for all Stanford models 
@@ -71,7 +58,7 @@ public class NERStanfordServiceItalianImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws NERAnnotateException {
 		
 		
 		  // Use for example a text in a String text = "I topi non avevano nipoti. Il mio nome è Nicolo Rossi. Il mio nome è Massimo Pietro."; 
@@ -162,7 +149,6 @@ public class NERStanfordServiceItalianImpl implements NERService{
 					temp.add(wordWithPosition);
 					map.put(category, temp);
 				}
-				//System.out.println(word + ":" + category);
 			}
 		}
 		return map;

@@ -1,4 +1,4 @@
-package eu.europeana.geolocation;
+package eu.europeana.enrichment.geolocation;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -22,6 +22,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,6 +45,8 @@ import fr.dudie.nominatim.model.Address;
 @ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class GeolocationServiceTest {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	private String nameKey = "name";
 	private String streetKey = "street";
 	private String administrativeEntityKey = "administrative";
@@ -109,12 +113,12 @@ public class GeolocationServiceTest {
 		List<TreeMap<String, String>> allEntries = initStreetLocation();
 
 		for(TreeMap<String, String> entryMap : allEntries) {
-			System.out.println("Entry: " + entryMap.get(nameKey));
+			logger.info("Entry: " + entryMap.get(nameKey));
 			
 			Double orgLatitude = Double.parseDouble(entryMap.get(coordinateLocationLatitudeKey));
 			Double orgLongitude = Double.parseDouble(entryMap.get(coordinateLocationLongitudeKey));
 			final Address address = nominatimClient.getAddress(orgLongitude, orgLatitude);
-			System.out.println("Adress: " + address.getDisplayName());
+			logger.info("Adress: " + address.getDisplayName());
 		}
 
         assertTrue(true);
@@ -202,7 +206,7 @@ public class GeolocationServiceTest {
 		List<TreeMap<String, String>> allEntries = new ArrayList<>();//initStreetLocation();
 		
 		for(TreeMap<String, String> entryMap : allEntries) {
-			System.out.println("Entry: " + entryMap.get(nameKey));
+			logger.info("Entry: " + entryMap.get(nameKey));
 			
 			Double orgLatitude = Double.parseDouble(entryMap.get(coordinateLocationLatitudeKey));
 			Double orgLongitude = Double.parseDouble(entryMap.get(coordinateLocationLongitudeKey));
@@ -210,11 +214,11 @@ public class GeolocationServiceTest {
 			GeocodingApiRequest req = GeocodingApi.reverseGeocode(context, location);
 			GeocodingResult[] resultsReverse = req.await();
 			if(resultsReverse == null || resultsReverse.length == 0) {
-				System.out.println("No reverse Gocoding result");
+				logger.info("No reverse Gocoding result");
 				continue;
 			}
 			for(GeocodingResult geocodingEntity : resultsReverse) {
-				System.out.println(geocodingEntity.formattedAddress);
+				logger.info(geocodingEntity.formattedAddress);
 			}
 			
 			
@@ -229,7 +233,7 @@ public class GeolocationServiceTest {
 					strBuilder.append(value);
 					if(results == null || results.length == 0) {
 						strBuilder.append(") no result!");
-						System.out.println(strBuilder.toString());
+						logger.info(strBuilder.toString());
 						continue;
 					}
 					String firstPart =strBuilder.toString();
@@ -243,7 +247,7 @@ public class GeolocationServiceTest {
 						strBuilder.append(") lat (");
 						strBuilder.append(latitude);
 						strBuilder.append(")");
-						System.out.println(strBuilder.toString());
+						logger.info(strBuilder.toString());
 					}
 				}
 				
@@ -261,7 +265,7 @@ public class GeolocationServiceTest {
 			Double distance = Math.abs(lat-latitude) + Math.abs(lon-longitutde);
 			double factor = 10000;
 			Double distanceRound = Math.round((distance * factor)) / factor;
-			System.out.println(coord + " Distance: (" + distance + ") " +distanceRound);
+			logger.info(coord + " Distance: (" + distance + ") " +distanceRound);
 		}
 	}
 	
@@ -271,29 +275,29 @@ public class GeolocationServiceTest {
 		Double bnfLat = 48.833611;
 		List<String> bnfGoogleList = Arrays.asList("48.8672911,2.3384118","48.86643549999999,2.3386024",
 				"48.8682118,2.3381815","48.8669707,2.3394572","48.8672227,2.3389067", "48.83391109999999,2.3776154");
-		System.out.println("Google BNF distances");
+		logger.info("Google BNF distances");
 		distanceComparison(bnfGoogleList, bnfLat, bnfLong);
 		List<String> bnfOSMList = Arrays.asList("48.8677158,2.3383186", "48.866471,2.3383888", "48.8679195,2.3394708",
 				"48.8670223,2.3389229", "48.834463,2.3768672");
-		System.out.println("OSM BNF distances");
+		logger.info("OSM BNF distances");
 		distanceComparison(bnfOSMList, bnfLat, bnfLong);
 		
 		Double BLLong = -0.126944;
 		Double BLLat = 51.529444;
 		List<String> BLList = Arrays.asList("51.5299658,-0.1276734","51.5298765,-0.127719844483978");
-		System.out.println("BL distances");
+		logger.info("BL distances");
 		distanceComparison(BLList, BLLat, BLLong);
 		
 		Double NISVLong = 5.173056;
 		Double NISVLat = 52.235278;
 		List<String> NISVList = Arrays.asList("52.235459,5.1730565","52.2356788,5.1733122");
-		System.out.println("NISVL distances");
+		logger.info("NISVL distances");
 		distanceComparison(NISVList, NISVLat, NISVLong);
 		
 		Double SASLong = 8.547531;
 		Double SASLat = 47.366828;
 		List<String> SASList = Arrays.asList("47.366825,8.547526200000002","47.3668235,8.5474436");
-		System.out.println("SAS distances");
+		logger.info("SAS distances");
 		distanceComparison(SASList, SASLat, SASLong);
 	}
 }

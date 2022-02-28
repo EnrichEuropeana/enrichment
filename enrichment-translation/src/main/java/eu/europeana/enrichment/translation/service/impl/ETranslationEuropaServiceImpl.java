@@ -19,6 +19,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -244,13 +245,11 @@ public class ETranslationEuropaServiceImpl {
 			request.setEntity(params);
 			HttpResponse result = httpClient.execute(request);
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
-
-			System.out.println("(eTranslation) Http reponse: " + responeString);
 			return responeString;
 		} catch (Exception ex) {
 			//TODO: proper exception handling
-			logger.error("Exception raised during the creation of eTranslation request: " + ex.getMessage());
-			return "";
+			logger.log(Level.ERROR, "Exception during the creation of eTranslation request.", ex);
+			return null;
 		}
 	}
 		

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,8 +22,8 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMYKColor;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
 // code is aken from: https://stackoverflow.com/questions/25166533/java-write-to-pdf-with-color
 
@@ -48,7 +49,7 @@ public class JavaPDFWriter
 	/*
 	 * translationOrOriginalText=0 -> write translated text in a pdf; translationOrOriginalText=1 -> write original text to pdf
 	 */
-	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText) throws Exception
+	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntityImpl>> NERNamedEntities, int translationOrOriginalText) throws Exception
 	{
 		outputText=addSpecialCharactersToString(outputText, NERNamedEntities, translationOrOriginalText);
 		
@@ -108,7 +109,7 @@ public class JavaPDFWriter
 		    
 		} catch (Exception e)
 		{
-		    e.printStackTrace();
+		    logger.log(Level.ERROR, "Exception during writting the pdf with Java.", e);
 		    throw e;
 		}
 	}
@@ -125,28 +126,28 @@ public class JavaPDFWriter
 	}
 	
 	
-	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText)
+	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntityImpl>> NERNamedEntities, int translationOrOriginalText)
 	{
 		StringBuilder sb = new StringBuilder(textString);	 
 		
 		List<Integer> allAddedPositions = new ArrayList<Integer>();
 	
-		for(Map.Entry<String, List<NamedEntity>> entry : NERNamedEntities.entrySet()) {
+		for(Map.Entry<String, List<NamedEntityImpl>> entry : NERNamedEntities.entrySet()) {
         	
         	String key = entry.getKey();
-        	List<NamedEntity> values = entry.getValue();
+        	List<NamedEntityImpl> values = entry.getValue();
 
         	if(values!=null) {
-	        	Iterator<NamedEntity> NEREntitiesIterator = values.iterator();	        	
+	        	Iterator<NamedEntityImpl> NEREntitiesIterator = values.iterator();	        	
 	        	while(NEREntitiesIterator.hasNext()) {
 	        		
-	        		NamedEntity nextNEREntity=NEREntitiesIterator.next();
+	        		NamedEntityImpl nextNEREntity=NEREntitiesIterator.next();
 	        		
 	        		if(nextNEREntity.getPositionEntities()!=null) {
-		        		Iterator<PositionEntity> PositionsIterator = nextNEREntity.getPositionEntities().iterator();		        		
+		        		Iterator<PositionEntityImpl> PositionsIterator = nextNEREntity.getPositionEntities().iterator();		        		
 		            	while(PositionsIterator.hasNext()) {
 		            		
-		            		PositionEntity nextPosition=PositionsIterator.next();   
+		            		PositionEntityImpl nextPosition=PositionsIterator.next();   
 		            		
 		            		/*
 		            		 * check if the position is valid, if the value is <0 it is not valid meaning the NamedEntity is not found

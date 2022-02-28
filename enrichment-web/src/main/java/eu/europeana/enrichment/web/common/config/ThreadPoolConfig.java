@@ -3,6 +3,9 @@ package eu.europeana.enrichment.web.common.config;
 import java.lang.reflect.Method;
 import java.util.concurrent.Executor;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -18,6 +21,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 @Configuration
 public class ThreadPoolConfig implements AsyncConfigurer {
+	
+	Logger logger = LogManager.getLogger(getClass());
 
 	@Override
 	public Executor getAsyncExecutor() {
@@ -35,15 +40,13 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 
 			@Override
 			public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-				System.out.println("Throwable Exception message: " + ex.getMessage());
-				System.out.println("Method name: " + method.getName());
+				String exceptionMessage = "Exception message: " + ex.getMessage();
+				exceptionMessage += "Method name: " + method.getName();
 				for (Object param : params) {
-					System.out.println("Parameter value: " + param);
+					exceptionMessage += "Parameter value: " + param;
 				}
-				System.out.println("Stack Trace: ");
-				ex.printStackTrace();
+				logger.log(Level.ERROR, exceptionMessage, ex);
 			}
-
 		};
 	}
 }

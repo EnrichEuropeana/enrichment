@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -30,9 +32,9 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
-import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
+import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import eu.europeana.enrichment.web.service.impl.TranscribathonConcurrentCallServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,8 +45,10 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = "Administration service", description=" ")
 public class AdministrationController extends BaseRest {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
-	EnrichmentNERService enrichmentNerService;
+	EnrichmentNERServiceImpl enrichmentNerService;
 	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
 	@Autowired
@@ -125,10 +129,10 @@ public class AdministrationController extends BaseRest {
 			}
 			Instant finish = Instant.now();
 			long timeElapsed = Duration.between(start, finish).getSeconds();
-			System.out.println("Total time: " + timeElapsed + " s.");
+			logger.info("Total time: " + timeElapsed + " s.");
 			if(numberNotFetchedStories>0) {
-				System.out.println("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
-				System.out.println("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
+				logger.info("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
+				logger.info("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
 			}
 			/*
 			 * The commented-out code below is for the parallel fetching of stories 
@@ -152,9 +156,9 @@ public class AdministrationController extends BaseRest {
 //			Instant finish = Instant.now();
 //			long timeElapsed = Duration.between(start, finish).getSeconds();
 //
-//			System.out.println("Total time: " + timeElapsed + " s.");
-//			System.out.println("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
-//			System.out.println("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
+//			logger.info("Total time: " + timeElapsed + " s.");
+//			logger.info("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+//			logger.info("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
 			
 			String responseString = "{\"info\": \"Done successfully!\"}";
 			

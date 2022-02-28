@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -222,7 +223,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			List<String> sentences = translationLanguageTool.sentenceSplitter(translatedText);
 			for (String translatedSentence : sentences) {
 				double ratio = translationLanguageTool.getLanguageRatio(translatedSentence);
-				System.out.println("Sentence ratio: " + ratio + " ("+translatedSentence+")");
+				logger.info("Sentence ratio: " + ratio + " ("+translatedSentence+")");
 				//TODO: save ratio
 			}*/
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | TranslationException | InterruptedException e) {
@@ -293,7 +294,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during setting the key in the process of storing the translation entity.", e);
 			return "Item " + i + " failed to be uploaded!";
 		}
 		

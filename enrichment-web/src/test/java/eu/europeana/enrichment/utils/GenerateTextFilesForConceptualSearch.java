@@ -16,6 +16,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,6 +35,7 @@ import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 
 public class GenerateTextFilesForConceptualSearch {
 	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	@Resource(name = "persistentStoryEntityService")
 	PersistentStoryEntityService persistentStoryEntityService;
@@ -62,7 +65,7 @@ public class GenerateTextFilesForConceptualSearch {
 //				BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
 //
 //				bwTranslations.write(stories.get(i).getDescription());
-//				System.out.print("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
+//				logger.info("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
 //				
 //				bwTranslations.close();	
 //			}
@@ -81,7 +84,7 @@ public class GenerateTextFilesForConceptualSearch {
 //				String fileName = directoryForConceptualSearch+"/itemTranslation-"+itemsTranslations.get(i).getStoryId()+".txt";
 //				BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
 //				bwTranslations.write(itemsTranslations.get(i).getTranslatedText());
-//				System.out.print("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
+//				logger.info("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
 //				bwTranslations.close();	
 //				
 //				itemIDs.add(itemsTranslations.get(i).getItemId());
@@ -107,7 +110,7 @@ public class GenerateTextFilesForConceptualSearch {
 //
 //				bwTranslations.write("\""+Integer.toString(itemIDs.size())+"\":"+"\""+correctedTranslationsForQuotationWithin+"\",\n");
 //				
-//				System.out.print("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
+//				logger.info("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
 //			
 //				itemIDs.add(itemsTranslations.get(i).getItemId());
 //				

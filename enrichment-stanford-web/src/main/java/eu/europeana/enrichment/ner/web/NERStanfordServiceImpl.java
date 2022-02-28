@@ -9,10 +9,9 @@ import org.json.JSONObject;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 
@@ -47,10 +46,10 @@ public class NERStanfordServiceImpl{
 	 * @throws 							NERAnnotateException
 	 */
 	//TODO: check where exception could appear
-	private TreeMap<String, List<NamedEntity>> processClassifiedResult(List<List<CoreLabel>> classify){
+	private TreeMap<String, List<NamedEntityImpl>> processClassifiedResult(List<List<CoreLabel>> classify){
 		if(classify==null) return null;
 
-		TreeMap<String, List<NamedEntity>> map = new TreeMap<>();
+		TreeMap<String, List<NamedEntityImpl>> map = new TreeMap<>();
 		String previousWord = null;
 		String previousCategory = null;
 		int previousOffset=-1;
@@ -109,8 +108,8 @@ public class NERStanfordServiceImpl{
 		return map;
 	}
 	
-	private void updateNamedEntity (String word, int offset, String category, TreeMap<String, List<NamedEntity>> map) {
-		List<NamedEntity> tmp;					
+	private void updateNamedEntity (String word, int offset, String category, TreeMap<String, List<NamedEntityImpl>> map) {
+		List<NamedEntityImpl> tmp;					
 		if (map.containsKey(category)) {
 			// key is already there just insert in the list {word,position}
 			tmp = map.get(category);
@@ -119,7 +118,7 @@ public class NERStanfordServiceImpl{
 			map.put(category, tmp);
 		}
 		
-		NamedEntity alreadyExistNamedEntity = null;
+		NamedEntityImpl alreadyExistNamedEntity = null;
 		for(int index = 0; index < tmp.size(); index++) {
 			if(tmp.get(index).getLabel().equals(word)) {
 				alreadyExistNamedEntity = tmp.get(index);
@@ -127,16 +126,19 @@ public class NERStanfordServiceImpl{
 			}
 		}
 		if(alreadyExistNamedEntity == null) {
-			NamedEntity namedEntity = new NamedEntityImpl(word);
+			NamedEntityImpl namedEntity = new NamedEntityImpl(word);
 			namedEntity.setType(category);
 			//setting the offsets(positions) of the found entity in the text
 			if(offset!=-1) {
-				PositionEntity positionEntity = new PositionEntityImpl();
+				PositionEntityImpl positionEntity = new PositionEntityImpl();
 				List<Integer> offsetList = new ArrayList<Integer>();
 				offsetList.add(offset);
 				// default: Offset position will be added to the translated 
 				positionEntity.setOffsetsTranslatedText(offsetList);
-				List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+				List<String> nerTools = new ArrayList<String>();
+				nerTools.add(NERConstants.stanfordNer);
+				positionEntity.setNerTools(nerTools);
+				List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
 				positionEntities.add(positionEntity);
 				namedEntity.setPositionEntities(positionEntities);
 			}
@@ -145,12 +147,15 @@ public class NERStanfordServiceImpl{
 		else {
 			if(alreadyExistNamedEntity.getPositionEntities()==null) {
 				if(offset!=-1) {
-					PositionEntity positionEntity = new PositionEntityImpl();
+					PositionEntityImpl positionEntity = new PositionEntityImpl();
 					List<Integer> offsetList = new ArrayList<Integer>();
 					offsetList.add(offset);
 					// default: Offset position will be added to the translated 
 					positionEntity.setOffsetsTranslatedText(offsetList);
-					List<PositionEntity> positionEntities = new ArrayList<PositionEntity>();
+					List<String> nerTools = new ArrayList<String>();
+					nerTools.add(NERConstants.stanfordNer);
+					positionEntity.setNerTools(nerTools);
+					List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
 					positionEntities.add(positionEntity);
 					alreadyExistNamedEntity.setPositionEntities(positionEntities);
 				}

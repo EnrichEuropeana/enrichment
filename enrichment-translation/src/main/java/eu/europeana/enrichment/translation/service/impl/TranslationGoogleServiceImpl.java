@@ -3,6 +3,7 @@ package eu.europeana.enrichment.translation.service.impl;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,8 +115,7 @@ public class TranslationGoogleServiceImpl {
 			return translation;
 		}
 		catch(Exception ex) {
-			logger.error("Exception raised by translating text using Google!" + ex.getMessage());
-			ex.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the translation of the text using Google!", ex);
 			return null;
 		}
 	}	

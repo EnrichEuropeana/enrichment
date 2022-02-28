@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
+	<Properties>
+		<Property name="basePath">enrichment-logs</Property>
+	</Properties>
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
       <!--
@@ -10,14 +13,55 @@
       	<pattern>{&quot;@timestamp&quot;:&quot;%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}&quot;,&quot;level&quot;:&quot;%-5p&quot;,&quot;thread&quot;:&quot;%t&quot;,&quot;class&quot;:&quot;%C&quot;, &quot;code_line_number&quot;:&quot;%L&quot;,&quot;message&quot;:&quot;%replace{%m %throwable}{[\n\t"]}{ }&quot;}%n</pattern>
       </PatternLayout>
     </Console>
+    <RollingFile name="FileLoggerInfo"
+			fileName="${basePath}/info.log"
+			filePattern="${basePath}/info-%d{yyyy-MM-dd}.log">
+		  <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+	      <PatternLayout>
+	      	<alwaysWriteExceptions>false</alwaysWriteExceptions>
+	      	<pattern>{&quot;@timestamp&quot;:&quot;%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}&quot;,&quot;level&quot;:&quot;%-5p&quot;,&quot;thread&quot;:&quot;%t&quot;,&quot;class&quot;:&quot;%C&quot;, &quot;code_line_number&quot;:&quot;%L&quot;,&quot;message&quot;:&quot;%replace{%m %throwable}{[\n\t"]}{ }&quot;}%n</pattern>
+	      </PatternLayout>
+	      <Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<SizeBasedTriggeringPolicy size="500MB" />
+			</Policies>
+			<!-- Max 10 files will be created everyday -->
+			<DefaultRolloverStrategy max="10">
+				<Delete basePath="${basePathr}" maxDepth="10">
+					<!-- Delete all files older than 30 days -->
+					<IfLastModified age="30d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+	</RollingFile>
+	    <RollingFile name="FileLoggerError"
+			fileName="${basePath}/error.log"
+			filePattern="${basePath}/error-%d{yyyy-MM-dd}.log">
+		  <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+	      <PatternLayout>
+	      	<alwaysWriteExceptions>false</alwaysWriteExceptions>
+	      	<pattern>{&quot;@timestamp&quot;:&quot;%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}&quot;,&quot;level&quot;:&quot;%-5p&quot;,&quot;thread&quot;:&quot;%t&quot;,&quot;class&quot;:&quot;%C&quot;, &quot;code_line_number&quot;:&quot;%L&quot;,&quot;message&quot;:&quot;%replace{%m %throwable}{[\n\t"]}{ }&quot;}%n</pattern>
+	      </PatternLayout>
+	      <Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+				<SizeBasedTriggeringPolicy size="100MB" />
+			</Policies>
+			<!-- Max 10 files will be created everyday -->
+			<DefaultRolloverStrategy max="10">
+				<Delete basePath="${basePathr}" maxDepth="10">
+					<!-- Delete all files older than 30 days -->
+					<IfLastModified age="30d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+	</RollingFile>
   </Appenders>
   <Loggers>
     <Root level="INFO" additivity="false">
       <appender-ref ref="Console"/>
     </Root>
-      
-    <Logger name="eu.europeana.entity" level="INFO" additivity="true">
-		<appender-ref ref="Console"/>
+    <Logger name="eu.europeana.enrichment" level="INFO" additivity="false">
+    	<appender-ref ref="Console"/>
+		<appender-ref ref="FileLoggerInfo"/>
+		<appender-ref ref="FileLoggerError"/>
 	</Logger>
   </Loggers>
 </Configuration> 

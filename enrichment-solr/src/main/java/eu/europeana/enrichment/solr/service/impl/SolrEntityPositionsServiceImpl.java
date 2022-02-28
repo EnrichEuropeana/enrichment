@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -47,6 +48,8 @@ import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServic
 @Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	//@Resource(name = "solrBaseClientService")
 	@Autowired
 	SolrBaseClientService solrBaseClientService;
@@ -115,7 +118,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 				data = new String(Files.readAllBytes(Paths.get(enrichmentConfiguration.getSolrTranslatedEntities())));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.log(Level.ERROR, "Exception during reading the solr entity positions from a file.", e);
 				throw e;
 			}
 			String[] entities = data.split(",");
