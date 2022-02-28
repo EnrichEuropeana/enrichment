@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +32,8 @@ import objects.Transcription;
 @Service
 public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStoryAndItemStorageService{
 	
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
 	
@@ -48,8 +53,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 			}
 			else return null;
 		} catch (JsonProcessingException e) {
-			System.out.println("An exception: " + e.toString() + "is thrown during fetching or deserializing the story (minimal profile) from Transcribathon.");
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during fetching or deserializing the story (minimal profile) from Transcribathon.", e);
 			return null;
 		}
 		
@@ -132,8 +136,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 				return newItem;
 			} catch (JsonProcessingException e) {
-				System.out.println("An exception: " + e.toString() + "is thrown during fetching or deserializing an item from Transcribathon.");
-				e.printStackTrace();
+				logger.log(Level.ERROR, "Exception during fetching or deserializing an item from Transcribathon.", e);
 				return null;
 			}
 			

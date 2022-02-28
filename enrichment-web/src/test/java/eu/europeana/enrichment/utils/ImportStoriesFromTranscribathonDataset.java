@@ -3,6 +3,8 @@ package eu.europeana.enrichment.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import objects.Transcription;
 @Disabled("Excluded from automated runs.")
 public class ImportStoriesFromTranscribathonDataset {
 		
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
 	@Autowired
@@ -114,7 +118,7 @@ public class ImportStoriesFromTranscribathonDataset {
 //
 //					bwTranslations.write(storyTranslations.get(i).getStoryId() + ",\"" + removedAllNonAsciiCharacters + "\"\n");
 //					
-//					System.out.print("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
+//					logger.info("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
 //				
 //				}
 //			}		

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -52,12 +53,12 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 	private String solrCore = "wikidata";
 	
-	private final Logger log = LogManager.getLogger(getClass());
+	private final Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
 	public void store(String solrCollection, WikidataEntity wikidataEntity, boolean doCommit) throws SolrNamedEntityServiceException {
 
-		log.debug("store: " + wikidataEntity.toString());	
+		logger.debug("store: " + wikidataEntity.toString());	
 		
 		if(wikidataEntity instanceof WikidataAgent)
 		{
@@ -108,7 +109,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	@Override
 	public String searchByWikidataURL(String wikidataURL) throws SolrNamedEntityServiceException {
 		
-		log.debug("Search wikidata entity by its URL: " + wikidataURL);
+		logger.debug("Search wikidata entity by its URL: " + wikidataURL);
 
 		/**
 		 * Construct a SolrQuery
@@ -121,8 +122,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		try {
 			rsp = solrBaseClientService.query(solrCore, query);
 		} catch (SolrNamedEntityServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the Solr quering for the wikidata.", e);
 			throw e;
 		}
 	    SolrDocumentList docs = rsp.getResults();
@@ -235,7 +235,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			rsp = solrBaseClientService.query(solrCore, query);
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during getting the wikidata from Solr.", e);
 			throw e;
 		}	
 		binder = new DocumentObjectBinder();
@@ -243,12 +243,12 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 				
 		if(docList.size() > 1)
 		{
-			log.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
+			logger.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
 			return null;
 		}
 		else if(docList.size() == 0)
 		{
-			log.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			logger.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
 			return null;
 		}
 		
@@ -274,7 +274,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		}
 		else
 		{
-			log.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
+			logger.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
 			return null;
 		}
 		
@@ -304,7 +304,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 				rsp = solrBaseClientService.query(solrCore, query);
 			} catch (SolrNamedEntityServiceException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.log(Level.ERROR, "Exception during the Solr search with the wikidata url.", e);
 				throw e;
 			}
 	
@@ -325,12 +325,12 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 		if(docList.size() > 1)
 		{
-			log.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
+			logger.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
 			return null;
 		}
 		else if(docList.size() == 0)
 		{
-			log.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			logger.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
 			return null;
 		}
 		
@@ -354,10 +354,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
 				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
-			} catch (IOException e1) {
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				throw e1;
+				logger.log(Level.ERROR, "Exception during the serializion of the wikidata agent from Solr.", e);
+				throw e;
 			}
 	    	
 	    	return serializedUserSetJsonLdStr;
@@ -372,17 +372,17 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
 				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
-			} catch (IOException e1) {
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
-				throw e1;
+				logger.log(Level.ERROR, "Exception during the serializion of the wikidata place from Solr.", e);
+				throw e;
 			}
 	    	
 	    	return serializedUserSetJsonLdStr;
 		}
 		else
 		{
-			log.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
+			logger.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
 			return null;
 		}
 	}
@@ -400,7 +400,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 		
 		//forming solr queries to get the data from Solr
-		log.info("Forming Solr queries to get the data from Solr.");
+		logger.info("Forming Solr queries to get the data from Solr.");
 		
 		SolrQuery queryOnePage = new SolrQuery();
 		SolrQuery queryAllPages = new SolrQuery();	
@@ -467,7 +467,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		queryOnePage.set("rows", Integer.valueOf(pageSize));
 	
 		
-		log.info("Calling Solr for executing queries.");
+		logger.info("Calling Solr for executing queries.");
 		
 	    QueryResponse rspOnePage = null;
 	    QueryResponse rspAllPages = null;
@@ -476,11 +476,11 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			rspAllPages = solrBaseClientService.query(solrCore, queryAllPages);
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the search for the NamedEntity from Solr.", e);
 			throw e;
 		}
 
-		log.info("Getting results from Solr in the form of SolrDocumentList.");
+		logger.info("Getting results from Solr in the form of SolrDocumentList.");
 		
 		//ResultSet<T> resultSet = new ResultSet<>();		
 		DocumentObjectBinder binder = new DocumentObjectBinder();
@@ -491,7 +491,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		totalResultsAll = docListAllPages.size();
 		totalResultsPerPage = (totalResultsAll < Integer.valueOf(pageSize)) ? totalResultsAll : Integer.valueOf(pageSize);
 		
-		log.info("Analysing Solr data for NamedEntity types.");
+		logger.info("Analysing Solr data for NamedEntity types.");
 		
 		for(int i=0;i<docListOnePage.size();i++)
 		{
@@ -526,7 +526,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			}
 			else
 			{
-				log.error("Solr document retrived is niether of type \"agent\" nor \"place\".");
+				logger.error("Solr document retrived is niether of type \"agent\" nor \"place\".");
 				return null;
 			}
 			
@@ -536,7 +536,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
 		}
 		
-		log.info("Serializing Solr data using Jackson to JSON string.");
+		logger.info("Serializing Solr data using Jackson to JSON string.");
 			
 		
 		NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);
@@ -544,10 +544,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		String serializedNamedEntityCollection=null;
     	try {
     		serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
-		} catch (IOException e1) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			throw e1;
+			logger.log(Level.ERROR, "Exception during the serializion of the NamedEntity from Solr.", e);
+			throw e;
 		}
     	
     	return serializedNamedEntityCollection;

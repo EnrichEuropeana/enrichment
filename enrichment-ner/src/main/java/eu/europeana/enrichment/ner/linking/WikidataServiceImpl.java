@@ -14,6 +14,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -142,21 +143,18 @@ public class WikidataServiceImpl implements WikidataService {
 		// and Agent/Person
 		if (reponse == null || reponse.isBlank() || !reponse.startsWith("{"))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is either null or not appropriate (does not start with {)" + "\n");
 			return null;
 		}				
 
 		JSONObject responseJson = new JSONObject(reponse);
 		if(!responseJson.has(wikidataResultKey))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The json response to the Wikidata request does not contain the key: " + wikidataResultKey + "\n");
 			return null;
 		}
 		
 		JSONObject resultObj = responseJson.getJSONObject(wikidataResultKey);
 		if(!resultObj.has(wikidataBindingsKey))
 		{
-			logger.info("\n" + this.getClass().getSimpleName() + "The json response to the Wikidata request does not contain the key: " + wikidataBindingsKey + "\n");
 			return null;
 		}
 		
@@ -173,11 +171,9 @@ public class WikidataServiceImpl implements WikidataService {
 		}
 		
 		if(retValue.size()>0) {
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request is: " + retValue.toString() + "\n");
 			return retValue;
 		}
 		else {
-			logger.info("\n" + this.getClass().getSimpleName() + "The response to the Wikidata request does not contain the key: " + wikidataItemKey + "\n");
 			return null;
 		}
 	}
@@ -201,9 +197,6 @@ public class WikidataServiceImpl implements WikidataService {
 				builder.addParameter("query", query);
 			}
 
-			logger.info(this.getClass().getSimpleName() + ": " + query);
-			logger.info(this.getClass().getSimpleName() + builder.toString());
-
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			HttpGet request = new HttpGet(builder.build());
 			request.addHeader("content-type", "application/json");
@@ -216,7 +209,7 @@ public class WikidataServiceImpl implements WikidataService {
 
 		} catch (URISyntaxException | IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the wikidata service call.", e);
 			return null;
 		}
 

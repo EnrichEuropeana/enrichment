@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 
 public interface PersistentNamedEntityService {
 	
@@ -13,15 +13,15 @@ public interface PersistentNamedEntityService {
 	 * @param key						label of the named entity
 	 * @return							a database named entity 
 	 */
-	public NamedEntity findNamedEntity(String key);
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type);
+	public NamedEntityImpl findNamedEntity(String key);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type);
 
 	/*
 	 * This method retrieves all named entities from the Mongo database
 	 * 
 	 * @return							list of database named entities
 	 */
-	public List<NamedEntity> getAllNamedEntities();
+	public List<NamedEntityImpl> getAllNamedEntities();
 	/*
 	 * This method saves and updates named entities into the Mongo database
 	 * 
@@ -29,7 +29,7 @@ public interface PersistentNamedEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveNamedEntity(NamedEntity entity);
+	public void saveNamedEntity(NamedEntityImpl entity);
 	/*
 	 * This method saves and updates a list of named entities into the Mongo database
 	 * 
@@ -37,7 +37,7 @@ public interface PersistentNamedEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveNamedEntities(List<NamedEntity> entities);
+	public void saveNamedEntities(List<NamedEntityImpl> entities);
 
 	/**
 	 * Deletes all NamedEntities form the Mongo db
@@ -45,7 +45,7 @@ public interface PersistentNamedEntityService {
 	public void deleteAllNamedEntities ();
 	
 	public void deletePositionEntitiesFromNamedEntity(String storyId,String itemId, String fieldUsedForNER);
-	List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type,
+	List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type,
 			List<String> nerTools);
 
 }

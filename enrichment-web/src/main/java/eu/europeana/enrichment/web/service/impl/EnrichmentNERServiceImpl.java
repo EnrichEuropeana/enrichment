@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
@@ -27,15 +27,16 @@ import org.springframework.stereotype.Service;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.NamedEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.model.utils.ModelUtils;
+import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -55,12 +56,13 @@ import eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
-import eu.europeana.enrichment.web.service.EnrichmentNERService;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_NER_SERVICE)
-public class EnrichmentNERServiceImpl implements EnrichmentNERService{
+public class EnrichmentNERServiceImpl {
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/*
 	 * Loading Solr service for finding the positions of Entities in the original text
@@ -109,11 +111,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
 
-	/*
-	 * Defining the available tools for named entities
-	 */
-	private static final String stanfordNer = "Stanford_NER";
-	private static final String dbpediaSpotlightName = "DBpedia_Spotlight";
 	private static final Map<String, String> languageCodeMap;
     static {
         Map<String, String> aMap = new HashMap<String, String>();
@@ -130,9 +127,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
     private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
     private static final String transcribathonBaseURLStoriesMinimal = "https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal/";
     private static int cascadeCall = 0;
-	
-	Logger logger = LogManager.getLogger(getClass());
-	
+		
 	//@Resource(name = "persistentNamedEntityService")
 	@Autowired
 	PersistentNamedEntityService persistentNamedEntityService;
@@ -150,33 +145,25 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
 	
 	//@Cacheable("nerResults")
-	@Override
 	public String getEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
-		
-		String storyId = requestParam.getStoryId();
-		String itemId = requestParam.getItemId();
-		
-		TreeMap<String, List<NamedEntity>> resultMap = getNamedEntities(requestParam, process);
-		/*
-		 * Output preparation
-		 */
-		if(resultMap == null || resultMap.isEmpty()) {
+
+		List<NamedEntityImpl> result = getNamedEntities(requestParam, process);
+
+		if(result == null || result.isEmpty()) {
 			return "{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
 		}
 		else
 		{
-			prepareOutput(resultMap, storyId, itemId);
-			return new JSONObject(resultMap).toString();
+			return new JSONObject(result).toString();
 		}
 	}
 	
 	/*
 	 * TODO: refactor this method, is too long 
 	 */
-	@Override
-	public TreeMap<String, List<NamedEntity>> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
+	public List<NamedEntityImpl> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
 		
-		TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
+		List<NamedEntityImpl> result = new ArrayList<NamedEntityImpl>();
 		
 		//TODO: check parameters and return other status code
 		String storyId = requestParam.getStoryId();
@@ -227,37 +214,19 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 * This part from here down only executes for POST requests.
 		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
 		 */
-		List<NamedEntity> tmpNamedEntities = new ArrayList<>();
+		List<NamedEntityImpl> tmpNamedEntities = new ArrayList<>();
 
 		//fetching NamedEntity-ies to check if they are found with the required ner tools
 		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type));
 	
 		int numberNERTools = tools.size();
 		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued, returned is the number of 
-		//ner tools for which the analysis remained undone (the list "tools" is also updated, i.e. only the not analyzed tools remian in the list)
+		//ner tools for which the analysis remained undone (the list "tools" is also updated, i.e. only the not analyzed tools remain in the list)
 		int numberNERToolsFound = checkAllNerToolsAlreadyCompleted(tools, tmpNamedEntities);
-		
-		//TODO: check if update is need (e.g.: linking tools)
-		if(tmpNamedEntities.size() > 0 && numberNERToolsFound > 0) {
-			//TreeMap<String, List<NamedEntity>> resultMap = new TreeMap<>();
-			for(int index = tmpNamedEntities.size()-1; index >=0; index--) {
-				NamedEntity tmpNamedEntity = tmpNamedEntities.get(index);
-				String classificationType = tmpNamedEntity.getType();
-				if(!resultMap.containsKey(classificationType))
-					resultMap.put(classificationType, new ArrayList<>());
-				List<NamedEntity> classificationNamedEntities = resultMap.get(classificationType);
-				if(tmpNamedEntity.getLabel()!=null 
-						&& !classificationNamedEntities.stream().anyMatch(x -> tmpNamedEntity.getLabel().equals(x.getLabel()))) {
-					classificationNamedEntities.add(tmpNamedEntity);
-				}
-			}
-		}
-		
+				
 		//in case of GET API (process==FALSE) or POST API where all ner tools have been processed and no new provided text is given
 		if(!process || numberNERToolsFound==numberNERTools) {
-			//TODO: throw exception 404
-			//throw new HttpException("");
-			return resultMap;
+			return tmpNamedEntities;
 		}
 
 		//from this part down only POST method is executed and the NER analysis is done for all story or item fields
@@ -277,96 +246,114 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		for(String typeNERField : allNERFieldTypes)
 		{
-
 			type=typeNERField; 
 			
 			TranslationEntity dbTranslationEntity = null;
 			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type, dbTranslationEntity);
 			String textForNer = textAndLanguage[0];
 			String languageForNer = textAndLanguage[1];
-//			if(languageForNer==null)
-//				throw new HttpException("The original language of the story or item is null.", null, HttpStatus.PRECONDITION_REQUIRED);
 
 			//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
-			if(textForNer!=null && !textForNer.isBlank() && languageForNer!=null)
-			{
-				getNamedEntitiesForText(tools, textForNer, languageForNer, typeNERField, storyId, itemId, linking, resultMap);
+			for(String tool : tools) {
+				List<NamedEntityImpl> tmpResult = getUpdatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking);
+				updateNamedEntitiesDbAndSolr(tmpResult);
+				updateNamedEntityResultList (result, tmpResult);
 			}
-		}
+	
+		}	
 		
-		updateNamedEntities (resultMap, storyId, itemId);	
-		
-		return resultMap;
+		return result;
 	}
 	
+	private void updateNamedEntityResultList (List<NamedEntityImpl> main, List<NamedEntityImpl> newOnes) {
+		if(main==null) {
+			if(newOnes!=null) {
+				main=newOnes;
+				return;
+			}
+			else return;
+		}
+		else {
+			if(newOnes==null) {
+				return;
+			}
+		}
+		//update the main result with new elements (the new list is extended for the entities that are not inside from the previous list, because the new entities are the updated ones)
+		List<NamedEntityImpl> toAdd = new ArrayList<NamedEntityImpl>();
+		for(NamedEntityImpl mainEntity : main) {
+			boolean found = false;
+			for(NamedEntityImpl newEntity : newOnes) {
+				if(newEntity.getLabel().compareTo(mainEntity.getLabel())==0) {
+					found=true;
+					break;
+				}
+			}
+			if(!found) {
+				toAdd.add(mainEntity);
+			}
+		}
+		newOnes.addAll(toAdd);
+		main=newOnes;
+	}
 	
-	public void getNamedEntitiesForText(List<String> nerTools, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, TreeMap<String, List<NamedEntity>> result) throws IOException, ParamValidationException {
-		for(String NERTool : nerTools)
-		{
-			/*
-			 * Here for each ner tool the analysis is done separately because different tools may find
-			 * the same entities on different positions in the text and we would like to separate those results,
-			 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
-			 * belong to which ner tool analyser.
-			 */
-
-			TreeMap<String, List<NamedEntity>> tmpResult = applyNERTools(NERTool, textForNer, languageForNer, fieldType, storyId, itemId);
+	public List<NamedEntityImpl> getUpdatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws IOException, ParamValidationException {
+		/*
+		 * Here for each ner tool the analysis is done separately because different tools may find
+		 * the same entities on different positions in the text and we would like to separate those results,
+		 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
+		 * belong to which ner tool analyser.
+		 */
+		TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
+		
+		if(tmpResult==null || tmpResult.isEmpty()) return null;
+		
+		List<NamedEntityImpl> result = new ArrayList<NamedEntityImpl>();
+		for (String classificationType : tmpResult.keySet()) {
 			
-			for (String classificationType : tmpResult.keySet()) {
+			if (isRestrictedClassificationType(classificationType)) continue;
+			
+			for (NamedEntityImpl tmpNamedEntity : tmpResult.get(classificationType)) {
+				NamedEntityImpl dbEntity = null;
+				boolean oldNamedEntityChanged = false;
+				if (tmpNamedEntity.getLabel()!=null) {
+					dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel());
+				}
 				
-				List<NamedEntity> tmpClassificationList = new ArrayList<>();
-				/*
-				 * Check if already named entities exists from the previous story item
-				 */
-				if(result.containsKey(classificationType))
-					tmpClassificationList = result.get(classificationType);
-				else
-					result.put(classificationType, tmpClassificationList);
-				
-				for (NamedEntity tmpNamedEntity : tmpResult.get(classificationType)) {
-					NamedEntity dbEntity = null;
-					boolean oldNamedEntityChanged = false;
-					/*
-					 * Check if named entity with the same label was found in the
-					 * previous story item or in the database
-					 */
-					List<NamedEntity> tmpResultNamedEntityList = null;
-					if(tmpNamedEntity.getLabel()!=null) {
-						tmpResultNamedEntityList = tmpClassificationList.stream().
-							filter(x -> tmpNamedEntity.getLabel().equals(x.getLabel())).collect(Collectors.toList());
-					}
-					if(tmpResultNamedEntityList!=null && tmpResultNamedEntityList.size() > 0)
-						dbEntity = tmpResultNamedEntityList.get(0);
-					else if (tmpNamedEntity.getLabel()!=null)
-						dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel());
-					
-					if(dbEntity != null) {
-						//check if there are new position entities to be added
-						int addPositionEntitiesCheck = 1;
+				if(dbEntity != null) {
+					//check if there are new position entities to be added						
+					if(tmpNamedEntity.getPositionEntities()!=null) {
 						if(dbEntity.getPositionEntities()!=null) {
-							for(PositionEntity pe : dbEntity.getPositionEntities())
+							int addPositionEntitiesCheck = 1;
+							for(PositionEntityImpl pe : dbEntity.getPositionEntities())
 							{
-								if(tmpNamedEntity.getPositionEntities()!=null && tmpNamedEntity.getPositionEntities().get(0).equals(pe))
+								if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
 								{
 									addPositionEntitiesCheck = 0;
 									/*
 									 * only if all fields of the position entities are the same including the positions in the translated text
 									 * 2 or more ner tools are added to the same position entity
 									 */
-									if(pe.getNERTools()!=null && !pe.getNERTools().contains(NERTool)) { 
-										pe.getNERTools().add(NERTool);
+									if(pe.getNerTools()!=null && !pe.getNerTools().contains(nerTool)) { 
+										pe.getNerTools().add(nerTool);
 										oldNamedEntityChanged=true;
 									}
 									break;
 								}
 							}
+							if(addPositionEntitiesCheck==1) {
+								dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+								oldNamedEntityChanged=true;
+							}
 						}
-						if(addPositionEntitiesCheck==1 && tmpNamedEntity.getPositionEntities()!=null) {
-							dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
+						else {								
+							List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
+							positionEntities.add(tmpNamedEntity.getPositionEntities().get(0));
 							oldNamedEntityChanged=true;
-						}
+						}							
+					}
 
-						if(tmpNamedEntity.getDBpediaIds()!=null) {
+					if(tmpNamedEntity.getDBpediaIds()!=null) {
+						if(dbEntity.getDBpediaIds()!=null) {
 							for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
 								int tmpIndex = dbpediaIndex;
 								boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
@@ -376,60 +363,70 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 								}
 							}
 						}
-						
-						/*
-						 * Add the entity to the new ones if it is found in the db and it is changed
-						 */
-						if(oldNamedEntityChanged && (tmpResultNamedEntityList==null || tmpResultNamedEntityList.size() == 0)) {
-							tmpClassificationList.add(dbEntity);
+						else {
+							List<String> newDbpediaIds = new ArrayList<String>(tmpNamedEntity.getDBpediaIds());
+							dbEntity.setDBpediaIds(newDbpediaIds);
+							oldNamedEntityChanged=true;
 						}
 					}
-					else {
-						dbEntity = tmpNamedEntity;	
-						tmpClassificationList.add(dbEntity);
+					
+					/*
+					 * Add the entity to the new ones if it is found in the db and it is changed
+					 */
+					if(oldNamedEntityChanged) {
+						result.add(dbEntity);
 					}
 				}
-			}
+				else {
+					result.add(tmpNamedEntity);
+				}
+			}	
 		}
-
 		/*
 		 * Add linking information to named entity
 		 */
-		for (String classificationType : result.keySet()) {
-			for (NamedEntity namedEntity : result.get(classificationType)) {
-				nerLinkingService.addLinkingInformation(namedEntity, linking, languageForNer);
-			}
-		}
+		addLinkingInformation(result, linking, languageForNer);
+		
+		return result;
 	}
 	
-	public void updateNamedEntities (TreeMap<String, List<NamedEntity>> resultMap, String storyId, String itemId) throws SolrNamedEntityServiceException, IOException {
+	private boolean isRestrictedClassificationType(String type) {
+		if(type.compareToIgnoreCase(NERClassification.AGENT.toString())!=0 
+			&& type.compareToIgnoreCase(NERClassification.PLACE.toString())!=0) {
+			return true;
+		}
+		else return false;
+	}
+	
+	public void updateNamedEntitiesDbAndSolr (List<NamedEntityImpl> result) {
+		if(result==null) return;
 		/*
 		 * Save and update all named entities
 		 */
-		int numberFoundNamedEntity = 0;
-		if(resultMap.size()>0)
-		{
-			for (String key : resultMap.keySet()) {
-				List<NamedEntity> entities = resultMap.get(key);
-				for (NamedEntity entity : entities) {
-					//save the wikidata ids to solr
-					//for(String wikidataId : entity.getPreferredWikidataIds())
-					if(entity.getPreferredWikidataIds()!=null) {
-						for(String wikidataId : entity.getPreferredWikidataIds())
-						{
-							solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
-						} 
+		for (NamedEntityImpl entity : result) {
+			//save the wikidata ids to solr
+			//for(String wikidataId : entity.getPreferredWikidataIds())
+			if(entity.getPreferredWikidataIds()!=null) {
+				for(String wikidataId : entity.getPreferredWikidataIds())
+				{
+					try {
+						solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
+					} catch (SolrNamedEntityServiceException | IOException e) {
+						logger.log(Level.ERROR, "Exception during storing the wikidata entity to Solr.", e);
 					}
-					//save the NamedEntity to mongo db
-					persistentNamedEntityService.saveNamedEntity(entity);
-					numberFoundNamedEntity+=1;
-				}
+				} 
 			}
+			//save the NamedEntity to mongo db
+			persistentNamedEntityService.saveNamedEntity(entity);
 		}
-
-		logger.info("The NER analysis has been finished. The number of found NamedEntity-ies for storyId: " + storyId +
-				" and itemId: " + itemId + " is: " + Integer.toString(numberFoundNamedEntity));
-
+			
+	}
+	
+	private void addLinkingInformation(List<NamedEntityImpl> result, List<String> linking, String languageForNer) throws IOException {
+		if(result==null) return;
+		for (NamedEntityImpl namedEntity : result) {
+			nerLinkingService.addLinkingInformation(namedEntity, linking, languageForNer);
+		}
 	}
 	
 	/*
@@ -514,16 +511,16 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 	/*
 	 * This function returns the number of NER-tools that are present in the found NamedEntities  
 	 */
-	private int checkAllNerToolsAlreadyCompleted (List<String> tools, List<NamedEntity> tmpNamedEntities)
+	private int checkAllNerToolsAlreadyCompleted (List<String> tools, List<NamedEntityImpl> tmpNamedEntities)
 	{		
 		Set<String> nerToolsForStoryOrItem = new HashSet<String>();
 		if(tmpNamedEntities!=null) {
-			for (NamedEntity ne : tmpNamedEntities)
+			for (NamedEntityImpl ne : tmpNamedEntities)
 			{
 				if(ne.getPositionEntities()!=null) {
-					for(PositionEntity pe : ne.getPositionEntities())
+					for(PositionEntityImpl pe : ne.getPositionEntities())
 					{
-						nerToolsForStoryOrItem.addAll(pe.getNERTools());
+						nerToolsForStoryOrItem.addAll(pe.getNerTools());
 					}
 				}
 			}
@@ -541,13 +538,18 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return toolsToRemove.size();
 	}
 
-	private TreeMap<String, List<NamedEntity>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws ParamValidationException, IOException {
+	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws ParamValidationException, IOException {
+		
+		if(text==null || text.isBlank() || language==null) {
+			return null;
+		}
+			
 		NERService tmpTool;
 		switch(nerTool){
-			case stanfordNer:
+			case NERConstants.stanfordNer:
 				tmpTool = nerStanfordService;
 				break;
-			case dbpediaSpotlightName:
+			case NERConstants.dbpediaSpotlightName:
 				tmpTool = nerDBpediaSpotlightService;
 				break;
 			default:
@@ -556,74 +558,27 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 		adaptNERServiceEndpointBasedOnLanguage(tmpTool, language);
 		
-		TreeMap<String, List<NamedEntity>> currentResult = tmpTool.identifyNER(text);
-		if(currentResult!=null && !currentResult.isEmpty()) {
-			updateNamedEntityPositionEntity(currentResult, storyId, itemId, fieldUsedForNER, nerTool);
-			return currentResult;
-		}
-		else {
-			return null;
-		}
-
-		
+		TreeMap<String, List<NamedEntityImpl>> currentResult = tmpTool.identifyNER(text);
+		updateNamedEntityPositionEntity(currentResult, storyId, itemId, fieldUsedForNER, nerTool);
+		return currentResult;		
 	}
 	
-	private void updateNamedEntityPositionEntity(TreeMap<String, List<NamedEntity>> mapCurrentResult,
+	private void updateNamedEntityPositionEntity(TreeMap<String, List<NamedEntityImpl>> mapCurrentResult,
 		String storyId, String itemId, String fieldUsedForNER, String tool_string) {
-		for(Map.Entry<String, List<NamedEntity>> categoryList : mapCurrentResult.entrySet()) {
-			for(NamedEntity entity : categoryList.getValue()) {
+		
+		if(mapCurrentResult==null || mapCurrentResult.isEmpty()) return;
+		
+		for(Map.Entry<String, List<NamedEntityImpl>> categoryList : mapCurrentResult.entrySet()) {
+			for(NamedEntityImpl entity : categoryList.getValue()) {
 				if(entity.getPositionEntities()==null || entity.getPositionEntities().size()==0) continue;
-				PositionEntity pos = entity.getPositionEntities().get(0);
+				PositionEntityImpl pos = entity.getPositionEntities().get(0);
 				pos.setStoryId(storyId);
 				pos.setItemId(itemId);
 				pos.setFieldUsedForNER(fieldUsedForNER);
-				List<String> nerTools = new ArrayList<String>();
-				nerTools.add(tool_string);
-				pos.setNERTools(nerTools);
 			}
 		}
 	}
 	
-	private void prepareOutput(TreeMap<String, List<NamedEntity>> resultMap, String storyId, String itemId) {
-		List<String> classificationTypeForRemoval = new ArrayList<>();
-		for (String classificationType : resultMap.keySet()) {
-			if(!(classificationType.equals(NERClassification.AGENT.toString()) || 
-					classificationType.equals(NERClassification.PLACE.toString())))
-			{
-				classificationTypeForRemoval.add(classificationType);
-				continue;
-			}
-			List<NamedEntity> namedEntities = resultMap.get(classificationType);
-			if(namedEntities==null) continue;
-			for(int index = namedEntities.size()-1; index >= 0; index--) {
-				NamedEntity tmpNamedEntity = namedEntities.get(index);
-				List<PositionEntity> tmpPositions = tmpNamedEntity.getPositionEntities();
-				if(tmpPositions==null) continue;
-				for(int posIndex = tmpPositions.size()-1; posIndex >= 0; posIndex--) {
-					PositionEntity tmpPositionEntity = tmpPositions.get(posIndex);
-					String tmpStoryId = tmpPositionEntity.getStoryId();
-					String tmpItemId = tmpPositionEntity.getItemId();
-					if(storyId.compareTo(tmpStoryId)!=0 || itemId.compareTo(tmpItemId)!=0)
-						tmpPositions.remove(posIndex);
-					else {
-						tmpPositionEntity.setStoryEntity(null);
-						tmpPositionEntity.setStoryId(tmpStoryId);
-						tmpPositionEntity.setItemEntity(null);
-						tmpPositionEntity.setItemId(tmpItemId);
-						tmpPositionEntity.setTranslationEntity(null);
-						tmpPositionEntity.setTranslationKey(null);
-					}
-				}
-				tmpNamedEntity.setType(null);
-			}
-		}
-		
-		for(String type : classificationTypeForRemoval) {
-			resultMap.remove(type);
-		}
-	}
-
-	@Override
 	public String uploadStories(StoryEntity[] stories) throws HttpException {
 		
 		logger.info("Uploading new stories to the Mongo DB.");
@@ -688,7 +643,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		return "{\"info\": \"Done successfully!\"}";
 	}
 	
-	@Override
 	public String uploadItems(ItemEntity[] items) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		logger.info("Uploading new items to the Mongo DB.");
@@ -791,14 +745,14 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		 *  &nbsp;  → " " (space)
 	     */
 	    response = Parser.unescapeEntities(whole, false);
-	    //System.out.print(response);
-	    //System.out.print(response);
+	    //logger.info(response);
+	    //logger.info(response);
 	    return response;
 
 //	    Elements allParagraphs = doc.getElementsByTag("p");
 //		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
 //		logger.info(whole);
-//		System.out.print(whole);
+//		logger.info(whole);
 	}
 	
 	/**
@@ -813,7 +767,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
 	}
 
-	@Override
 	public String getStoryOrItemAnnotationCollection(String storyId, String itemId, boolean saveEntity, boolean crosschecked, String property) throws Exception {
 		
 		List<NamedEntityAnnotationImpl> namedEntityAnnoList = new ArrayList<NamedEntityAnnotationImpl> ();
@@ -854,7 +807,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 			source = item.getSource();
 		}
 	
-		Set<NamedEntity> NESet = new HashSet<NamedEntity>();
+		Set<NamedEntityImpl> NESet = new HashSet<NamedEntityImpl>();
 	
 		String allPropertyFields [] = {"description","transcription","summary"}; 
 		
@@ -866,7 +819,7 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 
 			if(NESet!=null && !NESet.isEmpty())
 			{
-				for (NamedEntity entity : NESet)
+				for (NamedEntityImpl entity : NESet)
 				{
 
 					if(entity.getPreferredWikidataIds()!=null) {
@@ -949,7 +902,6 @@ public class EnrichmentNERServiceImpl implements EnrichmentNERService{
 		
 	}
 
-	@Override
 	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
 		String wikidataIdGenerated=null;

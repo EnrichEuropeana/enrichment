@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
@@ -27,7 +26,7 @@ public class StanfordNamedEntityImpl extends NamedEntityImpl {
 	@JsonSetter("positionEntities")
 	public void setPositionEntitiesImpl(List<PositionEntityImpl> positions) {
 		this.positionEntities = new ArrayList<>();
-		for(PositionEntity pos : positions) {
+		for(PositionEntityImpl pos : positions) {
 			positionEntities.add(pos);
 		}
 	}

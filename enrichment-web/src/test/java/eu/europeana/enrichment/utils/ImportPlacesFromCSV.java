@@ -35,6 +35,8 @@
 //
 //public class ImportPlacesFromCSV {
 //	
+//  Logger logger = LogManager.getLogger(getClass());
+//
 //	@Resource(name = "wikidataService")
 //	WikidataService wikidataService;
 //	
@@ -100,7 +102,7 @@
 //					
 //					if(fileexists==false) 	
 //					{			
-//						System.out.print("Current wikidata id is: " + wikidataIDs.get(j) + ". Current index is: " + j + " .\n");
+//						logger.info("Current wikidata id is: " + wikidataIDs.get(j) + ". Current index is: " + j + " .\n");
 //						String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID(wikidataIDs.get(j));
 //						if(WikidataJSON==null || WikidataJSON.isEmpty()) 
 //						{
@@ -117,7 +119,7 @@
 //						else
 //						{
 //							HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataIDs.get(j), WikidataJSON);
-//							System.out.print("Analyzed wikidata entity number: " + j + " .\n");
+//							logger.info("Analyzed wikidata entity number: " + j + " .\n");
 //						}
 //						
 //					}

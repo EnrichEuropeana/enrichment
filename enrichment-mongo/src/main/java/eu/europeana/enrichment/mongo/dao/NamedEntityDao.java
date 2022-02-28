@@ -2,22 +2,22 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 
 /*
  * This interface defines database actions for named entities
  */
 public interface NamedEntityDao {
 	
-	public NamedEntity findNamedEntity(String key);
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type);
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
+	public NamedEntityImpl findNamedEntity(String key);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
 
-	//public List<NamedEntity> getAllNamedEntities();
-	public void saveNamedEntity(NamedEntity entity);
+	//public List<NamedEntityImpl> getAllNamedEntities();
+	public void saveNamedEntity(NamedEntityImpl entity);
 	public void deletePositionEntitiesFromNamedEntity(String storyId,String itemId, String fieldUsedForNER);
 	public long deleteNamedEntityByKey(String key);
-	public List<NamedEntity> findAllNamedEntities();
+	public List<NamedEntityImpl> findAllNamedEntities();
 	public long deleteAllNamedEntities();
 	
 }

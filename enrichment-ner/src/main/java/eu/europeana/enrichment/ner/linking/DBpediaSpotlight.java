@@ -17,6 +17,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,8 @@ import eu.europeana.enrichment.ner.linking.model.DBpediaResponseHeader;
 @Service
 public class DBpediaSpotlight implements InitializingBean{
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	private final JAXBContext jaxbContext;
 
 	/** Create a JAXB unmarshaller for each thread */
@@ -55,6 +60,7 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 	
 	public DBpediaResponse getDBpediaResponse(String dbpediaUrl) throws JAXBException {
 		String response = createRequest(dbpediaUrl);
+		if(response==null) return null;
 //		JacksonXmlModule xmlModule = new JacksonXmlModule();
 //		xmlModule.setDefaultUseWrapper(false);
 //		XmlMapper xmlMapper = new XmlMapper(xmlModule);
@@ -97,8 +103,7 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 			return responeString;
 
 		} catch (URISyntaxException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during sending the dbpedia NER request.", e);
 			return null;
 		}
 

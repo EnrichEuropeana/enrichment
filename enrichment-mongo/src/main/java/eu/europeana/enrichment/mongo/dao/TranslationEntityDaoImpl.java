@@ -99,7 +99,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void saveTranslationEntity(TranslationEntity entity) {
 		this.enrichmentDatastore.save(entity);
 	}
 
