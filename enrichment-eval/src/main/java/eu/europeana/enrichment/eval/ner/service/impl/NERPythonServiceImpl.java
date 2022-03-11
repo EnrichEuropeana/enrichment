@@ -104,7 +104,7 @@ public class NERPythonServiceImpl implements NERService{
 				sb.append(currentLine);
 			}
 			String pythonErrorResponse = sb.toString();
-			logger.error("Python error: " + pythonErrorResponse);
+			logger.debug("Python error: " + pythonErrorResponse);
 			
 			byte[] bytesDecoded = Base64.getDecoder().decode(pythonResponse.getBytes("UTF-8"));
 			String pythonResponseText = new String(bytesDecoded, "UTF-8");

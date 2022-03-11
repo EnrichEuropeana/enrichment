@@ -33,23 +33,23 @@
 			<groupId>edu.stanford.nlp</groupId>
 			<artifactId>stanford-corenlp</artifactId>
 			<version>${version.stanfordCoreNLP}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>xalan</groupId>
-					<artifactId>xalan</artifactId>				
-				</exclusion>
-			</exclusions>
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>xalan</groupId> -->
+<!-- 					<artifactId>xalan</artifactId>				 -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/xalan/xalan -->
 		<!-- Srdjan: this library new version is added here and excluded from the stanford-corenlp above, 
 		because the embedded spring-boot Tomcat expected a xalan serializer.jar to exist as a dependency in xalan,
 		which was not the case for the version 2.7.0, the stanford-corenlp was using. This caused a WARN from
 		Tomcat that the serializer.jar cannot be found.-->
-		<dependency>
-		    <groupId>xalan</groupId>
-		    <artifactId>xalan</artifactId>
-		    <version>${version.xalan}</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 		    <groupId>xalan</groupId> -->
+<!-- 		    <artifactId>xalan</artifactId> -->
+<!-- 		    <version>${version.xalan}</version> -->
+<!-- 		</dependency> -->
 		
 
 		<!-- spring -->
