@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,9 +54,7 @@ public class NERController extends BaseRest {
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
-			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation)."
-			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of "
-			+ "the given field of the story, it will be changed accordingly.")
+			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
@@ -66,61 +63,24 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
-			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
+
+			EnrichmentNERRequest body = new EnrichmentNERRequest();
+			body.setStoryId(storyId);
+			body.setItemId("all");
+			body.setTranslationTool(translationTool);
+			body.setProperty(property);
+			body.setLinking(Arrays.asList(linking.split(",")));
+			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setOriginal(original);
 			
-//			if(storyId.compareToIgnoreCase("nerallitems")==0)
-//			{
-//				EnrichmentNERRequest body = new EnrichmentNERRequest();
-//				String linking_local = "Wikidata";
-//				String nerTools_local = "Stanford_NER,DBpedia_Spotlight";
-//				String jsonLd;
-//				
-//				List<TranslationEntity> all_translation_entities = persistentTranslationEntityService.getAllTranslationEntities();
-//
-//				if(all_translation_entities!=null)
-//				{
-//					for(TranslationEntity tr_entity : all_translation_entities) {	
-//						
-//						if(tr_entity.getItemId().compareToIgnoreCase("all")!=0)
-//						{
-//						
-//							body.setStoryId(tr_entity.getStoryId());
-//							body.setItemId(tr_entity.getItemId());
-//							body.setTranslationTool("Google");
-//							body.setLinking(Arrays.asList(linking_local.split(",")));
-//							body.setNerTools(Arrays.asList(nerTools_local.split(",")));
-//							body.setOriginal(false);
-//												
-//							if(tr_entity.getTranslatedText()!=null && tr_entity.getTranslatedText().compareToIgnoreCase("")!=0)
-//							{
-//								jsonLd = enrichmentNerService.getEntities(body,null,true);
-//							}
-//						}				
-//					}
-//				}
-//				
-//				ResponseEntity<String> response = new ResponseEntity<String>("all-items-ner-done", HttpStatus.OK);
-//				return response;
-//			}
+			String jsonLd = enrichmentNerService.getEntities(body, true);
+			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
-				EnrichmentNERRequest body = new EnrichmentNERRequest();
-				body.setStoryId(storyId);
-				body.setItemId("all");
-				body.setTranslationTool(translationTool);
-				body.setProperty(property);
-				body.setLinking(Arrays.asList(linking.split(",")));
-				body.setNerTools(Arrays.asList(nerTools.split(",")));
-				body.setOriginal(original);
-				
-				if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
-				String jsonLd = enrichmentNerService.getEntities(body,text, true);
-				ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-				
-				return response;
+			return response;
 		
 	}
 	
@@ -150,7 +110,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(false);
 			
-			String jsonLd = enrichmentNerService.getEntities(body,null, false);
+			String jsonLd = enrichmentNerService.getEntities(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
@@ -165,9 +125,7 @@ public class NERController extends BaseRest {
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
-			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation)."
-			+ "\"text\": a new text for the given \"property\" provided by the user to be analysed. If the provided non-empty body is different from the text of" 
-			+ " the given field of the item, it will be changed accordingly.")
+			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getNEREntitiesItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
@@ -176,8 +134,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original,
-			@RequestBody(required = false) String text) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -191,8 +148,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(original);
 			
-			if(text!=null && text.compareToIgnoreCase("{}")==0) text="";
-			String jsonLd = enrichmentNerService.getEntities(body,text, true);
+			String jsonLd = enrichmentNerService.getEntities(body, true);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
@@ -225,7 +181,7 @@ public class NERController extends BaseRest {
 			body.setNerTools(Arrays.asList(nerTools.split(",")));
 			body.setOriginal(false);
 			
-			String jsonLd = enrichmentNerService.getEntities(body,null, false);
+			String jsonLd = enrichmentNerService.getEntities(body, false);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;

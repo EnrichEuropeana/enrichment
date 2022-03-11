@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Solr managed schema - automatically generated - DO NOT EDIT -->
 <schema name="translations" version="0.1">
-  <uniqueKey>item_id</uniqueKey>
+  <uniqueKey>key</uniqueKey>
   <fieldType name="boolean" class="solr.BoolField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="date" class="solr.DatePointField" omitNorms="true"/>
-  <fieldType name="double" class="solr.DoublePointField"/>
-  <fieldType name="float" class="solr.FloatPointField" />
-  <fieldType name="int" class="solr.IntPointField" />
+  <fieldType name="date" class="solr.TrieDateField" omitNorms="true" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="double" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="float" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="0"/>
   <fieldType name="json" class="solr.StrField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="long" class="solr.LongPointField" />
-  <fieldType name="location"
-			class="solr.LatLonPointSpatialField" docValues="true" />
-  
+  <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coords"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
   
   <fieldType name="text_general_experiment" class="solr.TextField" positionIncrementGap="100"> 
   <analyzer type="index"> 
@@ -89,10 +87,14 @@
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
   <field name="story_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="item_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="translatedText" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="language" type="string" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="tool" type="string" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="type" type="string" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="translatedText" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="language" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="tool" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="type" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="key" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true"/>
+  <field name="originLangGoogle" type="text_general_experiment" multiValued="false" indexed="false" required="false" stored="true"/>
+   
+  <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
   
   <dynamicField name="text.*" type="text" multiValued="true" indexed="true" stored="false"/>
 </schema>

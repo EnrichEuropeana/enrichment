@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.languagetool.JLanguageTool;
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.rules.RuleMatch;
@@ -16,6 +19,8 @@ import eu.europeana.enrichment.common.commons.AppConfigConstants;
 @Component(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_LANGUAGE_TOOL)
 public class TranslationLanguageTool {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	JLanguageTool langTool;
 	
 	/*
@@ -40,7 +45,6 @@ public class TranslationLanguageTool {
 		iterator.setText(text);
 		int start = iterator.first();
 		for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator.next()) {
-			//system.out.println(source.substring(start,end));
 			retValue.add(text.substring(start, end));
 		}
 		return retValue;
@@ -66,8 +70,7 @@ public class TranslationLanguageTool {
 			}
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the calculation of the language ratio.", e);
 		}
 		
 		double ratio = 1 - (nonEnglishWordsSize / (double)(sentence.length()));

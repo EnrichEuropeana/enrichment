@@ -3,14 +3,13 @@
 <schema name="wikidata" version="0.1">
   <uniqueKey>wikidata_id</uniqueKey>
   <fieldType name="boolean" class="solr.BoolField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="date" class="solr.DatePointField" omitNorms="true"/>
-  <fieldType name="double" class="solr.DoublePointField"/>
-  <fieldType name="float" class="solr.FloatPointField"/>
-  <fieldType name="int" class="solr.IntPointField"/>
+  <fieldType name="date" class="solr.TrieDateField" omitNorms="true" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="double" class="solr.TrieDoubleField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="float" class="solr.TrieFloatField" positionIncrementGap="0" precisionStep="0"/>
+  <fieldType name="int" class="solr.TrieIntField" positionIncrementGap="0" precisionStep="0"/>
   <fieldType name="json" class="solr.StrField" omitNorms="true" sortMissingLast="true"/>
-  <fieldType name="location"
-			class="solr.LatLonPointSpatialField" docValues="true" />
-  <fieldType name="long" class="solr.LongPointField"/>
+  <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coords"/>
+  <fieldType name="long" class="solr.TrieLongField" positionIncrementGap="0" precisionStep="0"/>
   <fieldType name="string" class="solr.StrField" omitNorms="true" sortMissingLast="true"/>  
   <fieldType name="proper_name" class="solr.TextField" positionIncrementGap="100">
           <analyzer>

@@ -15,6 +15,8 @@ public class SolrTranslationsEntityImpl extends TranslationEntityImpl implements
 		this.setLanguage(copy.getLanguage());
 		this.setTool(copy.getTool());
 		this.setType(copy.getType());
+		this.key = copy.getKey();	
+		this.setOriginLangGoogle(copy.getOriginLangGoogle());
 	}
 	
 	
@@ -53,5 +55,16 @@ public class SolrTranslationsEntityImpl extends TranslationEntityImpl implements
 	public void setType(String type) {
 		super.setType(type);
 	}
+	
+	@Override
+	@Field(TranslationsEntitySolrFields.KEY)
+	public void setKey(String key) {
+		this.key = key;
+	}
 
+	@Override
+	@Field(TranslationsEntitySolrFields.ORIGIN_LANG_GOOGLE)
+	public void setOriginLangGoogle(String originLangGoogle) {
+		super.setOriginLangGoogle(originLangGoogle);
+	}
 }

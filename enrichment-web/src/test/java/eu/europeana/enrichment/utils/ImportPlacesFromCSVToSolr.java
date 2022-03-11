@@ -1,7 +1,8 @@
 //package eu.europeana.enrichment.utils;
 //
 //import static org.junit.Assert.assertTrue;
-//
+//import org.apache.logging.log4j.LogManager;
+//import org.apache.logging.log4j.Logger;
 //import java.io.BufferedWriter;
 //import java.io.File;
 //import java.io.FileWriter;
@@ -38,6 +39,8 @@
 //
 //public class ImportPlacesFromCSVToSolr {
 //	
+//  Logger logger = LogManager.getLogger(getClass());
+//
 //	@Resource(name = "wikidataService")
 //	WikidataService wikidataService;
 //	
@@ -91,7 +94,7 @@
 //			if(!contentAnalysedWikidata.contains(listFiles[i].getName()))
 //			{
 //					
-//				System.out.print("Current analyzed file is: " + listFiles[i].getName() + " .\n");
+//				logger.debug("Current analyzed file is: " + listFiles[i].getName() + " .\n");
 //				
 //				//read from this file
 //				String contentJsonFile = null;
@@ -100,15 +103,15 @@
 //				//adding file name to the list of analyzed files
 //
 //				bwAnalysedWikidata.append(listFiles[i].getName() + ",");
-//				System.out.print("Current wikidata entity is successfully added to the list of analyzed files. \n");
+//				logger.debug("Current wikidata entity is successfully added to the list of analyzed files. \n");
 //	
 //				
 //				//this file contains no real wikidata, but the message that the wikidata id is not found
-//				if(contentJsonFile.substring(0, 1).compareToIgnoreCase("{")!=0)
+//				if(!contentJsonFile.substring(0, 1).equalsIgnoreCase("{"))
 //				{
 //
 //					bwNotFoundWikidata.append(listFiles[i].getName() + ",");
-//					System.out.print("Current wikidata entity contains no json. \n");
+//					logger.debug("Current wikidata entity contains no json. \n");
 //						
 //					continue;
 //				}
@@ -124,7 +127,7 @@
 //				
 //				WikidataEntity wikiEntity = wikidataService.getWikidataEntity(wikidataURL, contentJsonFile, "place");
 //				
-//				System.out.print("Current wikidata entity is successfully created. \n");
+//				logger.debug("Current wikidata entity is successfully created. \n");
 //				
 //				String xml = null;
 //				if(wikiEntity instanceof WikidataAgent)
@@ -177,7 +180,7 @@
 //					bw.append("<add>" + "\n");
 //					bw.append(xml + "\n");
 //						
-//					System.out.print("Current wikidata entity is successfully added to the new solr docs file. \n");
+//					logger.debug("Current wikidata entity is successfully added to the new solr docs file. \n");
 //					
 //				}
 //				else
@@ -185,7 +188,7 @@
 //					
 //					bw.append(xml + "\n");
 //						
-//					System.out.print("Current wikidata entity is successfully added to the existing solr docs file. \n");
+//					logger.debug("Current wikidata entity is successfully added to the existing solr docs file. \n");
 //					
 //				}
 //				

@@ -20,13 +20,14 @@ import eu.europeana.enrichment.model.TranslationEntity;
 @Entity(value="TranslationEntityImpl")
 public class TranslationEntityImpl implements TranslationEntity{
 
-	private String key;
+	protected String key;
 	private String language;
 	private String translatedText;
 	private String tool;
 	private String eTranslationId;
 	private String storyId;
 	private String itemId;
+	private String originLangGoogle;
 	
 	public TranslationEntityImpl (TranslationEntity copy)
 	{
@@ -37,6 +38,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 		this.eTranslationId = copy.getETranslationId();
 		this.storyId = copy.getStoryId();
 		this.itemId = copy.getItemId();
+		this.originLangGoogle = copy.getOriginLangGoogle();
 	}
 	
 	public TranslationEntityImpl() {
@@ -179,5 +181,13 @@ public class TranslationEntityImpl implements TranslationEntity{
 	@Override
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
+	}
+	
+	public String getOriginLangGoogle() {
+		return originLangGoogle;
+	}
+
+	public void setOriginLangGoogle(String originLangGoogle) {
+		this.originLangGoogle = originLangGoogle;
 	}
 }

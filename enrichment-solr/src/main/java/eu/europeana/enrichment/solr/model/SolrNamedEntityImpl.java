@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.NamedEntitySolrFields;
 
-public class SolrNamedEntityImpl extends NamedEntityImpl implements NamedEntity {
+public class SolrNamedEntityImpl extends NamedEntityImpl {
 
 	@Override
 	@Field(NamedEntitySolrFields.TYPE)
@@ -37,7 +36,7 @@ public class SolrNamedEntityImpl extends NamedEntityImpl implements NamedEntity 
 	
 	@Override
 	//@Field(NamedEntitySolrFields.POSITION_ENTITIES)
-	public void setPositionEntities(List<PositionEntity> positions) {
+	public void setPositionEntities(List<PositionEntityImpl> positions) {
 		super.setPositionEntities(positions);
 	}
 
