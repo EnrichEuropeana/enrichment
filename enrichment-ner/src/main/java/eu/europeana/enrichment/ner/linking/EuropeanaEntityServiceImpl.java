@@ -5,6 +5,9 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,8 @@ import eu.europeana.entity.definitions.model.Entity;
 @Service(AppConfigConstants.BEAN_ENRICHMENT_EUROPEANA_ENTITY_SERVICE)
 public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	/*
 	 * Europeana API key
 	 */
@@ -32,7 +37,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 	@Override
 	public List<String> getEntitySuggestions(String text, String classificationType, String language) {
 		List<String> entityIDs = new ArrayList<>();
-		String textURIEncoded = "";
+		String textURIEncoded;
 		String sortUrlEncoded = "derived_score+desc";
 		try {
 			StringBuilder strBuilder = new StringBuilder();
@@ -41,8 +46,7 @@ public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 			textURIEncoded = URLEncoder.encode(strBuilder.toString(), "UTF-8");
 			sortUrlEncoded = URLEncoder.encode(sortUrlEncoded, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during getting the entity suggestions.", e);
 			return null;
 		}
 		//List<Entity> suggestions = europeanaApiClient.getSuggestions(key, textURIEncoded, "en", "100");

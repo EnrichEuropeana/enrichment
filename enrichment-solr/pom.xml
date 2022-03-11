@@ -94,19 +94,20 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-api}</version>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
 			<scope>test</scope>
 		</dependency>
     
 	 <dependency>
 	  	<groupId>org.apache.solr</groupId>
 	  	<artifactId>solr-solrj</artifactId>	  
-	  	<version>${version.solrj}</version>	
+<!-- 	  	<version>${version.solrj}</version>	 -->
 	</dependency>
 	
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-data-solr</artifactId>
+		<version>2.4.13</version>
 	</dependency>
 	
    
@@ -137,30 +138,22 @@
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-core</artifactId>
     	<!-- version>2.9.8</version-->
-		<version>${version.jackson}</version>    	
+<!-- 		<version>${version.jackson}</version>    	 -->
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
 	<dependency>
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-annotations</artifactId>
      	<!-- version>2.9.8</version-->
-		<version>${version.jackson}</version>    	
+<!-- 		<version>${version.jackson}</version>    	 -->
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<dependency>
     	<groupId>com.fasterxml.jackson.core</groupId>
     	<artifactId>jackson-databind</artifactId>
      	<!-- version>2.9.8</version-->
-		<version>${version.jackson}</version>    	
+<!-- 		<version>${version.jackson}</version>    	 -->
 	</dependency>
-	<!-- https://mvnrepository.com/artifact/com.io-informatics.oss/jackson-jsonld -->
-	<dependency>
-    	<groupId>com.io-informatics.oss</groupId>
-    	<artifactId>jackson-jsonld</artifactId>
-    	<version>0.0.5</version>
-	</dependency>
-	
-	
 	<!-- https://mvnrepository.com/artifact/com.github.rholder/snowball-stemmer -->
 	<dependency>
     	<groupId>com.github.rholder</groupId>

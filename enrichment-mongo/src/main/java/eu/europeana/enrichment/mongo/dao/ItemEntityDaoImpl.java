@@ -65,6 +65,16 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 	
 	@Override
+	public ItemEntity findItemEntity(String itemId)
+	{
+		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
+                eq(EntityFields.ITEM_ID, itemId)
+                )
+                .first();		
+		return dbEntity;
+	}
+	
+	@Override
 	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId)
 	{
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
@@ -94,31 +104,8 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		ItemEntity dbItemEntity = findItemEntityFromStory(entity.getStoryId(), entity.getItemId());
-		if(dbItemEntity!=null)
-		{
-			dbItemEntity.setLanguage(entity.getLanguage());
-			dbItemEntity.setTitle(entity.getTitle());
-			dbItemEntity.setTranscriptionText(entity.getTranscriptionText());
-			dbItemEntity.setType(entity.getType());
-			dbItemEntity.setStoryId(entity.getStoryId());
-			dbItemEntity.setItemId(entity.getItemId());
-			dbItemEntity.setSource(entity.getSource());
-			dbItemEntity.setDescription(entity.getDescription());
-			this.enrichmentDatastore.save(dbItemEntity);
-		}
-		else
-		{
-			ItemEntityImpl tmp = null;
-			if(entity instanceof ItemEntityImpl)
-				tmp = (ItemEntityImpl) entity;
-			else {
-				tmp = new ItemEntityImpl(entity);				
-			}
-			if(tmp != null)
-				this.enrichmentDatastore.save(tmp);
-		}
+	public void saveItemEntity(ItemEntity entity) {
+		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

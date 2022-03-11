@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.solr.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +9,8 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataAgent;
-import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
-import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
-import eu.europeana.entity.definitions.model.vocabulary.AgentSolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.OrganizationSolrFields;
-//import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
 
 public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{
 	
@@ -25,18 +18,18 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 		
 	}
 	public SolrWikidataAgentImpl (WikidataAgent copy) {
-		this.setAltLabel(copy.getAltLabel());
+		if(copy.getAltLabel()!=null) this.setAltLabel(new HashMap<String, List<String>>(copy.getAltLabel()));
 		this.setCountry(copy.getCountry());
 		this.setDepiction(copy.getDepiction());
-		this.setDescription(copy.getDescription());
+		if(copy.getDescription()!=null) this.setDescription(new HashMap<String, List<String>>(copy.getDescription()));
 		this.setEntityId(copy.getEntityId());
 		this.setInternalType(copy.getInternalType());
 		this.setModificationDate(copy.getModificationDate());
-		this.setPrefLabel(copy.getPrefLabel());
-		this.setSameAs(copy.getSameAs());
-		this.setDateOfBirth(copy.getDateOfBirth());
-		this.setDateOfDeath(copy.getDateOfDeath());
-		this.setProfessionOrOccupation(copy.getProfessionOrOccupation());
+		if(copy.getPrefLabel()!=null) this.setPrefLabel(new HashMap<String, List<String>>(copy.getPrefLabel()));
+		if(copy.getSameAs()!=null) this.setSameAs(Arrays.copyOf(copy.getSameAs(), copy.getSameAs().length));
+		if(copy.getDateOfBirth()!=null) this.setDateOfBirth(Arrays.copyOf(copy.getDateOfBirth(),copy.getDateOfBirth().length));
+		if(copy.getDateOfDeath()!=null) this.setDateOfDeath(Arrays.copyOf(copy.getDateOfDeath(),copy.getDateOfDeath().length));
+		if(copy.getProfessionOrOccupation()!=null) this.setProfessionOrOccupation(Arrays.copyOf(copy.getProfessionOrOccupation(),copy.getProfessionOrOccupation().length));
 	}
 	
 	@Override

@@ -4,25 +4,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import javax.xml.bind.annotation.XmlElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-
-@JsonIgnoreProperties(ignoreUnknown=true)
+//@JsonIgnoreProperties(ignoreUnknown=true)
+//@XmlRootElement(namespace = XmlConstants.NAMESPACE_RDF, name = XmlConstants.XML_DESCRIPTION)
+//@XmlAccessorType(XmlAccessType.FIELD)
+//@JacksonXmlRootElement(namespace = "rdf", localName = XmlConstants.XML_SAME_DESCRIPTION)
 public class DBpediaResponse {
 
-	@JsonIgnore
+	//@JsonIgnore
 	private final String WIKIDATA_PREFIX = "http://www.wikidata.org/entity";
 	
-	@JacksonXmlProperty(localName = "sameAs")
-	List<RdfResource> resources;
+//	@JacksonXmlProperty(localName = "sameAs")
+//	List<RdfResource> resources;
 	
-	Logger logger = LogManager.getLogger(getClass());
+	@XmlElement(namespace = XmlConstants.NAMESPACE_OWL, name = XmlConstants.XML_SAME_AS)
+	private List<RdfResource> resources = new ArrayList<>();
 	
-	@JsonIgnore
+	//@JacksonXmlProperty(namespace = "owl", localName = XmlConstants.XML_SAME_AS)
+	public List<RdfResource> getResources() {
+		return resources;
+	}
+
+	//@JsonIgnore
 	public List<String> getWikidataUrls(){
 			
 		if(resources==null || resources.isEmpty()) return Collections.emptyList();

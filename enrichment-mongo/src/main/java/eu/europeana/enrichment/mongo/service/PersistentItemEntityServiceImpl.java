@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.mongo.service;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +22,10 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}
 	
+	public ItemEntity findItemEntity(String itemId) {
+		return itemEntityDao.findItemEntity(itemId);
+	}
+	
 	@Override
 	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId) {
 		return itemEntityDao.findItemEntitiesFromStory(storyId, itemId);
@@ -43,12 +45,12 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void saveItemEntity(ItemEntity entity) {
 		itemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
-	public void saveStoryItemEntities(List<ItemEntity> entities) throws Exception {
+	public void saveStoryItemEntities(List<ItemEntity> entities) {
 		for(ItemEntity entity : entities) {
 			saveItemEntity(entity);
 		}

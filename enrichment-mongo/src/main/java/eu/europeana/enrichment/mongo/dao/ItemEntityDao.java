@@ -17,11 +17,12 @@ public interface ItemEntityDao {
 	public List<ItemEntity> findAllItemEntities ();
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
-	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
+	public void saveItemEntity(ItemEntity entity);
 	public void deleteItemEntity(ItemEntity entity);
 	public long deleteItemEntityByStoryItemId(String key);
 	public void updateNerToolsForItem(String itemId, String nerTool);
 	public List<String> getNerToolsForItem(String itemId);
 //	public int getNumerAnalysedNamedEntities(String field);
 //	public void setNumerAnalysedNamedEntities(String field, int num);
+	public ItemEntity findItemEntity(String itemId);
 }

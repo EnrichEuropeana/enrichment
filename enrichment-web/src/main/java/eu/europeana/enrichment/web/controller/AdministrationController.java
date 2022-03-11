@@ -1,10 +1,14 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -18,18 +22,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.ItemEntity;
+import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
-import eu.europeana.enrichment.translation.service.TranslationService;
-import eu.europeana.enrichment.web.exception.ParamValidationException;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
-import eu.europeana.enrichment.web.service.EnrichmentNERService;
+import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
+import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
+import eu.europeana.enrichment.web.service.impl.TranscribathonConcurrentCallServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -39,8 +45,10 @@ import io.swagger.annotations.ApiOperation;
 @Api(tags = "Administration service", description=" ")
 public class AdministrationController extends BaseRest {
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
-	EnrichmentNERService enrichmentNerService;
+	EnrichmentNERServiceImpl enrichmentNerService;
 	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
 	@Autowired
@@ -49,42 +57,13 @@ public class AdministrationController extends BaseRest {
 	PersistentItemEntityService persistentItemEntityService;
 	
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 	
-	/*
-	 * This method represents the /administration/uploadStoriesAndItemsFromJson end point,
-	 * where a request with 2 json files (one for stories and one for items) to be read and 
-	 * saved to the database is sent
-	 * 
-	 * All requests on this end point are processed here.
-	 * 
-	 * @param wskey						is the application key which is required
-	 * 
-	 * @param jsonFileStoriesPath		the path to the json file for stories
-	 * 
-	 * @param jsonFileItemsPath		    the path to the json file for items
-	 * 
-	 * @return							"Done" if everything ok
-	 */
-	@ApiOperation(value = "Upload Story and Item entries from the json file to the database", nickname = "uploadStoriesAndItemsFromJson", notes = "This method reads the stories and items"
-			+ "from the given JSON files and saves them to the database. The files for reading the stories and items need to be specified as parameters to the request in the form of a proper full path to the files (e.g. C:/java/stories.json)")
-	@RequestMapping(value = "/administration/uploadStoriesAndItemsFromJson", method = {RequestMethod.POST} , produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> uploadStories(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestParam(value = "jsonFileStories", required = true) String jsonStories,
-			@RequestParam(value = "jsonFileItems", required = true) String jsonItems
-			) throws ParamValidationException, NoSuchAlgorithmException, UnsupportedEncodingException, HttpException {
-		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			String uploadStoriesStatus = enrichmentNerService.readStoriesAndItemsFromJson(jsonStories, jsonItems);
-			
-			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
-		
-			return response;
-		
-	}
+    @Autowired
+    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
+    
+    @Autowired
+    TranscribathonConcurrentCallServiceImpl transcribathonConcurrentCallServiceImpl;
 	
 	/*
 	 * This method represents the /administration/uploadStories end point,
@@ -122,6 +101,68 @@ public class AdministrationController extends BaseRest {
 			String uploadStoriesStatus = enrichmentNerService.uploadStories(body);
 			
 			ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
+		
+			return response;
+			
+	}
+	
+	@ApiOperation(value = "Upload stories from Transcribathon using their ids.", nickname = "uploadStoriesFromTranscribathon", notes = "This method uploads a set of stories from Transcribathon to the db.")
+	@RequestMapping(value = "/administration/uploadStoriesFromTranscribathon", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadStoriesFromTranscribathon(
+			@RequestParam(value = "wskey", required = false) String wskey,
+			@RequestBody String storiesIds) throws Exception {
+		
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+			
+			List<String> storyIdsList = new ArrayList<String>(Arrays.asList(storiesIds.split(",")));
+			Instant start = Instant.now();
+			String notFetchedStoryIds = "";
+			int numberNotFetchedStories = 0;
+			for (int i = 0; i < storyIdsList.size(); i++) {
+				StoryEntity storyFetchedAgain = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(storyIdsList.get(i));
+				if(storyFetchedAgain==null) {
+					notFetchedStoryIds += " " + storyIdsList.get(i);
+					numberNotFetchedStories ++;
+				}	
+			}
+			Instant finish = Instant.now();
+			long timeElapsed = Duration.between(start, finish).getSeconds();
+			logger.debug("Total time: " + timeElapsed + " s.");
+			if(numberNotFetchedStories>0) {
+				logger.debug("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
+				logger.debug("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
+			}
+			/*
+			 * The commented-out code below is for the parallel fetching of stories 
+			 */
+//			Instant start = Instant.now();
+//			List<CompletableFuture<String>> allFutures = new ArrayList<>();
+//			for (int i=0; i<storyIdsList.size(); i++) {
+//				allFutures.add(transcribathonConcurrentCallServiceImpl.callStoryMinimalService(storyIdsList.get(i)));
+//			}
+//			CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).join();
+//			//fetching the stories that from some reason failed to be fetched
+//			int numberInitiallyNotFetchedStories = 0;
+//			int numberFinalNotFetchedStories = 0;
+//			for (int i = 0; i < storyIdsList.size(); i++) {
+//				if(allFutures.get(i).get()!=null) {
+//					StoryEntity storyFetchedAgain = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(allFutures.get(i).get().toString());
+//					if(storyFetchedAgain==null) numberFinalNotFetchedStories++;
+//					numberInitiallyNotFetchedStories ++;
+//				}				
+//			}
+//			Instant finish = Instant.now();
+//			long timeElapsed = Duration.between(start, finish).getSeconds();
+//
+//			logger.debug("Total time: " + timeElapsed + " s.");
+//			logger.debug("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+//			logger.debug("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
+			
+			String responseString = "{\"info\": \"Done successfully!\"}";
+			
+			ResponseEntity<String> response = new ResponseEntity<String>(responseString, HttpStatus.OK);
 		
 			return response;
 			
@@ -259,7 +300,7 @@ public class AdministrationController extends BaseRest {
 			{
 				for(TranslationEntity tr_entity : all_translation_entities) {	
 					
-					if(tr_entity.getItemId().compareToIgnoreCase("all")!=0)
+					if(!tr_entity.getItemId().equalsIgnoreCase("all"))
 					{
 					
 						body.setStoryId(tr_entity.getStoryId());
@@ -269,9 +310,9 @@ public class AdministrationController extends BaseRest {
 						body.setNerTools(Arrays.asList(nerTools_local.split(",")));
 						body.setOriginal(false);
 											
-						if(tr_entity.getTranslatedText()!=null && tr_entity.getTranslatedText().compareToIgnoreCase("")!=0)
+						if(tr_entity.getTranslatedText()!=null && !tr_entity.getTranslatedText().equalsIgnoreCase(""))
 						{
-							jsonLd = enrichmentNerService.getEntities(body,null,true);
+							jsonLd = enrichmentNerService.getEntities(body, true);
 						}
 					}				
 				}
@@ -291,9 +332,9 @@ public class AdministrationController extends BaseRest {
 					body.setNerTools(Arrays.asList(nerTools_local.split(",")));
 					body.setOriginal(true);
 										
-					if(item_entity.getTranscriptionText()!=null && item_entity.getTranscriptionText().compareToIgnoreCase("")!=0)
+					if(item_entity.getTranscriptionText()!=null && !item_entity.getTranscriptionText().equalsIgnoreCase(""))
 					{
-						jsonLd = enrichmentNerService.getEntities(body,null,true);
+						jsonLd = enrichmentNerService.getEntities(body, true);
 					}				
 				}
 			}

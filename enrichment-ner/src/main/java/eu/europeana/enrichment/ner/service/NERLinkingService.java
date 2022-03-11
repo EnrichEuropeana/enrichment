@@ -2,9 +2,8 @@ package eu.europeana.enrichment.ner.service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.TreeMap;
 
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 
 public interface NERLinkingService {
 
@@ -23,5 +22,5 @@ public interface NERLinkingService {
 	 * 									used if not entity linking was found with "en"
 	 * @return							no return but the findings will be changed
 	 */
-	void addLinkingInformation(NamedEntity namedEntity, List<String> linkingTools, String sourceLanguage) throws IOException;
+	void addLinkingInformation(NamedEntityImpl namedEntity, List<String> linkingTools, String sourceLanguage) throws IOException;
 }

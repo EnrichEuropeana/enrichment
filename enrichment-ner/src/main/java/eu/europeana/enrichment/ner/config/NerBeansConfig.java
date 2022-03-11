@@ -16,7 +16,7 @@ public class NerBeansConfig {
 
     @Bean(AppConfigConstants.BEAN_ENRICHMENT_WEB_ENTITY_PROTOCOL_API)
     public WebEntityProtocolApi europeanaApiClient() {
-        logger.info("Configuring the Europeana API client.");
+        logger.debug("Configuring the Europeana API client.");
         WebEntityProtocolApi europeanaApiClient = new WebEntityProtocolApiImpl();
         return europeanaApiClient;
     }

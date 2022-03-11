@@ -29,12 +29,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 
 		<dependency>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
-			<version>${version.annotation-api}</version>
+<!-- 			<version>${version.annotation-api}</version> -->
 		</dependency>
 
 		
@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-api}</version>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
 			<scope>test</scope>
 		</dependency>
 

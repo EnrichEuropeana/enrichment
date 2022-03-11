@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +15,7 @@ import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
-@JsonPropertyOrder({ "entityId","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
+@JsonPropertyOrder({ CONTEXT_FIELD,"id","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataEntityImpl implements WikidataEntity {
 	
@@ -77,6 +80,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	@JsonProperty("prefLabel")
 	public Map<String, String> getEntityPrefLabel() {
+		if(this.getPrefLabel()==null) return null;
 		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeToStringMap(WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, this.getPrefLabel());
 		return normalizedPrefLabel;
 	}
@@ -95,6 +99,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	
 	@JsonProperty("altLabel")
 	public Map<String, List<String>> getEntityAltLabel() {
+		if(this.getAltLabel()==null) return null;
 		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED, this.getAltLabel());
 		return normalizedAltLabel;
 
@@ -160,6 +165,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 
 	@JsonProperty("description")
 	public Map<String, List<String>> getEntityDescription() {
+		if(this.getDescription()==null) return null;
 		Map<String, List<String>> normalizedDescription = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED, this.getDescription());
 		return normalizedDescription;
 
@@ -198,6 +204,9 @@ public class WikidataEntityImpl implements WikidataEntity {
 		return null;
 	}
 
-
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return WIKIDATA_CONTEXT;
+	}
 	
 }

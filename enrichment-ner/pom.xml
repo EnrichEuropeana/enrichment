@@ -50,22 +50,22 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>${version.commonsLang3}</version>
+<!-- 			<version>${version.commonsLang3}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
-			<version>${version.apacheHttp}</version>
+<!-- 			<version>${version.apacheHttp}</version> -->
 		</dependency>
 		<dependency>
 		    <groupId>org.apache.httpcomponents</groupId>
 		    <artifactId>httpmime</artifactId>
-		    <version>${version.apacheHttp}</version>
+<!-- 		    <version>${version.apacheHttp}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		
 		<dependency>
@@ -108,30 +108,30 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
-			<version>${version.annotation-api}</version>
+<!-- 			<version>${version.annotation-api}</version> -->
 		</dependency>
 			 
-		<dependency>
-    		<groupId>eu.fbk.dh</groupId>
-    		<artifactId>tint-runner</artifactId>
-    		<version>0.2</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!--     		<groupId>eu.fbk.dh</groupId> -->
+<!--     		<artifactId>tint-runner</artifactId> -->
+<!--     		<version>0.2</version> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${version.jackson}</version>
+<!-- 			<version>${version.jackson}</version> -->
 		</dependency>
 		
 		<dependency>
 		    <groupId>com.fasterxml.jackson.dataformat</groupId>
 		    <artifactId>jackson-dataformat-xml</artifactId>
-		    <version>${version.jackson}</version>
+<!-- 		    <version>${version.jackson}</version> -->
 		</dependency>
 			
 		<!-- Test dependencies -->
@@ -168,7 +168,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-api}</version>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
 			<scope>test</scope>
 		</dependency>
 

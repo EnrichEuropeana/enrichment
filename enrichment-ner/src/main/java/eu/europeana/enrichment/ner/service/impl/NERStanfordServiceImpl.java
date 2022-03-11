@@ -1,9 +1,7 @@
 package eu.europeana.enrichment.ner.service.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.http.HttpResponse;
@@ -13,6 +11,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.linking.model.StanfordNerRequest;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.ner.service.model.StanfordNamedEntityImpl;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE)
 public class NERStanfordServiceImpl implements NERService{
@@ -46,49 +44,32 @@ public class NERStanfordServiceImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException {
-		TreeMap<String, List<StanfordNamedEntityImpl>> map = null;
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws IOException {
+		TreeMap<String, List<NamedEntityImpl>> result = null;
 		String serializedRequest = null;
 		try {
 			serializedRequest = new ObjectMapper().writeValueAsString(new StanfordNerRequest(text));
 		} catch (JsonProcessingException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the staford NER request serialization.", e);
 			throw e;
 		}
 		if(serializedRequest == null)
 			return null;
 		String response = createRequest(serializedRequest);
+		if(response==null) return null;
 		
 		ObjectMapper mapper = new ObjectMapper();
-		TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>> typeRef = new TypeReference<TreeMap<String, List<StanfordNamedEntityImpl>>>() {};
+		TypeReference<TreeMap<String, List<NamedEntityImpl>>> typeRef = new TypeReference<TreeMap<String, List<NamedEntityImpl>>>() {};
 		try {
-			logger.info("\n The response from the StanfordNER service is: " + response + "\n");
-			map = mapper.readValue(response, typeRef);
+			logger.debug("\n The response from the StanfordNER service is: " + response + "\n");
+			result = mapper.readValue(response, typeRef);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception during the staford NER response deserialization.", e);
 			throw e;
 		}
 		
-		/*
-		 * convert the response from TreeMap<String, List<StanfordNamedEntityImpl>> to TreeMap<String, List<NamedEntity>>
-		 * TODO: improve the code so that we do not need such a conversion
-		 */
-		TreeMap<String, List<NamedEntity>> result = null;
-		if (map.size()>0) result =  new TreeMap<String, List<NamedEntity>>();
-		else return null;
-		for(Map.Entry<String, List<StanfordNamedEntityImpl>> entry : map.entrySet()) {
-			List<NamedEntity> resultValue =  new ArrayList<NamedEntity>();
-			for(StanfordNamedEntityImpl entryValueElem : entry.getValue()) {
-				resultValue.add(entryValueElem);
-			}
-			result.put(entry.getKey(), resultValue);
-		}
-		
 		return result;
-		
-		//return processClassifiedResult(classify);
 	}
 	
 	private String createRequest(String requestJson) {
@@ -103,7 +84,7 @@ public class NERStanfordServiceImpl implements NERService{
 
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
-			return "";
+			return null;
 		}
 	}
 

@@ -40,7 +40,7 @@ public class SolrHTTPRequest {
 		 */
 		
 		int status = con.getResponseCode();
-		log.info("Solr request output code: " + String.valueOf(status));
+		log.debug("Solr request output code: " + String.valueOf(status));
 		
 		/*
 		 * read a response and put it in the "content" string 
@@ -53,7 +53,7 @@ public class SolrHTTPRequest {
 		}
 		in.close();
 		
-		log.info("Solr response: " + content.toString());
+		log.debug("Solr response: " + content.toString());
 		return content.toString();
 	}
 

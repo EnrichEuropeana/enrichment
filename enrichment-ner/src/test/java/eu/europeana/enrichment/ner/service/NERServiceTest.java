@@ -68,7 +68,6 @@ public class NERServiceTest {
 				resultComparison(stanfordNerModel4Service.identifyNER(testString)));
 		assertTrue("Stanford model 7 classifier failed in comparison!", 
 				resultComparison(stanfordNerModel7Service.identifyNER(testString)));
-		System.out.println("Works");
 	}
 	
 	@Test

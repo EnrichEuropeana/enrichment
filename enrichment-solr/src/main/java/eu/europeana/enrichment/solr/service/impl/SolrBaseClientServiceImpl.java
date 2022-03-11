@@ -48,7 +48,7 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 			log.debug("store: " + solrObject.toString());
 				
 			UpdateResponse rsp = solrServer.addBean(solrCollection, solrObject);
-			log.info("store response: " + rsp.toString());
+			log.debug("store response: " + rsp.toString());
 			if(doCommit)
 				solrServer.commit(solrCollection);
 		} catch (SolrServerException ex) {
@@ -78,7 +78,7 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 //				rsp = solrServer.addBean(solrCollection, (SolrWikidataPlaceImpl)solrObject);
 //			}
 			
-			log.info("store response: " + rsp.toString());
+			log.debug("store response: " + rsp.toString());
 			if(doCommit)
 				solrServer.commit(solrCollection);
 		} catch (SolrServerException ex) {
@@ -96,20 +96,20 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 	@Override
 	public void search (String solrCollection, String term) throws SolrNamedEntityServiceException {
 
-		log.info("search StoryEntity by term: " + term);
+		log.debug("search StoryEntity by term: " + term);
 
 		/**
 		 * Construct a SolrQuery
 		 */
 		SolrQuery query = new SolrQuery(term);
-		log.info("query: " + query.toString());
+		log.debug("query: " + query.toString());
 
 		/**
 		 * Query the server
 		 */
 		try {
 			QueryResponse rsp = solrServer.query(solrCollection, query);
-			log.info("query response: " + rsp.toString());
+			log.debug("query response: " + rsp.toString());
 			
 		} catch (IOException | SolrServerException e) {
 			throw new SolrNamedEntityServiceException("Unexpected exception occured when searching StoryEntity in Solr for the term: " + term,
@@ -127,9 +127,9 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 	@Override
 	public void deleteByQuery(String solrCollection, String query) throws SolrNamedEntityServiceException {
 		try {
-			log.info("Solr deleteByQuery call: " + query);
+			log.debug("Solr deleteByQuery call: " + query);
 			UpdateResponse rsp = solrServer.deleteByQuery(solrCollection, query);
-			log.info("Solr deleteByQuery response: " + rsp.toString());
+			log.debug("Solr deleteByQuery response: " + rsp.toString());
 			solrServer.commit(solrCollection);
 		} catch (IOException | SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
@@ -146,7 +146,7 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 		QueryResponse rsp = null;
 		try {
 			rsp = solrServer.query(solrCollection, query);
-			log.info("query response: " + rsp.toString());
+			log.debug("query response: " + rsp.toString());
 			
 		} catch (IOException | SolrServerException e) {
 			throw new SolrNamedEntityServiceException("Unexpected exception occured when sending a query to the Solr server: " + query.toString(),
