@@ -86,7 +86,7 @@ public class AnnotationController extends BaseRest {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-//			if(storyId.compareToIgnoreCase("all")==0 && itemId.compareToIgnoreCase("all")==0)
+//			if(storyId.equalsIgnoreCase("all") && itemId.equalsIgnoreCase("all"))
 //			{
 //				List<ItemEntity> all_item_entities = persistentItemEntityService.getAllItemEntities();
 //

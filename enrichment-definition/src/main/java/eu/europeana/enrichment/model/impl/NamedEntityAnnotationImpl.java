@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,15 +14,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 
 @Entity(value="NamedEntityAnnotationImpl")
-@JsonPropertyOrder({ "id", "type", "motivation","body","target"})
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD,
+	"id", 
+	"type", 
+	"motivation",
+	"body",
+	"target"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
@@ -75,7 +81,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	
 	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
 		this.source = entity.getWikidataId();
-		if(entity.getItemId().compareToIgnoreCase("all")!=0)
+		if(!entity.getItemId().equalsIgnoreCase("all"))
 		{
 			this.target = targetBaseItems + "story="+entity.getStoryId()+"&item="+entity.getItemId();
 		}
@@ -121,7 +127,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam) {
 
 		this.source = wikidataId;
-		if(itemId.compareToIgnoreCase("all")!=0)
+		if(!itemId.equalsIgnoreCase("all"))
 		{
 			this.target = targetBaseItems + "story="+storyId+"&item="+itemId;	
 		}
@@ -141,7 +147,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.motivation = "tagging";
 		this.body = new HashMap<String, Object> ();
 		this.body.put("id", wikidataId);
-		if(entityTypeParam.compareToIgnoreCase("agent")==0)
+		if(entityTypeParam.equalsIgnoreCase("agent"))
 		{
 			this.entityType = "Person";
 			this.body.put("type", "Person");
@@ -297,6 +303,10 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.entityType = type;
 	}
 
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return ANNOTATION_CONTEXT;
+	}
 
 
 }

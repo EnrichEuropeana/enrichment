@@ -102,17 +102,12 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>${version.commonsLang3}</version>
+<!-- 			<version>${version.commonsLang3}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>${version.json}</version>
-		</dependency>
-		<dependency>
-			<groupId>edu.stanford.nlp</groupId>
-			<artifactId>stanford-corenlp</artifactId>
-			<version>${version.stanfordCoreNLP}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.cloud</groupId>
@@ -180,13 +175,13 @@
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
-			<version>${version.jackson}</version>
+<!-- 			<version>${version.jackson}</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-jaxb-annotations</artifactId>
-			<version>${version.jackson}</version>
+<!-- 			<version>${version.jackson}</version> -->
 		</dependency>
 
 		<dependency>
@@ -198,7 +193,7 @@
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>jstl</artifactId>
-			<version>${version.servletJstl}</version>
+<!-- 			<version>${version.servletJstl}</version> -->
 		</dependency>
 
 		<dependency>
@@ -211,24 +206,24 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-oxm</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -264,12 +259,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
-			<version>${version.spring}</version>
+<!-- 			<version>${version.spring}</version> -->
 		</dependency>
 
 		<dependency>
@@ -355,7 +350,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>${version.junit-jupiter-api}</version>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
 			<scope>test</scope>
 		</dependency>
 
@@ -382,7 +377,6 @@
 			<systemPath>${basedir}/lib/tp-api.jar</systemPath>
 		</dependency>
 		
-		
 	</dependencies>
 	
 	<build>
@@ -397,6 +391,16 @@
 					<!-- warSourceDirectory>WebContent</warSourceDirectory-->
 					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<webResources>
+						<resource>
+						<directory>${basedir}/lib</directory>
+						<targetPath>WEB-INF/lib</targetPath>
+						<filtering>false</filtering>
+						<includes>
+							<include>**/*.jar</include>
+						</includes>
+						</resource>
+					</webResources>
 				</configuration>
 			</plugin>
 			<plugin>

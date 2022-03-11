@@ -11,6 +11,8 @@ import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Indexed;
+import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -25,7 +27,9 @@ public class ItemEntityImpl implements ItemEntity {
 	@Transient
 	private StoryEntity storyEntity;
 
+	@Indexed(options = @IndexOptions(unique = true))
 	private String itemId;
+	
 	private List<String> transcriptionLanguages;
 	private String type;
 	private String transcriptionText;

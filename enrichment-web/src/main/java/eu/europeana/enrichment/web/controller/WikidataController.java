@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.solr.commons.JacksonSerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import io.swagger.annotations.Api;
@@ -41,7 +41,7 @@ public class WikidataController extends BaseRest {
 	WikidataService wikidataService;
 	
 	@Autowired
-	JacksonSerializer jacksonSerializer;
+	JsonLdSerializer jsonLdSerializer;
 
 	
     /**
@@ -192,7 +192,7 @@ public class WikidataController extends BaseRest {
 					
 					if (wikidataEntity!=null) { 
 						items.add(wikidataEntity);						
-						logger.info("Wikidata place found is: ");						
+						logger.debug("Wikidata place found is: ");						
 						
 						//adjust for languages, i.e. remove the fields for other not required languages
 						if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
@@ -207,7 +207,7 @@ public class WikidataController extends BaseRest {
 			
 			if(items.size()>0) {
 				NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);   	
-		    	serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
+		    	serializedNamedEntityCollection = jsonLdSerializer.serializeObject(neColl);
 			}
 			ResponseEntity<String> response = new ResponseEntity<String>(serializedNamedEntityCollection, HttpStatus.OK);			
 

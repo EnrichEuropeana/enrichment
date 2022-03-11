@@ -82,8 +82,8 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 			
 			URIBuilder builder = new URIBuilder(wholeUrl);
 
-			//logger.info(this.getClass().getSimpleName() + ": " + query);
-			//logger.info(this.getClass().getSimpleName() + builder.toString());
+			//logger.debug(this.getClass().getSimpleName() + ": " + query);
+			//logger.debug(this.getClass().getSimpleName() + builder.toString());
 
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			HttpPost request = new HttpPost(builder.build());

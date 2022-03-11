@@ -214,7 +214,7 @@ public class JavaPDFWriter
 		            		}
 		            		else
 		            		{
-		            			logger.info("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
+		            			logger.debug("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
 		            		
 		            		}
 		            	}

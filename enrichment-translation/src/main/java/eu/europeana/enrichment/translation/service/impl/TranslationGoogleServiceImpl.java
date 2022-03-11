@@ -93,7 +93,7 @@ public class TranslationGoogleServiceImpl {
 //			}
 //		}
 //
-//		if(finalTranslationText.compareToIgnoreCase("")==0) return null;
+//		if(finalTranslationText.equalsIgnoreCase("")) return null;
 //		else return finalTranslationText;
 //	}
 //
@@ -105,13 +105,7 @@ public class TranslationGoogleServiceImpl {
 	
 	public Translation translateText(String text, String sourceLanguage, String targetLanguage) {
 		try {
-			Translation translation = null;
-			if(sourceLanguage!=null && !sourceLanguage.isBlank()) {
-				translation= translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage),TranslateOption.targetLanguage(targetLanguage));
-			}
-			else {
-				translation= translate.translate(text, TranslateOption.targetLanguage(targetLanguage));
-			}			
+			Translation translation = translate.translate(text, TranslateOption.targetLanguage(targetLanguage));		
 			return translation;
 		}
 		catch(Exception ex) {

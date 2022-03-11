@@ -19,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
@@ -27,7 +29,6 @@ import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.solr.commons.JacksonSerializer;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
@@ -42,14 +43,15 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	@Autowired
 	SolrBaseClientService solrBaseClientService;
 	
-	//@Resource(name = "jacksonSerializer")
 	@Autowired
-	JacksonSerializer jacksonSerializer;
-	
+	JsonLdSerializer jsonLdSerializer; 	
 	
 	//@Resource(name = "wikidataService")
 	@Autowired
 	WikidataService wikidataService;	
+	
+	@Autowired
+	EnrichmentConfiguration enrichmentConfiguration;
 
 	private String solrCore = "wikidata";
 	
@@ -254,7 +256,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 		SolrDocument doc = docList.get(0);		
 
-		if(type.compareToIgnoreCase("agent")==0)
+		if(type.equalsIgnoreCase("agent"))
 		{
 			SolrWikidataAgentImpl entity;
 			Class<SolrWikidataAgentImpl> entityClass = null;
@@ -263,7 +265,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 				    	
 	    	return entity;
 		}
-		else if(type.compareToIgnoreCase("place")==0) 
+		else if(type.equalsIgnoreCase("place")) 
 		{
 			SolrWikidataPlaceImpl entity;
 			Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -344,7 +346,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		 * type of the class that needs to be serialized
 		 */
 
-		if(type.compareToIgnoreCase("agent")==0)
+		if(type.equalsIgnoreCase("agent"))
 		{
 			SolrWikidataAgentImpl entity;
 			Class<SolrWikidataAgentImpl> entityClass = null;
@@ -353,7 +355,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 						
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
+				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the serializion of the wikidata agent from Solr.", e);
@@ -362,7 +364,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    	
 	    	return serializedUserSetJsonLdStr;
 		}
-		else if(type.compareToIgnoreCase("place")==0) 
+		else if(type.equalsIgnoreCase("place")) 
 		{
 			SolrWikidataPlaceImpl entity;
 			Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -371,7 +373,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 					
 	    	String serializedUserSetJsonLdStr=null;
 	    	try {
-				serializedUserSetJsonLdStr = jacksonSerializer.serializeWikidataEntity(entity);
+				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the serializion of the wikidata place from Solr.", e);
@@ -400,7 +402,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 		
 		//forming solr queries to get the data from Solr
-		logger.info("Forming Solr queries to get the data from Solr.");
+		logger.debug("Forming Solr queries to get the data from Solr.");
 		
 		SolrQuery queryOnePage = new SolrQuery();
 		SolrQuery queryAllPages = new SolrQuery();	
@@ -427,8 +429,10 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			
-			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
-			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+//			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+//			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			
 		}
 		else
@@ -436,8 +440,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			
-			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
-			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
 		}
 		
 		if(solrSortText!=null && !solrSortText.isEmpty())
@@ -467,7 +471,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		queryOnePage.set("rows", Integer.valueOf(pageSize));
 	
 		
-		logger.info("Calling Solr for executing queries.");
+		logger.debug("Calling Solr for executing queries.");
 		
 	    QueryResponse rspOnePage = null;
 	    QueryResponse rspAllPages = null;
@@ -480,7 +484,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			throw e;
 		}
 
-		logger.info("Getting results from Solr in the form of SolrDocumentList.");
+		logger.debug("Getting results from Solr in the form of SolrDocumentList.");
 		
 		//ResultSet<T> resultSet = new ResultSet<>();		
 		DocumentObjectBinder binder = new DocumentObjectBinder();
@@ -491,7 +495,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		totalResultsAll = docListAllPages.size();
 		totalResultsPerPage = (totalResultsAll < Integer.valueOf(pageSize)) ? totalResultsAll : Integer.valueOf(pageSize);
 		
-		logger.info("Analysing Solr data for NamedEntity types.");
+		logger.debug("Analysing Solr data for NamedEntity types.");
 		
 		for(int i=0;i<docListOnePage.size();i++)
 		{
@@ -505,7 +509,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 
 			WikidataEntityImpl wikidataEntity=null;
 			
-			if(internalType.compareToIgnoreCase("agent")==0)
+			if(internalType.equalsIgnoreCase("agent"))
 			{
 				SolrWikidataAgentImpl entity;
 				Class<SolrWikidataAgentImpl> entityClass = null;
@@ -515,7 +519,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 				wikidataEntity=entity;
 								    	
 			}
-			else if(internalType.compareToIgnoreCase("place")==0) 
+			else if(internalType.equalsIgnoreCase("place")) 
 			{
 				SolrWikidataPlaceImpl entity;
 				Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -536,14 +540,14 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 			if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
 		}
 		
-		logger.info("Serializing Solr data using Jackson to JSON string.");
+		logger.debug("Serializing Solr data using Jackson to JSON string.");
 			
 		
 		NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);
 		
 		String serializedNamedEntityCollection=null;
     	try {
-    		serializedNamedEntityCollection = jacksonSerializer.serializeNamedEntitySolrCollection(neColl);
+    		serializedNamedEntityCollection = jsonLdSerializer.serializeObject(neColl);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during the serializion of the NamedEntity from Solr.", e);

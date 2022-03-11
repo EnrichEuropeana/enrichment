@@ -1,12 +1,30 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.enrichment.model.WikidataPlace;
 
 //@JsonPropertyOrder({ "id", "type", "description", "depiction","country", "logo","latitude","longitude","prefLabel","altLabel","modificationDate","sameAs"})
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD,
+	"id",
+	"type",
+	"prefLabel",
+	"altLabel",
+	"country",
+	"logo",
+	"latitude",
+	"longitude",
+	"description",
+	"depiction",
+	"modified",
+	"sameAs"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataPlaceImpl extends WikidataEntityImpl implements WikidataPlace {
 

@@ -129,10 +129,10 @@ public class AdministrationController extends BaseRest {
 			}
 			Instant finish = Instant.now();
 			long timeElapsed = Duration.between(start, finish).getSeconds();
-			logger.info("Total time: " + timeElapsed + " s.");
+			logger.debug("Total time: " + timeElapsed + " s.");
 			if(numberNotFetchedStories>0) {
-				logger.info("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
-				logger.info("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
+				logger.debug("Number not fetched stories: " + String.valueOf(numberNotFetchedStories) + ".");
+				logger.debug("Not fetched storyIds: " + String.valueOf(notFetchedStoryIds) + ".");
 			}
 			/*
 			 * The commented-out code below is for the parallel fetching of stories 
@@ -156,9 +156,9 @@ public class AdministrationController extends BaseRest {
 //			Instant finish = Instant.now();
 //			long timeElapsed = Duration.between(start, finish).getSeconds();
 //
-//			logger.info("Total time: " + timeElapsed + " s.");
-//			logger.info("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
-//			logger.info("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
+//			logger.debug("Total time: " + timeElapsed + " s.");
+//			logger.debug("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+//			logger.debug("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
 			
 			String responseString = "{\"info\": \"Done successfully!\"}";
 			
@@ -300,7 +300,7 @@ public class AdministrationController extends BaseRest {
 			{
 				for(TranslationEntity tr_entity : all_translation_entities) {	
 					
-					if(tr_entity.getItemId().compareToIgnoreCase("all")!=0)
+					if(!tr_entity.getItemId().equalsIgnoreCase("all"))
 					{
 					
 						body.setStoryId(tr_entity.getStoryId());
@@ -310,7 +310,7 @@ public class AdministrationController extends BaseRest {
 						body.setNerTools(Arrays.asList(nerTools_local.split(",")));
 						body.setOriginal(false);
 											
-						if(tr_entity.getTranslatedText()!=null && tr_entity.getTranslatedText().compareToIgnoreCase("")!=0)
+						if(tr_entity.getTranslatedText()!=null && !tr_entity.getTranslatedText().equalsIgnoreCase(""))
 						{
 							jsonLd = enrichmentNerService.getEntities(body, true);
 						}
@@ -332,7 +332,7 @@ public class AdministrationController extends BaseRest {
 					body.setNerTools(Arrays.asList(nerTools_local.split(",")));
 					body.setOriginal(true);
 										
-					if(item_entity.getTranscriptionText()!=null && item_entity.getTranscriptionText().compareToIgnoreCase("")!=0)
+					if(item_entity.getTranscriptionText()!=null && !item_entity.getTranscriptionText().equalsIgnoreCase(""))
 					{
 						jsonLd = enrichmentNerService.getEntities(body, true);
 					}				

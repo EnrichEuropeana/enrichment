@@ -134,12 +134,14 @@
   <field name="description" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
   <field name="summary_en" type="text_general_experiment" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
   <field name="description_en" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="language_description" type="string" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="language_summary" type="string" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="transcriptionLanguages" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="keywords" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
+  <field name="source" type="text_general_experiment" multiValued="false" indexed="false" required="false" stored="true"/>
+  <field name="title" type="text_general_experiment" multiValued="false" indexed="false" required="false" stored="true"/>
+  <field name="language_description" type="string" multiValued="false" indexed="false" required="false" stored="true"/>
+  <field name="language_summary" type="string" multiValued="false" indexed="false" required="false" stored="true"/>
+  <field name="transcriptionLanguages" type="string" multiValued="true" indexed="false" required="false" stored="true"/>
+  <field name="keywords" type="string" multiValued="true" indexed="true" required="false" stored="true"/>
+  <field name="completionStatus" type="string" multiValued="true" indexed="false" required="false" stored="true"/>
+  <field name="itemCount" type="int" multiValued="false" indexed="false" required="false" stored="true"/>
   <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
   
   <dynamicField name="text.*" type="text" multiValued="true" indexed="true" stored="false"/>

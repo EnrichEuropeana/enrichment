@@ -7,7 +7,7 @@
             and passes them to other entities which parse the file contents. 
         
 -->
-<entity name="pickupdir" processor="FileListEntityProcessor" rootEntity="false" dataSource="null" fileName="^[\w\d-]+\.xml$" baseDir="/home/ait/enrich/solr_xmls/items" recursive="false">
+<entity name="pickupdir" processor="FileListEntityProcessor" rootEntity="false" dataSource="null" fileName="^[\w\d-]+\.xml$" baseDir="/home/ait/enrich/solr_xmls/wikidata" recursive="false">
 <!--
 
             Pickupxmlfile parses standard Solr update XML.

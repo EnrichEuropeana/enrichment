@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.solr.model;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,14 +9,8 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataAgent;
-import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
-import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
-import eu.europeana.entity.definitions.model.vocabulary.AgentSolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.ConceptSolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.OrganizationSolrFields;
-//import eu.europeana.entity.definitions.model.vocabulary.SolrConceptSchemeConstants;
 
 public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{
 	

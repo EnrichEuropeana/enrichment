@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +15,7 @@ import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
-@JsonPropertyOrder({ "entityId","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
+@JsonPropertyOrder({ CONTEXT_FIELD,"id","type","prefLabel","altLabel","description","depiction","modified","sameAs"})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataEntityImpl implements WikidataEntity {
 	
@@ -201,6 +204,9 @@ public class WikidataEntityImpl implements WikidataEntity {
 		return null;
 	}
 
-
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return WIKIDATA_CONTEXT;
+	}
 	
 }

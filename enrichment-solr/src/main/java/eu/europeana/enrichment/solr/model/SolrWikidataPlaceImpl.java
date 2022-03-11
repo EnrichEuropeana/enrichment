@@ -6,13 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
-
 import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.entity.definitions.model.vocabulary.PlaceSolrFields;
-
 
 public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
 	<Properties>
-		<Property name="basePath">enrichment-logs</Property>
+		<Property name="basePath">/home/ait/enrich/enrichment-logs</Property>
 	</Properties>
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
@@ -23,17 +23,17 @@
 	      </PatternLayout>
 	      <Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
-				<SizeBasedTriggeringPolicy size="500MB" />
+				<SizeBasedTriggeringPolicy size="100MB" />
 			</Policies>
 			<!-- Max 10 files will be created everyday -->
 			<DefaultRolloverStrategy max="10">
 				<Delete basePath="${basePathr}" maxDepth="10">
-					<!-- Delete all files older than 30 days -->
-					<IfLastModified age="30d" />
+					<!-- Delete all files older than n days -->
+					<IfLastModified age="10d" />
 				</Delete>
 			</DefaultRolloverStrategy>
 	</RollingFile>
-	    <RollingFile name="FileLoggerError"
+	<RollingFile name="FileLoggerError"
 			fileName="${basePath}/error.log"
 			filePattern="${basePath}/error-%d{yyyy-MM-dd}.log">
 		  <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
@@ -48,8 +48,8 @@
 			<!-- Max 10 files will be created everyday -->
 			<DefaultRolloverStrategy max="10">
 				<Delete basePath="${basePathr}" maxDepth="10">
-					<!-- Delete all files older than 30 days -->
-					<IfLastModified age="30d" />
+					<!-- Delete all files older than n days -->
+					<IfLastModified age="10d" />
 				</Delete>
 			</DefaultRolloverStrategy>
 	</RollingFile>
