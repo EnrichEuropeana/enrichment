@@ -321,7 +321,7 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			else
 			{
-				logger.error("The analysed Wikidata JSON response does not contain the required JSON object: " + 
+				logger.debug("The analysed Wikidata JSON response does not contain the required JSON object: " + 
 						fieldParts[0] + " in the JSON field: " + field);
 			}
 			

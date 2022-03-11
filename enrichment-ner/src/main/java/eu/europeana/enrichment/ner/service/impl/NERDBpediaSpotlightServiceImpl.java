@@ -261,7 +261,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			return responeString;
 
 		} catch (Exception ex) {
-			logger.error("Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage());
+			logger.log(Level.ERROR, "Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage(), ex);
 			return null;
 		}
 	}
