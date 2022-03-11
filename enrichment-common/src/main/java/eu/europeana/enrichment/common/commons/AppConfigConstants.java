@@ -32,9 +32,10 @@ public class AppConfigConstants {
     public static final String BEAN_ENRICHMENT_LEVENSCHTEIN_DISTANCE= "levenschteinDistance";
     public static final String BEAN_ENRICHMENT_TRANSLATION_LANGUAGE_TOOL= "translationLanguageTool";
     public static final String BEAN_ENRICHMENT_GOOGLE_TRANSLATOR= "googleTranslator";
-    public static final String BEAN_ENRICHMENT_STORY_WIKIDATA_ENTITY_SERIALIZER= "storyEntitySerializer";
+    public static final String BEAN_ENRICHMENT_JSONLD_SERIALIZER= "jsonLdSerializer";
     public static final String BEAN_ENRICHMENT_WEB_ENTITY_PROTOCOL_API = "europeanaApiClient";
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
+    public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
 }
 

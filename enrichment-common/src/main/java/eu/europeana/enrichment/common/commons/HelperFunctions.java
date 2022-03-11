@@ -60,7 +60,6 @@ public class HelperFunctions {
 
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 
-			//logger.info("Http reponse: " + responeString);
 			return responeString;
 		} catch (Exception ex) {
 			//TODO: proper exception handling
@@ -162,7 +161,7 @@ public class HelperFunctions {
 	    	
 			bw.write(content);
 			
-		    logger.info("Wikidata JSON File is written successfully!");
+		    logger.debug("Wikidata JSON File is written successfully!");
 			    
 		} catch (IOException ioe) 
 	    {

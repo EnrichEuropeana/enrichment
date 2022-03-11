@@ -16,7 +16,6 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.parser.Parser;
@@ -26,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -52,7 +52,6 @@ import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
-import eu.europeana.enrichment.web.commons.StoryWikidataEntitySerializer;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -80,10 +79,8 @@ public class EnrichmentNERServiceImpl {
 	SolrWikidataEntityService solrWikidataEntityService;
 	
 
-	//@Resource(name = "storyEntitySerializer")
-	@Autowired
-	StoryWikidataEntitySerializer storyEntitySerializer;
-	
+	@Autowired 
+	JsonLdSerializer jsonLdSerializer;
 	/*
 	 * Loading all translation services
 	 */
@@ -154,7 +151,8 @@ public class EnrichmentNERServiceImpl {
 		}
 		else
 		{
-			return new JSONObject(result).toString();
+//			return new JSONObject(result).toString();
+			return jsonLdSerializer.serializeObject(result);
 		}
 	}
 	
@@ -231,13 +229,13 @@ public class EnrichmentNERServiceImpl {
 
 		//from this part down only POST method is executed and the NER analysis is done for all story or item fields
 		List<String> allNERFieldTypes = new ArrayList<String>();
-		if(itemId.compareToIgnoreCase("all")==0 && type.compareToIgnoreCase("all")==0)
+		if(itemId.equalsIgnoreCase("all") && type.equalsIgnoreCase("all"))
 		{
 			allNERFieldTypes.add("transcription");
 			allNERFieldTypes.add("description");
 			allNERFieldTypes.add("summary");
 		}
-		else if (type.compareToIgnoreCase("all")==0) {
+		else if (type.equalsIgnoreCase("all")) {
 			allNERFieldTypes.add("transcription");
 		}
 		else {
@@ -391,8 +389,8 @@ public class EnrichmentNERServiceImpl {
 	}
 	
 	private boolean isRestrictedClassificationType(String type) {
-		if(type.compareToIgnoreCase(NERClassification.AGENT.toString())!=0 
-			&& type.compareToIgnoreCase(NERClassification.PLACE.toString())!=0) {
+		if(!type.equalsIgnoreCase(NERClassification.AGENT.toString()) 
+			&& !type.equalsIgnoreCase(NERClassification.PLACE.toString())) {
 			return true;
 		}
 		else return false;
@@ -461,7 +459,7 @@ public class EnrichmentNERServiceImpl {
 				else if(type.toLowerCase().equals("transcription"))
 				{
 					results[0] = story.getTranscriptionText();
-					results[1] = ModelUtils.getSingleTranslationLanguage(story);
+					results[1] = ModelUtils.getMainTranslationLanguage(story);
 				}
 				return results;
 			}
@@ -472,7 +470,7 @@ public class EnrichmentNERServiceImpl {
 				if (item==null) return results;
 				
 				results[0] = item.getTranscriptionText();
-				results[1] = ModelUtils.getSingleTranslationLanguage(item);
+				results[1] = ModelUtils.getMainTranslationLanguage(item);
 				return results;
 			}
 		}
@@ -581,7 +579,7 @@ public class EnrichmentNERServiceImpl {
 	
 	public String uploadStories(StoryEntity[] stories) throws HttpException {
 		
-		logger.info("Uploading new stories to the Mongo DB.");
+		logger.debug("Uploading new stories to the Mongo DB.");
 		
 		for (StoryEntity story : stories) {
 			if(story.getStoryId() == null)
@@ -645,7 +643,7 @@ public class EnrichmentNERServiceImpl {
 	
 	public String uploadItems(ItemEntity[] items) throws HttpException, NoSuchAlgorithmException, UnsupportedEncodingException {
 		
-		logger.info("Uploading new items to the Mongo DB.");
+		logger.debug("Uploading new items to the Mongo DB.");
 		
 		for (ItemEntity item : items) {
 			if(item.getStoryId() == null)
@@ -670,7 +668,7 @@ public class EnrichmentNERServiceImpl {
 				boolean transcriptionChanged = false;
 				if(dbItemEntity.getTranscriptionText().compareTo(item.getTranscriptionText())!=0)
 				{
-					logger.info("Uploading new items : deleting old NamedEntity and TranslationEntity for transcription.");
+					logger.debug("Uploading new items : deleting old NamedEntity and TranslationEntity for transcription.");
 					transcriptionChanged = true;
 					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId() , "transcription");
@@ -745,14 +743,14 @@ public class EnrichmentNERServiceImpl {
 		 *  &nbsp;  → " " (space)
 	     */
 	    response = Parser.unescapeEntities(whole, false);
-	    //logger.info(response);
-	    //logger.info(response);
+	    //logger.debug(response);
+	    //logger.debug(response);
 	    return response;
 
 //	    Elements allParagraphs = doc.getElementsByTag("p");
 //		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
-//		logger.info(whole);
-//		logger.info(whole);
+//		logger.debug(whole);
+//		logger.debug(whole);
 	}
 	
 	/**
@@ -784,11 +782,11 @@ public class EnrichmentNERServiceImpl {
 
 			}
 			
-			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
+			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
 		}
 		else if(!saveEntity)
 		{
-			logger.info("No valid entries found! Please use the POST method first to save the data to the database.");
+			logger.debug("No valid entries found! Please use the POST method first to save the data to the database.");
 			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 		}
 			
@@ -869,7 +867,7 @@ public class EnrichmentNERServiceImpl {
 		
 		if(namedEntityAnnoList!=null && !namedEntityAnnoList.isEmpty())
 		{
-			return storyEntitySerializer.serializeCollection(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
+			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(namedEntityAnnoList, storyId, itemId));
 		}
 		else
 		{
@@ -891,7 +889,7 @@ public class EnrichmentNERServiceImpl {
 			//calling the NER analysis first but just once
 			cascadeCall += 1;
 			if(cascadeCall>1) {
-				logger.info("No valid entries found! There are no entries for the given storyId to be generated even after doing the NER analysis first.");
+				logger.debug("No valid entries found! There are no entries for the given storyId to be generated even after doing the NER analysis first.");
 				return "{\"info\" : \"No valid entries found! There are no entries for the given storyId to be generated even after doing the NER analysis first.\"}";
 			}
 			else
@@ -911,11 +909,11 @@ public class EnrichmentNERServiceImpl {
 		NamedEntityAnnotation entityAnno = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
 		if(entityAnno!=null)
 		{
-			return storyEntitySerializer.serialize(new NamedEntityAnnotationImpl(entityAnno));
+			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationImpl(entityAnno));
 		}
 		else
 		{
-			logger.info("No valid entries found! Please use the POST method first to save the data to the database or provide a valid Wikidata identifier.");
+			logger.debug("No valid entries found! Please use the POST method first to save the data to the database or provide a valid Wikidata identifier.");
 			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 		}
 	}

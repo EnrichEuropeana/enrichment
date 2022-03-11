@@ -135,7 +135,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					if(type.toLowerCase().equals("transcription") && dbStoryEntity.getTranscriptionText()!=null && !dbStoryEntity.getTranscriptionText().isBlank()) {
 						
 						textToTranslate = dbStoryEntity.getTranscriptionText();
-						sourceLanguage = ModelUtils.getSingleTranslationLanguage(dbStoryEntity);
+						sourceLanguage = ModelUtils.getMainTranslationLanguage(dbStoryEntity);
 					}
 					else if(type.toLowerCase().equals("summary") && dbStoryEntity.getSummary()!=null && !dbStoryEntity.getSummary().isBlank()) {
 						
@@ -160,7 +160,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				if(dbItemEntity!=null)
 				{
 					textToTranslate = dbItemEntity.getTranscriptionText();
-					sourceLanguage = ModelUtils.getSingleTranslationLanguage(dbItemEntity);
+					sourceLanguage = ModelUtils.getMainTranslationLanguage(dbItemEntity);
 				}
 				else
 				{
@@ -172,12 +172,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			
 			if(textToTranslate == null || textToTranslate.isBlank())
 			{
-				logger.info("The original text is empty or null");
+				logger.debug("The original text is empty or null");
 				return;
 			}
 				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 
-			logger.info("The original text is NOT empty or null.");
+			logger.debug("The original text is NOT empty or null.");
 			
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
 			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
@@ -192,7 +192,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			case googleToolName:
 				if(sendRequest) {
 					if(googleTranslationService==null) {
-						logger.info("The google translation service is currently disabled.");
+						logger.debug("The google translation service is currently disabled.");
 						return;
 					}
 					Translation googleResponse = googleTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
@@ -223,7 +223,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			List<String> sentences = translationLanguageTool.sentenceSplitter(translatedText);
 			for (String translatedSentence : sentences) {
 				double ratio = translationLanguageTool.getLanguageRatio(translatedSentence);
-				logger.info("Sentence ratio: " + ratio + " ("+translatedSentence+")");
+				logger.debug("Sentence ratio: " + ratio + " ("+translatedSentence+")");
 				//TODO: save ratio
 			}*/
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException | TranslationException | InterruptedException e) {

@@ -195,9 +195,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			List<Double> positionsAdapted = new ArrayList<Double>();
 			List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
 			
-			log.info("Solr query: " + query.toString());
-			log.info("Solr query response, terms adapted: " + termsAdapted.toString());
-			log.info("Solr query response, offsets adapted: " + offsetsAdapted.toString());
+			log.debug("Solr query: " + query.toString());
+			log.debug("Solr query response, terms adapted: " + termsAdapted.toString());
+			log.debug("Solr query response, offsets adapted: " + offsetsAdapted.toString());
 			
 			adaptTermsPositionsOffsets(offsetTranslatedText,termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
 	
@@ -895,7 +895,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * if the original language is the same as the target language, add positions in the original text
 		 * to be the same as in the translated text
 		 */
-		if(ModelUtils.compareSingleTranslationLanguage(dbStoryEntity, targetLanguage))
+		if(ModelUtils.compareMainTranslationLanguage(dbStoryEntity, targetLanguage))
 		{			
 			for (String classificationType : identifiedNER.keySet()) {
 				for (List<String> entityList : identifiedNER.get(classificationType)) {

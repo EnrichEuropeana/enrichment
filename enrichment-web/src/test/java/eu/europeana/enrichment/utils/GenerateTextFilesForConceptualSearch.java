@@ -58,14 +58,14 @@ public class GenerateTextFilesForConceptualSearch {
 //		
 //		for(int i=0;i<stories.size();i++)
 //		{
-//			if(stories.get(i).getLanguage().compareToIgnoreCase("en")==0 && stories.get(i).getDescription()!=null &&
+//			if(stories.get(i).getLanguage().equalsIgnoreCase("en") && stories.get(i).getDescription()!=null &&
 //					!stories.get(i).getDescription().isEmpty())
 //			{
 //				String fileName = directoryForConceptualSearch+"/story-"+stories.get(i).getStoryId()+".txt";
 //				BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
 //
 //				bwTranslations.write(stories.get(i).getDescription());
-//				logger.info("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
+//				logger.debug("Currently analysed storyId: " + stories.get(i).getStoryId() +". \n");
 //				
 //				bwTranslations.close();	
 //			}
@@ -78,13 +78,13 @@ public class GenerateTextFilesForConceptualSearch {
 //		
 //		for(int i=0;i<itemsTranslations.size();i++)
 //		{
-//			if(itemsTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && itemsTranslations.get(i).getItemId().compareToIgnoreCase("all")!=0
+//			if(itemsTranslations.get(i).getLanguage().equalsIgnoreCase("en") && !itemsTranslations.get(i).getItemId().equalsIgnoreCase("all")
 //					&& itemsTranslations.get(i).getTranslatedText()!=null && !itemsTranslations.get(i).getTranslatedText().isEmpty())
 //			{
 //				String fileName = directoryForConceptualSearch+"/itemTranslation-"+itemsTranslations.get(i).getStoryId()+".txt";
 //				BufferedWriter bwTranslations = new BufferedWriter(new FileWriter(new File(fileName)));
 //				bwTranslations.write(itemsTranslations.get(i).getTranslatedText());
-//				logger.info("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
+//				logger.debug("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
 //				bwTranslations.close();	
 //				
 //				itemIDs.add(itemsTranslations.get(i).getItemId());
@@ -102,7 +102,7 @@ public class GenerateTextFilesForConceptualSearch {
 //		
 //		for(int i=0;i<itemsTranslations.size();i++)
 //		{
-//			if(itemsTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && itemsTranslations.get(i).getItemId().compareToIgnoreCase("all")!=0
+//			if(itemsTranslations.get(i).getLanguage().equalsIgnoreCase("en") && !itemsTranslations.get(i).getItemId().equalsIgnoreCase("all")
 //					&& itemsTranslations.get(i).getTranslatedText()!=null && !itemsTranslations.get(i).getTranslatedText().isEmpty())
 //			{
 //				
@@ -110,7 +110,7 @@ public class GenerateTextFilesForConceptualSearch {
 //
 //				bwTranslations.write("\""+Integer.toString(itemIDs.size())+"\":"+"\""+correctedTranslationsForQuotationWithin+"\",\n");
 //				
-//				logger.info("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
+//				logger.debug("Currently analysed translation with itemId: " + itemsTranslations.get(i).getItemId() +". \n");
 //			
 //				itemIDs.add(itemsTranslations.get(i).getItemId());
 //				
@@ -168,7 +168,7 @@ public class GenerateTextFilesForConceptualSearch {
 		List<String> storyTranscriptions = new ArrayList<String>();//this corresponds to the storyIds list
 		for(int i=0;i<allStories.size();i++)
 		{
-			if(ModelUtils.compareSingleTranslationLanguage(allStories.get(i), "en") && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
+			if(ModelUtils.compareMainTranslationLanguage(allStories.get(i), "en") && allStories.get(i).getTranscriptionText()!=null && !allStories.get(i).getTranscriptionText().isEmpty())
 			{				
 				//String correctedTranslationsForQuotationWithin = itemsTranslations.get(i).getTranslatedText().replaceAll("\"", "\\\\\"");
 				storyIds.add(allStories.get(i).getStoryId());
@@ -205,7 +205,7 @@ public class GenerateTextFilesForConceptualSearch {
 			{
 				String storyID = (String) keywords.get(i).get("StoryId");
 				
-				if(storyID.compareToIgnoreCase(storyIds.get(m))==0)
+				if(storyID.equalsIgnoreCase(storyIds.get(m)))
 				{
 					String newKeywordsFromFileString = (String) keywords.get(i).get("Keywords");
 					List<String> newKeywordsFromFile = Arrays.asList(newKeywordsFromFileString.split(","));
@@ -236,7 +236,7 @@ public class GenerateTextFilesForConceptualSearch {
 		Set<String> differentEnglishStoriesIDs = new HashSet<String>();
 		for(int i=0;i<storyTranslations.size();i++)
 		{
-			if(ModelUtils.compareSingleTranslationLanguage(storyTranslations.get(i), "en") && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+			if(ModelUtils.compareMainTranslationLanguage(storyTranslations.get(i), "en") && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 			{
 				differentEnglishStoriesIDs.add(storyTranslations.get(i).getStoryId());
 			}

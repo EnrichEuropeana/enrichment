@@ -40,6 +40,11 @@ public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
 		super.setTranscriptionLanguages(transcriptionLanguages);
 	}
 
+	@Override
+	@Field(ItemEntitySolrFields.KEYWORDS)
+	public void setKeywords(List<String> keywords) {
+		super.setKeywords(keywords);
+	}
 	
 	@Override
 	@Field(ItemEntitySolrFields.TRANSCRIPTION)

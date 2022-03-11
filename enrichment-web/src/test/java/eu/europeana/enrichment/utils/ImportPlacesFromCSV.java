@@ -102,7 +102,7 @@
 //					
 //					if(fileexists==false) 	
 //					{			
-//						logger.info("Current wikidata id is: " + wikidataIDs.get(j) + ". Current index is: " + j + " .\n");
+//						logger.debug("Current wikidata id is: " + wikidataIDs.get(j) + ". Current index is: " + j + " .\n");
 //						String WikidataJSON = wikidataService.getWikidataJSONFromWikidataID(wikidataIDs.get(j));
 //						if(WikidataJSON==null || WikidataJSON.isEmpty()) 
 //						{
@@ -119,7 +119,7 @@
 //						else
 //						{
 //							HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataIDs.get(j), WikidataJSON);
-//							logger.info("Analyzed wikidata entity number: " + j + " .\n");
+//							logger.debug("Analyzed wikidata entity number: " + j + " .\n");
 //						}
 //						
 //					}

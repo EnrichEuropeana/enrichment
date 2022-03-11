@@ -20,7 +20,7 @@ import eu.europeana.enrichment.model.TranslationEntity;
 @Entity(value="TranslationEntityImpl")
 public class TranslationEntityImpl implements TranslationEntity{
 
-	private String key;
+	protected String key;
 	private String language;
 	private String translatedText;
 	private String tool;

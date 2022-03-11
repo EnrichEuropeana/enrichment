@@ -62,7 +62,7 @@ public class NERStanfordServiceImpl implements NERService{
 		ObjectMapper mapper = new ObjectMapper();
 		TypeReference<TreeMap<String, List<NamedEntityImpl>>> typeRef = new TypeReference<TreeMap<String, List<NamedEntityImpl>>>() {};
 		try {
-			logger.info("\n The response from the StanfordNER service is: " + response + "\n");
+			logger.debug("\n The response from the StanfordNER service is: " + response + "\n");
 			result = mapper.readValue(response, typeRef);
 		} catch (IOException e) {
 			logger.log(Level.ERROR, "Exception during the staford NER response deserialization.", e);

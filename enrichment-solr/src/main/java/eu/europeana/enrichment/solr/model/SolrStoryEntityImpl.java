@@ -5,10 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
+import eu.europeana.enrichment.common.commons.SolrUtils;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 
 public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity {
@@ -102,16 +105,21 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	public void setLanguageSummary(String language) {
 		super.setLanguageSummary(language);
 	}
-	
-	@Override
-	@Field(StoryEntitySolrFields.COMPLETION_STATUS)
-	public void setCompletionStatus(Map<String, Integer> completionStatus) {
-		super.setCompletionStatus(getCompletionStatus());
-	}
 
 	@Override
 	@Field(StoryEntitySolrFields.ITEM_COUNT)
 	public void setItemCount(int itemCount) {
 		super.setItemCount(itemCount);
 	}
+	
+	@Override
+	@Field(StoryEntitySolrFields.COMPLETION_STATUS_ALL)
+	public void setCompletionStatus(Map<String, Integer> completionStatus) {
+		if (MapUtils.isNotEmpty(completionStatus)) {
+			super.setCompletionStatus(new HashMap<>(
+				SolrUtils.normalizeStringMapByAddingPrefix(
+				StoryEntitySolrFields.COMPLETION_STATUS + EntitySolrFields.DYNAMIC_FIELD_SEPARATOR,
+				completionStatus)));
+	    }
+	  }
 }

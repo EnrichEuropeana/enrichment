@@ -93,7 +93,7 @@ public class ImportStoriesFromTranscribathonDataset {
 			StoryEntity [] newStories = new StoryEntity [1];
 			newStories[0] = new StoryEntityImpl();
 			
-			if(storyTranscription.compareToIgnoreCase("")!=0) newStories[0].setTranscriptionText(storyTranscription);
+			if(!storyTranscription.equalsIgnoreCase("")) newStories[0].setTranscriptionText(storyTranscription);
 			newStories[0].setDescription(minimalStory.dcDescription);
 			newStories[0].setSource(minimalStory.dcSource);
 			newStories[0].setStoryId(minimalStory.StoryId.toString());
@@ -108,7 +108,7 @@ public class ImportStoriesFromTranscribathonDataset {
 //			
 //			for(int i=0;i<listStoryTranscribathon.size();i++)
 //			{
-//				if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+//				if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().equalsIgnoreCase("en") && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 //				{				
 //					String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
 //
@@ -118,7 +118,7 @@ public class ImportStoriesFromTranscribathonDataset {
 //
 //					bwTranslations.write(storyTranslations.get(i).getStoryId() + ",\"" + removedAllNonAsciiCharacters + "\"\n");
 //					
-//					logger.info("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
+//					logger.debug("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
 //				
 //				}
 //			}		

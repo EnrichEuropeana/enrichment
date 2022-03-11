@@ -10,7 +10,7 @@ public class ModelUtils {
 	
 	static Logger logger = LogManager.getLogger(ModelUtils.class);
 	
-	public static String getSingleTranslationLanguage (ItemEntity item) {
+	public static String getMainTranslationLanguage (ItemEntity item) {
 		if(item.getTranscriptionLanguages()!=null && item.getTranscriptionLanguages().size()==1) {
 			return item.getTranscriptionLanguages().get(0);
 		}
@@ -19,7 +19,7 @@ public class ModelUtils {
 		}
 	}
 	
-	public static String getSingleTranslationLanguage (StoryEntity story) {
+	public static String getMainTranslationLanguage (StoryEntity story) {
 		if(story.getTranscriptionLanguages()!=null && story.getTranscriptionLanguages().size()==1) {
 			return story.getTranscriptionLanguages().get(0);
 		}
@@ -28,18 +28,18 @@ public class ModelUtils {
 		}
 	}
 	
-	public static boolean compareSingleTranslationLanguage (StoryEntity story, String targetLanguage) {
+	public static boolean compareMainTranslationLanguage (StoryEntity story, String targetLanguage) {
 		if(story.getTranscriptionLanguages()!=null && story.getTranscriptionLanguages().size()==1) {
-			return story.getTranscriptionLanguages().get(0).compareToIgnoreCase(targetLanguage)==0;
+			return story.getTranscriptionLanguages().get(0).equalsIgnoreCase(targetLanguage);
 		}
 		else {
 			return false;
 		}
 	}
 	
-	public static boolean compareSingleTranslationLanguage (ItemEntity item, String targetLanguage) {
+	public static boolean compareMainTranslationLanguage (ItemEntity item, String targetLanguage) {
 		if(item.getTranscriptionLanguages()!=null && item.getTranscriptionLanguages().size()==1) {
-			return item.getTranscriptionLanguages().get(0).compareToIgnoreCase(targetLanguage)==0;
+			return item.getTranscriptionLanguages().get(0).equalsIgnoreCase(targetLanguage);
 		}
 		else {
 			return false;

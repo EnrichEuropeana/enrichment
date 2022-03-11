@@ -37,16 +37,15 @@ public class SolrUtils {
 	}
 	
 	/**
-	 * This method adds prefixes to the fields in format Map<String, String> languageMap
-	 * e.g. "skos_prefLabel"
+	 * This method adds prefixes to the fields in format Map<String, Object>
 	 * @param fieldNamePrefix e.g. ConceptSolrFields.PREF_LABEL
 	 * @param languageMap e.g. prefLabel
-	 * @return normalized content in format Map<String, String>  
+	 * @return normalized content in format Map<String, Object>  
 	 */
-    public static Map<String, String> normalizeStringMapByAddingPrefix(String fieldNamePrefix,
-	    Map<String, String> languageMap) {
+    public static <T> Map<String, T> normalizeStringMapByAddingPrefix(String fieldNamePrefix,
+	    Map<String, T> languageMap) {
     if(languageMap==null) return null;
-	Map<String, String> res;
+	Map<String, T> res;
 	if (!languageMap.keySet().iterator().next().contains(fieldNamePrefix)) {
 	    res = languageMap.entrySet().stream()
 		    .collect(Collectors.toMap(entry -> fieldNamePrefix + entry.getKey(), entry -> entry.getValue()));

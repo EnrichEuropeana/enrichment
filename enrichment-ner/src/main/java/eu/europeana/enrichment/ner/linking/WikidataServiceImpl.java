@@ -372,11 +372,11 @@ public class WikidataServiceImpl implements WikidataService {
 		String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
 		if(WikidataJSON==null) 	
 		{
-			logger.info("Wikidata entity does not exist in a local file cache!");
+			logger.debug("Wikidata entity does not exist in a local file cache!");
 			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
 			if(WikidataJSON==null || WikidataJSON.isEmpty()) return null;
 			HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
-			logger.info("Wikidata entity is successfully saved to a local file cache!");			
+			logger.debug("Wikidata entity is successfully saved to a local file cache!");			
 		}
 		
 		WikidataEntity wikiEntity = null;
@@ -408,7 +408,7 @@ public class WikidataServiceImpl implements WikidataService {
 	{
 		List<List<String>> jsonElement;
 		
-		if(type.compareToIgnoreCase("agent")==0)
+		if(type.equalsIgnoreCase("agent"))
 		{
 			WikidataAgent newWikidataAgent = new WikidataAgentImpl ();
 			

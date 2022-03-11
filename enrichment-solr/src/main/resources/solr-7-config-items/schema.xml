@@ -87,14 +87,11 @@
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
   <field name="story_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="item_id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="transcription" type="text_general_experiment" multiValued="false" indexed="true" required="true" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="description" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="transcriptionLanguages" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-  <field name="keywords" type="string" multiValued="true" indexed="true" required="false" stored="true" termVectors="true" termPositions="true" termOffsets="true"/>
-
-  
+  <field name="transcription" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="source" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="title" type="text_general_experiment" multiValued="false" indexed="true" required="false" stored="true"/>
+  <field name="transcriptionLanguages" type="text_general_experiment" multiValued="true" indexed="false" required="false" stored="true"/>
+  <field name="keywords" type="text_general_experiment" multiValued="true" indexed="false" required="false" stored="true"/>
   
   <field name="text" type="text" multiValued="true" indexed="true" stored="true"/>
   
