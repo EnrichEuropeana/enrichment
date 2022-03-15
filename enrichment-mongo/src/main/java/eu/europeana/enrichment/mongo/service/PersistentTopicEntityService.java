@@ -7,14 +7,14 @@ import eu.europeana.enrichment.model.TopicModel;
 
 public interface PersistentTopicEntityService {
 	
-	public void saveTopicEntity(TopicEntity topicEntity);
+	public void save(TopicEntity topicEntity);
 
-	public TopicEntity findTopicEntityByIdentifier(String topicIdentifier);
+	public TopicEntity findById(String topicIdentifier);
 
-	public void updateTopicEntity(TopicEntity dbtopicEntity);
+	public void update(TopicEntity dbtopicEntity);
 
-	public void deleteTopicEntity(TopicEntity dbtopiEntity);
+	public void delete(TopicEntity dbtopiEntity);
 
-	public List<TopicEntity> findTopicEntitiesByTopicModel(String topicModel);
+	public List<TopicEntity> findByModelId(String topicModel);
 
 }

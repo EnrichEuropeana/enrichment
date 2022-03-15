@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.TopicEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
@@ -87,5 +88,30 @@ public interface SolrBaseClientService {
 	 * @throws SolrNamedEntityServiceException 
 	 */
 	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrNamedEntityServiceException;
+	
+	/**
+	 * This method stores a TopicEntity in SOLR
+	 * @param solrCollection
+	 * @param solrObject
+	 * @param doCommit
+	 * @throws SolrNamedEntityServiceException
+	 */
+	public void storeTopicEntity (String solrCollection, TopicEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;
+
+	/**
+	 * This method is used for updating a TopicEntity in SOLR
+	 * @param solrCore
+	 * @param dbtopicEntity
+	 * @throws SolrNamedEntityServiceException
+	 */
+	public void updateTopicEntity(String solrCore, TopicEntity dbtopicEntity)  throws SolrNamedEntityServiceException;
+
+	/**
+	 * This method is used for deleting a TopicEntity in SOLR
+	 * @param solrCore
+	 * @param dbtopiEntity
+	 * @throws SolrNamedEntityServiceException
+	 */
+	public void deleteTopicEntity(String solrCore, TopicEntity dbtopiEntity) throws SolrNamedEntityServiceException;
 
 }

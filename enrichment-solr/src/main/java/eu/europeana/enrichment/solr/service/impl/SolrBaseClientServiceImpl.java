@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.TopicEntity;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
@@ -153,6 +154,42 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 					e);
 		}
 		return rsp;
+		
+	}
+
+
+	@Override
+	public void storeTopicEntity(String solrCollection, TopicEntity solrObject, boolean doCommit)
+			throws SolrNamedEntityServiceException {
+		try {
+			
+			log.debug("store: " + solrObject.toString());
+				
+			UpdateResponse rsp = solrServer.addBean(solrCollection, solrObject);
+			log.info("store response: " + rsp.toString());
+			if(doCommit)
+				solrServer.commit(solrCollection);
+		} catch (SolrServerException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected Solr server exception occured when storing TopicEntity: " + solrObject.toString(),
+					ex);
+		} catch (IOException ex) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected IO exception occured when storing TopicEntity: " + solrObject.toString() + "in Solr.", ex);
+		}
+		
+	}
+
+
+	@Override
+	public void updateTopicEntity(String solrCore, TopicEntity dbtopicEntity) throws SolrNamedEntityServiceException {
+		
+	}
+
+
+	@Override
+	public void deleteTopicEntity(String solrCore, TopicEntity dbtopiEntity) throws SolrNamedEntityServiceException {
+		// TODO Auto-generated method stub
 		
 	}
 

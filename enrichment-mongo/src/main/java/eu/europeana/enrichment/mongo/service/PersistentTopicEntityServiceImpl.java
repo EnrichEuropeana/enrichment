@@ -19,30 +19,30 @@ public class PersistentTopicEntityServiceImpl implements PersistentTopicEntitySe
 	private TopicEntityDao topicEntityDao;
 
 	@Override
-	public void saveTopicEntity(TopicEntity topicEntity) {
-		topicEntityDao.saveTopicEntity(topicEntity);
+	public void save(TopicEntity topicEntity) {
+		topicEntityDao.save(topicEntity);
 	}
 
 	@Override
-	public TopicEntity findTopicEntityByIdentifier(String topicIdentifier) {
-		return topicEntityDao.findTopicEntityByIdentifier(topicIdentifier);
+	public TopicEntity findById(String topicIdentifier) {
+		return topicEntityDao.findById(topicIdentifier);
 	}
 
 	@Override
-	public void updateTopicEntity(TopicEntity dbtopicEntity) {
-		topicEntityDao.updateTopicEntity(dbtopicEntity);
+	public void update(TopicEntity dbtopicEntity) {
+		topicEntityDao.update(dbtopicEntity);
 		
 	}
 
 	@Override
-	public void deleteTopicEntity(TopicEntity dbtopicEntity) {
-		topicEntityDao.deleteTopicEntity (dbtopicEntity);
+	public void delete(TopicEntity dbtopicEntity) {
+		topicEntityDao.delete (dbtopicEntity);
 		
 	}
 
 	@Override
-	public List<TopicEntity> findTopicEntitiesByTopicModel(String topicModel) {
-		return topicEntityDao.findTopicEntitiesByTopicModel(topicModel);
+	public List<TopicEntity> findByModelId(String topicModel) {
+		return topicEntityDao.findByModelId(topicModel);
 	}
 
 }

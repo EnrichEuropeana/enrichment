@@ -7,14 +7,14 @@ import eu.europeana.enrichment.model.TopicModel;
 
 public interface TopicEntityDao {
 	
-	public void saveTopicEntity (TopicEntity topicEntity);
+	public void save (TopicEntity topicEntity);
 
-	public TopicEntity findTopicEntityByIdentifier(String topicID);
+	public TopicEntity findById(String topicID);
 
-	public void updateTopicEntity(TopicEntity dbtopicEntity);
+	public void update(TopicEntity dbtopicEntity);
 
-	public void deleteTopicEntity(TopicEntity dbtopicEntity);
+	public void delete(TopicEntity dbtopicEntity);
 
-	public List<TopicEntity> findTopicEntitiesByTopicModel(String topicModelId);
+	public List<TopicEntity> findByModelId(String topicModelId);
 
 }

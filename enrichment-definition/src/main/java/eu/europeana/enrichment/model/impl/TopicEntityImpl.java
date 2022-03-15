@@ -56,23 +56,7 @@ public class TopicEntityImpl implements TopicEntity {
 		
 	}
 
-	public TopicEntityImpl(String id, String identifier, List<String> labels, Map<String, String> descriptions,
-			List<TermEntity> terms, List<TermEntity> keywords, TopicModel model, Date created, Date modified) {
-		super();
-		this.topicID = id;
-		this.identifier = identifier;
-		this.labels = labels;
-		this.descriptions = descriptions;
-		this.terms = terms;
-		this.keywords = keywords;
-		this.model = model;
-		this.modelId = model.getIdentifier();
-		this.created = created;
-		if (modified == null)
-			this.modified = new Date();
-		else
-			this.modified = modified;
-	}
+	
 
 	public TopicEntityImpl(TopicEntity topicEntity) {
 		this.topicID = topicEntity.getTopicID();
