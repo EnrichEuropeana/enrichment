@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.List;
+
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -34,8 +35,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.europeana.api.commons.web.controller.BaseRestController;
-
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 @RestController
 @EnableCaching
 //@SwaggerSelect
@@ -80,7 +80,7 @@ public class TopicController extends BaseRest{
 		
 		
 		// check mandatory fields
-		if (!validString(request.topicIdentifier) || testNullOrEmpty(request.descriptions) || testNullOrEmpty(request.topicTerms) )
+		if (!HelperFunctions.validString(request.topicIdentifier) || HelperFunctions.testNullOrEmpty(request.descriptions) || HelperFunctions.testNullOrEmpty(request.topicTerms) )
 		{
 			response = new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
 			return response;
@@ -196,30 +196,6 @@ public class TopicController extends BaseRest{
 		return response;
 		
 	}
-	private boolean testNullOrEmpty(Object object) {
-		if (object == null)
-			return true;
-		if (object instanceof List)
-		{
-			if (((List)object).isEmpty())
-				return true;
-		}
-		if (object instanceof Map)
-		{
-			if (((Map)object).isEmpty())
-				return true;
-		}
-		return false;
-	}
 	
-	
-
-	private boolean validString(String string) {
-		if (string == null)
-			return false;
-		if (string.isBlank() || string.isEmpty())
-			return false;
-		return true;
-	}
 
 }

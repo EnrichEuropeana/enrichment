@@ -26,8 +26,8 @@ public class TopicEntityDaoImpl implements TopicEntityDao{
 	private Datastore enrichmentDatastore;
 	
 	@Override
-	public void saveTopicEntity(TopicEntity topicEntity) {
-		TopicEntity dbTopicEntity = findTopicEntityByIdentifier(topicEntity.getIdentifier());
+	public void save(TopicEntity topicEntity) {
+		TopicEntity dbTopicEntity = findById(topicEntity.getIdentifier());
 		if(dbTopicEntity!=null)
 		{
 			dbTopicEntity.setIdentifier(topicEntity.getIdentifier());
@@ -61,7 +61,7 @@ public class TopicEntityDaoImpl implements TopicEntityDao{
 
 
 	@Override
-	public TopicEntity findTopicEntityByIdentifier(String topicID) {
+	public TopicEntity findById(String topicID) {
 		TopicEntityImpl dbEntity = enrichmentDatastore.find(TopicEntityImpl.class).filter(
                 eq(EntityFields.TOPIC_ENTITY_IDENTIFIER, topicID)
                 )
@@ -71,19 +71,19 @@ public class TopicEntityDaoImpl implements TopicEntityDao{
 
 
 	@Override
-	public void updateTopicEntity(TopicEntity dbtopicEntity) {
+	public void update(TopicEntity dbtopicEntity) {
 		enrichmentDatastore.save(dbtopicEntity);
 	}
 
 
 	@Override
-	public void deleteTopicEntity(TopicEntity dbtopicEntity) {
+	public void delete(TopicEntity dbtopicEntity) {
 		enrichmentDatastore.delete(dbtopicEntity);
 	}
 
 
 	@Override
-	public List<TopicEntity> findTopicEntitiesByTopicModel(String topicModel) {
+	public List<TopicEntity> findByModelId(String topicModel) {
 		MorphiaCursor<TopicEntityImpl> iter = enrichmentDatastore.find(TopicEntityImpl.class).filter(eq(EntityFields.MODEL_ID,topicModel)).iterator();
 		List<TopicEntity> list = new ArrayList<TopicEntity>();
 		while (iter.hasNext())
