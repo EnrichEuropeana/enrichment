@@ -8,5 +8,7 @@ public interface TranslationsEntitySolrFields {
 	public static final String TYPE = "type";
 	public static final String TRANSLATION = "translatedText";
 	public static final String TOOL = "tool";
+	public static final String KEY = "key";
+	public static final String ORIGIN_LANG_GOOGLE = "originLangGoogle";
 	
 }

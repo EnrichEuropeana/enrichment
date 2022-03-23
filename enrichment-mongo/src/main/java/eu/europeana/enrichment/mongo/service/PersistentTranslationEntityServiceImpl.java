@@ -45,7 +45,7 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void saveTranslationEntity(TranslationEntity entity) {
 		translationEntityDao.saveTranslationEntity(entity);
 	}
 

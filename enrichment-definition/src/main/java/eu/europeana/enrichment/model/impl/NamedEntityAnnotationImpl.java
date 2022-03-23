@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,15 +14,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 
 @Entity(value="NamedEntityAnnotationImpl")
-@JsonPropertyOrder({ "id", "type", "motivation","body","target"})
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD,
+	"id", 
+	"type", 
+	"motivation",
+	"body",
+	"target"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
@@ -71,26 +77,11 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	}
 	
 	public NamedEntityAnnotationImpl () {
-		init();
-	}
-	
-	void init() {
-		source = "";
-		target = "";
-		annoId = "";
-		type = "";
-		motivation = "";
-		body = new HashMap<String, Object>();
-		wikidataId = "";
-		storyId = "";
-		itemId = "";
-		property = "";
-		entityType= "";
 	}
 	
 	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
 		this.source = entity.getWikidataId();
-		if(entity.getItemId().compareToIgnoreCase("all")!=0)
+		if(!entity.getItemId().equalsIgnoreCase("all"))
 		{
 			this.target = targetBaseItems + "story="+entity.getStoryId()+"&item="+entity.getItemId();
 		}
@@ -101,20 +92,29 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.annoId = entity.getAnnoId();
 		this.type = "Annotation";
 		this.motivation = "tagging";
-		this.body = new HashMap<String, Object> ();
-		this.body.put("id", entity.getWikidataId());
-		this.body.put("type", entity.getEntityType());
-		Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
-		Map<String,String> bodyHiddenLableOld = (Map<String,String>)entity.getBody().get("hiddenLabel");
-		bodyHiddenLabel.put("en",bodyHiddenLableOld.get("en"));
-		this.body.put("hiddenLabel", bodyHiddenLabel);
+		if(entity.getWikidataId()!=null) {
+			this.body = new HashMap<String, Object> ();
+			this.body.put("id", entity.getWikidataId());
+		}
+		if(entity.getEntityType()!=null) {
+			if(this.body==null) this.body = new HashMap<String, Object> ();
+			this.body.put("type", entity.getEntityType());
+		}
+		if(entity.getBody()!=null && entity.getBody().get("hiddenLabel")!=null) {
+			Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
+			Map<String,String> bodyHiddenLableOld = (Map<String, String>) entity.getBody().get("hiddenLabel");
+			bodyHiddenLabel.put("en",bodyHiddenLableOld.get("en"));
+			if(this.body==null) this.body = new HashMap<String, Object> ();
+			this.body.put("hiddenLabel", bodyHiddenLabel);
+		}
 		
-		Map<String,String> bodyPrefLabel = new HashMap<String, String>();
-		@SuppressWarnings("unchecked")
-		Map<String,String> bodyPrefLableOld = (Map<String,String>)entity.getBody().get("prefLabel");
-		bodyPrefLabel.put("en",bodyPrefLableOld.get("en"));
-		this.body.put("prefLabel", bodyPrefLabel);
+		if(entity.getBody()!=null && entity.getBody().get("prefLabel")!=null) {
+			Map<String,String> bodyPrefLabel = new HashMap<String, String>();
+			Map<String,String> bodyPrefLableOld = (Map<String,String>)entity.getBody().get("prefLabel");
+			bodyPrefLabel.put("en",bodyPrefLableOld.get("en"));
+			if(this.body==null) this.body = new HashMap<String, Object> ();
+			this.body.put("prefLabel", bodyPrefLabel);
+		}
 		
 		this.wikidataId = entity.getWikidataId();
 		this.storyId = entity.getStoryId();
@@ -127,7 +127,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam) {
 
 		this.source = wikidataId;
-		if(itemId.compareToIgnoreCase("all")!=0)
+		if(!itemId.equalsIgnoreCase("all"))
 		{
 			this.target = targetBaseItems + "story="+storyId+"&item="+itemId;	
 		}
@@ -147,7 +147,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.motivation = "tagging";
 		this.body = new HashMap<String, Object> ();
 		this.body.put("id", wikidataId);
-		if(entityTypeParam.compareToIgnoreCase("agent")==0)
+		if(entityTypeParam.equalsIgnoreCase("agent"))
 		{
 			this.entityType = "Person";
 			this.body.put("type", "Person");
@@ -263,19 +263,20 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
         NamedEntityAnnotation nea_new = (NamedEntityAnnotation) nea; 
        
         // Compare the data members and return accordingly  
-        return nea_new.getStoryId().compareTo(storyId)==0
-                && nea_new.getItemId().compareTo(itemId)==0
-                && nea_new.getWikidataId().compareTo(wikidataId)==0
-                && nea_new.getProperty().compareTo(property)==0;
+        return this.hashCode()==nea_new.hashCode();
+//        		nea_new.getStoryId().compareTo(storyId)==0
+//                && nea_new.getItemId().compareTo(itemId)==0
+//                && nea_new.getWikidataId().compareTo(wikidataId)==0
+//                && nea_new.getProperty().compareTo(property)==0;
     } 
     
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result + storyId.hashCode();
-        result = 31 * result + itemId.hashCode();
-        result = 31 * result + wikidataId.hashCode();
-        result = 31 * result + property.hashCode();
+        if(storyId!=null) result = 31 * result + storyId.hashCode();
+        if(itemId!=null) result = 31 * result + itemId.hashCode();
+        if(wikidataId!=null) result = 31 * result + wikidataId.hashCode();
+        if(property!=null) result = 31 * result + property.hashCode();
         return result;
     }
 
@@ -302,6 +303,10 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.entityType = type;
 	}
 
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return ANNOTATION_CONTEXT;
+	}
 
 
 }

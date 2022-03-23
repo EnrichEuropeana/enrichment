@@ -65,24 +65,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	
 	@Override
 	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity) {
-		//first check if there is the same entity in the db
-		NamedEntityAnnotation existingNAE = findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(entity.getStoryId(),entity.getItemId(),entity.getWikidataId());
-		if(existingNAE!=null) return;
-		
-		NamedEntityAnnotationImpl tmp = null;
-		if(entity instanceof NamedEntityAnnotationImpl)
-			tmp = (NamedEntityAnnotationImpl) entity;
-		else {
-			tmp = new NamedEntityAnnotationImpl(entity);
-		}
-		if(tmp != null)
-			this.enrichmentDatastore.save(tmp);
-		
-	}
-
-	@Override
-	public void deleteNamedEntityAnnotation(NamedEntityAnnotation entity) {
-		deleteNamedEntityAnnotationById(entity.getAnnoId());
+		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

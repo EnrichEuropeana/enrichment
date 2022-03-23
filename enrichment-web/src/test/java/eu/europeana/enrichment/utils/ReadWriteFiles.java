@@ -152,7 +152,7 @@
 //        	 
 //        	while(NEREntitiesIterator.hasNext()) {
 //        		
-//        		logger.info(this.getClass().getSimpleName() + "The NERNamedEntities key: " + key);
+//        		logger.debug(this.getClass().getSimpleName() + "The NERNamedEntities key: " + key);
 //        		
 //        		NamedEntity nextNEREntity=NEREntitiesIterator.next();
 //        		
@@ -335,7 +335,7 @@
 //			
 //			String uploadItemsStatus = enrichmentNerService.uploadItems(itemEntities.toArray(new DBItemEntityImpl[0]));
 //			
-//			logger.info("Stories and Items are saved to the database from the JSON file!");
+//			logger.debug("Stories and Items are saved to the database from the JSON file!");
 //						
 //		}
 //		catch (FileNotFoundException e) {

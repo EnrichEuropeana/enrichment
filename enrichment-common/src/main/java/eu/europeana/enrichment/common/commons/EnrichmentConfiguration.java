@@ -16,7 +16,7 @@ import org.springframework.context.annotation.PropertySources;
 	@PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true) })
 public class EnrichmentConfiguration  {
 
-	private static final Logger LOG = LogManager.getLogger(EnrichmentConfiguration.class);
+	Logger logger = LogManager.getLogger(getClass());
 
     @Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
@@ -77,8 +77,11 @@ public class EnrichmentConfiguration  {
 
     @Value("${solr.facetLimit}")
     private int solrFacetLimit;
+    
+    @Value("${solr.wikidata-search.baseUrl}")
+    private String solrWikidataBaseUrl;
 
-    @Value("${enrich.solr.translated.entities}")
+	@Value("${enrich.solr.translated.entities}")
     private String solrTranslatedEntities;
 
     @Value("${enrich.stories.import}")
@@ -91,7 +94,7 @@ public class EnrichmentConfiguration  {
     private String enrichWikidataDirectory;
 
   	public EnrichmentConfiguration() {
-		LOG.info("Initializing EnrichmentConfiguration bean as: configuration");
+		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
 
   	public String getMongodbConnectionUri() {
@@ -188,5 +191,9 @@ public class EnrichmentConfiguration  {
 	
     public String getNerStanfordModel() {
 		return nerStanfordModel;
+	}
+
+    public String getSolrWikidataBaseUrl() {
+		return solrWikidataBaseUrl;
 	}
 }

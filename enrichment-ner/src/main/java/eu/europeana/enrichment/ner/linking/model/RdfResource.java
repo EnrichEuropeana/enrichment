@@ -1,16 +1,15 @@
 package eu.europeana.enrichment.ner.linking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import javax.xml.bind.annotation.XmlAttribute;
 
-@JsonIgnoreProperties(ignoreUnknown=true)
+//@JsonIgnoreProperties(ignoreUnknown=true)
 public class RdfResource {
 
-	@JacksonXmlProperty(localName = "resource", isAttribute = true)
+	//@XmlAttribute(name = XmlConstants.RESOURCE, namespace = XmlConstants.NAMESPACE_RDF)
+	@XmlAttribute(name = XmlConstants.RESOURCE, namespace = XmlConstants.NAMESPACE_RDF)
 	String resourceUrl;
 
-	@JsonIgnore
+	//@JacksonXmlProperty(isAttribute = true, namespace = "rdf", localName = XmlConstants.RESOURCE)
 	public String getResourceUrl() {
 		return resourceUrl;
 	}

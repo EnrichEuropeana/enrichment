@@ -51,5 +51,9 @@ public interface TranslationEntity {
 	
 	String getETranslationId();	
 	void setETranslationId(String eTranslationId);
+	
+	String getOriginLangGoogle();
+	
+	void setOriginLangGoogle(String originLangGoogle);
 
 }

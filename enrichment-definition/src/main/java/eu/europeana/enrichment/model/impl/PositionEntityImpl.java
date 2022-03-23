@@ -1,16 +1,16 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import dev.morphia.annotations.Embedded;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
-public class PositionEntityImpl implements PositionEntity{
+@Embedded
+public class PositionEntityImpl {
 
 	private List<Integer> offsetsTranslatedText;
 	private List<Integer> offsetsOriginalText;
@@ -29,12 +29,12 @@ public class PositionEntityImpl implements PositionEntity{
 	@Transient
 	private TranslationEntity translationEntity;
 	
-	@Override
+	
 	public StoryEntity getStoryEntity() {
 		return storyEntity;
 	}
 
-	@Override
+	
 	public void setStoryEntity(StoryEntity storyEntity) {
 		this.storyEntity=storyEntity;
 		if(storyEntity != null)
@@ -43,12 +43,12 @@ public class PositionEntityImpl implements PositionEntity{
 			setStoryId(null);
 	}
 
-	@Override
+	
 	public ItemEntity getItemEntity() {
 		return itemEntity;
 	}
 
-	@Override
+	
 	public void setItemEntity(ItemEntity itemEntity) {
 		this.itemEntity=itemEntity;
 		if(itemEntity != null)
@@ -57,12 +57,12 @@ public class PositionEntityImpl implements PositionEntity{
 			setItemId(null);
 	}
 
-	@Override
+	
 	public TranslationEntity getTranslationEntity() {
 		return translationEntity;
 	}
 
-	@Override
+	
 	public void setTranslationEntity(TranslationEntity translationEntity) {
 		this.translationEntity = translationEntity;
 		if(translationEntity != null)
@@ -80,12 +80,6 @@ public class PositionEntityImpl implements PositionEntity{
 	}
 
 	private String translationKey;
-	
-	public PositionEntityImpl() {
-		offsetsTranslatedText = new ArrayList<Integer>();
-		offsetsOriginalText = new ArrayList<Integer>();
-		nerTools = new ArrayList<String>();
-	}
 	
 	public String getItemId() {
 		return itemId;
@@ -111,40 +105,40 @@ public class PositionEntityImpl implements PositionEntity{
 		this.translationKey = translationKey;
 	}
 	
-	@Override
+	
 	public List<Integer> getOffsetsTranslatedText() {
 		return offsetsTranslatedText;
 	}
 
-	@Override
+	
 	public void setOffsetsTranslatedText(List<Integer> offsetPositions) {
 		this.offsetsTranslatedText = offsetPositions;
 	}
 
-	@Override
+	
 	public void addOfssetsTranslatedText(int offsetPosition) {
 		offsetsTranslatedText.add(offsetPosition);
 	}
 
-	@Override
+	
 	public List<Integer> getOffsetsOriginalText() {
 		return offsetsOriginalText;
 	}
 
-	@Override
+	
 	public void setOffsetsOriginalText(List<Integer> offsetPositions) {
 		this.offsetsOriginalText=offsetPositions;
 		
 	}
 
-	@Override
+	
 	public void addOfssetsOriginalText(int offsetPosition) {
 		offsetsOriginalText.add(offsetPosition);
 		
 	}
 
 	// Overriding equals() to compare two PositionEntity objects 
-    @Override
+    
     public boolean equals(Object pe){ 
   
         // If the object is compared with itself then return true   
@@ -154,12 +148,12 @@ public class PositionEntityImpl implements PositionEntity{
   
         /* Check if object is an instance of PositionEntity or not 
           "null instanceof [type]" also returns false */
-        if (!(pe instanceof PositionEntity)) { 
+        if (!(pe instanceof PositionEntityImpl)) { 
             return false; 
         } 
           
         // typecast pe to PositionEntity so that we can compare data members  
-        PositionEntity pe_new = (PositionEntity) pe; 
+        PositionEntityImpl pe_new = (PositionEntityImpl) pe; 
         
         Collections.sort(offsetsTranslatedText);
         Collections.sort(pe_new.getOffsetsTranslatedText());
@@ -171,7 +165,7 @@ public class PositionEntityImpl implements PositionEntity{
                 && pe_new.getFieldUsedForNER().compareTo(fieldUsedForNER)==0;
     } 
     
-    @Override
+    
     public int hashCode() {
         int result = 17;
         result = 31 * result + storyId.hashCode();
@@ -180,20 +174,11 @@ public class PositionEntityImpl implements PositionEntity{
         return result;
     }
     
-	@Override
-	public List<String> getNERTools() {
-		
+	public List<String> getNerTools() {
 		return nerTools;
 	}
 
-	@Override
-	public void addNERTool(String tool) {
-		if(!nerTools.contains(tool)) nerTools.add(tool);
+	public void setNerTools(List<String> nerTools) {
+		this.nerTools = nerTools;
 	}
-
-	@Override
-	public void setNERTools(List<String> tools) {
-		nerTools.addAll(tools);
-	}
-
 }

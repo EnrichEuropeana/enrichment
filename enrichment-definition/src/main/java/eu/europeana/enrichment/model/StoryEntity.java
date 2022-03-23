@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model;
 
+import java.util.List;
+import java.util.Map;
+
 public interface StoryEntity {
 
 	/*
@@ -25,9 +28,6 @@ public interface StoryEntity {
 	String getSummary();
 	void setSummary(String storySummary);
 	
-	String getLanguageTranscription();
-	void setLanguageTranscription(String storyLanguageTranscription);
-	
 	String getLanguageDescription();
 	void setLanguageDescription(String storyLanguageDescription);
 	
@@ -44,5 +44,23 @@ public interface StoryEntity {
 	String getSummaryEn();
 
 	void setSummaryEn(String summaryEn);
+
+	List<String> getKeywords() ;
+
+	void setKeywords(List<String> keywords);
 	
+	Map<String, Integer> getCompletionStatus();
+
+	void setCompletionStatus(Map<String, Integer> completionStatus);
+	
+	int getItemCount();
+	
+	void setItemCount(int itemCount);
+	
+	List<String> getTranscriptionLanguages();
+
+	void setTranscriptionLanguages(List<String> transcriptionLanguages);
+	
+	void copyFromStory(StoryEntity story);
+
 }

@@ -1,5 +1,10 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
@@ -15,13 +20,16 @@ public class StoryEntityImpl implements StoryEntity {
 	private String source;
 	private String description;
 	private String summary;
-	private String languageTranscription;
+	private List<String> transcriptionLanguages;
 	private String languageDescription;
 	private String languageSummary;
 	private String transcriptionText;
 	private String descriptionEn;
 	private String summaryEn;
-	
+	private List<String> keywords;
+	private Map<String, Integer> completionStatus;
+	private int itemCount;
+
 	@Id
     private String _id = new ObjectId().toString();
 	
@@ -39,10 +47,13 @@ public class StoryEntityImpl implements StoryEntity {
 		this.descriptionEn = copy.getDescriptionEn();
 		this.summary = copy.getSummary();
 		this.summaryEn = copy.getSummaryEn();
-		this.languageTranscription = copy.getLanguageTranscription();
 		this.languageDescription = copy.getLanguageDescription();
 		this.languageSummary = copy.getLanguageSummary();
 		this.transcriptionText = copy.getTranscriptionText();
+		if(copy.getKeywords()!=null) this.keywords = new ArrayList<String>(copy.getKeywords());
+		if(copy.getCompletionStatus()!=null) this.completionStatus = new HashMap<String, Integer>(copy.getCompletionStatus());
+		if(copy.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<String>(copy.getTranscriptionLanguages()); 
+		this.itemCount = copy.getItemCount();
 	}
 	
 	public StoryEntityImpl() {
@@ -149,15 +160,54 @@ public class StoryEntityImpl implements StoryEntity {
 	public void setLanguageSummary(String storyLanguageSummary) {
 		this.languageSummary=storyLanguageSummary;
 	}
+	
+	public List<String> getKeywords() {
+		return keywords;
+	}
 
-	@Override
-	public String getLanguageTranscription() {
-		return languageTranscription;
+	public void setKeywords(List<String> keywords) {
+		this.keywords = keywords;
+	}
+	
+	public Map<String, Integer> getCompletionStatus() {
+		return completionStatus;
+	}
+
+	public void setCompletionStatus(Map<String, Integer> completionStatus) {
+		this.completionStatus = completionStatus;
+	}
+
+	public int getItemCount() {
+		return itemCount;
+	}
+
+	public void setItemCount(int itemCount) {
+		this.itemCount = itemCount;
+	}
+	
+	public List<String> getTranscriptionLanguages() {
+		return transcriptionLanguages;
+	}
+
+	public void setTranscriptionLanguages(List<String> transcriptionLanguages) {
+		this.transcriptionLanguages = transcriptionLanguages;
 	}
 
 	@Override
-	public void setLanguageTranscription(String storyLanguageTranscription) {
-		this.languageTranscription=storyLanguageTranscription;
+	public void copyFromStory(StoryEntity story) {
+		this.storyId = story.getStoryId();
+		this.title = story.getTitle();
+		this.source = story.getSource();
+		this.description = story.getDescription();
+		this.descriptionEn = story.getDescriptionEn();
+		this.summary = story.getSummary();
+		this.summaryEn = story.getSummaryEn();
+		this.languageDescription = story.getLanguageDescription();
+		this.languageSummary = story.getLanguageSummary();
+		this.transcriptionText = story.getTranscriptionText();
+		if(story.getKeywords()!=null) this.keywords = new ArrayList<String>(story.getKeywords());
+		if(story.getCompletionStatus()!=null) this.completionStatus = new HashMap<String, Integer>(story.getCompletionStatus());
+		if(story.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<String>(story.getTranscriptionLanguages()); 
+		this.itemCount = story.getItemCount();
 	}
-
 }
