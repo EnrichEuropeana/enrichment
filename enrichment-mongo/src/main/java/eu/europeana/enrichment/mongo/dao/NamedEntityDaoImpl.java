@@ -13,14 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
-import dev.morphia.query.Query;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(AppConfigConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
@@ -38,10 +36,11 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
-	private void addAdditonalInformation(NamedEntity dbEntity) {
-		List<PositionEntity> positions = dbEntity.getPositionEntities();
+	private void addAdditonalInformation(NamedEntityImpl dbEntity) {
+		List<PositionEntityImpl> positions = dbEntity.getPositionEntities();
+		if(positions==null) return;
 		for(int index = positions.size()-1; index >= 0; index--) {
-			PositionEntity dbPositionEntity = positions.get(index);
+			PositionEntityImpl dbPositionEntity = positions.get(index);
 			String storyId = dbPositionEntity.getStoryId();
 			String itemId = dbPositionEntity.getItemId();
 			String translationKey = dbPositionEntity.getTranslationKey();
@@ -61,22 +60,22 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 	
 	@Override
-	public NamedEntity findNamedEntity(String label) {
+	public NamedEntityImpl findNamedEntity(String label) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
                 eq(EntityFields.LABEL, label))
                 .first();
 	}
 	
 	@Override
-	public List<NamedEntity> findAllNamedEntities() {
+	public List<NamedEntityImpl> findAllNamedEntities() {
 		List<NamedEntityImpl> queryResult = enrichmentDatastore.find(NamedEntityImpl.class).iterator().toList();
 		if(queryResult == null)
 			return null;
 		else
 		{
-			List<NamedEntity> tmpResult = new ArrayList<>();
+			List<NamedEntityImpl> tmpResult = new ArrayList<>();
 			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntity dbEntity = queryResult.get(index);
+				NamedEntityImpl dbEntity = queryResult.get(index);
 				tmpResult.add(dbEntity);
 			}
 			return tmpResult;
@@ -84,34 +83,24 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}	
 
 	@Override
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, boolean translation) {
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type) {
 		List<NamedEntityImpl> queryResult = null;
-		if(translation) {
-			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
-					elemMatch(EntityFields.POSITION_ENTITIES,
-	                eq(EntityFields.TRANSLATION_KEY, storyId),
-	                eq(EntityFields.FIELD_USED_FOR_NER, type)	            
-					))
-					.iterator()
-					.toList();
-		} else {
-			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
-					elemMatch(EntityFields.POSITION_ENTITIES,
-	                eq(EntityFields.STORY_ID, storyId),
-	                eq(EntityFields.ITEM_ID, itemId),
-	                eq(EntityFields.FIELD_USED_FOR_NER, type)	            
-					))
-					.iterator()
-					.toList();
-		}
-		
+		queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+				elemMatch(EntityFields.POSITION_ENTITIES,
+                eq(EntityFields.STORY_ID, storyId),
+                eq(EntityFields.ITEM_ID, itemId),
+                eq(EntityFields.FIELD_USED_FOR_NER, type)	            
+				))
+				.iterator()
+				.toList();
+
 		if(queryResult == null)
 			return null;
 		else
 		{
-			List<NamedEntity> tmpResult = new ArrayList<>();
+			List<NamedEntityImpl> tmpResult = new ArrayList<>();
 			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntity dbEntity = queryResult.get(index);
+				NamedEntityImpl dbEntity = queryResult.get(index);
 				//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
 				//addAdditonalInformation(dbEntity);
 				tmpResult.add(dbEntity);
@@ -121,7 +110,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 
 	@Override
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
 
 		List<NamedEntityImpl> result = enrichmentDatastore.find(NamedEntityImpl.class).filter(
 				elemMatch(EntityFields.POSITION_ENTITIES,
@@ -133,9 +122,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 				.iterator()
 				.toList();
 		
-		List<NamedEntity> tmpResult = new ArrayList<>();
+		List<NamedEntityImpl> tmpResult = new ArrayList<>();
 		for(int index = result.size()-1; index >= 0; index--) {
-			NamedEntity dbEntity = result.get(index);
+			NamedEntityImpl dbEntity = result.get(index);
 			//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
 			//addAdditonalInformation(dbEntity);
 			tmpResult.add(dbEntity);
@@ -143,73 +132,9 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		return tmpResult;
 	}
 
-	
 	@Override
-	public List<NamedEntity> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, boolean translation) {
-		List<NamedEntityImpl> queryResult = null;
-		if(translation) {
-			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
-					elemMatch(EntityFields.POSITION_ENTITIES,
-	                eq(EntityFields.TRANSLATION_KEY, storyId)
-					))
-					.iterator()
-					.toList();
-		} else {
-			queryResult = enrichmentDatastore.find(NamedEntityImpl.class).filter(
-					elemMatch(EntityFields.POSITION_ENTITIES,
-	                eq(EntityFields.STORY_ID, storyId),
-	                eq(EntityFields.ITEM_ID, itemId)
-					))
-					.iterator()
-					.toList();
-		}
-		
-		if(queryResult == null)
-			return null;
-		else
-		{
-			List<NamedEntity> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntity dbEntity = queryResult.get(index);
-				//commented out addAdditonalInformation() function from performance reasons becuase it slows down the db operations in case of many NamedEntities
-				//addAdditonalInformation(dbEntity);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-	}
-
-	@Override
-	public void saveNamedEntity(NamedEntity entity) {
-		NamedEntity dbNamedEntity = findNamedEntity(entity.getLabel());
-		if(dbNamedEntity!=null)
-		{
-			dbNamedEntity.setDBpediaIds(entity.getDBpediaIds());
-			dbNamedEntity.setDbpediaWikidataIds(entity.getDbpediaWikidataIds());
-			dbNamedEntity.setEuropeanaIds(entity.getEuropeanaIds());
-			dbNamedEntity.setLabel(entity.getLabel());
-			dbNamedEntity.setPositionEntities(entity.getPositionEntities());
-			dbNamedEntity.setPreferredWikidataIds(entity.getPreferredWikidataIds());
-			dbNamedEntity.setType(entity.getType());
-			dbNamedEntity.setWikidataIds(entity.getWikidataIds());
-			this.enrichmentDatastore.save(dbNamedEntity);
-		}
-		else
-		{	
-			NamedEntityImpl tmp = null;
-			if(entity instanceof NamedEntityImpl)
-				tmp = (NamedEntityImpl) entity;
-			else {
-				tmp = new NamedEntityImpl(entity);
-			}
-			if(tmp != null)
-				this.enrichmentDatastore.save(tmp);
-		}
-	}
-
-	@Override
-	public void deleteNamedEntity(NamedEntity entity) {
-		deleteNamedEntityByKey(entity.getLabel());
+	public void saveNamedEntity(NamedEntityImpl entity) {
+		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override
@@ -241,7 +166,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 		//fetching the PositionEntity-ies to be deleted from the NamedEntity-ies
 		for(int index = queryResult.size()-1; index >= 0; index--) {
-			List<PositionEntity> positionEntityList = queryResult.get(index).getPositionEntities();
+			List<PositionEntityImpl> positionEntityList = queryResult.get(index).getPositionEntities();
+			if(positionEntityList==null) continue;
 			int posIndex = 0;
 			while(posIndex<positionEntityList.size())
 			{

@@ -6,7 +6,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({ "@context", "id", "type", "creator","total","items"})
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD, 
+	"id", 
+	"type", 
+	"creator",
+	"total",
+	"items"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
 
@@ -88,5 +98,9 @@ public class NamedEntityAnnotationCollection {
 		this.total = total;
 	}
 	
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return ANNOTATION_CONTEXT;
+	}
 	
 }

@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.web.service;
 
-import org.springframework.stereotype.Service;
-
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 
@@ -20,7 +18,7 @@ public interface EnrichmentTranslationService {
 	 * 									a ID will be returned
 	 * @throws							HttpException
 	 */
-	public String translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException, Exception;  
+	public void translate(EnrichmentTranslationRequest requestParam, boolean process) throws HttpException, Exception;  
 	
 	/*
 	 * This method uploads the translation text to a TranslationEntity.

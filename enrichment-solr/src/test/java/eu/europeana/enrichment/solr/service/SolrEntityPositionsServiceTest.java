@@ -53,7 +53,7 @@ public class SolrEntityPositionsServiceTest {
 //			e.printStackTrace();
 //		}
 		
-		log.info("The found term offset using Solr HIghlighter is: " + Double.toString(termOffset));
+		log.debug("The found term offset using Solr HIghlighter is: " + Double.toString(termOffset));
 		
 	}
 	

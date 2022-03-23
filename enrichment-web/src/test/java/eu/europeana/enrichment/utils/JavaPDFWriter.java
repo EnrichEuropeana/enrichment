@@ -8,23 +8,22 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chapter;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.CMYKColor;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import eu.europeana.enrichment.model.NamedEntity;
-import eu.europeana.enrichment.model.PositionEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
 // code is aken from: https://stackoverflow.com/questions/25166533/java-write-to-pdf-with-color
 
@@ -50,7 +49,7 @@ public class JavaPDFWriter
 	/*
 	 * translationOrOriginalText=0 -> write translated text in a pdf; translationOrOriginalText=1 -> write original text to pdf
 	 */
-	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText) throws Exception
+	public void writeFormatedPDF(String fileURL, String outputText, TreeMap<String, List<NamedEntityImpl>> NERNamedEntities, int translationOrOriginalText) throws Exception
 	{
 		outputText=addSpecialCharactersToString(outputText, NERNamedEntities, translationOrOriginalText);
 		
@@ -110,7 +109,7 @@ public class JavaPDFWriter
 		    
 		} catch (Exception e)
 		{
-		    e.printStackTrace();
+		    logger.log(Level.ERROR, "Exception during writting the pdf with Java.", e);
 		    throw e;
 		}
 	}
@@ -127,96 +126,100 @@ public class JavaPDFWriter
 	}
 	
 	
-	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntity>> NERNamedEntities, int translationOrOriginalText)
+	private String addSpecialCharactersToString(String textString, TreeMap<String, List<NamedEntityImpl>> NERNamedEntities, int translationOrOriginalText)
 	{
 		StringBuilder sb = new StringBuilder(textString);	 
 		
 		List<Integer> allAddedPositions = new ArrayList<Integer>();
 	
-		for(Map.Entry<String, List<NamedEntity>> entry : NERNamedEntities.entrySet()) {
+		for(Map.Entry<String, List<NamedEntityImpl>> entry : NERNamedEntities.entrySet()) {
         	
         	String key = entry.getKey();
-        	List<NamedEntity> values = entry.getValue();
+        	List<NamedEntityImpl> values = entry.getValue();
 
-        	Iterator<NamedEntity> NEREntitiesIterator = values.iterator();
-        	
-        	while(NEREntitiesIterator.hasNext()) {
-        		
-        		NamedEntity nextNEREntity=NEREntitiesIterator.next();
-        		
-        		Iterator<PositionEntity> PositionsIterator = nextNEREntity.getPositionEntities().iterator();
-        		
-            	while(PositionsIterator.hasNext()) {
-            		
-            		PositionEntity nextPosition=PositionsIterator.next();   
-            		
-            		/*
-            		 * check if the position is valid, if the value is <0 it is not valid meaning the NamedEntity is not found
-            		 */
-            		
-            		int checkIfPositionIsValid;
-            		if (translationOrOriginalText==0) {
-            			checkIfPositionIsValid = nextPosition.getOffsetsTranslatedText().get(0);
-        			}
-        			else {
-        				checkIfPositionIsValid = nextPosition.getOffsetsOriginalText().get(0);
-        			}
-            		
-            		if(checkIfPositionIsValid>=0 && checkIfPositionIsValid<=textString.length())
-            		{
-	            		/* 
-	            		 * here we have to update where to insert a symbol based on already inserted symbols
-	            		 */
-	        			int positionToInsert;
-	        			if (translationOrOriginalText==0) {
-	        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
-	        			}
-	        			else {
-	        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
-	        			}
-	            		
-	        			boolean addedSymbol = false;
-	        			if(key.equalsIgnoreCase("agent"))
-	        			{
-	            			sb.insert(positionToInsert, SPADE);
-	            			addedSymbol=true;
-	        			}
-	        			else if(key.equalsIgnoreCase("organization"))
-	        			{
-	        				//this symbol is a HEART character
-	        				sb.insert(positionToInsert, HEART);
-	        				addedSymbol=true;
-	        			}
-	        			else if(key.equalsIgnoreCase("place"))
-	        			{
-	        				//this symbol is a DIAMOND character
-	        				sb.insert(positionToInsert, DIAMOND);
-	        				addedSymbol=true;
-	        			}
-	        			else if(key.equalsIgnoreCase("misc"))
-	        			{
-	        				//this symbol is a CLUB character
-	        				sb.insert(positionToInsert, CLUB);
-	        				addedSymbol=true;
-	        			}
-	            		
-	        			if(addedSymbol)
-	        			{
-		        			if (translationOrOriginalText==0) {
-		        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+        	if(values!=null) {
+	        	Iterator<NamedEntityImpl> NEREntitiesIterator = values.iterator();	        	
+	        	while(NEREntitiesIterator.hasNext()) {
+	        		
+	        		NamedEntityImpl nextNEREntity=NEREntitiesIterator.next();
+	        		
+	        		if(nextNEREntity.getPositionEntities()!=null) {
+		        		Iterator<PositionEntityImpl> PositionsIterator = nextNEREntity.getPositionEntities().iterator();		        		
+		            	while(PositionsIterator.hasNext()) {
+		            		
+		            		PositionEntityImpl nextPosition=PositionsIterator.next();   
+		            		
+		            		/*
+		            		 * check if the position is valid, if the value is <0 it is not valid meaning the NamedEntity is not found
+		            		 */
+		            		
+		            		int checkIfPositionIsValid = -1;
+		            		if (translationOrOriginalText==0 && nextPosition.getOffsetsTranslatedText()!=null &&
+		            				nextPosition.getOffsetsTranslatedText().size()>0) {
+		            			checkIfPositionIsValid = nextPosition.getOffsetsTranslatedText().get(0);
 		        			}
-		        			else
-		        			{
-		        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+		        			else if(nextPosition.getOffsetsOriginalText()!=null && nextPosition.getOffsetsOriginalText().size()>0){
+		        				checkIfPositionIsValid = nextPosition.getOffsetsOriginalText().get(0);
 		        			}
-	        			}
-            		}
-            		else
-            		{
-            			logger.info("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
-            		
-            		}
-            	}
+		            		
+		            		if(checkIfPositionIsValid>=0 && checkIfPositionIsValid<=textString.length())
+		            		{
+			            		/* 
+			            		 * here we have to update where to insert a symbol based on already inserted symbols
+			            		 */
+			        			int positionToInsert = -1;
+			        			if (translationOrOriginalText==0 && nextPosition.getOffsetsTranslatedText()!=null &&
+			            				nextPosition.getOffsetsTranslatedText().size()>0) {
+			        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsTranslatedText().get(0));
+			        			}
+			        			else if (nextPosition.getOffsetsOriginalText()!=null && nextPosition.getOffsetsOriginalText().size()>0) {
+			        				positionToInsert=newPositionToInsert(allAddedPositions,nextPosition.getOffsetsOriginalText().get(0));
+			        			}
+			            		
+			        			boolean addedSymbol = false;
+			        			if(key.equalsIgnoreCase("agent"))
+			        			{
+			            			sb.insert(positionToInsert, SPADE);
+			            			addedSymbol=true;
+			        			}
+			        			else if(key.equalsIgnoreCase("organization"))
+			        			{
+			        				//this symbol is a HEART character
+			        				sb.insert(positionToInsert, HEART);
+			        				addedSymbol=true;
+			        			}
+			        			else if(key.equalsIgnoreCase("place"))
+			        			{
+			        				//this symbol is a DIAMOND character
+			        				sb.insert(positionToInsert, DIAMOND);
+			        				addedSymbol=true;
+			        			}
+			        			else if(key.equalsIgnoreCase("misc"))
+			        			{
+			        				//this symbol is a CLUB character
+			        				sb.insert(positionToInsert, CLUB);
+			        				addedSymbol=true;
+			        			}
+			            		
+			        			if(addedSymbol)
+			        			{
+				        			if (translationOrOriginalText==0) {
+				        				allAddedPositions.add(nextPosition.getOffsetsTranslatedText().get(0));
+				        			}
+				        			else
+				        			{
+				        				allAddedPositions.add(nextPosition.getOffsetsOriginalText().get(0));
+				        			}
+			        			}
+		            		}
+		            		else
+		            		{
+		            			logger.debug("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
+		            		
+		            		}
+		            	}
+	        		}
+	        	}
         	}
 		
 		}

@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +13,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 
-@JsonPropertyOrder({ "@context", "id", "type", "total","partOf", "items"})
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD, 
+	"id", 
+	"type", 
+	"total",
+	"partOf", 
+	"items"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntitySolrCollection {
 
@@ -77,5 +87,9 @@ public class NamedEntitySolrCollection {
 		this.total = total;
 	}
 	
+	@JsonProperty(CONTEXT_FIELD)
+	public String getContext() {
+		return WIKIDATA_CONTEXT;
+	}
 	
 }

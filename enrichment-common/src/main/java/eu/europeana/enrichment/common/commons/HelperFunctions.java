@@ -20,7 +20,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -60,12 +60,10 @@ public class HelperFunctions {
 
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 
-			logger.info("Http reponse: " + responeString);
 			return responeString;
 		} catch (Exception ex) {
 			//TODO: proper exception handling
-			logger.error("Exception raised during the creation of the Http request to: " + baseUrl);
-			logger.error("Exception raised during the creation of the Http request: " + ex.getMessage());			
+			logger.log(Level.ERROR, "Exception raised during the creation of the Http request to: " + baseUrl, ex);
 			return "";
 		}
 	}
@@ -162,7 +160,7 @@ public class HelperFunctions {
 	    	
 			bw.write(content);
 			
-		    logger.info("Wikidata JSON File is written successfully!");
+		    logger.debug("Wikidata JSON File is written successfully!");
 			    
 		} catch (IOException ioe) 
 	    {

@@ -3,9 +3,26 @@ package eu.europeana.enrichment.model.impl;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
 
 import eu.europeana.enrichment.model.WikidataAgent;
 
+@JsonPropertyOrder({ 
+	CONTEXT_FIELD,
+	"id",
+	"type",
+	"prefLabel",
+	"altLabel",
+	"country",
+	"dateOfBirth",
+	"dateOfDeath",
+	"professionOrOccupation",
+	"description",
+	"depiction",
+	"modified",
+	"sameAs"
+})
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAgent {
 

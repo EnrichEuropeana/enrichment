@@ -18,6 +18,8 @@ public interface PersistentItemEntityService {
 	 */
 	public ItemEntity findItemEntity(String storyId, String itemId);
 	
+	public ItemEntity findItemEntity(String itemId);
+	
 	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId);
 	
 	/**
@@ -42,7 +44,7 @@ public interface PersistentItemEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveItemEntity(ItemEntity entity) throws NoSuchAlgorithmException, UnsupportedEncodingException;
+	public void saveItemEntity(ItemEntity entity);
 	/*
 	 * This method saves and updates a list of story item entities into the Mongo database
 	 * 
@@ -50,7 +52,7 @@ public interface PersistentItemEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveStoryItemEntities(List<ItemEntity> entities) throws Exception;
+	public void saveStoryItemEntities(List<ItemEntity> entities);
 	/*
 	 * This method deletes story item entities from the Mongo database
 	 * 

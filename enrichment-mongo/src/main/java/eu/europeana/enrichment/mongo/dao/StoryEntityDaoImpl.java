@@ -39,32 +39,8 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 
 	@Override
 	public void saveStoryEntity(StoryEntity entity) {
-		StoryEntity dbStoryEntity = findStoryEntity(entity.getStoryId());
-		if(dbStoryEntity!=null)
-		{
-			dbStoryEntity.setDescription(entity.getDescription());
-			dbStoryEntity.setDescriptionEn(entity.getDescriptionEn());
-			dbStoryEntity.setLanguageTranscription(entity.getLanguageTranscription());
-			dbStoryEntity.setLanguageDescription(entity.getLanguageDescription());
-			dbStoryEntity.setLanguageSummary(entity.getLanguageSummary());
-			dbStoryEntity.setSource(entity.getSource());
-			dbStoryEntity.setSummary(entity.getSummary());
-			dbStoryEntity.setSummaryEn(entity.getSummaryEn());
-			dbStoryEntity.setTitle(entity.getTitle());
-			dbStoryEntity.setTranscriptionText(entity.getTranscriptionText());
-			this.enrichmentDatastore.save(dbStoryEntity);
-		}
-		else
-		{
-			StoryEntityImpl tmp = null;
-			if(entity instanceof StoryEntityImpl)
-				tmp = (StoryEntityImpl) entity;
-			else {
-				tmp = new StoryEntityImpl(entity);
-			}
-			if(tmp != null)
-				this.enrichmentDatastore.save(tmp);
-		}
+		if(entity==null) return;
+		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

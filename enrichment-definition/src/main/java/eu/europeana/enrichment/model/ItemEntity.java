@@ -2,6 +2,7 @@ package eu.europeana.enrichment.model;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public interface ItemEntity {
 	
@@ -22,15 +23,10 @@ public interface ItemEntity {
 	 * Text information original language, type (Title, Description, 
 	 * StoryItem,..)
 	 */
-	String getLanguage();
-	void setLanguage(String language);
 	String getType();
 	void setType(String textType);
 	String getTranscriptionText();
 	void setTranscriptionText(String transcriptionText);
-	
-	String getDescription();
-	void setDescription(String descriptionText);
 
 	String getSource();
 	void setSource(String sourceParam);
@@ -47,5 +43,15 @@ public interface ItemEntity {
 	String getStoryId();
 
 	void setStoryId(String storyId);
+
+	List<String> getKeywords() ;
+
+	void setKeywords(List<String> keywords);
+	
+	List<String> getTranscriptionLanguages();
+
+	void setTranscriptionLanguages(List<String> transcriptionLanguages);
+	
+	void copyFromItem(ItemEntity item) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 
 }

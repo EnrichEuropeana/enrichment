@@ -24,7 +24,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
-import eu.europeana.enrichment.model.NamedEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.service.NERService;
 
 @Service
@@ -70,7 +70,7 @@ public class NERPythonServiceImpl implements NERService{
 	 * @see eu.europeana.enrichment.ner.service.NERService#identifyNER(java.lang.String)
 	 */
 	@Override
-	public TreeMap<String, List<NamedEntity>> identifyNER(String text) throws IOException {
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws IOException {
 		TreeMap<String, List<List<String>>> map = new TreeMap<>();
 		Process process;
 		try {
@@ -104,12 +104,10 @@ public class NERPythonServiceImpl implements NERService{
 				sb.append(currentLine);
 			}
 			String pythonErrorResponse = sb.toString();
-			logger.error("Python error: " + pythonErrorResponse);
-			System.out.println("Python error: " + pythonErrorResponse);
+			logger.debug("Python error: " + pythonErrorResponse);
 			
 			byte[] bytesDecoded = Base64.getDecoder().decode(pythonResponse.getBytes("UTF-8"));
 			String pythonResponseText = new String(bytesDecoded, "UTF-8");
-			//System.out.println("Python response: " + pythonResponse);
 			
 			map = readJSON(pythonResponseText);
 

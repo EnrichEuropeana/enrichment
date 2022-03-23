@@ -19,7 +19,7 @@ import eu.europeana.enrichment.common.commons.AppConfigConstants;
 @PropertySource(value = {"classpath:config/enrichment.properties", "classpath:config/enrichment.user.properties"}, ignoreResourceNotFound = true)
 public class DataSourceConfig {
 
-    private static final Logger logger = LogManager.getLogger(DataSourceConfig.class);
+    Logger logger = LogManager.getLogger(getClass());
 
     @Value("${enrich.mongodb.connectionUri}")
     private String hostUri;
@@ -34,7 +34,7 @@ public class DataSourceConfig {
     
     @Bean(AppConfigConstants.BEAN_ENRICHMENT_DATASTORE)
     public Datastore enrichmentDatastore(MongoClient mongoClient) {
-        logger.info("Configuring the database: {}", emDatabase);
+        logger.debug("Configuring the database: {}", emDatabase);
         Datastore datastore = Morphia.createDatastore(mongoClient, emDatabase, MapperOptions.builder().mapSubPackages(true).build());
         // EA-2520: explicit package mapping required to prevent EntityDecoder error
         datastore.getMapper().mapPackage("eu.europeana.enrichment.model.impl");

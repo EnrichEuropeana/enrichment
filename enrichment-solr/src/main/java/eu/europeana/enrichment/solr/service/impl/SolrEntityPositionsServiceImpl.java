@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -33,6 +34,7 @@ import org.tartarus.snowball.ext.romanianStemmer;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
@@ -41,11 +43,13 @@ import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
-import eu.europeana.enrichment.translation.service.TranslationService;
+import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
 
+	Logger logger = LogManager.getLogger(getClass());
+	
 	//@Resource(name = "solrBaseClientService")
 	@Autowired
 	SolrBaseClientService solrBaseClientService;
@@ -65,7 +69,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 	//@Resource(name = "eTranslationService")
 	@Autowired
-	TranslationService eTranslationService;
+	ETranslationEuropaServiceImpl eTranslationService;
 
 	/*
 	 * The "scaleFactorRangeOfCharsToObserve" param below is introduced to make sure we are searching in a range that is big enough to with the matching term
@@ -90,11 +94,11 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 	
 	private final Logger log = LogManager.getLogger(getClass());
 	private List<String> entitiesOriginalText = new ArrayList<String>();
-	private String storyOriginalText="";
-	private String storyTranslatedText="";
-	private String storyOriginalLanguage="";
-	private String storyTranslatedLanguage="";
-	private String storyIdSolr="";
+	private String storyOriginalText;
+	private String storyTranslatedText;
+	private String storyOriginalLanguage;
+	private String storyTranslatedLanguage;
+	private String storyIdSolr;
 	private boolean fuzzyLogicSolr = false;
 	
 	private int sentencesByNowTranslated=1;
@@ -109,12 +113,12 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		if(!enrichmentConfiguration.getSolrTranslatedEntities().isEmpty())
 		{
-			String data = ""; 
+			String data; 
 			try {
 				data = new String(Files.readAllBytes(Paths.get(enrichmentConfiguration.getSolrTranslatedEntities())));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.log(Level.ERROR, "Exception during reading the solr entity positions from a file.", e);
 				throw e;
 			}
 			String[] entities = data.split(",");
@@ -191,9 +195,9 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			List<Double> positionsAdapted = new ArrayList<Double>();
 			List<List<Double>> offsetsAdapted = new ArrayList<List<Double>>();
 			
-			log.info("Solr query: " + query.toString());
-			log.info("Solr query response, terms adapted: " + termsAdapted.toString());
-			log.info("Solr query response, offsets adapted: " + offsetsAdapted.toString());
+			log.debug("Solr query: " + query.toString());
+			log.debug("Solr query response, terms adapted: " + termsAdapted.toString());
+			log.debug("Solr query response, offsets adapted: " + offsetsAdapted.toString());
 			
 			adaptTermsPositionsOffsets(offsetTranslatedText,termLowerCaseStemmed,terms,positions,offsets,termsAdapted,positionsAdapted,offsetsAdapted);
 	
@@ -891,7 +895,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * if the original language is the same as the target language, add positions in the original text
 		 * to be the same as in the translated text
 		 */
-		if(dbStoryEntity.getLanguageTranscription().compareTo(targetLanguage)==0)
+		if(ModelUtils.compareMainTranslationLanguage(dbStoryEntity, targetLanguage))
 		{			
 			for (String classificationType : identifiedNER.keySet()) {
 				for (List<String> entityList : identifiedNER.get(classificationType)) {
@@ -909,7 +913,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		
 		storyOriginalText=dbStoryEntity.getTranscriptionText();
 		storyTranslatedText=translatedText;
-		storyOriginalLanguage=dbStoryEntity.getLanguageTranscription();
 		storyTranslatedLanguage=targetLanguage;
 		storyIdSolr=dbStoryEntity.getStoryId();
 		fuzzyLogicSolr=fuzzyLogic;		

@@ -3,6 +3,8 @@ package eu.europeana.enrichment.utils;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,8 @@ import objects.Transcription;
 @Disabled("Excluded from automated runs.")
 public class ImportStoriesFromTranscribathonDataset {
 		
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
 	@Autowired
@@ -89,9 +93,8 @@ public class ImportStoriesFromTranscribathonDataset {
 			StoryEntity [] newStories = new StoryEntity [1];
 			newStories[0] = new StoryEntityImpl();
 			
-			newStories[0].setTranscriptionText(storyTranscription);
-			newStories[0].setDescription(minimalStory.dcDescription);				
-			newStories[0].setLanguageTranscription(minimalStory.edmLanguage);
+			if(!storyTranscription.equalsIgnoreCase("")) newStories[0].setTranscriptionText(storyTranscription);
+			newStories[0].setDescription(minimalStory.dcDescription);
 			newStories[0].setSource(minimalStory.dcSource);
 			newStories[0].setStoryId(minimalStory.StoryId.toString());
 			newStories[0].setTitle(minimalStory.dcTitle);
@@ -105,7 +108,7 @@ public class ImportStoriesFromTranscribathonDataset {
 //			
 //			for(int i=0;i<listStoryTranscribathon.size();i++)
 //			{
-//				if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().compareToIgnoreCase("en")==0 && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
+//				if(storyTranslations.get(i).getLanguage()!=null && storyTranslations.get(i).getLanguage().equalsIgnoreCase("en") && storyTranslations.get(i).getTranscriptionText()!=null && !storyTranslations.get(i).getTranscriptionText().isEmpty())
 //				{				
 //					String storyTranscriptionOneLine = storyTranslations.get(i).getTranscriptionText().replaceAll("[\r\n\t]+", " ");
 //
@@ -115,7 +118,7 @@ public class ImportStoriesFromTranscribathonDataset {
 //
 //					bwTranslations.write(storyTranslations.get(i).getStoryId() + ",\"" + removedAllNonAsciiCharacters + "\"\n");
 //					
-//					System.out.print("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
+//					logger.debug("Currently analysed story with storyId: " + storyTranslations.get(i).getStoryId() +". \n");
 //				
 //				}
 //			}		
