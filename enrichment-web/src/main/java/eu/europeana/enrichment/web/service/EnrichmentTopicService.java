@@ -2,15 +2,14 @@ package eu.europeana.enrichment.web.service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
-import eu.europeana.enrichment.model.TopicEntity;
-import eu.europeana.enrichment.web.model.EnrichmentTopicRequest;
+import eu.europeana.enrichment.model.Topic;
 
 public interface EnrichmentTopicService {
 	
-	public TopicEntity createTopic(EnrichmentTopicRequest topicRequest) throws HttpException, UnsupportedEntityTypeException;
+	public Topic createTopic(Topic topic) throws HttpException, UnsupportedEntityTypeException;
 
-	public TopicEntity updateTopic(EnrichmentTopicRequest request);
+	public Topic updateTopic(Topic topic);
 
-	public TopicEntity deleteTopic(String topicIdentifier);
+	public Topic deleteTopic(String identifier);
 
 }

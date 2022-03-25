@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import dev.morphia.annotations.Embedded;
 import eu.europeana.enrichment.exceptions.UnsupportedRangeTermEntityException;
-import eu.europeana.enrichment.model.impl.TermEntityImpl;
+import eu.europeana.enrichment.model.impl.TermImpl;
 
-@JsonDeserialize(as = TermEntityImpl.class)
+@JsonDeserialize(as = TermImpl.class)
 @Embedded
-public interface TermEntity {
+public interface Term {
 	
 	public String getTerm();
 	public void setTerm(String term);

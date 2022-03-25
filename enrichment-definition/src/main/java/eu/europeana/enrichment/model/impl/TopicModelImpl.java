@@ -13,7 +13,7 @@ import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.model.vocabulary.TopicConst;
 
 
-@Entity(value="TopicModelImpl")
+//@Entity(value="TopicModelImpl")
 public class TopicModelImpl implements TopicModel {
 	
 	private String url;
@@ -26,12 +26,12 @@ public class TopicModelImpl implements TopicModel {
 	
 	@Id
 	@JsonIgnore
-    private String _id = new ObjectId().toString();
+    private ObjectId _id; 
 	
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(_id, algorithm, description, identifier, url);
+		return Objects.hash(identifier);
 	}
 
 
@@ -44,14 +44,12 @@ public class TopicModelImpl implements TopicModel {
 		if (getClass() != obj.getClass())
 			return false;
 		TopicModelImpl other = (TopicModelImpl) obj;
-		return Objects.equals(_id, other._id) && Objects.equals(algorithm, other.algorithm)
-				&& Objects.equals(description, other.description) && Objects.equals(identifier, other.identifier)
-				&& Objects.equals(url, other.url);
+		return  Objects.equals(identifier, other.identifier);
 	}
 
 
 	@Override
-	public String getId() {
+	public ObjectId getObjectId() {
 		return _id;
 	}
 
@@ -60,20 +58,7 @@ public class TopicModelImpl implements TopicModel {
 	{
 		
 	}
-	public TopicModelImpl(String url, String id, String description, String algorithm) {
-		this.url = url;
-		this.identifier = id;
-		this.description = description;
-		this.algorithm = algorithm;
-	}
-
-	public TopicModelImpl(TopicModel tm) {
-		this._id = tm.getId();
-		this.url = tm.getURL();
-		this.identifier = tm.getIdentifier();
-		this.description = tm.getDescription();
-		this.algorithm = tm.getAlgorithm();
-	}
+	
 
 	@Override
 	public String getURL() {

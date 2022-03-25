@@ -8,21 +8,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.europeana.enrichment.model.TermEntity;
+import eu.europeana.enrichment.model.Term;
 
 
-public class TopicTermsDeserializer extends JsonDeserializer<List<TermEntity>>{
+public class TopicTermsDeserializer extends JsonDeserializer<List<Term>>{
 
 	@Override
-	public List<TermEntity> deserialize(JsonParser p, DeserializationContext ctxt)
+	public List<Term> deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		
 		return p.readValueAs(TYPE_REF);
 	}
 	
-	private static final TypeReference<List<TermEntity>> TYPE_REF = 
-            new TypeReference<List<TermEntity>>() {};
+	private static final TypeReference<List<Term>> TYPE_REF = 
+            new TypeReference<List<Term>>() {};
 
 }

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TopicEntity;
+import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
@@ -159,7 +159,7 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 
 
 	@Override
-	public void storeTopicEntity(String solrCollection, TopicEntity solrObject, boolean doCommit)
+	public void storeTopic(String solrCollection, Topic solrObject, boolean doCommit)
 			throws SolrNamedEntityServiceException {
 		try {
 			
@@ -182,13 +182,13 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 
 
 	@Override
-	public void updateTopicEntity(String solrCore, TopicEntity dbtopicEntity) throws SolrNamedEntityServiceException {
-		
+	public void updateTopic(String solrCore, Topic dbtopicEntity) throws SolrNamedEntityServiceException {
+		// TODO 
 	}
 
 
 	@Override
-	public void deleteTopicEntity(String solrCore, TopicEntity dbtopiEntity) throws SolrNamedEntityServiceException {
+	public void deleteTopic(String solrCore, Topic dbtopiEntity) throws SolrNamedEntityServiceException {
 		// TODO Auto-generated method stub
 		
 	}
