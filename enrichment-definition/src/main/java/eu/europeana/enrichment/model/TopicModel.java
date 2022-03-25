@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.model;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
@@ -21,6 +23,6 @@ public interface TopicModel {
 	public String getAlgorithm();
 	public void setAlgorithm(String alg) throws UnsupportedEntityTypeException;
 	
-	public String getId();
+	public ObjectId getObjectId();
 	
 }

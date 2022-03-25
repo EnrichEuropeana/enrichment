@@ -11,90 +11,66 @@ import org.springframework.stereotype.Service;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
-import eu.europeana.enrichment.model.TermEntity;
-import eu.europeana.enrichment.model.TopicEntity;
+import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
-import eu.europeana.enrichment.model.impl.TopicEntityImpl;
-import eu.europeana.enrichment.mongo.service.PersistentTopicEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentTopicModelService;
+import eu.europeana.enrichment.model.impl.TopicImpl;
+import eu.europeana.enrichment.mongo.service.PersistentTopicService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TopicEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
-import eu.europeana.enrichment.web.model.EnrichmentTopicRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_TOPIC_SERVICE)
 public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	
 	@Autowired
-	PersistentTopicEntityService persistentTopicEntityService;
-	@Autowired
-	PersistentTopicModelService persistentTopicModelService;
+	PersistentTopicService persistentTopicService;
+	
 	@Autowired
 	SolrBaseClientService solrService;
 
 	@Override
-	public TopicEntity createTopic(EnrichmentTopicRequest topicRequest) throws HttpException, UnsupportedEntityTypeException {
-		TopicModel dbtopicModel = persistentTopicModelService.findTopicModelByIdentifier(topicRequest.getModel().getIdentifier());
-		if (dbtopicModel == null)
-		{
-			persistentTopicModelService.saveTopicModel(topicRequest.getModel());
-			dbtopicModel = topicRequest.getModel();
-		}
-		
-		TopicEntity dbtopicEntity = persistentTopicEntityService.findById(topicRequest.getTopicIdentifier());
+	public Topic createTopic(Topic topic) throws HttpException, UnsupportedEntityTypeException {
+		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
 		if (dbtopicEntity != null)
 		{
 			
 			return null;
 		}
 		
-		TopicEntity topicEntity = new TopicEntityImpl();
-		topicEntity.setTopicID(topicRequest.topicID);
-		topicEntity.setIdentifier(topicRequest.topicIdentifier);
-		topicEntity.setLabel(topicRequest.topicLabels);
-		topicEntity.setTopicTerms(topicRequest.topicTerms);
-		topicEntity.setDescription(topicRequest.descriptions);
-		topicEntity.setTopicKeywords(topicRequest.topicKeywords);
-		topicEntity.setModelId(topicRequest.getModel().getIdentifier());
-		topicEntity.setTopicModel(dbtopicModel);
-		topicEntity.setCreatedDate(topicRequest.created);
-		topicEntity.setModifiedDate(topicRequest.modified);
-				
-				
-		persistentTopicEntityService.save(topicEntity);
+		persistentTopicService.save(topic);
 		try {
-			solrService.storeTopicEntity(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(topicEntity), true);
+			solrService.storeTopic(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(topic), true);
 		} catch (SolrNamedEntityServiceException e) {
 			e.printStackTrace();
 		}
-		return topicEntity;
+		return topic;
 	}
 
 	@Override
-	public TopicEntity updateTopic(EnrichmentTopicRequest request) {
-		TopicEntity dbtopicEntity = persistentTopicEntityService.findById(request.getTopicIdentifier());
+	public Topic updateTopic(Topic topic) {
+		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
 		if (dbtopicEntity != null)
 		{
-			if (request.topicTerms != null)
-				dbtopicEntity.setTopicTerms(request.topicTerms);
-			if (request.topicKeywords != null)
-				dbtopicEntity.setTopicKeywords(request.topicKeywords);
-			if (request.descriptions != null)
-				dbtopicEntity.setDescription(request.descriptions);
-			if (request.topicID != null)
-				dbtopicEntity.setTopicID(request.topicID);
-			if (request.topicLabels != null)
-				dbtopicEntity.setLabel(request.topicLabels);
-			if (request.getCreated() != null)
-				dbtopicEntity.setCreatedDate(request.created);
+			if (topic.getTopicTerms() != null)
+				dbtopicEntity.setTopicTerms(topic.getTopicTerms());
+			if (topic.getTopicKeywords() != null)
+				dbtopicEntity.setTopicKeywords(topic.getTopicKeywords());
+			if (topic.getDescription() != null)
+				dbtopicEntity.setDescription(topic.getDescription());
+			if (topic.getTopicID() != null)
+				dbtopicEntity.setTopicID(topic.getTopicID());
+			if (topic.getLabel() != null)
+				dbtopicEntity.setLabel(topic.getLabel());
+			if (topic.getCreatedDate() != null)
+				dbtopicEntity.setCreatedDate(topic.getCreatedDate());
 			
 			// we set modified to current date
 			dbtopicEntity.setModifiedDate(new Date());
-			persistentTopicEntityService.update(dbtopicEntity);
+			persistentTopicService.save(dbtopicEntity);
 			try {
-				solrService.updateTopicEntity(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity));
+				solrService.updateTopic(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity));
 			} catch (SolrNamedEntityServiceException e) {
 				e.printStackTrace();
 			}
@@ -104,22 +80,18 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public TopicEntity deleteTopic(String topicIdentifier) {
-		TopicEntity dbtopiEntity = persistentTopicEntityService.findById(topicIdentifier);
-		if (dbtopiEntity == null)
+	public Topic deleteTopic(String topicIdentifier) {
+		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topicIdentifier);
+		if (dbtopicEntity == null)
 			return null;
 		
-		List<TopicEntity> otherTopics = persistentTopicEntityService.findByModelId(dbtopiEntity.getModelId());
-		otherTopics.remove(dbtopiEntity);
-		if (otherTopics.isEmpty())
-			persistentTopicModelService.deleteTopicModel(persistentTopicModelService.findTopicModelByIdentifier(dbtopiEntity.getModelId()));
-		persistentTopicEntityService.delete(dbtopiEntity);
+		persistentTopicService.delete(dbtopicEntity);
 		try {
-			solrService.deleteTopicEntity(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopiEntity));
+			solrService.deleteTopic(TopicEntitySolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity));
 		} catch (SolrNamedEntityServiceException e) {
 			e.printStackTrace();
 		}
-		return dbtopiEntity;
+		return dbtopicEntity;
 	}
 
 }

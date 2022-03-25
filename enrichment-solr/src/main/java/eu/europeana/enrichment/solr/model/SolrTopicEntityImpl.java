@@ -1,8 +1,6 @@
 package eu.europeana.enrichment.solr.model;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -11,12 +9,12 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import eu.europeana.enrichment.model.TermEntity;
-import eu.europeana.enrichment.model.TopicEntity;
-import eu.europeana.enrichment.model.impl.TopicEntityImpl;
+import eu.europeana.enrichment.model.Term;
+import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TopicEntitySolrFields;
 
-public class SolrTopicEntityImpl extends TopicEntityImpl implements TopicEntity {
+public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
 	@Field(TopicEntitySolrFields.TERMS)
 	private String solrTerms;
@@ -24,7 +22,7 @@ public class SolrTopicEntityImpl extends TopicEntityImpl implements TopicEntity 
 	@Field(TopicEntitySolrFields.KEYWORDS)
 	private String solrKeywords;
 	
-	public SolrTopicEntityImpl(TopicEntity copy)
+	public SolrTopicEntityImpl(Topic copy)
 	{
 		this.setIdentifier(copy.getIdentifier());
 		this.setTopicID(copy.getTopicID());
@@ -67,7 +65,7 @@ public class SolrTopicEntityImpl extends TopicEntityImpl implements TopicEntity 
 	
 	@Override
 	//@Field(TopicEntitySolrFields.TERMS)
-	public void setTopicTerms(List<TermEntity> terms) {
+	public void setTopicTerms(List<Term> terms) {
 		try {
 			this.solrTerms = toJSON(terms);
 		} catch (IOException e) {
@@ -80,7 +78,7 @@ public class SolrTopicEntityImpl extends TopicEntityImpl implements TopicEntity 
 		//}
 	}
 	
-	private String toJSON(List<TermEntity> terms) throws JsonGenerationException, JsonMappingException, IOException {
+	private String toJSON(List<Term> terms) throws JsonGenerationException, JsonMappingException, IOException {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(terms);
 	}
@@ -88,7 +86,7 @@ public class SolrTopicEntityImpl extends TopicEntityImpl implements TopicEntity 
 
 	@Override
 	//@Field(TopicEntitySolrFields.KEYWORDS)
-	public void setTopicKeywords(List<TermEntity> keywords) {
+	public void setTopicKeywords(List<Term> keywords) {
 		try {
 			this.solrKeywords = toJSON(keywords);
 		} catch (IOException e) {

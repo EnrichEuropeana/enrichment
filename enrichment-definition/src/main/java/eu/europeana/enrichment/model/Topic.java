@@ -3,15 +3,16 @@ package eu.europeana.enrichment.model;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import eu.europeana.enrichment.model.impl.TopicEntityImpl;
+import eu.europeana.enrichment.model.impl.TopicImpl;
 
 import java.util.Date;
 
-@JsonDeserialize(as = TopicEntityImpl.class)
-public interface TopicEntity {
+@JsonDeserialize(as = TopicImpl.class)
+public interface Topic {
 	
 	public String getTopicID();
 	public void setTopicID(String id);
@@ -25,12 +26,12 @@ public interface TopicEntity {
 	public Map<String,String> getDescription();
 	public void setDescription(Map<String,String> descr);
 	
-	public List<TermEntity> getTopicTerms();
-	public void setTopicTerms(List<TermEntity> terms);
+	public List<Term> getTopicTerms();
+	public void setTopicTerms(List<Term> terms);
 	
 	// keywords from transcribathon that are related to this topic
-	public List<TermEntity> getTopicKeywords();
-	public void setTopicKeywords(List<TermEntity> keywords);
+	public List<Term> getTopicKeywords();
+	public void setTopicKeywords(List<Term> keywords);
 	
 	public TopicModel getTopicModel();
 	public void setTopicModel (TopicModel model);
@@ -40,8 +41,8 @@ public interface TopicEntity {
 	
 	public void setCreatedDate(Date date);
 	public void setModifiedDate(Date date);
-	public String getId();
-	public String toJSON() throws JsonProcessingException;
+	public ObjectId getObjectId();
+	//public String toJSON() throws JsonProcessingException;
 	
 	public String getModelId();
 	public void setModelId(String modelId);

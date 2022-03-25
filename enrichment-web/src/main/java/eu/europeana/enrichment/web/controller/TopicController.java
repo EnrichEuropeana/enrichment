@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import eu.europeana.api.commons.web.http.HttpHeaders;
-
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.web.definitions.WebFields;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
-import eu.europeana.enrichment.model.TopicEntity;
+import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
-import eu.europeana.enrichment.web.model.EnrichmentTopicRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,6 +47,8 @@ public class TopicController extends BaseRest{
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
+	private JsonLdSerializer jsonSerlializer = new JsonLdSerializer(new ObjectMapper());
+	
 	
 	
 	/**
@@ -62,7 +64,7 @@ public class TopicController extends BaseRest{
 			+ "Mandatory fields: identifier, description and topicTerm")
 	@RequestMapping(value = "/enrichment/topic/", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> postTopicCreation (@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestBody(required = false) String text) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
+			@RequestBody(required = true) String text) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
 	{
 		ResponseEntity<String> response = null;
 		try {
@@ -75,28 +77,33 @@ public class TopicController extends BaseRest{
 		// parse JSON 
 		ObjectMapper objectMapper = new ObjectMapper();
 		System.out.println(text);
-		EnrichmentTopicRequest request = objectMapper.readValue(text, EnrichmentTopicRequest.class);
+		Topic topic = objectMapper.readValue(text, Topic.class);
 		
 		
 		
 		// check mandatory fields
-		if (!HelperFunctions.validString(request.topicIdentifier) || HelperFunctions.testNullOrEmpty(request.descriptions) || HelperFunctions.testNullOrEmpty(request.topicTerms) )
+		if (!HelperFunctions.validString(topic.getIdentifier()) || HelperFunctions.testNullOrEmpty(topic.getDescription()) || HelperFunctions.testNullOrEmpty(topic.getTopicTerms()) )
 		{
 			response = new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
 			return response;
 		}
 			
 		// use create topic service
-		TopicEntity te = enrichmentTopicService.createTopic(request);
-		if (te != null)
+		Topic newTopic = enrichmentTopicService.createTopic(topic);
+		if (newTopic != null)
 		{
 			//TODO: add apiVersion to the generateETag method
-			String etag = generateETag(te.getModifiedDate(), WebFields.JSON_LD_REST);
+			String etag = generateETag(newTopic.getModifiedDate(), WebFields.JSON_LD_REST);
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
 		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
-		    response = new ResponseEntity<String>(te.toJSON(), headers, HttpStatus.OK);
+		    try {
+				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(newTopic), headers, HttpStatus.OK);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		else
 		{
@@ -121,7 +128,7 @@ public class TopicController extends BaseRest{
 			+ "Non-updatable fields: identifier, model")
 	@RequestMapping(value = "/enrichment/topic/update", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> postTopicUpdate (@RequestParam(value = "wskey", required = true) String wskey, @RequestParam(value = "topicIdentifier", required = true) String topicIdentifier,
-			@RequestBody(required = false) String text) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
+			@RequestBody(required = true) String text) throws JsonMappingException, JsonProcessingException, HttpException, UnsupportedEntityTypeException
 	{
 		ResponseEntity<String> response = null;
 		try {
@@ -134,10 +141,10 @@ public class TopicController extends BaseRest{
 		// parse JSON 
 		ObjectMapper objectMapper = new ObjectMapper();
 		System.out.println(text);
-		EnrichmentTopicRequest request = objectMapper.readValue(text, EnrichmentTopicRequest.class);
-		request.setTopicIdentifier(topicIdentifier);
+		Topic topic = objectMapper.readValue(text, Topic.class);
+		topic.setIdentifier(topicIdentifier);
 		
-		TopicEntity topicEntity = enrichmentTopicService.updateTopic(request);
+		Topic topicEntity = enrichmentTopicService.updateTopic(topic);
 		if (topicEntity == null)
 		{
 			response = new ResponseEntity<String>("", HttpStatus.UNPROCESSABLE_ENTITY);
@@ -150,7 +157,12 @@ public class TopicController extends BaseRest{
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
 		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
-		    response = new ResponseEntity<String>(topicEntity.toJSON(), headers, HttpStatus.OK);
+		    try {
+				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(topicEntity), headers, HttpStatus.OK);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 				
 		return response;
@@ -178,7 +190,7 @@ public class TopicController extends BaseRest{
 			e.printStackTrace();
 			response = new ResponseEntity<String>("",HttpStatus.UNAUTHORIZED);
 		}
-		TopicEntity topicEntity = enrichmentTopicService.deleteTopic(topicIdentifier);
+		Topic topicEntity = enrichmentTopicService.deleteTopic(topicIdentifier);
 		
 		if (topicEntity == null)
 		{
@@ -190,7 +202,12 @@ public class TopicController extends BaseRest{
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
-		    response = new ResponseEntity<String>(topicEntity.toJSON(), headers, HttpStatus.OK);
+		    try {
+				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(topicEntity), headers, HttpStatus.OK);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return response;

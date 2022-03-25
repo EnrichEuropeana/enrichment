@@ -14,20 +14,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Transient;
-import eu.europeana.enrichment.model.TermEntity;
-import eu.europeana.enrichment.model.TopicEntity;
+import eu.europeana.enrichment.model.Term;
+import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
 
 
-@Entity(value="TopicEntityImpl")
-public class TopicEntityImpl implements TopicEntity {
+@Entity(value="TopicEntity")
+public class TopicImpl implements Topic {
 	
 	//id will be used for storing MongoDB _id
 	@Id
 	@JsonIgnore
-	public String _id = new ObjectId().toString();
-	
-	@Transient
+	public ObjectId _id;	
 	private TopicModel model;
 	
 	// <{baseurl}/topic/1>
@@ -41,9 +39,9 @@ public class TopicEntityImpl implements TopicEntity {
 	private Map<String,String> descriptions;
 	
 	
-	private List<TermEntity> terms;
+	private List<Term> terms;
 	
-	private List<TermEntity> keywords;
+	private List<Term> keywords;
 	
 	private String modelId;
 	
@@ -51,27 +49,9 @@ public class TopicEntityImpl implements TopicEntity {
 	private Date modified;
 	
 	
-	public TopicEntityImpl()
+	public TopicImpl()
 	{
 		
-	}
-
-	
-
-	public TopicEntityImpl(TopicEntity topicEntity) {
-		this.topicID = topicEntity.getTopicID();
-		this.identifier = topicEntity.getIdentifier();
-		this.labels = topicEntity.getLabel();
-		this.descriptions = topicEntity.getDescription();
-		this.terms = topicEntity.getTopicTerms();
-		this.keywords = topicEntity.getTopicKeywords();
-		this.model = topicEntity.getTopicModel();
-		this.modelId = topicEntity.getModelId();
-		this.created = topicEntity.getCreatedDate();
-		if (topicEntity.getModifiedDate()==null)
-			this.modified = new Date();
-		else
-			this.modified = topicEntity.getModifiedDate();
 	}
 
 	@Override
@@ -117,22 +97,22 @@ public class TopicEntityImpl implements TopicEntity {
 	}
 
 	@Override
-	public List<TermEntity> getTopicTerms() {
+	public List<Term> getTopicTerms() {
 		return this.terms;
 	}
 
 	@Override
-	public void setTopicTerms(List<TermEntity> terms) {
+	public void setTopicTerms(List<Term> terms) {
 		this.terms = terms;
 	}
 
 	@Override
-	public List<TermEntity> getTopicKeywords() {
+	public List<Term> getTopicKeywords() {
 		return this.keywords;
 	}
 
 	@Override
-	public void setTopicKeywords(List<TermEntity> keywords) {
+	public void setTopicKeywords(List<Term> keywords) {
 		this.keywords = keywords;
 	}
 
@@ -168,16 +148,11 @@ public class TopicEntityImpl implements TopicEntity {
 	}
 	
 	@Override
-	public String getId() {
+	public ObjectId getObjectId() {
 		return _id;
 	}
 
-	@Override
-	public String toJSON() throws JsonProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
-		
-		return mapper.writeValueAsString(this);
-	}
+	
 
 	@Override
 	public String getModelId() {
@@ -186,8 +161,7 @@ public class TopicEntityImpl implements TopicEntity {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(_id, created, descriptions, identifier, keywords, labels, model, modelId, modified, terms,
-				topicID);
+		return Objects.hash(identifier);
 	}
 
 	@Override
@@ -198,13 +172,8 @@ public class TopicEntityImpl implements TopicEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TopicEntityImpl other = (TopicEntityImpl) obj;
-		return Objects.equals(_id, other._id) && Objects.equals(created, other.created)
-				&& Objects.equals(descriptions, other.descriptions) && Objects.equals(identifier, other.identifier)
-				&& Objects.equals(keywords, other.keywords) && Objects.equals(labels, other.labels)
-				&& Objects.equals(modelId, other.modelId)
-				&& Objects.equals(modified, other.modified) && Objects.equals(terms, other.terms)
-				&& Objects.equals(topicID, other.topicID);
+		TopicImpl other = (TopicImpl) obj;
+		return  Objects.equals(identifier, other.identifier);
 	}
 
 	@Override

@@ -6,11 +6,11 @@ import dev.morphia.annotations.Embedded;
 import dev.morphia.annotations.Entity;
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.exceptions.UnsupportedRangeTermEntityException;
-import eu.europeana.enrichment.model.TermEntity;
+import eu.europeana.enrichment.model.Term;
 
 //@Entity(value="TermEntityImpl")
 //@Embedded
-public class TermEntityImpl implements TermEntity {
+public class TermImpl implements Term {
 	
 	// must be UTF-8 aware to allow special chars
 	private String term;
@@ -20,12 +20,12 @@ public class TermEntityImpl implements TermEntity {
 	private Integer score;
 	
 	
-	public TermEntityImpl()
+	public TermImpl()
 	{
 		
 	}
 	
-	public TermEntityImpl(String term, Integer rank, Integer score) throws UnsupportedRangeTermEntityException {
+	public TermImpl(String term, Integer rank, Integer score) throws UnsupportedRangeTermEntityException {
 		if (!(1<=rank.intValue() && rank.intValue()<=250))
 			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
 		
@@ -50,7 +50,7 @@ public class TermEntityImpl implements TermEntity {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		TermEntityImpl other = (TermEntityImpl) obj;
+		TermImpl other = (TermImpl) obj;
 		return Objects.equals(rank, other.rank) && Objects.equals(score, other.score)
 				&& Objects.equals(term, other.term);
 	}
