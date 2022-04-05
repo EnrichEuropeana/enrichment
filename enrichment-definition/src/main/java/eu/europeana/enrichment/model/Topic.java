@@ -20,28 +20,28 @@ public interface Topic {
 	public String getIdentifier();
 	public void setIdentifier(String identifier);
 	
-	public List<String> getLabel();
-	public void setLabel(List<String> label);
+	public List<String> getLabels();
+	public void setLabels(List<String> label);
 	
-	public Map<String,String> getDescription();
-	public void setDescription(Map<String,String> descr);
+	public Map<String,String> getDescriptions();
+	public void setDescriptions(Map<String,String> descr);
 	
-	public List<Term> getTopicTerms();
-	public void setTopicTerms(List<Term> terms);
+	public List<Term> getTerms();
+	public void setTerms(List<Term> terms);
 	
 	// keywords from transcribathon that are related to this topic
-	public List<Term> getTopicKeywords();
-	public void setTopicKeywords(List<Term> keywords);
+	public List<Term> getKeywords();
+	public void setKeywords(List<Term> keywords);
 	
-	public TopicModel getTopicModel();
-	public void setTopicModel (TopicModel model);
+	public TopicModel getModel();
+	public void setModel (TopicModel model);
 	
-	public Date getCreatedDate();
-	public Date getModifiedDate();
+	public Date getCreated();
+	public Date getModified();
 	
-	public void setCreatedDate(Date date);
-	public void setModifiedDate(Date date);
-	public ObjectId getObjectId();
+	public void setCreated(Date date);
+	public void setModified(Date date);
+	//public ObjectId getObjectId();
 	//public String toJSON() throws JsonProcessingException;
 	
 	public String getModelId();

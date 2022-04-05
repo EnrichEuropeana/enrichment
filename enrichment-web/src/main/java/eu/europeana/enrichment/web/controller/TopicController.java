@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ import eu.europeana.api.commons.web.definitions.WebFields;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 import io.swagger.annotations.Api;
@@ -77,12 +79,12 @@ public class TopicController extends BaseRest{
 		// parse JSON 
 		ObjectMapper objectMapper = new ObjectMapper();
 		System.out.println(text);
-		Topic topic = objectMapper.readValue(text, Topic.class);
+		Topic topic = objectMapper.readValue(text, TopicImpl.class);
 		
 		
 		
 		// check mandatory fields
-		if (!HelperFunctions.validString(topic.getIdentifier()) || HelperFunctions.testNullOrEmpty(topic.getDescription()) || HelperFunctions.testNullOrEmpty(topic.getTopicTerms()) )
+		if (!HelperFunctions.validString(topic.getIdentifier()) || HelperFunctions.testNullOrEmpty(topic.getDescriptions()) || HelperFunctions.testNullOrEmpty(topic.getTerms()) )
 		{
 			response = new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
 			return response;
@@ -93,7 +95,12 @@ public class TopicController extends BaseRest{
 		if (newTopic != null)
 		{
 			//TODO: add apiVersion to the generateETag method
-			String etag = generateETag(newTopic.getModifiedDate(), WebFields.JSON_LD_REST);
+			Date date = new Date();
+			if (newTopic.getModified() != null)
+				date = newTopic.getModified();
+			else if (newTopic.getCreated() != null)
+				date = newTopic.getCreated();
+			String etag = generateETag(date, WebFields.JSON_LD_REST);
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
@@ -101,7 +108,6 @@ public class TopicController extends BaseRest{
 		    try {
 				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(newTopic), headers, HttpStatus.OK);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -152,7 +158,12 @@ public class TopicController extends BaseRest{
 		}
 		else
 		{
-			String etag = generateETag(topicEntity.getModifiedDate(), WebFields.JSON_LD_REST);
+			Date date = new Date();
+			if (topicEntity.getModified() != null)
+				date = topicEntity.getModified();
+			else if (topicEntity.getCreated() != null)
+				date = topicEntity.getCreated();
+			String etag = generateETag(date, WebFields.JSON_LD_REST);
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
@@ -160,7 +171,6 @@ public class TopicController extends BaseRest{
 		    try {
 				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(topicEntity), headers, HttpStatus.OK);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -205,7 +215,6 @@ public class TopicController extends BaseRest{
 		    try {
 				response = new ResponseEntity<String>(jsonSerlializer.serializeObject(topicEntity), headers, HttpStatus.OK);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

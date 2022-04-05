@@ -24,9 +24,9 @@ public class TopicModelImpl implements TopicModel {
 	private String algorithm;
 	
 	
-	@Id
-	@JsonIgnore
-    private ObjectId _id; 
+	//@Id
+	//@JsonIgnore
+    //private ObjectId _id; 
 	
 
 	@Override
@@ -48,10 +48,10 @@ public class TopicModelImpl implements TopicModel {
 	}
 
 
-	@Override
-	public ObjectId getObjectId() {
-		return _id;
-	}
+	//@Override
+	//public ObjectId getObjectId() {
+	//	return _id;
+	//}
 
 	
 	public TopicModelImpl()

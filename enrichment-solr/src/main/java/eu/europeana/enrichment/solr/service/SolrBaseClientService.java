@@ -104,7 +104,7 @@ public interface SolrBaseClientService {
 	 * @param dbtopicEntity
 	 * @throws SolrNamedEntityServiceException
 	 */
-	public void updateTopic(String solrCore, Topic dbtopicEntity)  throws SolrNamedEntityServiceException;
+	public void updateTopic(String solrCore, Topic dbtopicEntity, boolean doCommit)  throws SolrNamedEntityServiceException;
 
 	/**
 	 * This method is used for deleting a TopicEntity in SOLR

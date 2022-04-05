@@ -7,17 +7,17 @@ import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
-
+import eu.europeana.enrichment.model.utils.*;
 
 @Entity(value="TopicEntity")
 public class TopicImpl implements Topic {
@@ -26,26 +26,42 @@ public class TopicImpl implements Topic {
 	@Id
 	@JsonIgnore
 	public ObjectId _id;	
+	
+	
+	@JsonProperty("model")
 	private TopicModel model;
 	
 	// <{baseurl}/topic/1>
+	@JsonProperty("topicID")
 	private String topicID;
 	
 	// "LDA_EXP1-K15-IT200#TOPIC1"
+	@JsonProperty("identifier")
 	private String identifier;
 	
+	@JsonProperty("labels")
 	private List<String> labels;
+	
 	// language based description
+	@JsonProperty("descriptions")
 	private Map<String,String> descriptions;
 	
-	
+	@JsonDeserialize(using=TopicTermsDeserializer.class)
+	@JsonProperty("terms")
 	private List<Term> terms;
 	
+	@JsonDeserialize(using=TopicTermsDeserializer.class)
+	@JsonProperty("keywords")
 	private List<Term> keywords;
 	
+	@JsonIgnore
 	private String modelId;
 	
+	
+	@JsonProperty("created")
 	private Date created;
+	
+	@JsonProperty("modified")
 	private Date modified;
 	
 	
@@ -77,77 +93,77 @@ public class TopicImpl implements Topic {
 	}
 
 	@Override
-	public List<String> getLabel() {
+	public List<String> getLabels() {
 		return this.labels;
 	}
 
 	@Override
-	public void setLabel(List<String> label) {
+	public void setLabels(List<String> label) {
 		this.labels = label;
 	}
 
 	@Override
-	public Map<String, String> getDescription() {
+	public Map<String, String> getDescriptions() {
 		return this.descriptions;
 	}
 
 	@Override
-	public void setDescription(Map<String, String> descr) {
+	public void setDescriptions(Map<String, String> descr) {
 		this.descriptions = descr;
 	}
 
 	@Override
-	public List<Term> getTopicTerms() {
+	public List<Term> getTerms() {
 		return this.terms;
 	}
 
 	@Override
-	public void setTopicTerms(List<Term> terms) {
+	public void setTerms(List<Term> terms) {
 		this.terms = terms;
 	}
 
 	@Override
-	public List<Term> getTopicKeywords() {
+	public List<Term> getKeywords() {
 		return this.keywords;
 	}
 
 	@Override
-	public void setTopicKeywords(List<Term> keywords) {
+	public void setKeywords(List<Term> keywords) {
 		this.keywords = keywords;
 	}
 
 	@Override
-	public TopicModel getTopicModel() {
+	public TopicModel getModel() {
 		return this.model;
 	}
 
 	@Override
-	public void setTopicModel(TopicModel model) {
+	public void setModel(TopicModel model) {
 		this.model = model;
 
 	}
 
 	@Override
-	public Date getCreatedDate() {
+	public Date getCreated() {
 		return this.created;
 	}
 
 	@Override
-	public Date getModifiedDate() {
+	public Date getModified() {
 		return this.modified;
 	}
 
 	@Override
-	public void setCreatedDate(Date date) {
+	public void setCreated(Date date) {
 		this.created = date;
 	}
 
 	@Override
-	public void setModifiedDate(Date date) {
+	public void setModified(Date date) {
 		this.modified = date;
 	}
 	
-	@Override
+
 	public ObjectId getObjectId() {
 		return _id;
 	}

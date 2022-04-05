@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.solr.model;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,96 +13,100 @@ import org.codehaus.jackson.map.ObjectMapper;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
-import eu.europeana.enrichment.solr.model.vocabulary.TopicEntitySolrFields;
+import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 
 public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
-	@Field(TopicEntitySolrFields.TERMS)
-	private String solrTerms;
+	@Field(TopicSolrFields.TERMS)
+	private List<String> solrTerms;
 	
-	@Field(TopicEntitySolrFields.KEYWORDS)
-	private String solrKeywords;
+	@Field(TopicSolrFields.KEYWORDS)
+	private List<String> solrKeywords;
 	
 	public SolrTopicEntityImpl(Topic copy)
 	{
 		this.setIdentifier(copy.getIdentifier());
 		this.setTopicID(copy.getTopicID());
-		this.setLabel(copy.getLabel());
-		this.setTopicTerms(copy.getTopicTerms());
-		this.setTopicKeywords(copy.getTopicKeywords());
-		this.setModelId(copy.getModelId());
-		this.setTopicModel(copy.getTopicModel());
-		this.setDescription(copy.getDescription());
-		this.setCreatedDate(copy.getCreatedDate());
-		this.setModifiedDate(copy.getModifiedDate());
+		this.setLabels(copy.getLabels());
+		this.setTerms(copy.getTerms());
+		this.setKeywords(copy.getKeywords());
+		this.setModelId(copy.getModel().getIdentifier());
+		this.setModel(copy.getModel());
+		this.setDescriptions(copy.getDescriptions());
+		this.setCreated(copy.getCreated());
+		this.setModified(copy.getModified());
 	}
 	
 
 	@Override
-	@Field(TopicEntitySolrFields.TOPIC_ID)
+	@Field(TopicSolrFields.TOPIC_ID)
 	public void setTopicID(String id) {
 		super.setTopicID(id);
 	}
 	
 
 	@Override
-	@Field(TopicEntitySolrFields.IDENTIFIER)
+	@Field(TopicSolrFields.IDENTIFIER)
 	public void setIdentifier(String identifier)
 	{
 		super.setIdentifier(identifier);
 	}
 	
 	@Override
-	@Field(TopicEntitySolrFields.LABELS)
-	public void setLabel(List<String> label) {
-		super.setLabel(label);
+	@Field(TopicSolrFields.LABELS)
+	public void setLabels(List<String> label) {
+		super.setLabels(label);
 	}
 	
 	@Override
-	@Field(TopicEntitySolrFields.DESCRIPTION)
-	public void setDescription(Map<String,String> descr) {
-		super.setDescription(descr);
+	@Field(TopicSolrFields.DESCRIPTION)
+	public void setDescriptions(Map<String,String> descr) {
+		super.setDescriptions(descr);
 	}
 	
 	@Override
 	//@Field(TopicEntitySolrFields.TERMS)
-	public void setTopicTerms(List<Term> terms) {
-		try {
-			this.solrTerms = toJSON(terms);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//for (TermEntity te: terms)
-		//{
-		//	String solrTerm = te.getTerm()+"^"+te.getScore();
-		//	this.solrTerms.add(solrTerm);
+	public void setTerms(List<Term> terms) {
+		//try {
+		//	this.solrTerms = toJSON(terms);
+		//} catch (IOException e) {
+		//	e.printStackTrace();
 		//}
+		this.solrTerms = new ArrayList<String>();
+		for (Term te: terms)
+		{
+			for (int i = 0; i<te.getScore();i++) {
+				String solrTerm = te.getTerm();
+				this.solrTerms.add(solrTerm);
+				}
+				
+		}
 	}
 	
-	private String toJSON(List<Term> terms) throws JsonGenerationException, JsonMappingException, IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper.writeValueAsString(terms);
-	}
+
 
 
 	@Override
 	//@Field(TopicEntitySolrFields.KEYWORDS)
-	public void setTopicKeywords(List<Term> keywords) {
-		try {
-			this.solrKeywords = toJSON(keywords);
-		} catch (IOException e) {
+	public void setKeywords(List<Term> keywords) {
+		//try {
+		//	this.solrKeywords = toJSON(keywords);
+		//} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		//for (TermEntity te : keywords)
-		//{
-			//String solrTerm = te.getTerm()+"^"+te.getScore();
-			//this.solrKeywords.add(solrTerm);
+		//	e.printStackTrace();
 		//}
+		this.solrKeywords = new ArrayList<String>();
+		for (Term te : keywords)
+		{
+			for (int i=0;i<te.getScore();i++) {
+				String solrTerm = te.getTerm();
+				this.solrKeywords.add(solrTerm);
+			}
+		}
 	}
 
 	@Override
-	@Field(TopicEntitySolrFields.MODEL_ID)
+	@Field(TopicSolrFields.MODEL_ID)
 	public void setModelId(String modelId) {
 		super.setModelId(modelId);
 	}
