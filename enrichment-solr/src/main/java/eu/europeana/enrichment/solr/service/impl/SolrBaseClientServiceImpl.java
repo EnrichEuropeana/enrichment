@@ -171,25 +171,34 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 				solrServer.commit(solrCollection);
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing TopicEntity: " + solrObject.toString(),
+					"Unexpected Solr server exception occured when storing Topic: " + solrObject.toString(),
 					ex);
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing TopicEntity: " + solrObject.toString() + "in Solr.", ex);
+					"Unexpected IO exception occured when storing Topic: " + solrObject.toString() + "in Solr.", ex);
 		}
 		
 	}
 
 
 	@Override
-	public void updateTopic(String solrCore, Topic dbtopicEntity) throws SolrNamedEntityServiceException {
-		// TODO 
+	public void updateTopic(String solrCore, Topic solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
+		log.debug("update: " + solrObject.toString());
+		deleteTopic(solrCore, solrObject);
+		storeTopic(solrCore, solrObject, doCommit);
 	}
 
 
 	@Override
-	public void deleteTopic(String solrCore, Topic dbtopiEntity) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
+	public void deleteTopic(String solrCore, Topic solrObject) throws SolrNamedEntityServiceException {
+		log.debug("delete: " + solrObject.toString());
+		try {
+			solrServer.deleteById(solrCore,solrObject.getIdentifier());
+		} catch (SolrServerException | IOException e) {
+			throw new SolrNamedEntityServiceException(
+					"Unexpected Solr server exception occured when deleting Topic: " + solrObject.toString(),
+					e);
+		}
 		
 	}
 

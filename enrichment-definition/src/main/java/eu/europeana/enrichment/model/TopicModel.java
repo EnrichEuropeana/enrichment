@@ -4,10 +4,12 @@ import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import dev.morphia.annotations.Embedded;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.impl.TopicModelImpl;
 
 @JsonDeserialize(as = TopicModelImpl.class)
+@Embedded
 public interface TopicModel {
 	
 	public String getURL();
@@ -23,6 +25,6 @@ public interface TopicModel {
 	public String getAlgorithm();
 	public void setAlgorithm(String alg) throws UnsupportedEntityTypeException;
 	
-	public ObjectId getObjectId();
+	//public ObjectId getObjectId();
 	
 }
