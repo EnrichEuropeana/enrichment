@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.mongo.dao.TopicDao;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE)
 public class PersistentTopicServiceImpl implements PersistentTopicService{
 	
 	@Autowired

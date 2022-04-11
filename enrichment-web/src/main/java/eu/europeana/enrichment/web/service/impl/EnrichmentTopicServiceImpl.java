@@ -1,11 +1,12 @@
 package eu.europeana.enrichment.web.service.impl;
 
 import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.mongo.service.PersistentTopicService;
@@ -15,7 +16,7 @@ import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_TOPIC_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_SERVICE)
 public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	
 	@Autowired

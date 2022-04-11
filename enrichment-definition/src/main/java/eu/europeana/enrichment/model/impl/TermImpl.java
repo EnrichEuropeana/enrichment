@@ -2,9 +2,6 @@ package eu.europeana.enrichment.model.impl;
 
 import java.util.Objects;
 
-import dev.morphia.annotations.Embedded;
-import dev.morphia.annotations.Entity;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.exceptions.UnsupportedRangeTermEntityException;
 import eu.europeana.enrichment.model.Term;
 
