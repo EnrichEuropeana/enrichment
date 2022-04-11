@@ -93,6 +93,7 @@
 		<version.solrj>7.7.2</version.solrj>
 		<version.swagger>3.0.0</version.swagger>
 		<version.xalan>2.7.2</version.xalan>
+		<version.jsoup>1.10.2</version.jsoup>
 <!-- 		<version.jackson-jsonld>0.0.5</version.jackson-jsonld> -->
 	</properties>
 

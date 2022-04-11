@@ -1,7 +1,8 @@
 package eu.europeana.enrichment.common.commons;
 
-public class AppConfigConstants {
+public class EnrichmentConstants {
 
+	//config constants
 	public static final String BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
@@ -37,5 +38,8 @@ public class AppConfigConstants {
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
     public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
+    
+    //wikidata
+    public static final String WIKIDATA_ENTITY_BASE_URL = "http://www.wikidata.org/entity/";
 }
 

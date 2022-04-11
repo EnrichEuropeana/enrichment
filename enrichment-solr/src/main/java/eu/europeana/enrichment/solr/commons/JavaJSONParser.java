@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@Component(AppConfigConstants.BEAN_ENRICHMENT_JAVA_JSON_PARSER)
+@Component(EnrichmentConstants.BEAN_ENRICHMENT_JAVA_JSON_PARSER)
 public class JavaJSONParser {
 
 	private Gson gson; 

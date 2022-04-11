@@ -21,13 +21,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.linking.model.StanfordNerRequest;
 import eu.europeana.enrichment.ner.service.NERService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE)
 public class NERStanfordServiceImpl implements NERService{
 
 	private String endpoint;

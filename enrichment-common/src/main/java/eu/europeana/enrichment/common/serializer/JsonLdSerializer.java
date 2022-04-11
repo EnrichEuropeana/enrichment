@@ -10,9 +10,9 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@Component(AppConfigConstants.BEAN_ENRICHMENT_JSONLD_SERIALIZER)
+@Component(EnrichmentConstants.BEAN_ENRICHMENT_JSONLD_SERIALIZER)
 public class JsonLdSerializer {
 
   private final ObjectMapper mapper;
@@ -20,7 +20,7 @@ public class JsonLdSerializer {
   public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
   @Autowired
-  public JsonLdSerializer(@Qualifier(AppConfigConstants.BEAN_ENRICHMENT_JSON_MAPPER) ObjectMapper objectMapper) {
+  public JsonLdSerializer(@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_JSON_MAPPER) ObjectMapper objectMapper) {
     mapper = objectMapper.copy();
     SimpleDateFormat df = new SimpleDateFormat(DATE_FORMAT, Locale.ENGLISH);
     mapper.setDateFormat(df);

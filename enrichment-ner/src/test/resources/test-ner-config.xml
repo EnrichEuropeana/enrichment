@@ -29,7 +29,12 @@
 	<bean id="europeanaEntityService" class="eu.europeana.enrichment.ner.linking.EuropeanaEntityServiceImpl">
 		<constructor-arg type="String" value="${enrich.ner.linking.europeana.apikey}"/>
 	</bean>
-	<bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl" />
+	<bean id="wikidataService" class="eu.europeana.enrichment.ner.linking.WikidataServiceImpl">
+		<constructor-arg ref="enrichmentConfiguration"/>
+	</bean>
+	
+	<bean id="enrichmentConfiguration" class="eu.europeana.enrichment.common.commons.EnrichmentConfiguration" />
+	
 	<bean id="nerLinkingService" class="eu.europeana.enrichment.ner.service.impl.NERLinkingServiceImpl" />
 	
 	<bean id="stanfordNerModel3Service" class="eu.europeana.enrichment.ner.service.impl.NERStanfordServiceImpl">
@@ -43,11 +48,6 @@
 	</bean>
 	<bean id="dbpediaSpotlightService" class="eu.europeana.enrichment.ner.service.impl.NERDBpediaSpotlightServiceImpl">
 		<constructor-arg type="String" value="${enrich.ner.dbpedia.baseUrl}"/>
-	</bean>
-	<bean id="pythonService" class="eu.europeana.enrichment.ner.service.impl.NERPythonServiceImpl">
-		<constructor-arg type="String" value="${enrich.ner.python.path}"/>
-		<constructor-arg type="String" value="${enrich.ner.python.script}"/>
-        <constructor-arg type="String" value="${enrich.ner.python.spacy.model}" />
 	</bean>
 	
 	

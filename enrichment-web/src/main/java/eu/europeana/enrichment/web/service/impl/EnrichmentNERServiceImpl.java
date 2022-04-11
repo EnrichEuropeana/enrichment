@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
@@ -58,7 +58,7 @@ import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_SERVICE)
 public class EnrichmentNERServiceImpl {
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -281,7 +281,7 @@ public class EnrichmentNERServiceImpl {
 		for(NamedEntityImpl mainEntity : main) {
 			boolean found = false;
 			for(NamedEntityImpl newEntity : newOnes) {
-				if(newEntity.getLabel().compareTo(mainEntity.getLabel())==0) {
+				if(newEntity.getLabel().equals(mainEntity.getLabel()) && newEntity.getType().equals(mainEntity.getType())) {
 					found=true;
 					break;
 				}
@@ -314,7 +314,7 @@ public class EnrichmentNERServiceImpl {
 				NamedEntityImpl dbEntity = null;
 				boolean oldNamedEntityChanged = false;
 				if (tmpNamedEntity.getLabel()!=null) {
-					dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel());
+					dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel(), tmpNamedEntity.getType());
 				}
 				
 				if(dbEntity != null) {
@@ -383,7 +383,7 @@ public class EnrichmentNERServiceImpl {
 		/*
 		 * Add linking information to named entity
 		 */
-		addLinkingInformation(result, linking, languageForNer);
+		addLinkingInformation(result, linking, languageForNer, nerTool);
 		
 		return result;
 	}
@@ -403,9 +403,9 @@ public class EnrichmentNERServiceImpl {
 		 */
 		for (NamedEntityImpl entity : result) {
 			//save the wikidata ids to solr
-			//for(String wikidataId : entity.getPreferredWikidataIds())
-			if(entity.getPreferredWikidataIds()!=null) {
-				for(String wikidataId : entity.getPreferredWikidataIds())
+			List<String> wikidataIdsForSolr = getWikidataIdsSolr(entity);
+			if(wikidataIdsForSolr!=null) {
+				for(String wikidataId : wikidataIdsForSolr)
 				{
 					try {
 						solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
@@ -414,16 +414,29 @@ public class EnrichmentNERServiceImpl {
 					}
 				} 
 			}
+			
 			//save the NamedEntity to mongo db
 			persistentNamedEntityService.saveNamedEntity(entity);
 		}
 			
 	}
 	
-	private void addLinkingInformation(List<NamedEntityImpl> result, List<String> linking, String languageForNer) throws IOException {
+	private List<String> getWikidataIdsSolr(NamedEntityImpl ne) {
+		if(ne.getPreferredWikidataLabelAndTypeMatchIds()!=null) {
+			return ne.getPreferredWikidataLabelAndTypeMatchIds();
+		}
+		else if(ne.getPreferredWikidataLabelMatchIds()!=null) {
+			return ne.getPreferredWikidataLabelMatchIds();
+		}
+		else {
+			return null;
+		}
+	}
+	
+	private void addLinkingInformation(List<NamedEntityImpl> result, List<String> linking, String languageForNer, String nerTool) throws IOException {
 		if(result==null) return;
 		for (NamedEntityImpl namedEntity : result) {
-			nerLinkingService.addLinkingInformation(namedEntity, linking, languageForNer);
+			nerLinkingService.addLinkingInformation(namedEntity, linking, languageForNer, nerTool);
 		}
 	}
 	
@@ -775,7 +788,7 @@ public class EnrichmentNERServiceImpl {
 		{
 			for(NamedEntityAnnotation anno : entities )
 			{
-				if(!crosschecked || (crosschecked && anno.getWikidataId().contains("www.wikidata.org")))
+				if(!crosschecked || (crosschecked && anno.getWikidataId().contains(EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL)))
 				{
 					namedEntityAnnoList.add(new NamedEntityAnnotationImpl(anno));
 				}
@@ -820,8 +833,9 @@ public class EnrichmentNERServiceImpl {
 				for (NamedEntityImpl entity : NESet)
 				{
 
-					if(entity.getPreferredWikidataIds()!=null) {
-						for(String wikidataId : entity.getPreferredWikidataIds())
+					List<String> wikidataIdsFromSolr = getWikidataIdsSolr(entity);
+					if(wikidataIdsFromSolr!=null) {
+						for(String wikidataId : wikidataIdsFromSolr)
 						{				
 							//getting Solr WikidataEntity prefLabel
 							WikidataEntity wikiEntity = solrWikidataEntityService.getWikidataEntity(wikidataId, entity.getType());
@@ -903,7 +917,7 @@ public class EnrichmentNERServiceImpl {
 	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
 		String wikidataIdGenerated=null;
-		if(wikidataEntity.startsWith("Q")) wikidataIdGenerated = "http://www.wikidata.org/entity/" + wikidataEntity;
+		if(wikidataEntity.startsWith("Q")) wikidataIdGenerated = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + wikidataEntity;
 		else wikidataIdGenerated = wikidataEntity;		
 		
 		NamedEntityAnnotation entityAnno = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);

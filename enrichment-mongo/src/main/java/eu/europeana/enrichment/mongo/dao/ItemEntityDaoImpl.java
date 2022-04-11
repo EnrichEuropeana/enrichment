@@ -13,13 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
-@Repository(AppConfigConstants.BEAN_ENRICHMENT_ITEM_ENTITY_DAO)
+@Repository(EnrichmentConstants.BEAN_ENRICHMENT_ITEM_ENTITY_DAO)
 public class ItemEntityDaoImpl implements ItemEntityDao{
 
 	@Autowired

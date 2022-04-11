@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
-@Repository(AppConfigConstants.BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO)
+@Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO)
 public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 
 	@Autowired

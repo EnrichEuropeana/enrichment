@@ -13,7 +13,7 @@ import com.mongodb.client.MongoClients;
 import dev.morphia.Datastore;
 import dev.morphia.Morphia;
 import dev.morphia.mapping.MapperOptions;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 @Configuration
 @PropertySource(value = {"classpath:config/enrichment.properties", "classpath:config/enrihment.user.properties"}, ignoreResourceNotFound = true)
@@ -32,7 +32,7 @@ public class DataSourceConfig {
         return MongoClients.create(hostUri);
     }
     
-    @Bean(AppConfigConstants.BEAN_ENRICHMENT_DATASTORE)
+    @Bean(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
     public Datastore enrichmentDatastore(MongoClient mongoClient) {
         logger.debug("Configuring the database: {}", emDatabase);
         Datastore datastore = Morphia.createDatastore(mongoClient, emDatabase, MapperOptions.builder().mapSubPackages(true).build());

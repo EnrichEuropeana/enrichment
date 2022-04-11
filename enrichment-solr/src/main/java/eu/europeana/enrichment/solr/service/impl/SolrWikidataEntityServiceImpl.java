@@ -18,7 +18,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
@@ -36,7 +36,7 @@ import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE)
 public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService {
 
 	//@Resource(name = "solrBaseClientService")
