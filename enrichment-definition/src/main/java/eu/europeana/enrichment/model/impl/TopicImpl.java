@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexed;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
@@ -37,6 +39,7 @@ public class TopicImpl implements Topic {
 	
 	// "LDA_EXP1-K15-IT200#TOPIC1"
 	@JsonProperty("identifier")
+	@Indexed(options = @IndexOptions(unique = true))
 	private String identifier;
 	
 	@JsonProperty("labels")
