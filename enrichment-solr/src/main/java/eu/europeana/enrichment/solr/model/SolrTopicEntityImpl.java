@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.solr.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +24,20 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	{
 		this.setIdentifier(copy.getIdentifier());
 		this.setTopicID(copy.getTopicID());
-		this.setLabels(copy.getLabels());
-		this.setTerms(copy.getTerms());
-		this.setKeywords(copy.getKeywords());
+		if(copy.getLabels()!=null) {
+			this.setLabels(new ArrayList<>(copy.getLabels()));
+		}
+		if(copy.getTerms()!=null) {
+			this.setTerms(copy.getTerms());
+		}
+		if(copy.getKeywords()!=null) {
+			this.setKeywords(copy.getKeywords());
+		}
 		this.setModelId(copy.getModel().getIdentifier());
 		this.setModel(copy.getModel());
-		this.setDescriptions(copy.getDescriptions());
+		if(copy.getDescriptions()!=null) {
+			this.setDescriptions(new HashMap<String, String>(copy.getDescriptions()));
+		}
 		this.setCreated(copy.getCreated());
 		this.setModified(copy.getModified());
 	}
@@ -61,13 +70,7 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	}
 	
 	@Override
-	//@Field(TopicEntitySolrFields.TERMS)
 	public void setTerms(List<Term> terms) {
-		//try {
-		//	this.solrTerms = toJSON(terms);
-		//} catch (IOException e) {
-		//	e.printStackTrace();
-		//}
 		this.solrTerms = new ArrayList<String>();
 		for (Term te: terms)
 		{
@@ -78,19 +81,9 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 				
 		}
 	}
-	
-
-
 
 	@Override
-	//@Field(TopicEntitySolrFields.KEYWORDS)
 	public void setKeywords(List<Term> keywords) {
-		//try {
-		//	this.solrKeywords = toJSON(keywords);
-		//} catch (IOException e) {
-			// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
 		this.solrKeywords = new ArrayList<String>();
 		for (Term te : keywords)
 		{
