@@ -63,7 +63,7 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata entity urls
 	 */
-	public List<String> getWikidataIdWithLabel(String label, String language);
+	public List<String> getWikidataIdWithLabelAltLabel(String label, String language);
 	
 	/*
 	 * This method sends a Wikidata place label sparql search query including
@@ -97,6 +97,8 @@ public interface WikidataService {
 	 * @return						a list of Wikidata agents entity urls
 	 */
 	public List<String> getWikidataAgentIdWithLabel(String label, String language);
+	
+	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language);
 	
 	/**
 	 * This method creates and returns WikidataEntity based on the given wikidataURL

@@ -30,8 +30,8 @@ public class SolrNamedEntityImpl extends NamedEntityImpl {
 
 	@Override
 	//@Field(NamedEntitySolrFields.WIKIPEDIA_IDS)
-	public void setWikidataIds(List<String> ids) {
-		super.setWikidataIds(ids);
+	public void setWikidataLabelAndTypeMatchIds(List<String> ids) {
+		super.setWikidataLabelAndTypeMatchIds(ids);
 	}
 	
 	@Override

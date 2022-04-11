@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
@@ -29,7 +29,7 @@ import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
-@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
 public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 	private String baseUrl;

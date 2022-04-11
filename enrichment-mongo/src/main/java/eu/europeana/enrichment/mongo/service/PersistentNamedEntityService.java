@@ -10,10 +10,13 @@ public interface PersistentNamedEntityService {
 	 * This method retrieves a named entity from the Mongo 
 	 * database based on their key
 	 * 
-	 * @param key						label of the named entity
+	 * @param label						label of the named entity
 	 * @return							a database named entity 
 	 */
-	public NamedEntityImpl findNamedEntity(String key);
+	public NamedEntityImpl findNamedEntity(String label);
+	
+	public NamedEntityImpl findNamedEntity(String label, String type);
+	
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type);
 
 	/*

@@ -11,9 +11,9 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.springframework.stereotype.Component;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@Component(AppConfigConstants.BEAN_ENRICHMENT_GOOGLE_TRANSLATOR)
+@Component(EnrichmentConstants.BEAN_ENRICHMENT_GOOGLE_TRANSLATOR)
 public class GoogleTranslator {
 
 	 public static void main(String[] args) throws Exception 

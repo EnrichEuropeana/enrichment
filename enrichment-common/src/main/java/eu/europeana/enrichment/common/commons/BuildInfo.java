@@ -9,7 +9,7 @@ import org.springframework.context.annotation.PropertySource;
  * While generating a war file this data is written automatically to the build.properties file which is read here.
  * Note that the same information is also available in the Spring-Boot /actuator/info endpoint
  */
-@Configuration(AppConfigConstants.BEAN_ENRICHMENT_BUILD_INFO)
+@Configuration(EnrichmentConstants.BEAN_ENRICHMENT_BUILD_INFO)
 @PropertySource("classpath:config/build.properties")
 public class BuildInfo {
 

@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.dao.NamedEntityDao;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE)
 public class PersistentNamedEntityServiceImpl implements PersistentNamedEntityService {
 
 	//@Resource(name = "namedEntityDao")
@@ -17,6 +17,10 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	NamedEntityDao namedEntityDao;
 	
 	public NamedEntityImpl findNamedEntity(String label) {
+		return namedEntityDao.findNamedEntity(label);
+	}
+	
+	public NamedEntityImpl findNamedEntity(String label, String type) {
 		return namedEntityDao.findNamedEntity(label);
 	}
 	

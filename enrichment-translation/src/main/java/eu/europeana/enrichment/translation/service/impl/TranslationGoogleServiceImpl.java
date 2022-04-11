@@ -17,11 +17,11 @@ import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.common.collect.Lists;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 
 //https://cloud.google.com/translate/docs/reference/libraries
-@Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
 @ConditionalOnProperty(
 	    value="enrich.translation.google", 
 	    havingValue = "true")

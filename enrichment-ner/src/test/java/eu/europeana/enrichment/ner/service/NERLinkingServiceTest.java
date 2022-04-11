@@ -1,8 +1,13 @@
 package eu.europeana.enrichment.ner.service;
 
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(locations = "classpath:test-ner-config.xml")
+//@ContextConfiguration(locations = "classpath:test-ner-config.xml")
+@ContextConfiguration(locations = { "classpath:test-ner-config.xml" })
+//@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
 public class NERLinkingServiceTest {
 
 	/*
