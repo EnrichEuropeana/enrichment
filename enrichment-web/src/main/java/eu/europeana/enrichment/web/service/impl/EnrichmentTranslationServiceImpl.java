@@ -17,7 +17,7 @@ import com.google.cloud.translate.Translation;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -37,7 +37,7 @@ import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_SERVICE)
 public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationService {
 
 	/*

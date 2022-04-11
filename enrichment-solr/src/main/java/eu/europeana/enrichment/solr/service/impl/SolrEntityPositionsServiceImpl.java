@@ -31,7 +31,7 @@ import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 import org.tartarus.snowball.ext.romanianStemmer;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.utils.ModelUtils;
@@ -45,7 +45,7 @@ import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
 public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
 
 	Logger logger = LogManager.getLogger(getClass());

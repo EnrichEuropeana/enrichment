@@ -9,7 +9,8 @@ import eu.europeana.enrichment.model.impl.NamedEntityImpl;
  */
 public interface NamedEntityDao {
 	
-	public NamedEntityImpl findNamedEntity(String key);
+	public NamedEntityImpl findNamedEntity(String label);
+	public NamedEntityImpl findNamedEntity(String label, String type);
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type);
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
 

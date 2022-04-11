@@ -6,14 +6,13 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+
 //@JsonIgnoreProperties(ignoreUnknown=true)
 //@XmlRootElement(namespace = XmlConstants.NAMESPACE_RDF, name = XmlConstants.XML_DESCRIPTION)
 //@XmlAccessorType(XmlAccessType.FIELD)
 //@JacksonXmlRootElement(namespace = "rdf", localName = XmlConstants.XML_SAME_DESCRIPTION)
 public class DBpediaResponse {
-
-	//@JsonIgnore
-	private final String WIKIDATA_PREFIX = "http://www.wikidata.org/entity";
 	
 //	@JacksonXmlProperty(localName = "sameAs")
 //	List<RdfResource> resources;
@@ -33,7 +32,7 @@ public class DBpediaResponse {
 		
 		List<String> wikidataUrls = new ArrayList<>();
 		for(RdfResource res : resources) {
-			if(res.getResourceUrl() != null && res.getResourceUrl().startsWith(WIKIDATA_PREFIX))
+			if(res.getResourceUrl() != null && res.getResourceUrl().startsWith(EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL))
 				wikidataUrls.add(res.getResourceUrl());
 		}
 		return wikidataUrls;

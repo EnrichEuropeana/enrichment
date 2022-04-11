@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySources;
  * Container for all settings that we load from the enrichment.properties
  * file and optionally override from enrichment.user.properties file
  */
-@Configuration(AppConfigConstants.BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION)
+@Configuration(EnrichmentConstants.BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION)
 @PropertySources({ @PropertySource("classpath:config/enrichment.properties"),
 	@PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true) })
 public class EnrichmentConfiguration  {

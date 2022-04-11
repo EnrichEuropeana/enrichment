@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 import org.springframework.stereotype.Component;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@Component(AppConfigConstants.BEAN_ENRICHMENT_LEVENSCHTEIN_DISTANCE)
+@Component(EnrichmentConstants.BEAN_ENRICHMENT_LEVENSCHTEIN_DISTANCE)
 public class LevenschteinDistance {
 
 	public int costOfSubstitution(char a, char b) {
