@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.common.commons;
 
-import org.springframework.core.type.filter.AbstractClassTestingTypeFilter;
-
 public class AppConfigConstants {
 
 	public static final String BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";

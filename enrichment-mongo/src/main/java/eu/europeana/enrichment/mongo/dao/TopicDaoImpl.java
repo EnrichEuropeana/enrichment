@@ -3,7 +3,6 @@ package eu.europeana.enrichment.mongo.dao;
 import static dev.morphia.query.experimental.filters.Filters.eq;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,6 @@ import eu.europeana.enrichment.model.impl.TopicImpl;
 @Repository(AppConfigConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicDaoImpl implements TopicDao{
 
-	
-
 	@Autowired
 	private Datastore enrichmentDatastore;
 	
@@ -28,7 +25,6 @@ public class TopicDaoImpl implements TopicDao{
 		this.enrichmentDatastore.save(topicEntity);
 	}
 
-
 	@Override
 	public Topic getByIdentifier(String identifier) {
 		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
@@ -36,16 +32,12 @@ public class TopicDaoImpl implements TopicDao{
                 )
                 .first();		
 		return dbEntity;
-	}
-
-
-	
+	}	
 
 	@Override
 	public void delete(Topic dbtopicEntity) {
 		enrichmentDatastore.delete(dbtopicEntity);
 	}
-
 
 	@Override
 	public List<Topic> getByModelIdentifier(String modelIdentifier) {
@@ -58,7 +50,5 @@ public class TopicDaoImpl implements TopicDao{
 		
 		return list ;
 	}
-
-
-
+	
 }

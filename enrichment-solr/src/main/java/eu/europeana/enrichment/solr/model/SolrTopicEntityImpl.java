@@ -1,14 +1,10 @@
 package eu.europeana.enrichment.solr.model;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;

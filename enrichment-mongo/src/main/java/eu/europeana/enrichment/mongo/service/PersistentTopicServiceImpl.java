@@ -7,19 +7,13 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.AppConfigConstants;
 import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.mongo.dao.TopicDao;
-import eu.europeana.enrichment.mongo.dao.TopicModelDao;
 
 @Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE)
 public class PersistentTopicServiceImpl implements PersistentTopicService{
 	
-	
 	@Autowired
 	private TopicDao topicDao;
-	
-	@Autowired
-	private TopicModelDao topicModelDao;
 
 	@Override
 	public void save(Topic topicEntity) {
