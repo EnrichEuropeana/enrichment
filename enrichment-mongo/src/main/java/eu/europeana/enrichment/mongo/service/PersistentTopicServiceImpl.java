@@ -29,17 +29,14 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 
 	@Override
 	public void update(Topic dbtopicEntity) {
-		
 		// check if exists, otherwise throw exception; update only non-null fields and then save
 		topicDao.save(dbtopicEntity);
-		
 	}
 
 	@Override
 	public void delete(Topic dbtopicEntity) {
 		// check if exists, otherwise throw exception; call delete in DAO
 		topicDao.delete (dbtopicEntity);
-		
 	}
 
 	@Override
