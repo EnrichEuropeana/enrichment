@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -21,7 +21,7 @@ import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
-@Repository(AppConfigConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
+@Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
 public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Autowired
@@ -63,6 +63,14 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	public NamedEntityImpl findNamedEntity(String label) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
                 eq(EntityFields.LABEL, label))
+                .first();
+	}
+	
+	@Override
+	public NamedEntityImpl findNamedEntity(String label, String type) {
+		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+                eq(EntityFields.LABEL, label),
+                eq(EntityFields.TYPE, type))
                 .first();
 	}
 	

@@ -11,12 +11,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.entity.client.web.WebEntityProtocolApi;
 import eu.europeana.entity.definitions.model.Entity;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_EUROPEANA_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_EUROPEANA_ENTITY_SERVICE)
 public class EuropeanaEntityServiceImpl implements EuropeanaEntityService {
 
 	Logger logger = LogManager.getLogger(getClass());

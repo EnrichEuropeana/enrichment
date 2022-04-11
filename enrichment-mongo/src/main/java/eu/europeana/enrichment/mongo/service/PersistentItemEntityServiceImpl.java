@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE)
 public class PersistentItemEntityServiceImpl implements PersistentItemEntityService {
 
 	//@Resource(name = "ItemEntityDao")

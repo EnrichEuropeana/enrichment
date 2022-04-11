@@ -13,14 +13,14 @@ import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 
-@Service(AppConfigConstants.BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE)
 public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 
 	@Autowired

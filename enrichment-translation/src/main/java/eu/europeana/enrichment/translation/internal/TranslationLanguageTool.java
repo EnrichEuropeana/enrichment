@@ -14,9 +14,9 @@ import org.languagetool.language.AmericanEnglish;
 import org.languagetool.rules.RuleMatch;
 import org.springframework.stereotype.Component;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@Component(AppConfigConstants.BEAN_ENRICHMENT_TRANSLATION_LANGUAGE_TOOL)
+@Component(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_LANGUAGE_TOOL)
 public class TranslationLanguageTool {
 
 	Logger logger = LogManager.getLogger(getClass());

@@ -20,7 +20,9 @@ public interface NERLinkingService {
 	 * 									or Wikidata)
 	 * @param sourceLanguage			original language of the translated text will be
 	 * 									used if not entity linking was found with "en"
+	 * @param nerTool					ner tool like Stanford_NLP or DBpedia_Spotlight
+	 * 
 	 * @return							no return but the findings will be changed
 	 */
-	void addLinkingInformation(NamedEntityImpl namedEntity, List<String> linkingTools, String sourceLanguage) throws IOException;
+	void addLinkingInformation(NamedEntityImpl namedEntity, List<String> linkingTools, String sourceLanguage, String nerTool) throws IOException;
 }

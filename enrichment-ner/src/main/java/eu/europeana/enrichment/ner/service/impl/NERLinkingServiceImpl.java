@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import eu.europeana.enrichment.common.commons.AppConfigConstants;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.DBpediaSpotlight;
@@ -22,7 +23,7 @@ import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.linking.model.DBpediaResponse;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
-@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_LINKING_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_LINKING_SERVICE)
 public class NERLinkingServiceImpl implements NERLinkingService {
 
 	Logger logger = LogManager.getLogger(getClass());
@@ -43,7 +44,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	 */
 	
 	@Override
-	public void addLinkingInformation(NamedEntityImpl namedEntity, List<String> linkingTools, String sourceLanguage) throws IOException {
+	public void addLinkingInformation(NamedEntityImpl namedEntity, List<String> linkingTools, String sourceLanguage, String nerTool) throws IOException {
 		if(namedEntity == null || linkingTools == null || linkingTools.size() == 0 || sourceLanguage==null)
 			return;
 		
@@ -57,7 +58,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				europeana = true;
 		}
 
-		NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findNamedEntity(namedEntity.getLabel());
+		NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findNamedEntity(namedEntity.getLabel(), namedEntity.getType());
 		
 		// TODO: change classification and language from all to specific
 		if(europeana && namedEntity.getEuropeanaIds()==null) {
@@ -75,9 +76,39 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			//TODO: else block if no entry was found then with sourceLanguage flag
 		}
 		if(wikidata) {
+			//populate the wikidataIds
+			if(dbNamedEntity==null) {
+				List<String> wikidataLabelAndTypeMatchIDs = null;
+				List<String> wikidataLabelMatchIDs = null;
+				//TODO: implement information retrieval from Wikidata
+				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
+					String namedEntityKey = namedEntity.getLabel();
+					//Agents with only first name or last name will not be searched
+					if(StringUtils.containsWhitespace(namedEntityKey)) {
+						wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataAgentIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+					}
+				}
+				else if(namedEntity.getType().equals(NERClassification.PLACE.toString())) {
+					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+				}	
+				else {
+					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+					wikidataLabelMatchIDs=wikidataLabelAndTypeMatchIDs;
+				}
+				if(wikidataLabelAndTypeMatchIDs!=null) {
+					namedEntity.setWikidataLabelAndTypeMatchIds(wikidataLabelAndTypeMatchIDs);
+				}
+				
+				if(wikidataLabelMatchIDs==null) {
+					wikidataLabelMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+				}
+				if(wikidataLabelMatchIDs!=null) {
+					namedEntity.setWikidataLabelMatchIds(wikidataLabelMatchIDs);
+				}
+			}
 			
 			//populate the dbpediaWikidataIds
-			if(namedEntity.getDBpediaIds()!=null) {
+			if(nerTool.equals(NERConstants.dbpediaSpotlightName) && namedEntity.getDBpediaIds()!=null) {
 				for(String dbpediaUri : namedEntity.getDBpediaIds()) {
 					//only fetch the dbpedia ids that are new, i.e. do not exist in the dbpedia ids of the entity from the db
 					if(dbNamedEntity==null || 
@@ -106,41 +137,48 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				}		
 			}
 			
-			if(namedEntity.getWikidataIds()==null) {
-				//populate the wikidataIds
-				List<String> wikidataIDs = null;
-				//TODO: implement information retrieval from Wikidata
-				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
-					String namedEntityKey = namedEntity.getLabel();
-					/*
-					 * Agents with only first name or last name will not be searched
-					 */
-					if(StringUtils.containsWhitespace(namedEntityKey))
-						wikidataIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), sourceLanguage);
+			//populate the preferred WikidataIds
+			if(nerTool.equals(NERConstants.dbpediaSpotlightName)) {
+				//setting the prefered wikidata ids where the label and type match
+				List<String> preferredWikidataIdsLabelAndTypeMatch = new ArrayList<String>();
+				if(namedEntity.getWikidataLabelAndTypeMatchIds() != null) {
+					for(String wikidataID : namedEntity.getWikidataLabelAndTypeMatchIds()) {
+						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+							preferredWikidataIdsLabelAndTypeMatch.add(wikidataID);
+						}
+					}
 				}
-				else if(namedEntity.getType().equals(NERClassification.PLACE.toString())) {
-					wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-				}	
+				if(preferredWikidataIdsLabelAndTypeMatch.size()>0) {
+					namedEntity.setPreferredWikidataLabelAndTypeMatchIds(preferredWikidataIdsLabelAndTypeMatch);
+					namedEntity.setPreferedWikidataId(preferredWikidataIdsLabelAndTypeMatch.get(0));
+				}
 				
-				if(wikidataIDs!=null) {
-					namedEntity.setWikidataIds(wikidataIDs);
+				//setting the prefered wikidata ids where the label matches
+				List<String> preferredWikidataIdsLabelMatch = new ArrayList<String>();
+				if(namedEntity.getWikidataLabelMatchIds() != null) {
+					for(String wikidataID : namedEntity.getWikidataLabelMatchIds()) {
+						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+							preferredWikidataIdsLabelMatch.add(wikidataID);
+						}
+					}
 				}
-			}
-			
-			//populate the preferredWikidataIds
-			List<String> preferredWikidataIds = new ArrayList<String>();
-			if(namedEntity.getWikidataIds() != null) {
-				for(String wikidataID : namedEntity.getWikidataIds()) {
-					if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
-						preferredWikidataIds.add(wikidataID);
+				if(preferredWikidataIdsLabelMatch.size()>0) {
+					namedEntity.setPreferredWikidataLabelMatchIds(preferredWikidataIdsLabelMatch);
+					if(namedEntity.getPreferedWikidataId()==null) {
+						namedEntity.setPreferedWikidataId(preferredWikidataIdsLabelMatch.get(0));
 					}
 				}
 			}
-			if(preferredWikidataIds.size()>0) {
-				namedEntity.setPreferredWikidataIds(preferredWikidataIds);
+			
+			//populate the preferred wikidata id as the main, one id
+			if(namedEntity.getPreferedWikidataId()==null) {
+				if(namedEntity.getWikidataLabelAndTypeMatchIds()!=null) {
+					namedEntity.setPreferedWikidataId(namedEntity.getWikidataLabelAndTypeMatchIds().get(0));
+				}
+				else if(namedEntity.getWikidataLabelMatchIds()!=null) {
+					namedEntity.setPreferedWikidataId(namedEntity.getWikidataLabelMatchIds().get(0));
+				}
 			}
-
-			// TODO: else block if no entry was found then with sourceLanguage flag
 		}
 	}
 
