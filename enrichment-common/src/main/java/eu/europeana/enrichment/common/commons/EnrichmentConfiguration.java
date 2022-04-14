@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySources;
  * Container for all settings that we load from the enrichment.properties
  * file and optionally override from enrichment.user.properties file
  */
-@Configuration(EnrichmentConstants.BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION)
+@Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 @PropertySources({ @PropertySource("classpath:config/enrichment.properties"),
 	@PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true) })
 public class EnrichmentConfiguration  {
@@ -92,7 +92,13 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.wikidata.directory}")
     private String enrichWikidataDirectory;
-
+    
+    @Value("${transcribathon.base.url.stories.minimal}")
+    private String transcribathonBaseUrlStoriesMinimal;
+    
+	@Value("${transcribathon.base.url.items}")
+    private String transcribathonBaseUrlItems;
+    
   	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -196,4 +202,21 @@ public class EnrichmentConfiguration  {
     public String getSolrWikidataBaseUrl() {
 		return solrWikidataBaseUrl;
 	}
+    
+    public String getTranscribathonBaseUrlStoriesMinimal() {
+		return transcribathonBaseUrlStoriesMinimal;
+	}
+
+	public void setTranscribathonBaseUrlStoriesMinimal(String transcribathonBaseUrlStoriesMinimal) {
+		this.transcribathonBaseUrlStoriesMinimal = transcribathonBaseUrlStoriesMinimal;
+	}
+
+	public String getTranscribathonBaseUrlItems() {
+		return transcribathonBaseUrlItems;
+	}
+
+	public void setTranscribathonBaseUrlItems(String transcribathonBaseUrlItems) {
+		this.transcribathonBaseUrlItems = transcribathonBaseUrlItems;
+	}
+
 }
