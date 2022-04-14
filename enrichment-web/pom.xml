@@ -54,6 +54,11 @@
   			<artifactId>enrichment-translation</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-tp-api-client</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
 <!-- 		<dependency> -->
 <!-- 			<groupId>eu.europeana.api.commons</groupId> -->
 <!-- 			<artifactId>commons-web</artifactId> -->
