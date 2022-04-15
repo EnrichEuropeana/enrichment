@@ -110,7 +110,8 @@
     <module>enrichment-eval</module>
     <module>enrichment-utils</module>
     <module>enrichment-stanford-web</module>
-	</modules>
+    <module>enrichment-tp-api-client</module>
+  </modules>
 
 	<build>
 		<!-- configure source and output locations -->

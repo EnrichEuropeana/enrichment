@@ -3,7 +3,7 @@ package eu.europeana.enrichment.common.commons;
 public class EnrichmentConstants {
 
 	//config constants
-	public static final String BEAN_ENRICHMENT_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";
+	public static final String BEAN_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_DAO= "namedEntityDao";
