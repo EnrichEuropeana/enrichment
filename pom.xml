@@ -107,7 +107,6 @@
     <module>enrichment-definition</module>
     <module>enrichment-solr</module>
     <module>enrichment-solr-positions-highlighter</module>
-    <module>enrichment-eval</module>
     <module>enrichment-utils</module>
     <module>enrichment-stanford-web</module>
     <module>enrichment-tp-api-client</module>
