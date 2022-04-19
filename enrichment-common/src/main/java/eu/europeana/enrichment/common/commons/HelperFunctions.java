@@ -142,12 +142,8 @@ public class HelperFunctions {
 			else
 			{
 				data.put("en", addEmptyElem);
-			}
-			
+			}			
 		}
-
-
-
 	}
 	
 	public static void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
@@ -204,32 +200,6 @@ public class HelperFunctions {
 	    
 	}
 	
-	public static boolean testNullOrEmpty(Object object) {
-		if (object == null)
-			return true;
-		if (object instanceof List)
-		{
-			if (((List)object).isEmpty())
-				return true;
-		}
-		if (object instanceof Map)
-		{
-			if (((Map)object).isEmpty())
-				return true;
-		}
-		return false;
-	}
-	
-	
-
-	public static boolean validString(String string) {
-		if (string == null)
-			return false;
-		if (string.isBlank() || string.isEmpty())
-			return false;
-		return true;
-	}
-
 	public static boolean checkWikidataJSONFileExistance (String directory, String wikidataURL) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
