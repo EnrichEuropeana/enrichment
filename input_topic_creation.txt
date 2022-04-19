@@ -1,0 +1,54 @@
+{
+	"topicID": "<{baseurl}/topic/1>",
+	"identifier": "LDA_EXP1-K15-IT200#TOPIC1",
+	"labels": ["first world war", "eastern front"],
+	"descriptions": {
+		"en": "LDA topic model learned on 1914-1918 collection",
+		"de": "LDA topic model generiert von 1914-1918 Kollektion"
+	},
+	"terms": [{
+			"term": "war",
+			"score": 80,
+			"rank": 1
+		},
+		{
+			"term": "front",
+			"score": 72,
+			"rank": 2
+		},
+		{
+			"term": "artilery",
+			"score": 70,
+			"rank": 3
+		},
+		{
+			"term": "soldier",
+			"score": 68,
+			"rank": 4
+		}
+	],
+	"keywords": [{
+			"term": "letters from the front",
+			"score": 70,
+			"rank": 1
+		},
+		{
+			"term": "war diary",
+			"score": 50,
+			"rank": 2
+		},
+		{	
+			"term": "prisoners of war",
+			"score": 20,
+			"rank": 3
+		}
+	],
+	"model": {
+		"url": "<https://lda-exp1-k15-it200#col1914-1919-v2>",
+		"identifier": "LDA_EXP1-K15-IT200",
+		"description": "First experiment using LDA on 1914-1918 collection, K=15, Iterations=200",
+		"algorithm": "LDA"
+	},
+	"created": "15022022",
+	"modified": ""
+}

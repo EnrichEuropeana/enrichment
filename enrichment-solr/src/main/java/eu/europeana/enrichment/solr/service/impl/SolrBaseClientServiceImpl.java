@@ -14,8 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 
@@ -32,66 +30,24 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 	@Override
 	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrNamedEntityServiceException {
 		return null;
-	}
-	
+	}	
 
 	@Override
-	public boolean store(String solrCollection, Object solrObject) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void storeStoryEntity(String solrCollection, StoryEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
+	public void store(String solrCollection, Object solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
 		try {
-			
 			log.debug("store: " + solrObject.toString());
-				
 			UpdateResponse rsp = solrServer.addBean(solrCollection, solrObject);
 			log.debug("store response: " + rsp.toString());
 			if(doCommit)
 				solrServer.commit(solrCollection);
 		} catch (SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing StoryEntity: " + solrObject.toString(),
-					ex);
+					"Unexpected Solr server exception occured when storing to the collection: " + solrCollection, ex);
 		} catch (IOException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing StoryEntity: " + solrObject.toString() + "in Solr.", ex);
+					"Unexpected IO exception occured when storing Solr object into collection: " + solrCollection, ex);
 		}
-		
 	}
-	
-	@Override
-	public void storeWikidataEntity(String solrCollection, WikidataEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException {
-		try {
-			
-			log.debug("store: " + solrObject.toString());
-				
-			UpdateResponse rsp = solrServer.addBean(solrCollection, solrObject);
-//			if(solrObject instanceof SolrWikidataAgentImpl) 
-//			{
-//				rsp = solrServer.addBean(solrCollection, (SolrWikidataAgentImpl)solrObject);
-//			}
-//			else
-//			{
-//				rsp = solrServer.addBean(solrCollection, (SolrWikidataPlaceImpl)solrObject);
-//			}
-			
-			log.debug("store response: " + rsp.toString());
-			if(doCommit)
-				solrServer.commit(solrCollection);
-		} catch (SolrServerException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected Solr server exception occured when storing WikidataEntity: " + solrObject.toString(),
-					ex);
-		} catch (IOException ex) {
-			throw new SolrNamedEntityServiceException(
-					"Unexpected IO exception occured when storing WikidataEntity: " + solrObject.toString() + "in Solr.", ex);
-		}
-		
-	}
-
 	
 	@Override
 	public void search (String solrCollection, String term) throws SolrNamedEntityServiceException {
@@ -119,21 +75,13 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 	}
 
 	@Override
-	public void update(String solrCollection, StoryEntity stryEntity) throws SolrNamedEntityServiceException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void deleteByQuery(String solrCollection, String query) throws SolrNamedEntityServiceException {
 		try {
-			log.debug("Solr deleteByQuery call: " + query);
-			UpdateResponse rsp = solrServer.deleteByQuery(solrCollection, query);
-			log.debug("Solr deleteByQuery response: " + rsp.toString());
+			solrServer.deleteByQuery(solrCollection, query);
 			solrServer.commit(solrCollection);
 		} catch (IOException | SolrServerException ex) {
 			throw new SolrNamedEntityServiceException(
-					"Unexpected solr server or IO exception occured when deleting StoryEntity with query: " + query, ex);
+				"Unexpected Solr server or IO exception occured during deleteByQuery for the collection: " + solrCollection, ex);
 		}		
 	}
 
@@ -154,6 +102,17 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 		}
 		return rsp;
 		
+	}
+
+	@Override
+	public void deleteById(String solrCollection, String id) throws SolrNamedEntityServiceException {
+		try {
+			solrServer.deleteById(solrCollection, id);
+			solrServer.commit(solrCollection);
+		} catch (SolrServerException | IOException e) {
+			throw new SolrNamedEntityServiceException(
+				"Unexpected exception occured during the deleteById from the Solr collection: " + solrCollection, e);
+		}		
 	}
 
 }

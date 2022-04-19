@@ -1,5 +1,4 @@
-//package eu.europeana.enrichment.eval.ner.service.impl;
-//
+//package eu.europeana.enrichment.ner.service.impl;
 //import java.io.IOException;
 //import java.util.ArrayList;
 //import java.util.List;

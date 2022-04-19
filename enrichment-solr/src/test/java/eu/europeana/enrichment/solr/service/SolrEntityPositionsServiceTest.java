@@ -17,14 +17,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:entity-solr-context.xml")
 
 public class SolrEntityPositionsServiceTest {
-	
-	@Resource(name = "solrEntityService")
-	SolrEntityPositionsService solrEntityService;
 
 	@Resource(name = "solrBaseClientService")
 	SolrBaseClientService solrBaseClientService;
@@ -43,7 +41,7 @@ public class SolrEntityPositionsServiceTest {
 		//delete all documents first
 		//solrEntityService.deleteByQuery("*");
 		
-		solrEntityService.store("enrichment",dbStoryEntity, true);
+		solrBaseClientService.store("enrichment", new SolrStoryEntityImpl(dbStoryEntity), true);
 		
 		double termOffset = 0;
 //		try {

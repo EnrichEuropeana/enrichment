@@ -150,4 +150,6 @@ public class SolrUtils {
 		return itemArr;
 	}
 	
+	
+	
 }
