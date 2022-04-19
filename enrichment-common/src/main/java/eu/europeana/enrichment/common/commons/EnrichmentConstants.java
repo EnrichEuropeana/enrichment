@@ -38,6 +38,12 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
     public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
+    // topic management API
+    public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
+    public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_MODEL_SERVICE = "persistentTopicModelService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE = "persistentTopicEntityService";
+    public static final String BEAN_ENRICHMENT_TOPIC_SERVICE = "enrichmentTopicService";
     
     //wikidata
     public static final String WIKIDATA_ENTITY_BASE_URL = "http://www.wikidata.org/entity/";

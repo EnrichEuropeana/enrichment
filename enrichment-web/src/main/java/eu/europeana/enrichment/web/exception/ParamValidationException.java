@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.web.exception;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 import eu.europeana.api.commons.web.exception.HttpException;

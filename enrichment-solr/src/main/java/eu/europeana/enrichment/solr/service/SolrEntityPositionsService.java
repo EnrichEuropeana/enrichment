@@ -11,23 +11,6 @@ import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
 public interface SolrEntityPositionsService {
 
-		/**
-		 * Storing a single StoryEntity to the Solr server 
-		 * 
-		 * @param solrCollection
-		 * @param storyEntity
-		 * @param doCommit
-		 * @throws SolrNamedEntityServiceException
-		 */
-		public void store(String solrCollection, StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException;
-		/**
-		 * Storing a list of StoryEntity to the Solr server
-		 * 
-		 * @param storyEntities
-		 * @throws SolrNamedEntityServiceException
-		 */
-	    public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException ;
-		
 	    /**
 		 * This method finds the positions of the NamedEntity terms in the original text using the adapted version of Solr-Highlighter
 		 * The found offset is the first one greater than startAfterOffset and smaller than startAfterOffset+rangeToObserve

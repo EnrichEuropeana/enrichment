@@ -200,14 +200,6 @@
 			<artifactId>jstl</artifactId>
 <!-- 			<version>${version.servletJstl}</version> -->
 		</dependency>
-
-<!-- 		<dependency> -->
-<!-- 			<groupId>javax.servlet</groupId> -->
-<!-- 			<artifactId>servlet-api</artifactId> -->
-<!-- 			<scope>provided</scope> -->
-<!-- 			<version>2.5</version> -->
-<!-- 		</dependency> -->
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
@@ -378,8 +370,8 @@
 			<groupId>tp-api</groupId>
 			<artifactId>tp-api</artifactId>
 			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/tp-api.jar</systemPath>
+			 <scope>system</scope>
+			<systemPath>${basedir}/lib/tp-api.jar</systemPath>  
 		</dependency>
 		
 	</dependencies>

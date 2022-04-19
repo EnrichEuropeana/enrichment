@@ -31,8 +31,8 @@ import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 import org.tartarus.snowball.ext.romanianStemmer;
 
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
@@ -41,18 +41,13 @@ import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
-import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
-public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsService{
+public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl implements SolrEntityPositionsService{
 
 	Logger logger = LogManager.getLogger(getClass());
-	
-	//@Resource(name = "solrBaseClientService")
-	@Autowired
-	SolrBaseClientService solrBaseClientService;
 	
 	//@Resource(name = "javaJSONParser")
 	@Autowired
@@ -129,31 +124,6 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 			}			
 		}
 	}
-	
-	@Override
-	public void store(List<? extends StoryEntity> storyEntities) throws SolrNamedEntityServiceException {
-		
-		for(StoryEntity ent : storyEntities) {
-			store(solrCore, ent, true);
-		}
-	}
-
-	@Override
-	public void store(String solrCollection, StoryEntity storyEntity, boolean doCommit) throws SolrNamedEntityServiceException {
-
-		log.debug("store: " + storyEntity.toString());
-		
-		SolrStoryEntityImpl solrStoryEntity = null;
-		if(storyEntity instanceof SolrStoryEntityImpl) {
-			solrStoryEntity=(SolrStoryEntityImpl) storyEntity;
-		}
-		else {
-			solrStoryEntity=new SolrStoryEntityImpl(storyEntity);
-		}
-		
-		solrBaseClientService.storeStoryEntity(solrCollection, solrStoryEntity,doCommit);
-		
-	}
 
 	@Override
 	public int findTermPositionsInStory(String term, int startAfterOffset, int offsetTranslatedText, int rangeToObserve) throws Exception {
@@ -181,7 +151,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		 * quering Solr server and parsing the obtained json response to extract the offsets, terms and positions
 		 */
 		try {
-			response = solrBaseClientService.query(solrCore, query);
+			response = query(solrCore, query);
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
 			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
@@ -909,7 +879,7 @@ public class SolrEntityPositionsServiceImpl implements SolrEntityPositionsServic
 		/*
 		 * store the entity in Solr (indexing of the story)
 		 */
-		store(solrCore, dbStoryEntity, true);
+		store(solrCore, new SolrStoryEntityImpl(dbStoryEntity), true);
 		
 		storyOriginalText=dbStoryEntity.getTranscriptionText();
 		storyTranslatedText=translatedText;

@@ -142,12 +142,8 @@ public class HelperFunctions {
 			else
 			{
 				data.put("en", addEmptyElem);
-			}
-			
+			}			
 		}
-
-
-
 	}
 	
 	public static void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
@@ -203,7 +199,7 @@ public class HelperFunctions {
 
 	    
 	}
-
+	
 	public static boolean checkWikidataJSONFileExistance (String directory, String wikidataURL) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);

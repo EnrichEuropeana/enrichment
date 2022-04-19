@@ -9,13 +9,16 @@ import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexed;
 import eu.europeana.enrichment.model.StoryEntity;
 
 @Entity(value="StoryEntityImpl")
 public class StoryEntityImpl implements StoryEntity {
 
-	//public String language;
+	@Indexed(options = @IndexOptions(unique = true))
 	private String storyId;
+	
 	private String title;
 	private String source;
 	private String description;

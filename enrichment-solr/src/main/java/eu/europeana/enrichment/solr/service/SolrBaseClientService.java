@@ -6,6 +6,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 
@@ -15,8 +16,8 @@ public interface SolrBaseClientService {
 	public static final String HANDLER_SUGGEST = "/suggestEntity";
 
 	/**
-	 * Sends the query to the Solr server
-	 * 
+	 * Sends the query to the Solr server.
+	 *  
 	 * @param solrCollection
 	 * @param query
 	 * @return
@@ -25,35 +26,18 @@ public interface SolrBaseClientService {
 	public QueryResponse query (String solrCollection, SolrQuery query) throws SolrNamedEntityServiceException ;
 	
 	/**
-	 * This method stores a StoryEntity object in SOLR.
+	 * This method stores an object to Solr.
+	 * 
 	 * @param solrObject
+	 * @param doCommit
 	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
-	 * @return 
+	 * @throws SolrNamedEntityServiceException
 	 */
 
-	public boolean store(String solrCollection, Object solrObject) throws SolrNamedEntityServiceException ;
-	
-	/**
-	 * This method stores a WikidataEntity object in SOLR.
-	 * @param solrObject
-	 * @param doCommit commit
-	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
-	 */
-	public void storeWikidataEntity(String solrCollection,WikidataEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;	
+	public void store(String solrCollection, Object solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;
 
 	/**
-	 * This method stores a StoryEntity object in SOLR.
-	 * @param solrObject
-	 * @param doCommit commit
-	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
-	 */
-	public void storeStoryEntity(String solrCollection,StoryEntity solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;	
-
-	/**
-	 * This method searches for a term in SOLR.
+	 * This method searches for a term in Solr.
 	 * @param term
 	 * @param solrCollection
 	 * @throws SolrNamedEntityServiceException 
@@ -62,16 +46,7 @@ public interface SolrBaseClientService {
 	public void search (String solrCollection, String term) throws SolrNamedEntityServiceException ;
 	
 	/**
-	 * This method updates a StoryEntity object in SOLR.
-	 * @param StoryEntity
-	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
-	 */
-	public void update(String solrCollection, StoryEntity storyEntity) throws SolrNamedEntityServiceException ;
-		
-
-	/**
-	 * This method removes a StoryEntity object or more objects from SOLR based on the fields in the query.
+	 * This method deletes an object or more objects from Solr based on the fields in the query.
 	 * @param query
 	 * @param solrCollection
 	 * @throws SolrNamedEntityServiceException 
@@ -87,5 +62,13 @@ public interface SolrBaseClientService {
 	 * @throws SolrNamedEntityServiceException 
 	 */
 	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrNamedEntityServiceException;
+	
+	/**
+	 * This method deletes an object from Solr based on its unique key
+	 * @param solrCollection
+	 * @param id
+	 * @throws SolrNamedEntityServiceException
+	 */
+	public void deleteById(String solrCollection, String id) throws SolrNamedEntityServiceException;
 
 }
