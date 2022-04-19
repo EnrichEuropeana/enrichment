@@ -7,8 +7,9 @@ import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -19,16 +20,17 @@ import dev.morphia.annotations.Indexed;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
-import eu.europeana.enrichment.model.utils.*;
+import eu.europeana.enrichment.model.utils.TopicTermsDeserializer;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Entity(value="TopicEntity")
 public class TopicImpl implements Topic {
 	
 	//id will be used for storing MongoDB _id
 	@Id
 	@JsonIgnore
-	public ObjectId _id;	
-	
+	public ObjectId _id;
 	
 	@JsonProperty("model")
 	private TopicModel model;
@@ -58,16 +60,14 @@ public class TopicImpl implements Topic {
 	private List<Term> keywords;
 	
 	@JsonIgnore
-	private String modelId;
-	
+	private String modelId;	
 	
 	@JsonProperty("created")
 	private Date created;
 	
 	@JsonProperty("modified")
 	private Date modified;
-	
-	
+		
 	public TopicImpl()
 	{
 		
@@ -143,7 +143,6 @@ public class TopicImpl implements Topic {
 	@Override
 	public void setModel(TopicModel model) {
 		this.model = model;
-
 	}
 
 	@Override
@@ -166,12 +165,9 @@ public class TopicImpl implements Topic {
 		this.modified = date;
 	}
 	
-
 	public ObjectId getObjectId() {
 		return _id;
 	}
-
-	
 
 	@Override
 	public String getModelId() {

@@ -8,7 +8,8 @@ public interface TopicSolrFields {
 	public static final String TERMS = "terms";
 	public static final String KEYWORDS = "keywords";
 	public static final String MODEL_ID = "modelID";
-	public static final String DESCRIPTION = "descriptions";
+	public static final String DESCRIPTION_ALL = "description.*";
+	public static final String DESCRIPTION = "description";
 	
 	public static final String SOLR_CORE = "topics";
 

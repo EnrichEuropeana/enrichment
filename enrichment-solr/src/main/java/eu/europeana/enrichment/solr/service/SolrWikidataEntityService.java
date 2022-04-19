@@ -11,16 +11,6 @@ public interface SolrWikidataEntityService {
 	public String searchByWikidataURL (String wikidataURL) throws SolrNamedEntityServiceException;
 
 	/**
-	 * Storing a single WikidataEntity to the Solr server 
-	 * 
-	 * @param solrCollection
-	 * @param wikidataEntity
-	 * @param doCommit
-	 * @throws SolrNamedEntityServiceException
-	 */
-	public void store(String solrCollection, WikidataEntity wikidataEntity, boolean doCommit) throws SolrNamedEntityServiceException;
-
-	/**
 	 * This function aims at storing the Wikidata Entity obtained from its URL, i.e.
 	 * first the json response obtained from wikidata is parsed and a result
 	 * is saved into the Solr server
@@ -36,8 +26,5 @@ public interface SolrWikidataEntityService {
 	String searchNamedEntities_usingJackson(String wskey, String query, String type, String lang, String solrQuery, String solrSort,
 			String pageSize, String page) throws SolrNamedEntityServiceException, IOException;
 	WikidataEntity getWikidataEntity(String wikidataURL, String type) throws SolrNamedEntityServiceException;
-	
-	
-	
-	
+		
 }

@@ -2,7 +2,11 @@ package eu.europeana.enrichment.web.service.impl;
 
 import java.util.Date;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
@@ -19,28 +23,30 @@ import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_SERVICE)
 public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	
+	Logger logger = LogManager.getLogger(getClass());
+	
 	@Autowired
 	PersistentTopicService persistentTopicService;
 	
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE)
 	SolrBaseClientService solrService;
 
 	@Override
 	public Topic createTopic(Topic topic) throws HttpException, UnsupportedEntityTypeException {
 		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
 		if (dbtopicEntity != null)
-		{
-			
-			return null;
-		}
-		
+			return dbtopicEntity;
+				
 		if (topic.getCreated() == null)
 			topic.setCreated(new Date());
+
 		persistentTopicService.save(topic);
+		
 		try {
-			solrService.storeTopic(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(topic), true);
+			solrService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(topic), true);
 		} catch (SolrNamedEntityServiceException e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 		}
 		return topic;
 	}
@@ -60,16 +66,13 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				dbtopicEntity.setTopicID(topic.getTopicID());
 			if (topic.getLabels() != null)
 				dbtopicEntity.setLabels(topic.getLabels());
-			if (topic.getCreated() != null)
-				dbtopicEntity.setCreated(topic.getCreated());
 			
-			// we set modified to current date
 			dbtopicEntity.setModified(new Date());
 			persistentTopicService.save(dbtopicEntity);
 			try {
-				solrService.updateTopic(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
+				solrService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
 			} catch (SolrNamedEntityServiceException e) {
-				e.printStackTrace();
+				logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 			}
 			return dbtopicEntity;
 		}
@@ -83,10 +86,11 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 			return null;
 		
 		persistentTopicService.delete(dbtopicEntity);
+		
 		try {
-			solrService.deleteTopic(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity));
+			solrService.deleteById(TopicSolrFields.SOLR_CORE, dbtopicEntity.getIdentifier());
 		} catch (SolrNamedEntityServiceException e) {
-			e.printStackTrace();
+			logger.log(Level.ERROR, "Exception is thrown during the deletion of the topic from Solr.", e);
 		}
 		return dbtopicEntity;
 	}

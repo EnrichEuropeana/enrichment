@@ -18,8 +18,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataAgent;
@@ -27,21 +27,17 @@ import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE)
-public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService {
-
-	//@Resource(name = "solrBaseClientService")
-	@Autowired
-	SolrBaseClientService solrBaseClientService;
+public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl implements SolrWikidataEntityService {
 	
 	@Autowired
 	JsonLdSerializer jsonLdSerializer; 	
@@ -58,51 +54,21 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	private final Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
-	public void store(String solrCollection, WikidataEntity wikidataEntity, boolean doCommit) throws SolrNamedEntityServiceException {
-
-		logger.debug("store: " + wikidataEntity.toString());	
-		
-		if(wikidataEntity instanceof WikidataAgent)
-		{
-			WikidataAgent agentLocal = (WikidataAgent) wikidataEntity;
-			SolrWikidataAgentImpl solrWikidataAgent = null;
-			
-			if(agentLocal instanceof SolrWikidataAgentImpl) {
-				solrWikidataAgent=(SolrWikidataAgentImpl) agentLocal;
-			}
-			else {
-				solrWikidataAgent=new SolrWikidataAgentImpl(agentLocal);
-			}
-			
-			solrBaseClientService.storeWikidataEntity(solrCollection, solrWikidataAgent, doCommit);
-		}
-		else if (wikidataEntity instanceof WikidataPlace)
-		{
-			WikidataPlace placeLocal = (WikidataPlace) wikidataEntity;
-			SolrWikidataPlaceImpl solrWikidataPlace = null;		
-			
-			if(placeLocal instanceof SolrWikidataPlaceImpl) {
-				solrWikidataPlace=(SolrWikidataPlaceImpl) placeLocal;
-			}
-			else {
-				solrWikidataPlace=new SolrWikidataPlaceImpl(placeLocal);
-			}
-			
-			solrBaseClientService.storeWikidataEntity(solrCollection, solrWikidataPlace, doCommit);
-		}
-	}
-	
-
-
-	@Override
 	public int storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
 		
 		WikidataEntity entity = wikidataService.getWikidataEntityUsingLocalCache(wikidataURL, type);
 
 		if(entity!=null)
 		{
-			store(solrCore, entity, true);
-			return 1;
+			if(EntityTypes.Agent.getEntityType().equalsIgnoreCase(type)) {
+				store(solrCore, new SolrWikidataAgentImpl((WikidataAgent)entity), true);
+				return 1;
+			}
+			else if(EntityTypes.Place.getEntityType().equalsIgnoreCase(type)) {
+				store(solrCore, new SolrWikidataPlaceImpl((WikidataPlace)entity), true);
+				return 1;
+			}
+			return 0;			
 		}
 		
 		return 0;
@@ -122,7 +88,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 	    QueryResponse rsp = null;
 		try {
-			rsp = solrBaseClientService.query(solrCore, query);
+			rsp = query(solrCore, query);
 		} catch (SolrNamedEntityServiceException e) {
 			logger.log(Level.ERROR, "Exception during the Solr quering for the wikidata.", e);
 			throw e;
@@ -234,7 +200,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		
 	    QueryResponse rsp = null;
 		try {
-			rsp = solrBaseClientService.query(solrCore, query);
+			rsp = query(solrCore, query);
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during getting the wikidata from Solr.", e);
@@ -303,7 +269,7 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 		{
 		    QueryResponse rsp = null;
 			try {
-				rsp = solrBaseClientService.query(solrCore, query);
+				rsp = query(solrCore, query);
 			} catch (SolrNamedEntityServiceException e) {
 				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the Solr search with the wikidata url.", e);
@@ -476,8 +442,8 @@ public class SolrWikidataEntityServiceImpl implements SolrWikidataEntityService 
 	    QueryResponse rspOnePage = null;
 	    QueryResponse rspAllPages = null;
 		try {
-			rspOnePage = solrBaseClientService.query(solrCore, queryOnePage);
-			rspAllPages = solrBaseClientService.query(solrCore, queryAllPages);
+			rspOnePage = query(solrCore, queryOnePage);
+			rspAllPages = query(solrCore, queryAllPages);
 		} catch (SolrNamedEntityServiceException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during the search for the NamedEntity from Solr.", e);
