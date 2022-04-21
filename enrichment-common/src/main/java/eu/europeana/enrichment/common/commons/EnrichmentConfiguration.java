@@ -68,8 +68,14 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.translation.eTranslation.emailDestination}")
     private String translationETranslationEmailDestination;
+    
+    @Value("${enrich.translation.deepl-free.baseUrl}")
+    private String translationDeeplFreeBaseUrl;
+    
+    @Value("${enrich.translation.deepl-free.authenticationKey}")
+    private String translationDeeplFreeAuthenticationKey;
 
-    @Value("${solr.entity-positions.url}")
+	@Value("${solr.entity-positions.url}")
     private String solrEntityPositionsUrl;
 
     @Value("${solr.entity-positions.timeout}")
@@ -219,4 +225,19 @@ public class EnrichmentConfiguration  {
 		this.transcribathonBaseUrlItems = transcribathonBaseUrlItems;
 	}
 
+    public String getTranslationDeeplFreeBaseUrl() {
+		return translationDeeplFreeBaseUrl;
+	}
+
+	public void setTranslationDeeplFreeBaseUrl(String translationDeeplFreeBaseUrl) {
+		this.translationDeeplFreeBaseUrl = translationDeeplFreeBaseUrl;
+	}
+	
+	public String getTranslationDeeplFreeAuthenticationKey() {
+		return translationDeeplFreeAuthenticationKey;
+	}
+
+	public void setTranslationDeeplFreeAuthenticationKey(String translationDeeplFreeAuthenticationKey) {
+		this.translationDeeplFreeAuthenticationKey = translationDeeplFreeAuthenticationKey;
+	}
 }
