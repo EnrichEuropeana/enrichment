@@ -52,8 +52,8 @@ public class StanfordNamedEntityImpl extends NamedEntityImpl {
 
 	@JsonSetter("preferedWikidataIds")
 	@Override
-	public void setPreferredWikidataLabelAndTypeMatchIds(List<String> ids) {
-		this.preferredWikidataLabelAndTypeMatchIds = ids;
+	public void setPreferredWikidataIds(List<String> ids) {
+		this.preferredWikidataIds = ids;
 	}
 
 	@JsonSetter("DBpediaIds")
