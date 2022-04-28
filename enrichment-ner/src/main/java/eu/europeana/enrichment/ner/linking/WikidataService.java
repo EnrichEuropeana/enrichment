@@ -63,6 +63,17 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata entity urls
 	 */
+	public List<String> getWikidataIdWithLabel(String label, String language);
+	
+	/*
+	 * This method sends a Wikidata sparql search query for label or altLabel including
+	 * language tag and returns a list of Wikidata entity urls
+	 * 
+	 * @param label					named entity label (e.g. Vienna, Max Mustermann, ..)
+	 * @param language				language tag which excludes all other language
+	 * 								labels for comparison
+	 * @return						a list of Wikidata entity urls
+	 */
 	public List<String> getWikidataIdWithLabelAltLabel(String label, String language);
 	
 	/*
