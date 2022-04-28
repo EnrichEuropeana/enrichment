@@ -13,13 +13,15 @@ public class NamedEntityImpl {
 
 	protected String type;
 	protected String label;
+	protected String wikidataLabel;
 	protected List<String> europeanaIds;
 	protected List<String> wikidataLabelMatchIds;
 	protected List<String> wikidataLabelAndTypeMatchIds;
+	protected List<String> wikidataLabelAltLabelMatchIds;
+	protected List<String> wikidataLabelAltLabelAndTypeMatchIds;
 	protected List<String> dbpediaIds;
 	protected List<String> dbpediaWikidataIds;
-	protected List<String> preferredWikidataLabelMatchIds;
-	protected List<String> preferredWikidataLabelAndTypeMatchIds;
+	protected List<String> preferredWikidataIds;
 	String preferedWikidataId;
 
 	protected List<PositionEntityImpl> positionEntities;
@@ -40,10 +42,11 @@ public class NamedEntityImpl {
 		if(copy.getEuropeanaIds()!=null) this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
 		if(copy.getWikidataLabelMatchIds()!=null) this.wikidataLabelMatchIds = new ArrayList<String>(copy.getWikidataLabelMatchIds());
 		if(copy.getWikidataLabelAndTypeMatchIds()!=null) this.wikidataLabelAndTypeMatchIds = new ArrayList<String>(copy.getWikidataLabelAndTypeMatchIds());
+		if(copy.getWikidataLabelAltLabelMatchIds()!=null) this.wikidataLabelAltLabelMatchIds = new ArrayList<String>(copy.getWikidataLabelAltLabelMatchIds());
+		if(copy.getWikidataLabelAltLabelAndTypeMatchIds()!=null) this.wikidataLabelAltLabelAndTypeMatchIds = new ArrayList<String>(copy.getWikidataLabelAltLabelAndTypeMatchIds());
 		if(copy.getDBpediaIds()!=null) this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
 		if(copy.getDbpediaWikidataIds()!=null) this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
-		if(copy.getPreferredWikidataLabelAndTypeMatchIds()!=null) this.preferredWikidataLabelAndTypeMatchIds = new ArrayList<String>(copy.getPreferredWikidataLabelAndTypeMatchIds());
-		if(copy.getPreferredWikidataLabelMatchIds()!=null) this.preferredWikidataLabelMatchIds = new ArrayList<String>(copy.getPreferredWikidataLabelMatchIds());
+		if(copy.getPreferredWikidataIds()!=null) this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
 	}
 	
 	public NamedEntityImpl() {
@@ -74,76 +77,61 @@ public class NamedEntityImpl {
 		this.label = key;
 	}
 
+	public String getWikidataLabel() {
+		return wikidataLabel;
+	}
+
+	public void setWikidataLabel(String wikidataLabel) {
+		this.wikidataLabel = wikidataLabel;
+	}
 	
 	public List<String> getEuropeanaIds() {
 		return europeanaIds;
 	}
-
 	
 	public void setEuropeanaIds(List<String> ids) {
 		this.europeanaIds = ids;
 	}
-
 	
 	public void addEuopeanaId(String id) {
 		this.europeanaIds.add(id);
 	}
-
 	
 	public List<String> getWikidataLabelAndTypeMatchIds() {
 		return wikidataLabelAndTypeMatchIds;
 	}
-
 	
 	public void setWikidataLabelAndTypeMatchIds(List<String> ids) {
 		this.wikidataLabelAndTypeMatchIds = ids;
-	}
-	
+	}	
 	
 	public List<String> getDbpediaWikidataIds(){
 		return dbpediaWikidataIds;
-	}
-	
+	}	
 	
 	public void setDbpediaWikidataIds(List<String> ids) {
 		dbpediaWikidataIds = ids;
 	}
-	
-	
-	public List<String> getPreferredWikidataLabelAndTypeMatchIds(){
-		return preferredWikidataLabelAndTypeMatchIds;
-	}
-	
-	
-	public void setPreferredWikidataLabelAndTypeMatchIds(List<String> ids) {
-		preferredWikidataLabelAndTypeMatchIds = ids;
-	}
 
-	
 	public void addPositionEntity(PositionEntityImpl positionEntity) {
 		positionEntities.add(positionEntity);
 	}
-
 	
 	public void setPositionEntities(List<PositionEntityImpl> positions) {
 		positionEntities = positions;
 	}
-
 	
 	public List<PositionEntityImpl> getPositionEntities() {
 		return positionEntities;
 	}
-
 	
 	public List<String> getDBpediaIds() {
 		return dbpediaIds;
 	}
-
 	
 	public void setDBpediaIds(List<String> ids) {
 		dbpediaIds = ids;
 	}
-
 	
 	public void addDBpediaId(String id) {
 		dbpediaIds.add(id);
@@ -157,15 +145,6 @@ public class NamedEntityImpl {
 		this.wikidataLabelMatchIds = wikidataLabelMatchIds;
 	}
 
-	public List<String> getPreferredWikidataLabelMatchIds() {
-		return preferredWikidataLabelMatchIds;
-	}
-
-	public void setPreferredWikidataLabelMatchIds(List<String> preferredWikidataLabelMatchIds) {
-		this.preferredWikidataLabelMatchIds = preferredWikidataLabelMatchIds;
-	}
-
-
 	public String getPreferedWikidataId() {
 		return preferedWikidataId;
 	}
@@ -173,4 +152,29 @@ public class NamedEntityImpl {
 	public void setPreferedWikidataId(String preferedWikidataId) {
 		this.preferedWikidataId = preferedWikidataId;
 	}
+	
+	public List<String> getWikidataLabelAltLabelMatchIds() {
+		return wikidataLabelAltLabelMatchIds;
+	}
+
+	public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
+		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
+	}
+
+	public List<String> getWikidataLabelAltLabelAndTypeMatchIds() {
+		return wikidataLabelAltLabelAndTypeMatchIds;
+	}
+
+	public void setWikidataLabelAltLabelAndTypeMatchIds(List<String> wikidataLabelAltLabelAndTypeMatchIds) {
+		this.wikidataLabelAltLabelAndTypeMatchIds = wikidataLabelAltLabelAndTypeMatchIds;
+	}
+
+	public List<String> getPreferredWikidataIds() {
+		return preferredWikidataIds;
+	}
+
+	public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
+		this.preferredWikidataIds = preferredWikidataIds;
+	}
+
 }
