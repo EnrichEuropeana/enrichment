@@ -422,11 +422,8 @@ public class EnrichmentNERServiceImpl {
 	}
 	
 	private List<String> getWikidataIdsSolr(NamedEntityImpl ne) {
-		if(ne.getPreferredWikidataLabelAndTypeMatchIds()!=null) {
-			return ne.getPreferredWikidataLabelAndTypeMatchIds();
-		}
-		else if(ne.getPreferredWikidataLabelMatchIds()!=null) {
-			return ne.getPreferredWikidataLabelMatchIds();
+		if(ne.getPreferredWikidataIds()!=null) {
+			return ne.getPreferredWikidataIds();
 		}
 		else {
 			return null;

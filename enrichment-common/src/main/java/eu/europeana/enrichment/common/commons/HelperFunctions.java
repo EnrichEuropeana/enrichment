@@ -221,5 +221,28 @@ public class HelperFunctions {
 			return false;
 		}
 	}
+	
+	public static Map<String, List<String>> convertListOfListOfStringToMapOfStringAndListOfString (List<List<String>> jsonElement)
+	{
+		Map<String,List<String>> altLabelMap = new HashMap<String,List<String>>();
+		for (List<String> altLabelElem : jsonElement)
+		{
+			if(altLabelMap.containsKey(altLabelElem.get(0)))
+			{
+				List<String> altLabelMapValue = altLabelMap.get(altLabelElem.get(0));
+				altLabelMapValue.add(altLabelElem.get(1));
+				altLabelMap.put(altLabelElem.get(0), altLabelMapValue);
+			}
+			else
+			{
+				List<String> newaltLabelMapValue = new ArrayList<String>();
+				newaltLabelMapValue.add(altLabelElem.get(1));
+				altLabelMap.put(altLabelElem.get(0), newaltLabelMapValue);
+			}
+			
+		}
+		return altLabelMap;
+	}
+
 
 }

@@ -47,13 +47,20 @@ public class WikidataServiceImpl implements WikidataService {
 	private static final String baseUrlSparql = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
 //	private static final String baseUrlWikidataSearch = "https://wikidata.org/w/api.php";
 	private static final String baseUrlWikidataSearch = "https://www.wikidata.org/w/index.php";
+	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 10;
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
 	private String geonamesIdQueryString = "SELECT ?item WHERE { ?item wdt:P1566 \"%s\" . "
 			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\"}}";
+	
+	private String labelQueryString = "SELECT ?item WHERE { ?item (rdfs:label) \"%s\"@%s . "
+			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\"}}"
+			+ " GROUP BY ?item";
+	
 	private String labelAltLabelQueryString = "SELECT ?item WHERE { ?item (rdfs:label|skos:altLabel) \"%s\"@%s . "
-			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\"}}";
+			+ "SERVICE wikibase:label { bd:serviceParam wikibase:language \"en\"}}"
+			+ " GROUP BY ?item";
 
 	/*
 	 * Wikidata place search
@@ -64,30 +71,40 @@ public class WikidataServiceImpl implements WikidataService {
 	private String placeLabelQueryString = "SELECT ?item ?description ?type WHERE {\r\n"
 			+ "   ?item rdfs:label \"%s\"@%s; \r\n p:P31/ps:P31/wdt:P279* ?type; \r\n"
 			+ "      schema:description ?description.\r\n"
-			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q12371824,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568)) \r\n"
-			+ "  FILTER((LANG(?description)) = \"en\") }";
+			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568)) \r\n"
+			+ "  FILTER((LANG(?description)) = \"en\") }"
+			+ " GROUP BY ?item ?description ?type";
 
 	/*
-	 * Defines multilingual Wikidata query including alternative label and 
+	 * Defines multilingual Wikidata query including alternative label
 	 */
-	private String placeLabelAltLabelQueryString = "SELECT distinct ?item ?type ?rank WHERE {\r\n"
-			+ "  hint:Query hint:optimizer \"None\".\r\n" 
-			+ "  values ?labels {\"%s\"@%s \"%s\"@%s}\r\n"
-			+ "  ?item (rdfs:label|skos:altLabel) ?labels;\r\n"
-			+ "  p:P31/ps:P31/wdt:P279* ?type. #;\r\n"
-			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q12371824,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568))}";
+	private String placeLabelAltLabelQueryString = "SELECT ?item ?description ?type WHERE {\r\n"
+			+ "   ?item (rdfs:label|skos:altLabel) \"%s\"@%s; \r\n p:P31/ps:P31/wdt:P279* ?type; \r\n"
+			+ "      schema:description ?description.\r\n"
+			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568)) \r\n"
+			+ "  FILTER((LANG(?description)) = \"en\") }"
+			+ " GROUP BY ?item ?description ?type";
+	
+//	private String placeLabelAltLabelQueryString = "SELECT distinct ?item ?type ?rank WHERE {\r\n"
+//			+ "  hint:Query hint:optimizer \"None\".\r\n" 
+//			+ "  values ?labels {\"%s\"@%s \"%s\"@%s}\r\n"
+//			+ "  ?item (rdfs:label|skos:altLabel) ?labels;\r\n"
+//			+ "  p:P31/ps:P31/wdt:P279* ?type. #;\r\n"
+//			+ "  FILTER(?type in (wd:Q82794,wd:Q2075301,wd:Q7444568,wd:Q18635222,wd:Q25345958,wd:Q56596860,wd:Q207326,wd:Q7444568))}";
 	/*
 	 * Wikidata agent search query
 	 */
 	private String agentlabelQueryString = "SELECT ?item ?description WHERE {\r\n" 
 			+ "  ?item wdt:P31 wd:Q5;\r\n rdfs:label \"%s\"@%s;\r\n" 
 			+ "      schema:description ?description.\r\n" 
-			+ "  FILTER((LANG(?description)) = \"en\") }";
+			+ "  FILTER((LANG(?description)) = \"en\") }"
+			+ " GROUP BY ?item ?description";
 	
 	private String agentlabelAltLabelQueryString = "SELECT ?item ?description WHERE {\r\n" 
 			+ "  ?item wdt:P31 wd:Q5;\r\n (rdfs:label|skos:altLabel) \"%s\"@%s;\r\n" 
 			+ "      schema:description ?description.\r\n" 
-			+ "  FILTER((LANG(?description)) = \"en\") }";
+			+ "  FILTER((LANG(?description)) = \"en\") }"
+			+ " GROUP BY ?item ?description";
 	
 	/*
 	 * Wikidata keys for the response JSON
@@ -117,6 +134,18 @@ public class WikidataServiceImpl implements WikidataService {
 		String query = String.format(geonamesIdQueryString, geonameId);
 		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 	}
+	
+	@Override
+	public List<String> getWikidataIdWithLabel(String label, String language) {
+		String query = String.format(labelQueryString, label, language);
+		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		if(wikidataIDs==null) {
+			//get the wikidata ids using the wikidata search api
+			return getWikidataIdWithWikidataSearch(label);
+		}
+		//returning the top n wikidata ids
+		return wikidataIDs.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+	}
 
 	@Override
 	public List<String> getWikidataIdWithLabelAltLabel(String label, String language) {
@@ -126,10 +155,8 @@ public class WikidataServiceImpl implements WikidataService {
 			//get the wikidata ids using the wikidata search api
 			return getWikidataIdWithWikidataSearch(label);
 		}
-		//returning the top 5 wikidata ids
-		return wikidataIDs.stream().limit(5).collect(Collectors.toList());
-		
-		
+		//returning the top n wikidata ids
+		return wikidataIDs.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
 	}
 	
 	private List<String> getWikidataIdWithWikidataSearch(String label) {
@@ -170,25 +197,41 @@ public class WikidataServiceImpl implements WikidataService {
 	@Override
 	public List<String> getWikidataPlaceIdWithLabel(String label, String language) {
 		String query = String.format(placeLabelQueryString, label, language);
-		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		if(result!=null)
+			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		else 
+			return null;
 	}
 	
 	@Override
 	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) {
-		String query = String.format(placeLabelAltLabelQueryString, label, language, label, "en");
-		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		String query = String.format(placeLabelAltLabelQueryString, label, language);
+		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		if(result!=null)
+			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		else 
+			return null;
 	}
 	
 	@Override
 	public List<String> getWikidataAgentIdWithLabel(String label, String language){
 		String query = String.format(agentlabelQueryString, label, language);
-		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		if(result!=null)
+			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		else 
+			return null;
 	}
 	
 	@Override
 	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language){
 		String query = String.format(agentlabelAltLabelQueryString, label, language);
-		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
+		if(result!=null)
+			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		else 
+			return null;
 	}
 
 	/*
@@ -473,30 +516,6 @@ public class WikidataServiceImpl implements WikidataService {
 			
 	}
 	
-	
-	private Map<String, List<String>> convertListOfListOfStringToMapOfStringAndListOfString (List<List<String>> jsonElement)
-	{
-		Map<String,List<String>> altLabelMap = new HashMap<String,List<String>>();
-		for (List<String> altLabelElem : jsonElement)
-		{
-			if(altLabelMap.containsKey(altLabelElem.get(0)))
-			{
-				List<String> altLabelMapValue = altLabelMap.get(altLabelElem.get(0));
-				altLabelMapValue.add(altLabelElem.get(1));
-				altLabelMap.put(altLabelElem.get(0), altLabelMapValue);
-			}
-			else
-			{
-				List<String> newaltLabelMapValue = new ArrayList<String>();
-				newaltLabelMapValue.add(altLabelElem.get(1));
-				altLabelMap.put(altLabelElem.get(0), newaltLabelMapValue);
-			}
-			
-		}
-		return altLabelMap;
-	}
-
-	
 	@Override
 	public WikidataEntity getWikidataEntityUsingLocalCache(String wikidataURL, String type) throws IOException {
 		
@@ -549,7 +568,7 @@ public class WikidataServiceImpl implements WikidataService {
 			Map<String,List<String>> altLabelMap = null;
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
-				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				altLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
 //			/*this is added because jackson has problems with serializing null values (version 2.9.4 that we use)
 //			 * TODO: find a better fix
@@ -604,7 +623,7 @@ public class WikidataServiceImpl implements WikidataService {
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDescription_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
 			if(descriptionsMap!=null) newWikidataAgent.setDescription(descriptionsMap);
 			
@@ -639,7 +658,7 @@ public class WikidataServiceImpl implements WikidataService {
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{ 
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
 			if(prefLabelMap!=null) newWikidataAgent.setPrefLabel(prefLabelMap);
 			
@@ -668,7 +687,7 @@ public class WikidataServiceImpl implements WikidataService {
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getAltLabel_jsonProp()); 
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				altLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				altLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 				
 			}
 			if(altLabelMap!=null) newWikidataPlace.setAltLabel(altLabelMap);
@@ -710,7 +729,7 @@ public class WikidataServiceImpl implements WikidataService {
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDescription_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
-				descriptionsMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
 			if(descriptionsMap!=null) newWikidataPlace.setDescription(descriptionsMap);
 			
@@ -739,7 +758,7 @@ public class WikidataServiceImpl implements WikidataService {
 			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
-				prefLabelMap = convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
 			}
 			if(prefLabelMap!=null) newWikidataPlace.setPrefLabel(prefLabelMap);
 			
