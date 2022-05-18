@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
@@ -30,9 +29,6 @@ public class NERController extends BaseRest {
 	@Autowired
 	EnrichmentNERServiceImpl enrichmentNerService;
 	
-	@Autowired
-	PersistentTranslationEntityService persistentTranslationEntityService;
-
 	/**
 	 * This method represents the /enrichment/ner/{storyId} end point,
 	 * where a request with a translated text is send and the named entities based on this text are retrieved.
@@ -55,7 +51,7 @@ public class NERController extends BaseRest {
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation).")
-	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
@@ -126,7 +122,7 @@ public class NERController extends BaseRest {
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation).")
-	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
+	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesItem(
 			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
