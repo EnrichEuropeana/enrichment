@@ -457,14 +457,14 @@ public class EnrichmentNERServiceImpl {
 				
 				if(type.toLowerCase().equals("description")) 
 				{
-					results[0] = story.getDescription();
-					results[1] = story.getLanguageDescription();
+					results[0] = story.getDescriptionEn();
+					results[1] = "en";
 					
 				}
 				else if(type.toLowerCase().equals("summary"))
 				{
-					results[0] = story.getSummary();
-					results[1] = story.getLanguageSummary();
+					results[0] = story.getSummaryEn();
+					results[1] = "en";
 				}
 				else if(type.toLowerCase().equals("transcription"))
 				{
