@@ -52,36 +52,37 @@ public class TopicController extends BaseRest{
 	 * @return
 	 * @throws Exception 
 	 */
-	@ApiOperation(value = "Create Topic", nickname = "postTopicCreation", notes = "This method stores the topics into the database\n"
-			+ "Mandatory fields: identifier, description and topicTerm")
+	@ApiOperation(value = "Create Topics", nickname = "postTopicCreation", notes = "This method stores the topics into the database\n")
 	@RequestMapping(value = "/enrichment/topic/", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> postTopicCreation (@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestBody(required = true) TopicImpl topic) throws Exception
+			@RequestBody(required = true) TopicImpl [] topics) throws Exception
 	{
 		validateApiKey(wskey);
 
-		// check mandatory fields
-		if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicIdentifier, null);
-		if (topic.getDescriptions()==null)
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicDescriptions, null);
-		if (topic.getTerms()==null)
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicTerms, null);
+		for(TopicImpl topic : topics) {
+			// check mandatory fields
+			if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicIdentifier, null);
+			if (topic.getDescriptions()==null)
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicDescriptions, null);
+			if (topic.getTerms()==null)
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicTerms, null);
+			
+			//TODO: add apiVersion to the generateETag method
+			Date date = new Date();
+			topic.setCreated(date);
+			
+			// use create topic service
+			enrichmentTopicService.createTopic(topic);
+		}
 		
-		//TODO: add apiVersion to the generateETag method
-		Date date = new Date();
-		topic.setCreated(date);
-		
-		// use create topic service
-		Topic newTopic = enrichmentTopicService.createTopic(topic);
-
-		String etag = generateETag(date, WebFields.JSON_LD_REST);
+		String etag = generateETag(new Date(), WebFields.JSON_LD_REST);
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 	    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 	    headers.add(HttpHeaders.ETAG, etag);
 	    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
 
-		return new ResponseEntity<String>(jsonLdSerializer.serializeObject(newTopic), headers, HttpStatus.OK);
+		return new ResponseEntity<String>(jsonLdSerializer.serializeObject("{\"result\":\"Done.\"}"), headers, HttpStatus.OK);
 		
 	}
 	

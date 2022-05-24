@@ -23,11 +23,11 @@ public class TermImpl implements Term {
 	}
 	
 	public TermImpl(String term, Integer rank, Integer score) throws UnsupportedRangeTermEntityException {
-		if (!(1<=rank.intValue() && rank.intValue()<=250))
-			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
-		
-		if (!(0<=score.intValue() && score.intValue()<=100))
-			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
+//		if (!(1<=rank.intValue() && rank.intValue()<=250))
+//			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
+//		
+//		if (!(0<=score.intValue() && score.intValue()<=100))
+//			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
 		
 		this.rank = rank;
 		this.score = score;
@@ -70,8 +70,8 @@ public class TermImpl implements Term {
 
 	@Override
 	public void setScore(Integer score) throws UnsupportedRangeTermEntityException {
-		if (!(0<=score.intValue() && score.intValue()<=100))
-			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
+//		if (!(0<=score.intValue() && score.intValue()<=100))
+//			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
 		this.score = score;
 	}
 
@@ -82,8 +82,8 @@ public class TermImpl implements Term {
 
 	@Override
 	public void setRank(Integer rank) throws UnsupportedRangeTermEntityException {
-		if (!(1<=rank.intValue() && rank.intValue()<=250))
-			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
+//		if (!(1<=rank.intValue() && rank.intValue()<=250))
+//			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
 		this.rank = rank;
 	}
 

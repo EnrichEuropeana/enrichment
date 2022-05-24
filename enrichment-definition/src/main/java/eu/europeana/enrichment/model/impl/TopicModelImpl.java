@@ -76,8 +76,8 @@ public class TopicModelImpl implements TopicModel {
 
 	@Override
 	public void setAlgorithm(String alg) throws UnsupportedEntityTypeException {
-		if (!(alg.equals(TopicConst.LDA) || alg.equals(TopicConst.LDA2Vec) ))
-			throw new UnsupportedEntityTypeException("Algorithm must be one of: LDA or LDA2Vec");
+//		if (!(alg.equals(TopicConst.LDA) || alg.equals(TopicConst.LDA2Vec) ))
+//			throw new UnsupportedEntityTypeException("Algorithm must be one of: LDA or LDA2Vec");
 		this.algorithm = alg;
 	}
 }
