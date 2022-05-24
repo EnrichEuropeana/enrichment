@@ -1,7 +1,10 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
@@ -28,6 +34,11 @@ public class NERController extends BaseRest {
 
 	@Autowired
 	EnrichmentNERServiceImpl enrichmentNerService;
+	
+	@Autowired
+	PersistentStoryEntityService persistentStoryEntityService;
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/**
 	 * This method represents the /enrichment/ner/{storyId} end point,
@@ -182,5 +193,33 @@ public class NERController extends BaseRest {
 			
 			return response;
 		
+	}	
+	
+	@ApiOperation(value = "Compute named entities for all stories")
+	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getNEREntitiesAllStories(
+			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrNamedEntityServiceException {
+	
+			// Check client access (a valid “wskey” must be provided)
+			validateApiKey(wskey);
+
+			String linking_local = "Wikidata";
+			List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
+			for(StoryEntity story : stories) {
+				if(story.getDescriptionEn()!=null) {
+					logger.info("NER analysis for the storyId: " + story.getStoryId());
+					
+					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
+					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);
+					
+					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
+					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);				
+
+				}			
+			}
+
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"result\":\"Done.\"}", HttpStatus.OK);
+			return response;
 	}
+
 }
