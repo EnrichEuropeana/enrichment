@@ -2,7 +2,9 @@ package eu.europeana.enrichment.ner.linking;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,8 +30,8 @@ import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -47,7 +49,7 @@ public class WikidataServiceImpl implements WikidataService {
 	private static final String baseUrlSparql = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
 //	private static final String baseUrlWikidataSearch = "https://wikidata.org/w/api.php";
 	private static final String baseUrlWikidataSearch = "https://www.wikidata.org/w/index.php";
-	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 10;
+	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 20;
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
@@ -139,27 +141,40 @@ public class WikidataServiceImpl implements WikidataService {
 	public List<String> getWikidataIdWithLabel(String label, String language) {
 		String query = String.format(labelQueryString, label, language);
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
-		if(wikidataIDs==null) {
-			//get the wikidata ids using the wikidata search api
-			return getWikidataIdWithWikidataSearch(label);
+		if(wikidataIDs!=null) {
+			for(String wikidataIdEach : wikidataIDs) {
+				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataIdEach);
+				if(validWikidataPage(wikidataJSONResponse)) {
+					return wikidataIDs;					
+				}
+			}
 		}
-		//returning the top n wikidata ids
-		return wikidataIDs.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		/*
+		 * in case the previous query does not find the results,
+		 * get the wikidata ids using the wikidata search apis 
+		 */		
+		return getWikidataIdWithWikidataSearch(label);
 	}
 
 	@Override
 	public List<String> getWikidataIdWithLabelAltLabel(String label, String language) {
 		String query = String.format(labelAltLabelQueryString, label, language);
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
-		if(wikidataIDs==null) {
-			//get the wikidata ids using the wikidata search api
-			return getWikidataIdWithWikidataSearch(label);
-		}
-		//returning the top n wikidata ids
-		return wikidataIDs.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+		if(wikidataIDs!=null) {
+			for(String wikidataIdEach : wikidataIDs) {
+				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataIdEach);
+				if(validWikidataPage(wikidataJSONResponse)) {
+					return wikidataIDs;					
+				}
+			}
+		}		
+		//get the wikidata ids using the wikidata search api
+		return getWikidataIdWithWikidataSearch(label);
+
 	}
 	
-	private List<String> getWikidataIdWithWikidataSearch(String label) {
+	@Override
+	public List<String> getWikidataIdWithWikidataSearch(String label) {
 		
 		Map<String, String> params = new HashMap<>();
 		
@@ -168,15 +183,19 @@ public class WikidataServiceImpl implements WikidataService {
 		 * The difference between this search and the sparql search is that this request will return the results
 		 * even if the spelling of the label is not correct, e.g. Sajudis, instead of Sąjūdis
 		 */
-		params.put("action", "wbsearchentities");
-		params.put("search", label);
-		params.put("language", "en");
-		params.put("format", "json");
-		
-		List<String> results = processWikidataSearchResponse(createRequest(baseUrlWikidataSearch, params));
-		if(results != null) {
-			return results;
-		}
+//		params.put("action", "wbsearchentities");
+//		params.put("search", label);
+//		params.put("language", "en");
+//		params.put("format", "json");
+//		
+//		List<String> results = processWikidataSearchResponse(createRequest(baseUrlWikidataSearch, params));
+//		if(results != null) {
+//			for(String wikidataIdEach : results) {
+//				if(validWikidataId(wikidataIdEach)) {
+//					return results;					
+//				}
+//			}
+//		}
 
 		/*
 		 * the params for the direct request to the wikidata search results page, in which case
@@ -199,7 +218,7 @@ public class WikidataServiceImpl implements WikidataService {
 		String query = String.format(placeLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
-			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+			return result;
 		else 
 			return null;
 	}
@@ -209,7 +228,7 @@ public class WikidataServiceImpl implements WikidataService {
 		String query = String.format(placeLabelAltLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
-			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+			return result;
 		else 
 			return null;
 	}
@@ -219,7 +238,7 @@ public class WikidataServiceImpl implements WikidataService {
 		String query = String.format(agentlabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
-			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+			return result;
 		else 
 			return null;
 	}
@@ -229,11 +248,29 @@ public class WikidataServiceImpl implements WikidataService {
 		String query = String.format(agentlabelAltLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
-			return result.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
+			return result;
 		else 
 			return null;
 	}
 
+	/*
+	 * This function ensure that the wikidata id is valid, and so in the way that
+	 * it checks that it is not a wikidata disambiguation page
+	 */
+	@Override
+	public boolean validWikidataPage (String wikidataJSONResponse) {
+		if(wikidataJSONResponse==null) {
+			return false;
+		}
+		String descriptionEn = getDescriptionEnFromWikidataJson(wikidataJSONResponse);
+		if(descriptionEn!=null && descriptionEn.contains("disambiguation page")) {
+			return false;
+		}		
+		else {
+			return true;
+		}
+	}
+	
 	/*
 	 * This method process the response of the Wikidata sparql query and returns a
 	 * list of Wikidata entity urls or null
@@ -275,7 +312,7 @@ public class WikidataServiceImpl implements WikidataService {
 		}
 		
 		if(retValue.size()>0) {
-			return retValue;
+			return retValue.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
 		}
 		else {
 			return null;
@@ -311,7 +348,7 @@ public class WikidataServiceImpl implements WikidataService {
 		}
 		
 		if(retValue.size()>0) {
-			return retValue;
+			return retValue.stream().limit(KEEP_FIRST_N_WIKIDATA_IDS).collect(Collectors.toList());
 		}
 		else {
 			return null;
@@ -331,7 +368,7 @@ public class WikidataServiceImpl implements WikidataService {
 			return null;
 		}
 		List<String> retValue = new ArrayList<>();
-		int numberElemToSelect = 5;
+		int numberElemToSelect = KEEP_FIRST_N_WIKIDATA_IDS;
 		for(Element el : searchResultsHeadings) {
 			String wikidataId = el.getElementsByTag("a").get(0).attr("href");
 			if(wikidataId==null || wikidataId.isBlank()) {
@@ -536,19 +573,17 @@ public class WikidataServiceImpl implements WikidataService {
 		 */
 		if(EntityTypes.Agent.getEntityType().equalsIgnoreCase(type)) {
 			wikiEntity = new WikidataAgentImpl();
+			if(WikidataJSON.contains(EnrichmentConstants.AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER)) {
+				return getWikidataEntity(wikidataURL,WikidataJSON,type);
+			}	
+
 		}
 		else if(EntityTypes.Place.getEntityType().equalsIgnoreCase(type)) {
 			wikiEntity = new WikidataPlaceImpl();
+			if(WikidataJSON.contains(EnrichmentConstants.PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER)) {
+				return getWikidataEntity(wikidataURL,WikidataJSON,type);
+			}				
 		}
-		
-//		List<List<String>> jsonTypeElement = getJSONFieldFromWikidataJSON(WikidataJSON,wikiEntity.getIdentification_jsonProp());
-//		if(jsonTypeElement!=null && !jsonTypeElement.isEmpty())
-//		{
-//			return getWikidataEntity(wikidataURL,WikidataJSON,type);
-//		}
-		if(WikidataJSON.contains(wikiEntity.getIdentification_jsonProp_identifier())) {
-			return getWikidataEntity(wikidataURL,WikidataJSON,type);
-		}	
 		
 		return null;
 		
@@ -563,7 +598,7 @@ public class WikidataServiceImpl implements WikidataService {
 		{
 			WikidataAgent newWikidataAgent = new WikidataAgentImpl ();
 			
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getAltLabel_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON, EnrichmentConstants.ALTLABEL_JSONPROP);
 			//converting the "jsonElement" to the appropriate object to be saved in Solr
 			Map<String,List<String>> altLabelMap = null;
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
@@ -583,7 +618,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(altLabelMap!=null) newWikidataAgent.setAltLabel(altLabelMap);
 
 			String country = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getCountry_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.AGENT_COUNTRY_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				country=EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(0).get(0);
@@ -591,7 +626,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(country!=null) newWikidataAgent.setCountry(country);
 
 			String [] dateBirthArray = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfBirth_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DATEOFBIRTH_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{		
 				dateBirthArray = new String [1];
@@ -600,7 +635,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(dateBirthArray!=null) newWikidataAgent.setDateOfBirth(dateBirthArray);
 			
 			String [] dateDeathArray = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDateOfDeath_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DATEOFDEATH_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				dateDeathArray = new String [jsonElement.size()];
@@ -612,7 +647,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(dateDeathArray!=null) newWikidataAgent.setDateOfDeath(dateDeathArray);
 			
 			String depiction = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDepiction_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DEPICTION_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
@@ -620,7 +655,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(depiction!=null) newWikidataAgent.setDepiction(depiction);
 			
 			Map<String,List<String>> descriptionsMap = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getDescription_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DESCRIPTION_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
@@ -633,7 +668,7 @@ public class WikidataServiceImpl implements WikidataService {
 			
 			
 			String modificationDate = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getModificationDate_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.MODIFICATIONDATE_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				modificationDate = jsonElement.get(0).get(0);
@@ -642,7 +677,7 @@ public class WikidataServiceImpl implements WikidataService {
 			
 			
 			String [] occupationArray = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getProfessionOrOccupation_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PROFESSIONOROCCUPATION_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				occupationArray = new String [jsonElement.size()];
@@ -655,7 +690,7 @@ public class WikidataServiceImpl implements WikidataService {
 			
 			
 			Map<String,List<String>> prefLabelMap = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getPrefLabel_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{ 
 				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
@@ -664,7 +699,7 @@ public class WikidataServiceImpl implements WikidataService {
 			
 			
 			String [] sameAsArray = null;		
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataAgent.getSameAs_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.SAMEAS_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())	
 			{
 				sameAsArray = new String [jsonElement.size()];
@@ -684,7 +719,7 @@ public class WikidataServiceImpl implements WikidataService {
 			WikidataPlace newWikidataPlace = new WikidataPlaceImpl ();
 			
 			Map<String,List<String>> altLabelMap = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getAltLabel_jsonProp()); 
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.ALTLABEL_JSONPROP); 
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				altLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
@@ -693,7 +728,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(altLabelMap!=null) newWikidataPlace.setAltLabel(altLabelMap);
 			
 			String country = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getCountry_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PLACE_COUNTRY_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				country = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(0).get(0);
@@ -701,7 +736,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(country!=null) newWikidataPlace.setCountry(country);
 			
 			Float latitude = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLatitude_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.LATITUDE_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				latitude = Float.valueOf(jsonElement.get(0).get(0));
@@ -710,7 +745,7 @@ public class WikidataServiceImpl implements WikidataService {
 
 			
 			Float longitude = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLongitude_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.LONGITUDE_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				longitude = Float.valueOf(jsonElement.get(0).get(0));
@@ -718,7 +753,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(longitude!=null) newWikidataPlace.setLongitude(longitude);
 
 			String depiction = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDepiction_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DEPICTION_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
@@ -726,7 +761,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(depiction!=null) newWikidataPlace.setDepiction(depiction);
 		
 			Map<String,List<String>> descriptionsMap = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getDescription_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DESCRIPTION_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
@@ -738,7 +773,7 @@ public class WikidataServiceImpl implements WikidataService {
 			newWikidataPlace.setInternalType(type);
 			
 			String modificationDate = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getModificationDate_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.MODIFICATIONDATE_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				modificationDate = jsonElement.get(0).get(0);
@@ -747,7 +782,7 @@ public class WikidataServiceImpl implements WikidataService {
 		
 			
 			String logo = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getLogo_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.LOGO_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				logo = jsonElement.get(0).get(0);
@@ -755,7 +790,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(logo!=null) newWikidataPlace.setLogo(logo);
 		
 			Map<String,List<String>> prefLabelMap = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getPrefLabel_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty())
 			{
 				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
@@ -763,7 +798,7 @@ public class WikidataServiceImpl implements WikidataService {
 			if(prefLabelMap!=null) newWikidataPlace.setPrefLabel(prefLabelMap);
 			
 			String [] sameAsArray = null;
-			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,newWikidataPlace.getSameAs_jsonProp());
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.SAMEAS_JSONPROP);
 			if(jsonElement!=null && !jsonElement.isEmpty()) 
 			{
 				sameAsArray = new String [jsonElement.size()];
@@ -778,4 +813,87 @@ public class WikidataServiceImpl implements WikidataService {
 			
 		}	
 	}
+	
+	@Override
+	public String getDescriptionEnFromWikidataJson(String wikidataJson) {		
+		Map<String,List<String>> descriptionsMap = null;
+		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJson,"descriptions.*.*");
+		if(jsonElement!=null && !jsonElement.isEmpty())
+		{ 
+			descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			List<String> descriptionEn = descriptionsMap.get("en");
+			if(descriptionEn!=null && descriptionEn.size()>0) {
+				return descriptionEn.get(0);
+			}
+			else
+				return null;
+		}
+		else
+			return null;
+	}
+	
+	@Override
+	public boolean containsNameInLabelOrAltLabelField(String wikidataJSONResponse, String name) {
+		//search through the prefLabel
+		Map<String,List<String>> prefLabelMap = null;
+		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.PREFLABEL_JSONPROP);
+		if(jsonElement!=null && !jsonElement.isEmpty())
+		{ 
+			prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+		}
+		if(prefLabelMap!=null) {
+			for(List<String> prefLabelValues : prefLabelMap.values()) {
+				for(String prefLabelSingle : prefLabelValues) {
+					/* 
+					 * check for the order of words that does not have to be the same, e.g.
+					 * for the name: Moore Lane, the found wikidata entity is Lane Moore,
+					 * which is correct.
+					 */
+					String prefLabelSingleUTF8 = new String(prefLabelSingle.getBytes(), StandardCharsets.UTF_8);
+					String prefLabelSingleUTF8LowerCase = prefLabelSingleUTF8.toLowerCase();
+					List<String> prefLabelSingleSplitted = Arrays.asList(prefLabelSingleUTF8LowerCase.split("\\s+"));
+					String nameUTF8 = new String(name.getBytes(), StandardCharsets.UTF_8);
+					String nameUTF8LowerCase = nameUTF8.toLowerCase();
+					List<String> nameSplitted = Arrays.asList(nameUTF8LowerCase.split("\\s+"));
+					if(prefLabelSingleSplitted.containsAll(nameSplitted) 
+						&& prefLabelSingleSplitted.size()==nameSplitted.size()) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		//search through the altLabel
+		jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.ALTLABEL_JSONPROP);
+		Map<String,List<String>> altLabelMap = null;
+		if(jsonElement!=null && !jsonElement.isEmpty()) 
+		{
+			altLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+		}
+		if(altLabelMap!=null) {
+			for(List<String> altLabelValues : altLabelMap.values()) {
+				for(String altLabelSingle : altLabelValues) {
+					/* 
+					 * check for the order of words that does not have to be the same, e.g.
+					 * for the name: Moore Lane, the found wikidata entity is Lane Moore,
+					 * which is correct.
+					 */
+					String altLabelSingleUTF8 = new String(altLabelSingle.getBytes(), StandardCharsets.UTF_8);
+					String altLabelSingleUTF8LowerCase = altLabelSingleUTF8.toLowerCase();
+					List<String> altLabelSingleSplitted = Arrays.asList(altLabelSingleUTF8LowerCase.split("\\s+"));
+					String nameUTF8 = new String(name.getBytes(), StandardCharsets.UTF_8);
+					String nameUTF8LowerCase = nameUTF8.toLowerCase();
+					List<String> nameSplitted = Arrays.asList(nameUTF8LowerCase.split("\\s+"));
+					if(altLabelSingleSplitted.containsAll(nameSplitted) 
+						&& altLabelSingleSplitted.size()==nameSplitted.size()) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+		
+	}
+	
 }

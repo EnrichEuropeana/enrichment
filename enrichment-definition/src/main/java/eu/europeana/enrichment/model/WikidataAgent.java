@@ -1,9 +1,5 @@
 package eu.europeana.enrichment.model;
 
-import java.util.List;
-import java.util.Map;
-
-
 public interface WikidataAgent extends WikidataEntity {
 
 	/**
@@ -20,14 +16,6 @@ public interface WikidataAgent extends WikidataEntity {
 	 * @return
 	 */
 	void setCountry(String country);
-	
-	String getCountry_jsonProp();
-
-	String getDateOfBirth_jsonProp();
-
-	String getDateOfDeath_jsonProp();
-
-	String getProfessionOrOccupation_jsonProp();
 
 	String[] getDateOfBirth();
 

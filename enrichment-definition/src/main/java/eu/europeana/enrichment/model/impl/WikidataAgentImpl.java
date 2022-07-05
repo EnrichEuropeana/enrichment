@@ -30,52 +30,6 @@ public class WikidataAgentImpl extends WikidataEntityImpl implements WikidataAge
 	private String[] dateOfBirth;
 	private String[] dateOfDeath;
 	private String[] professionOrOccupation;
-	
-	/**
-	 * The identification property if the first name of the person in this case
-	 */
-	private String identification_jsonProp_identifier = "P735";
-	private String identification_jsonProp = "claims."+ identification_jsonProp_identifier +".mainsnak.datavalue.value.id";
-	@Override
-	@JsonIgnore
-	public String getIdentification_jsonProp() {
-		return identification_jsonProp;
-	}
-	
-	@Override
-	@JsonIgnore
-	public String getIdentification_jsonProp_identifier() {
-		return identification_jsonProp_identifier;
-	}
-	
-	private String country_jsonProp = "claims.P27.mainsnak.datavalue.value.id";
-	@Override
-	@JsonIgnore
-	public String getCountry_jsonProp() {
-		return country_jsonProp;
-	}
-
-	private String dateOfBirth_jsonProp = "claims.P569.mainsnak.datavalue.value.time";
-	@Override
-	@JsonIgnore
-	public String getDateOfBirth_jsonProp() {
-		return dateOfBirth_jsonProp;
-	}
-
-	private String dateOfDeath_jsonProp = "claims.P570.mainsnak.datavalue.value.time";
-	@Override
-	@JsonIgnore
-	public String getDateOfDeath_jsonProp() {
-		return dateOfDeath_jsonProp;
-	}
-
-	private String professionOrOccupation_jsonProp = "claims.P106.mainsnak.datavalue.value.id";
-	@Override
-	@JsonIgnore
-	public String getProfessionOrOccupation_jsonProp() {
-		return professionOrOccupation_jsonProp;
-	}
-
 
 	@Override
 	@JsonProperty("country")

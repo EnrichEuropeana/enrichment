@@ -3,7 +3,6 @@ package eu.europeana.enrichment.ner.service.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -12,10 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -80,44 +77,48 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		if(wikidata) {
 			//populate the wikidataIds
 			if(dbNamedEntity==null) {
-				List<String> wikidataLabelAndTypeMatchIDs = null;
-				List<String> wikidataLabelAltLabelAndTypeMatchIDs = null;
-				List<String> wikidataLabelMatchIDs = null;				
+//				List<String> wikidataLabelAndTypeMatchIDs = null;
+//				List<String> wikidataLabelAltLabelAndTypeMatchIDs = null;
+//				List<String> wikidataLabelMatchIDs = null;				
 				List<String> wikidataLabelAltLabelMatchIDs = null;
-				//TODO: implement information retrieval from Wikidata
-				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
-					String namedEntityKey = namedEntity.getLabel();
-					//Agents with only first name or last name will not be searched
-					if(StringUtils.containsWhitespace(namedEntityKey)) {
-						wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), sourceLanguage);
-						wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataAgentIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-					}
-				}
-				else if(namedEntity.getType().equals(NERClassification.PLACE.toString())) {
-					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataPlaceIdWithLabel(namedEntity.getLabel(), sourceLanguage);
-					wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-				}	
-				else {
-					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithLabel(namedEntity.getLabel(), sourceLanguage);
-					wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-				}
-				if(wikidataLabelAndTypeMatchIDs!=null) {
-					namedEntity.setWikidataLabelAndTypeMatchIds(wikidataLabelAndTypeMatchIDs);
-				}
-				if(wikidataLabelAltLabelAndTypeMatchIDs!=null) {
-					namedEntity.setWikidataLabelAltLabelAndTypeMatchIds(wikidataLabelAltLabelAndTypeMatchIDs);
-				}
+
+//				if(namedEntity.getType().equals(NERClassification.AGENT.toString())) {
+//					String namedEntityKey = namedEntity.getLabel();
+//					//Agents with only first name or last name will not be searched
+//					if(StringUtils.containsWhitespace(namedEntityKey)) {
+//						wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataAgentIdWithLabel(namedEntity.getLabel(), sourceLanguage);
+//						wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataAgentIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+//					}
+//				}
+//				else if(namedEntity.getType().equals(NERClassification.PLACE.toString())) {
+//					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataPlaceIdWithLabel(namedEntity.getLabel(), sourceLanguage);
+//					wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+//				}	
+//				else {
+//					wikidataLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithLabel(namedEntity.getLabel(), sourceLanguage);
+//					wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+//				}
+//				if(wikidataLabelAndTypeMatchIDs!=null) {
+//					namedEntity.setWikidataLabelAndTypeMatchIds(wikidataLabelAndTypeMatchIDs);
+//				}
+//				if(wikidataLabelAltLabelAndTypeMatchIDs!=null) {
+//					namedEntity.setWikidataLabelAltLabelAndTypeMatchIds(wikidataLabelAltLabelAndTypeMatchIDs);
+//				}
+//				
+//				//for the non AGENT and non PLACE types (MISC types etc.) the wikidata ids without the type match are already set
+//				if(namedEntity.getType().equals(NERClassification.AGENT.toString()) 
+//						|| namedEntity.getType().equals(NERClassification.PLACE.toString())) {				
+//					wikidataLabelMatchIDs = wikidataService.getWikidataIdWithLabel(namedEntity.getLabel(), sourceLanguage);
+//					wikidataLabelAltLabelMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
+//					if(wikidataLabelMatchIDs!=null)
+//						namedEntity.setWikidataLabelMatchIds(wikidataLabelMatchIDs);
+//					if(wikidataLabelAltLabelMatchIDs!=null)
+//						namedEntity.setWikidataLabelAltLabelMatchIds(wikidataLabelAltLabelMatchIDs);
+//				}
 				
-				//for the non AGENT and non PLACE types (MISC types etc.) the wikidata ids without the type match are already set
-				if(namedEntity.getType().equals(NERClassification.AGENT.toString()) 
-						|| namedEntity.getType().equals(NERClassification.PLACE.toString())) {				
-					wikidataLabelMatchIDs = wikidataService.getWikidataIdWithLabel(namedEntity.getLabel(), sourceLanguage);
-					wikidataLabelAltLabelMatchIDs = wikidataService.getWikidataIdWithLabelAltLabel(namedEntity.getLabel(), sourceLanguage);
-					if(wikidataLabelMatchIDs!=null)
-						namedEntity.setWikidataLabelMatchIds(wikidataLabelMatchIDs);
-					if(wikidataLabelAltLabelMatchIDs!=null)
-						namedEntity.setWikidataLabelAltLabelMatchIds(wikidataLabelAltLabelMatchIDs);
-				}
+				wikidataLabelAltLabelMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(namedEntity.getLabel());
+				if(wikidataLabelAltLabelMatchIDs!=null)
+				namedEntity.setWikidataLabelAltLabelMatchIds(wikidataLabelAltLabelMatchIDs);
 			}
 			
 			//populate the dbpediaWikidataIds
@@ -152,41 +153,52 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			
 			//populate the preferred WikidataIds
 			if(nerTool.equals(NERConstants.dbpediaSpotlightName)) {
-				//setting the prefered wikidata ids
 				List<String> preferredWikidataIds = new ArrayList<String>();
-				if(namedEntity.getWikidataLabelAndTypeMatchIds() != null) {
-					for(String wikidataID : namedEntity.getWikidataLabelAndTypeMatchIds()) {
-						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
-							preferredWikidataIds.add(wikidataID);
+//				if(namedEntity.getWikidataLabelAndTypeMatchIds() != null) {
+//					for(String wikidataID : namedEntity.getWikidataLabelAndTypeMatchIds()) {
+//						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+//							preferredWikidataIds.add(wikidataID);
+//						}
+//					}
+//				}
+//				if(preferredWikidataIds.size()==0) {
+//					if(namedEntity.getWikidataLabelMatchIds() != null) {
+//						for(String wikidataID : namedEntity.getWikidataLabelMatchIds()) {
+//							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+//								preferredWikidataIds.add(wikidataID);
+//							}
+//						}
+//					}
+//				}
+//				if(preferredWikidataIds.size()==0) {
+//					if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds() != null) {
+//						for(String wikidataID : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
+//							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+//								preferredWikidataIds.add(wikidataID);
+//							}
+//						}
+//					}
+//				}
+//				if(preferredWikidataIds.size()==0) {
+//					if(namedEntity.getWikidataLabelAltLabelMatchIds() != null) {
+//						for(String wikidataID : namedEntity.getWikidataLabelAltLabelMatchIds()) {
+//							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
+//								preferredWikidataIds.add(wikidataID);
+//							}
+//						}
+//					}
+//				}
+				
+				if(namedEntity.getWikidataLabelAltLabelMatchIds()!=null) {
+					List<String> wikidataLabelAltLabelMatchIds = namedEntity.getWikidataLabelAltLabelMatchIds();
+					for(String wikidataId : wikidataLabelAltLabelMatchIds) {
+						if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataId)) {
+							preferredWikidataIds.add(wikidataId);
 						}
 					}
 				}
-				if(preferredWikidataIds.size()==0) {
-					if(namedEntity.getWikidataLabelMatchIds() != null) {
-						for(String wikidataID : namedEntity.getWikidataLabelMatchIds()) {
-							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
-								preferredWikidataIds.add(wikidataID);
-							}
-						}
-					}
-				}
-				if(preferredWikidataIds.size()==0) {
-					if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds() != null) {
-						for(String wikidataID : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
-							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
-								preferredWikidataIds.add(wikidataID);
-							}
-						}
-					}
-				}
-				if(preferredWikidataIds.size()==0) {
-					if(namedEntity.getWikidataLabelAltLabelMatchIds() != null) {
-						for(String wikidataID : namedEntity.getWikidataLabelAltLabelMatchIds()) {
-							if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getDbpediaWikidataIds().contains(wikidataID)) {
-								preferredWikidataIds.add(wikidataID);
-							}
-						}
-					}
+				if(preferredWikidataIds.size()==0 && namedEntity.getDbpediaWikidataIds()!=null) {
+					preferredWikidataIds.addAll(namedEntity.getDbpediaWikidataIds());
 				}
 				
 				if(preferredWikidataIds.size()>0)
@@ -201,38 +213,53 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	}
 	
 	String computePreferedWikidataId(NamedEntityImpl namedEntity) {
-		if(namedEntity.getPreferredWikidataIds()!=null)
-			return namedEntity.getPreferredWikidataIds().get(0);
+		//if there is a value in the preferred ids take the first valid one
+		if(namedEntity.getPreferredWikidataIds()!=null) {
+			for(String wikidataId : namedEntity.getPreferredWikidataIds()) {
+				String wikidataJSONResponse = wikidataService.getWikidataJSONFromWikidataID(wikidataId);
+				if(wikidataService.validWikidataPage(wikidataJSONResponse)) {
+					return wikidataId;
+				}
+			}
+		}
 
 		//get the first wikidata id which is not the "disambiguation page"
-		if(namedEntity.getWikidataLabelAndTypeMatchIds()!=null) {
-			for(String wikidataId : namedEntity.getWikidataLabelAndTypeMatchIds()) {
-				String descriptionEn = getDescriptionEnFromWikidataJson(wikidataId);
-				if(descriptionEn!=null && !descriptionEn.contains("disambiguation page")) {
-					return wikidataId;
-				}
-			}
-		}
-		if(namedEntity.getWikidataLabelMatchIds()!=null) {
-			for(String wikidataId : namedEntity.getWikidataLabelMatchIds()) {
-				String descriptionEn = getDescriptionEnFromWikidataJson(wikidataId);
-				if(descriptionEn!=null && !descriptionEn.contains("disambiguation page")) {
-					return wikidataId;
-				}
-			}
-		}
-		if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
-			for(String wikidataId : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
-				String descriptionEn = getDescriptionEnFromWikidataJson(wikidataId);
-				if(descriptionEn!=null && !descriptionEn.contains("disambiguation page")) {
-					return wikidataId;
-				}
-			}
-		}
+//		if(namedEntity.getWikidataLabelAndTypeMatchIds()!=null) {
+//			for(String wikidataId : namedEntity.getWikidataLabelAndTypeMatchIds()) {
+//				if(wikidataService.validWikidataId(wikidataId)) {
+//					return wikidataId;
+//				}
+//			}
+//		}
+//		if(namedEntity.getWikidataLabelMatchIds()!=null) {
+//			for(String wikidataId : namedEntity.getWikidataLabelMatchIds()) {
+//				if(wikidataService.validWikidataId(wikidataId)) {
+//					return wikidataId;
+//				}
+//			}
+//		}
+//		if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
+//			for(String wikidataId : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
+//				if(wikidataService.validWikidataId(wikidataId)) {
+//					return wikidataId;
+//				}
+//			}
+//		}
+//		if(namedEntity.getWikidataLabelAltLabelMatchIds()!=null) {
+//			for(String wikidataId : namedEntity.getWikidataLabelAltLabelMatchIds()) {
+//				if(wikidataService.validWikidataId(wikidataId)) {
+//					return wikidataId;
+//				}
+//			}
+//		}
+
+		//check if there is a wikidata id which contains the exact label name in its prefLabel or altLabel, if yes pick the first one
 		if(namedEntity.getWikidataLabelAltLabelMatchIds()!=null) {
-			for(String wikidataId : namedEntity.getWikidataLabelAltLabelMatchIds()) {
-				String descriptionEn = getDescriptionEnFromWikidataJson(wikidataId);
-				if(descriptionEn!=null && !descriptionEn.contains("disambiguation page")) {
+			List<String> wikidataLabelAltLabelMachIds = namedEntity.getWikidataLabelAltLabelMatchIds();
+			for(String wikidataId : wikidataLabelAltLabelMachIds) {
+				String wikidataJSONResponse = wikidataService.getWikidataJSONFromWikidataID(wikidataId);
+				if(wikidataService.validWikidataPage(wikidataJSONResponse)
+					&& wikidataService.containsNameInLabelOrAltLabelField(wikidataJSONResponse, namedEntity.getLabel())) {
 					return wikidataId;
 				}
 			}
@@ -241,22 +268,4 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		return null;
 	}
 	
-	String getDescriptionEnFromWikidataJson(String wikidataId) {
-		String wikidataJSONResponce = wikidataService.getWikidataJSONFromWikidataID(wikidataId);
-		Map<String,List<String>> descriptionsMap = null;
-		List<List<String>> jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSONResponce,"descriptions.*.*");
-		if(jsonElement!=null && !jsonElement.isEmpty())
-		{ 
-			descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-			List<String> descriptionEn = descriptionsMap.get("en");
-			if(descriptionEn!=null && descriptionEn.size()>0) {
-				return descriptionEn.get(0);
-			}
-			else
-				return null;
-		}
-		else
-			return null;
-	}
-
 }

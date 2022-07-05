@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.common.commons;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class EnrichmentConstants {
 
 	//config constants
@@ -42,10 +44,40 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
     public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_MODEL_SERVICE = "persistentTopicModelService";
-    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE = "persistentTopicEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_SERVICE = "persistentTopicService";
     public static final String BEAN_ENRICHMENT_TOPIC_SERVICE = "enrichmentTopicService";
     
     //wikidata
     public static final String WIKIDATA_ENTITY_BASE_URL = "http://www.wikidata.org/entity/";
+    
+    // properties fields in the wikidata json
+	/*
+	 * The syntax explained: e.g. "claims.P18.mainsnak.datavalue.value" (the dot "." defines a json element within 
+	 * another json element). Also an "*" can be provided as a sign to specify all elements within a given json element, 
+	 * e.g. "aliases.*.*" meaning all elements within an "aliases" element, and all of their elements  
+	 */
+    
+    public static final String PREFLABEL_JSONPROP = "labels.*.*";
+    public static final String ALTLABEL_JSONPROP = "aliases.*.*";
+    public static final String DEPICTION_JSONPROP = "claims.P18.mainsnak.datavalue.value";
+    public static final String DESCRIPTION_JSONPROP = "descriptions.*.*";
+    public static final String SAMEAS_JSONPROP = "sitelinks.*.url";
+    public static final String MODIFICATIONDATE_JSONPROP = "modified";
+    
+    //this is a name property
+	public static final String AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER = "P735";
+	public static final String AGENT_IDENTIFICATION_JSONPROP = "claims."+ AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER +".mainsnak.datavalue.value.id";
+	public static final String AGENT_COUNTRY_JSONPROP = "claims.P27.mainsnak.datavalue.value.id";
+	public static final String DATEOFBIRTH_JSONPROP = "claims.P569.mainsnak.datavalue.value.time";
+	public static final String DATEOFDEATH_JSONPROP = "claims.P570.mainsnak.datavalue.value.time";
+	public static final String PROFESSIONOROCCUPATION_JSONPROP = "claims.P106.mainsnak.datavalue.value.id";
+	//this property is the latitude property
+	public static final String PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER = "P625";
+	public static final String PLACE_IDENTIFICATION_JSONPROP = "claims."+ PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER+".mainsnak.datavalue.value.latitude";
+	public static final String PLACE_COUNTRY_JSONPROP = "claims.P17.mainsnak.datavalue.value.id";
+	public static final String LOGO_JSONPROP = "claims.P154.mainsnak.datavalue.value";
+	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
+	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
+
 }
 

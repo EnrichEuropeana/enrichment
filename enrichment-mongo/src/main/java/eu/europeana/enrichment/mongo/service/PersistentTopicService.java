@@ -16,4 +16,6 @@ public interface PersistentTopicService {
 
 	public List<Topic> getByModelIdentifier(String topicModel);
 
+	public List<Topic> getAll();
+
 }

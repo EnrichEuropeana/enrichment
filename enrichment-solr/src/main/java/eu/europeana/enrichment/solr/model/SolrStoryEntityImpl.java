@@ -15,6 +15,8 @@ import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 
 public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity {
+	
+	private String descriptionEnNonorm;
 
 	public SolrStoryEntityImpl (StoryEntity copy) {
 		this.setStoryId(copy.getStoryId());
@@ -22,6 +24,7 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 		this.setDescription(copy.getDescription());
 		this.setSummary(copy.getSummary());
 		this.setDescriptionEn(copy.getDescriptionEn());
+		this.setDescriptionEnNonorm(copy.getDescriptionEn());
 		this.setSummaryEn(copy.getSummaryEn());		
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
@@ -50,6 +53,15 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	@Field(StoryEntitySolrFields.DESCRIPTION_EN)
 	public void setDescriptionEn(String storyDescriptionEn) {
 		super.setDescriptionEn(storyDescriptionEn);
+	}
+	
+	public String getDescriptionEnNonorm() {
+		return descriptionEnNonorm;
+	}
+
+	@Field(StoryEntitySolrFields.DESCRIPTION_EN_NONORM)
+	public void setDescriptionEnNonorm(String descriptionEnNonorm) {
+		this.descriptionEnNonorm = descriptionEnNonorm;
 	}
 
 	@Override
