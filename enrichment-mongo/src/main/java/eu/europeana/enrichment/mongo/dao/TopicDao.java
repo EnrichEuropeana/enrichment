@@ -14,4 +14,6 @@ public interface TopicDao {
 
 	public List<Topic> getByModelIdentifier(String modelIdentifier);
 
+	public List<Topic> getAll();
+
 }

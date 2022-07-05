@@ -12,7 +12,9 @@ import dev.morphia.Datastore;
 import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TopicImpl;
+import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicDaoImpl implements TopicDao{
@@ -32,7 +34,19 @@ public class TopicDaoImpl implements TopicDao{
                 )
                 .first();		
 		return dbEntity;
-	}	
+	}
+	
+	@Override
+	public List<Topic> getAll() {
+		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class).iterator();
+		List<Topic> result = new ArrayList<>();
+		while (iter.hasNext())
+		{
+			result.add(iter.next());
+		}
+		return result;
+	}
+
 
 	@Override
 	public void delete(Topic dbtopicEntity) {

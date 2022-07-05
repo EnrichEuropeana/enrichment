@@ -1,7 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
 import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
 
 import java.util.List;
 import java.util.Map;
@@ -27,51 +27,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	protected String [] sameAs;
 	protected String depiction;
 	protected String modificationDate;
-	
-	protected String modificationDate_jsonProp = "modified";
-	
-	@Override
-	@JsonIgnore
-	public String getModificationDate_jsonProp() {
-		return modificationDate_jsonProp;
-	}
 
-	@Override
-	@JsonIgnore
-	public String getPrefLabel_jsonProp() {
-		return prefLabel_jsonProp;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getAltLabel_jsonProp() {
-		return altLabel_jsonProp;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getDepiction_jsonProp() {
-		return depiction_jsonProp;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getDescription_jsonProp() {
-		return description_jsonProp;
-	}
-
-	@Override
-	@JsonIgnore
-	public String getSameAs_jsonProp() {
-		return sameAs_jsonProp;
-	}
-
-	protected String prefLabel_jsonProp = "labels.*.*";
-	protected String altLabel_jsonProp = "aliases.*.*";
-	protected String depiction_jsonProp = "claims.P18.mainsnak.datavalue.value";
-	protected String description_jsonProp = "descriptions.*.*";
-	protected String sameAs_jsonProp = "sitelinks.*.url";
-	
 	@Override
 	@JsonIgnore
 	public Map<String, List<String>> getPrefLabel() {
@@ -186,22 +142,6 @@ public class WikidataEntityImpl implements WikidataEntity {
 	@Override
 	public void setSameAs(String[] sameAs) {
 		this.sameAs = sameAs;
-	}
-
-	/**
-	 * This method returns the property specific for the given type of the wikidata entity
-	 * that helps in recognizing it from other entities.
-	 */
-	@Override
-	public String getIdentification_jsonProp() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getIdentification_jsonProp_identifier() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@JsonProperty(CONTEXT_FIELD)

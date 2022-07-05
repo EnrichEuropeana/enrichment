@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.dao.TopicDao;
 
-@Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_ENTITY_SERVICE)
+@Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_SERVICE)
 public class PersistentTopicServiceImpl implements PersistentTopicService{
 	
 	@Autowired
@@ -43,6 +44,11 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 	public List<Topic> getByModelIdentifier(String topicModel) {
 		// find object in topicModelDao otherwise throw exception; then collect in a list all topics belonging to that model
 		return topicDao.getByModelIdentifier(topicModel);
+	}
+	
+	@Override
+	public List<Topic> getAll() {
+		return topicDao.getAll();
 	}
 
 }

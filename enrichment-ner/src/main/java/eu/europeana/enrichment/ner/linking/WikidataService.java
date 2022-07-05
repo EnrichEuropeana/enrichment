@@ -123,4 +123,11 @@ public interface WikidataService {
 
 	public WikidataEntity getWikidataEntity(String wikidataURL, String WikidataJSON, String type);
 	
+	public String getDescriptionEnFromWikidataJson(String wikidataJson);
+
+	boolean validWikidataPage(String wikidataJSONResponse);
+
+	List<String> getWikidataIdWithWikidataSearch(String label);
+
+	boolean containsNameInLabelOrAltLabelField(String wikidataJSONResponse, String name);
 }

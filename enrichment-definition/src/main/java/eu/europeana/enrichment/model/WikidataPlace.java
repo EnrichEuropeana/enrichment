@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.model;
 
-import java.util.Map;
-
 public interface WikidataPlace extends WikidataEntity {
 
 	/**
@@ -33,16 +31,6 @@ public interface WikidataPlace extends WikidataEntity {
 	 * @return
 	 */
 	public void setLogo(String setLogo);
-
-
-	String getCountry_jsonProp();
-
-	String getLogo_jsonProp();
-
-	String getLatitude_jsonProp();
-
-	String getLongitude_jsonProp();
-
 
 	Float getLatitude();
 

@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.model;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -125,7 +124,6 @@ public interface WikidataEntity {
 	 */
 	public String [] getSameAs();
 
-	
 	/**
 	 * Sets the Wikidata links that represent the Entity in the format (site, url),
 	 * e.g. site: "enwiki", url: "https://en.wikipedia.org/wiki/Leonardo_da_Vinci"
@@ -133,35 +131,5 @@ public interface WikidataEntity {
 	 * @param wikidataURLs
 	 */
 	public void setSameAs(String [] wikidataURLs);
-	
-	/**
-	 * This method returns the json field from the wikidata json response which stores Modification Date for Entity
-	 * This and all other get methods that return json fields work with the following syntax for specifying the 
-	 * json field to be taken: e.g. "claims.P18.mainsnak.datavalue.value" (the dot "." defines a json element within 
-	 * another json element). Also "*" as a sign can be provided to specify all elements within a given json element, 
-	 * e.g. "aliases.*.*" meaning all elements within an "aliases" element, and all of their elements  
-	 * 
-	 * @return
-	 */
-
-	String getModificationDate_jsonProp();
-
-	String getPrefLabel_jsonProp();
-
-	String getAltLabel_jsonProp();
-
-	String getDepiction_jsonProp();
-
-	String getDescription_jsonProp();
-
-	String getSameAs_jsonProp();
-	
-	String getIdentification_jsonProp();
-	
-	/**
-	 * Returns the identification property which is the one the given Wikidata entity must have for the given type.
-	 * @return
-	 */
-	String getIdentification_jsonProp_identifier();
-
+		
 }
