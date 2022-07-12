@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,6 +30,23 @@ public class PositionEntityImpl {
 	@Transient
 	private TranslationEntity translationEntity;
 	
+	public PositionEntityImpl() {		
+	}
+	
+	public PositionEntityImpl(PositionEntityImpl copy) {
+		if(offsetsTranslatedText!=null) {
+			this.offsetsTranslatedText = new ArrayList<Integer>(copy.getOffsetsTranslatedText());
+		}
+		if(offsetsOriginalText!=null) {
+			this.offsetsOriginalText = new ArrayList<Integer>(copy.getOffsetsOriginalText());
+		}
+		this.storyId=copy.getStoryId();
+		this.itemId=copy.getItemId();
+		if(nerTools!=null) {
+			this.nerTools = new ArrayList<String>(copy.getNerTools());
+		}
+		this.fieldUsedForNER = copy.getFieldUsedForNER();
+	}
 	
 	public StoryEntity getStoryEntity() {
 		return storyEntity;
