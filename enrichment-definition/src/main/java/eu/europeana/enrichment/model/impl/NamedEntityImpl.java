@@ -1,9 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bson.types.ObjectId;
 
@@ -15,10 +13,6 @@ public class NamedEntityImpl {
 
 	protected String type;
 	protected String label;
-	//this field is added for the experimentation with the keywords and maybe needs to be removed
-	protected String wikidataLabel;
-	//this field is added for the experimentation with the keywords and maybe needs to be removed
-	protected Map<String, String> wikidataType;
 	protected List<String> europeanaIds;
 	protected List<String> wikidataLabelMatchIds;
 	protected List<String> wikidataLabelAndTypeMatchIds;
@@ -43,8 +37,6 @@ public class NamedEntityImpl {
 	{
 		this.type=copy.getType();
 		this.label=copy.getLabel();
-		this.wikidataLabel=copy.getWikidataLabel();
-		if(copy.getWikidataType()!=null) this.wikidataType = new HashMap<String, String>(copy.getWikidataType());
 		this.preferedWikidataId=copy.getPreferedWikidataId();
 		if(copy.getEuropeanaIds()!=null) this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
 		if(copy.getWikidataLabelMatchIds()!=null) this.wikidataLabelMatchIds = new ArrayList<String>(copy.getWikidataLabelMatchIds());
@@ -54,6 +46,13 @@ public class NamedEntityImpl {
 		if(copy.getDBpediaIds()!=null) this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
 		if(copy.getDbpediaWikidataIds()!=null) this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
 		if(copy.getPreferredWikidataIds()!=null) this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
+		if(copy.getPositionEntities()!=null) {
+			this.positionEntities = new ArrayList<PositionEntityImpl>();
+			for(PositionEntityImpl pe : copy.getPositionEntities()) {
+				PositionEntityImpl pe_new = new PositionEntityImpl(pe);
+				this.positionEntities.add(pe_new);
+			}
+		}
 	}
 	
 	public NamedEntityImpl() {
@@ -82,22 +81,6 @@ public class NamedEntityImpl {
 	
 	public void setLabel(String key) {
 		this.label = key;
-	}
-
-	public String getWikidataLabel() {
-		return wikidataLabel;
-	}
-	
-	public Map<String, String> getWikidataType() {
-		return wikidataType;
-	}
-
-	public void setWikidataType(Map<String, String> wikidataType) {
-		this.wikidataType = wikidataType;
-	}
-
-	public void setWikidataLabel(String wikidataLabel) {
-		this.wikidataLabel = wikidataLabel;
 	}
 	
 	public List<String> getEuropeanaIds() {
