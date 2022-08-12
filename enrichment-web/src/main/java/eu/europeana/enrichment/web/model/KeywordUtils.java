@@ -81,14 +81,21 @@ public class KeywordUtils {
 
 
 
-    private static String getLabel(KeywordNamedEntity kne, String origLang) {
-        if(kne.getPrefLabel().containsKey(origLang)) {
-            return kne.getPrefLabel().get(origLang);
+    private static String getLabel(KeywordNamedEntity kne, String lang) {
+        if(lang == null) {
+            return null;
+        }
+            
+        if(kne.getPrefLabel() != null && kne.getPrefLabel().containsKey(lang)) {
+            return kne.getPrefLabel().get(lang);
         }
         return null;
     }
 
     private static String getOriginalLang(KeywordNamedEntity kne) {
+        if(kne.getPrefLabel() == null) {
+            return null;
+        }                 
         if(kne.getPrefLabel().size() == 1) {
             return LANG_EN;
         }else {
