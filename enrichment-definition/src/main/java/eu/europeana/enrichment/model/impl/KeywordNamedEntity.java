@@ -3,12 +3,9 @@ package eu.europeana.enrichment.model.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.bson.types.ObjectId;
-
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Id;
 
-@Entity(value="KeywordNamedEntity")
+@Entity(value="keywordNamedEntity")
 public class KeywordNamedEntity extends NamedEntityImpl{
 
 	protected Map<String, String> prefLabel;
