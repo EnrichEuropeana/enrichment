@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Keywords Overview</title>
+    <!-- 
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+     -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.css"/>
+</head>
+
+<body>
+    <h4>Keyword</h4>
+    <table id="keyword" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Pref Label (EN)</th>
+                <th>Keyword text</th>
+                <th>Keyword (EN)</th>
+                <th>Type</th>
+                <th>Position</th>
+                <th>Wikidata Types</th>
+                <th>Dbpedia ID</th>
+                <th>Dbpedia-WKD ID</th>
+                <th>Pref-WKD ID</th>
+                <th>WKD IDs</th>
+                <th>WKD Alt IDs</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Id</th>
+                <th>Keyword_Orig</th>
+                <th>Keyword_EN</th>
+                <th>PrefLabel_EN</th>
+                <th>Type</th>
+                <th>Position</th>
+                <th>WikidataTypes</th>
+                <th>Dbp_ID</th>
+                <th>DbpWKD_ID</th>
+                <th>PrefWKD_ID</th>
+                <th>WKD_IDs</th>
+                <th>WKD_AltLabel_IDs</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="jquery.spring-friendly.js"></script>
+    <!--  script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script -->
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.12.1/datatables.min.js"></script>
+    
+
+    <script type="text/javascript">
+    	function getDbpLink(url){
+    		if(url){
+    			return '<a href="' + url + '">'+ url.replace('http://dbpedia.org/resource/', '') + '</a>';
+    		}
+    		return ''; 
+    	}
+    
+    	function getWkdLink(url){
+    		if(url){
+    			return '<a href="' + url + '">'+ url.replace('http://www.wikidata.org/entity/', '') + '</a>';
+    		}
+    		return ''; 
+    	}
+    	
+    	function getWkdLinks(data){
+    		if(data){
+    			urls = data.split(',');
+    			res = '';
+    			 for (let i = 0; i < urls.length; i++){
+    				 res += getWkdLink(urls[i]);
+    				 res += ", ";
+    			 }
+    			return res;
+    		}
+    		return ''; 
+    	}
+    	
+        $(document).ready(function() {
+
+            $('#keyword tfoot th').each( function () {
+                var title = $(this).text();
+                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            } );
+
+            var table = $('#keyword').DataTable( {
+                processing: false,
+                serverSide: true,
+                ajax: {
+                    url: "/keyword/datatable",
+                    dataSrc: function (data) {
+                        let renderData = new Array();
+
+                        for (let i = 0; i < data.data.length; i++) {
+                            renderData.push({
+                                Id: data.data[i].id,
+                                Keyword_Orig: data.data[i].keyword,
+                                Keyword_EN: data.data[i].keywordEn,
+                                PrefLabel_EN: data.data[i].prefLabelEn,
+                                Type: data.data[i].type,
+                                Position: data.data[i].position,
+                                WikidataTypes: '' + data.data[i].wikidataTypes,
+                                Dbp_ID: getDbpLink(data.data[i].dbpId),
+                                DbpWKD_ID: getWkdLink(data.data[i].dbpWkdId),
+                                PrefWKD_ID: getWkdLink(data.data[i].prefWkdId),
+                                WKD_IDs: getWkdLinks(data.data[i].wkdIds),
+                                WKD_AltLabel_IDs: getWkdLinks(data.data[i].wkdAltLabelIds) 
+                            });
+                        }
+
+                        return renderData;
+                    }
+                },
+                columns: [
+                    { data: 'Id' },
+                    { data: 'Keyword_Orig' },
+                    { data: 'Keyword_EN' },
+                    { data: 'PrefLabel_EN' },
+                    { data: 'Type' },
+                    { data: 'Position' },
+                    { data: 'WikidataTypes' },
+                    { data: 'Dbp_ID' },
+                    { data: 'DbpWKD_ID' },
+                    { data: 'PrefWKD_ID' },
+                    { data: 'WKD_IDs' },
+                    { data: 'WKD_AltLabel_IDs' },
+                ]
+            } );
+
+            table.columns().every( function () {
+                var that = this;
+
+                $( 'input', this.footer() ).on( 'keyup change clear', function () {
+                    if ( that.search() !== this.value ) {
+                        that
+                            .search( this.value )
+                            .draw();
+                    }
+                } );
+            } );
+        } );
+        
+
+    </script>
+</body>
+
+</html>
