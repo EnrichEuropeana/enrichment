@@ -7,6 +7,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_DAO= "namedEntityDao";
+    public static final String BEAN_ENRICHMENT_POSITION_ENTITY_DAO= "positionEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_NAMED_ENTITY_DAO= "keywordNamedEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
