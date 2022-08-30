@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.common.commons;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class EnrichmentConstants {
 
 	//config constants
@@ -9,11 +7,15 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_DAO= "namedEntityDao";
+    public static final String BEAN_ENRICHMENT_KEYWORD_NAMED_ENTITY_DAO= "keywordNamedEntityDao";
+    public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
     public static final String BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO= "translationEntityDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE= "persistentNamedEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_NAMED_ENTITY_SERVICE= "persistentKeywordNamedEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_SERVICE= "persistentKeywordService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE= "persistentStoryEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_TRANSLATION_ENTITY_SERVICE= "persistentTranslationEntityService";
     public static final String BEAN_ENRICHMENT_EUROPEANA_ENTITY_SERVICE= "europeanaEntityService";
@@ -70,6 +72,8 @@ public class EnrichmentConstants {
 	public static final String AGENT_COUNTRY_JSONPROP = "claims.P27.mainsnak.datavalue.value.id";
 	public static final String DATEOFBIRTH_JSONPROP = "claims.P569.mainsnak.datavalue.value.time";
 	public static final String DATEOFDEATH_JSONPROP = "claims.P570.mainsnak.datavalue.value.time";
+	public static final String PLACE_OF_BIRTH_JSONPROP = "claims.P19.mainsnak.datavalue.value.id";
+	public static final String PLACE_OF_DEATH_JSONPROP = "claims.P20.mainsnak.datavalue.value.id";
 	public static final String PROFESSIONOROCCUPATION_JSONPROP = "claims.P106.mainsnak.datavalue.value.id";
 	//this property is the latitude property
 	public static final String PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER = "P625";
