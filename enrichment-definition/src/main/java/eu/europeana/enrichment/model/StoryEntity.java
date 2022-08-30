@@ -3,12 +3,14 @@ package eu.europeana.enrichment.model;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 public interface StoryEntity {
 
 	/*
 	 * Database ID
 	 */
-	String getId();
+	ObjectId getId();
 	
 	/*
 	 * Transcribathon and Europeana StoryId

@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 
-@Entity(value="Keyword")
+@Entity(value="keyword")
 public class Keyword {
 
 	private String propertyId;
@@ -22,15 +22,15 @@ public class Keyword {
 	private String approvedWikidataId;
 	private KeywordWikidataEntity approvedWikidataEntity;
 	
-	private KeywordNamedEntityNew keywordNamedEntity;
+	private KeywordPosition keywordNamedEntity;
 	
 	private List<String> wikidataPossibleMatchIds;
 
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id = new ObjectId().toString();
+    private ObjectId _id;
 	
-	public String get_id() {
+	public ObjectId get_id() {
 		return _id;
 	}
 		
@@ -109,11 +109,11 @@ public class Keyword {
 		this.approvedWikidataEntity = approvedWikidataEntity;
 	}
 
-	public KeywordNamedEntityNew getKeywordNamedEntity() {
+	public KeywordPosition getKeywordNamedEntity() {
 		return keywordNamedEntity;
 	}
 
-	public void setKeywordNamedEntity(KeywordNamedEntityNew keywordNamedEntity) {
+	public void setKeywordNamedEntity(KeywordPosition keywordNamedEntity) {
 		this.keywordNamedEntity = keywordNamedEntity;
 	}
 

@@ -49,11 +49,12 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id = new ObjectId().toString();
+	@JsonIgnore
+    private ObjectId _id;
 
 	@Override
 	@JsonIgnore
-	public String getId() {
+	public ObjectId getId() {
 		return _id;
 	}
 	

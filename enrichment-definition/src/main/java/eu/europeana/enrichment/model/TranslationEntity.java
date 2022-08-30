@@ -2,14 +2,15 @@ package eu.europeana.enrichment.model;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+
+import org.bson.types.ObjectId;
 
 public interface TranslationEntity {
 
 	/*
 	 * Database ID
 	 */
-	String getId();
+	ObjectId getId();
 	/*
 	 * Generates a string hash without whitespace which is also used as the key
 	 * and for comparison
