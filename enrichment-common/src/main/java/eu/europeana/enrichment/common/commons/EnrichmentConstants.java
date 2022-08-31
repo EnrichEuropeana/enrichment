@@ -11,6 +11,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
     public static final String BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO= "translationEntityDao";
+    public static final String BEAN_ENRICHMENT_RECORD_TRANSLATION_DAO= "recordTranslationDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE= "persistentNamedEntityService";
@@ -32,6 +33,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_NER_SERVICE= "enrichmentNerService";
     public static final String BEAN_ENRICHMENT_UI_SERVICE= "enrichmentUIService";
     public static final String BEAN_ENRICHMENT_TRANSLATION_SERVICE= "enrichmentTranslationService";
+    public static final String BEAN_RECORD_TRANSLATION_SERVICE= "recordTranslationService";
     public static final String BEAN_ENRICHMENT_DATASTORE= "enrichmentDatastore";
     public static final String BEAN_ENRICHMENT_JACKSON_SERIALIZER= "jacksonSerializer";
     public static final String BEAN_ENRICHMENT_JAVA_JSON_PARSER= "javaJSONParser";
