@@ -97,7 +97,25 @@ public class RecordTranslationTest {
         for (int i = 0; i < fileNames.length; i++) {
             filename = fileNames[i];
             logger.info("Count: " + i +  " Starting translation of file: " + filename);
-            savedTranslation = translateAndSerialize(filename);
+            Description1418 description;
+            try {
+                description = getDescription(filename);
+            }catch (Throwable e) {
+                logger.error("Failed to parse file: " + filename);
+                continue; 
+            }
+            
+            if(description.getDescriptions() == null || description.getDescriptions().isEmpty()) {
+                logger.info("The record has no descriptions, file: " + filename);
+                continue;
+            }
+            
+            File translatedFile = getTranslationFile(filename);
+            if(translatedFile.exists()) {
+                logger.info("The record was already translated, skip translation for file: " + filename);
+                continue;
+            }
+            savedTranslation = translateAndSerialize(filename, description);
             verifyTranslationComplete(savedTranslation);
         }        
     }
@@ -110,17 +128,20 @@ public class RecordTranslationTest {
         assertNotNull(savedTranslation.getTool());
     }
 
-    private EuropeanaRecordTranslationImpl translateAndSerialize(String filename)
+    private EuropeanaRecordTranslationImpl translateAndSerialize(String filename, Description1418 description)
             throws IOException, Exception, JsonProcessingException, JsonParseException, JsonMappingException {
-        Description1418 description = getDescription(filename);
         RecordTranslation recordTranslation = buildRecordTranslation(description);
         RecordTranslation translation = recordTranslationService.translate(recordTranslation);
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(translation);
-        File translatedFile = new File(translationsFolder, filename);
-        FileUtils.write(translatedFile, json, StandardCharsets.UTF_8);
-
+        File translatedFile = getTranslationFile(filename);
+        FileUtils.write(getTranslationFile(filename), json, StandardCharsets.UTF_8);
         return mapper.readValue(translatedFile, EuropeanaRecordTranslationImpl.class);
+    }
+
+    private File getTranslationFile(String filename) {
+        File translatedFile = new File(translationsFolder, filename);
+        return translatedFile;
     }
 
     private RecordTranslation buildRecordTranslation(Description1418 description) {
