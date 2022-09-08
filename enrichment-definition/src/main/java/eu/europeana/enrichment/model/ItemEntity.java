@@ -4,12 +4,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 public interface ItemEntity {
 	
 	/*
 	 * Database ID
 	 */
-	String getId();
+	ObjectId getId();
 	
 	/*
 	 * Transcribathon and Europeana information

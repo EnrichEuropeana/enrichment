@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonView;
 
-import eu.europeana.enrichment.model.impl.KeywordNamedEntity;
+import eu.europeana.enrichment.model.impl.Keyword;
 import eu.europeana.enrichment.web.model.KeywordUtils;
 import eu.europeana.enrichment.web.model.KeywordView;
 import eu.europeana.enrichment.web.repository.KeywordRepository;
@@ -51,7 +51,7 @@ public class KeywordController extends BaseRest {
 
 //        Criteria additionalCriteria = new Criteria();
         input.setSearch(new DataTablesInput.Search(null, false));
-        DataTablesOutput<KeywordNamedEntity> keywords = keywordRepository.findAll(input); 
+        DataTablesOutput<Keyword> keywords = keywordRepository.findAll(input); 
 
         DataTablesOutput<KeywordView> res = new DataTablesOutput<KeywordView>();
         res.setError(keywords.getError());
@@ -61,7 +61,7 @@ public class KeywordController extends BaseRest {
         res.setRecordsTotal(keywords.getRecordsTotal());
         List<KeywordView> results = new ArrayList<KeywordView>();
         KeywordView view;
-        for (KeywordNamedEntity keyword : keywords.getData()) {
+        for (Keyword keyword : keywords.getData()) {
             view = KeywordUtils.createView(keyword);  
             results.add(view);
         }

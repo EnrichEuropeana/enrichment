@@ -27,9 +27,9 @@ public class NamedEntityImpl {
 
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id = new ObjectId().toString();
+    private ObjectId _id;
 	
-	public String get_id() {
+	public ObjectId get_id() {
 		return _id;
 	}
 	

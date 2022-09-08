@@ -6,11 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
@@ -46,7 +42,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	}
 	
 	@Id
-    private String _id = new ObjectId().toString();
+    private ObjectId _id;
 	
 	@Transient
 	private StoryEntity storyEntity;
@@ -55,7 +51,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private ItemEntity itemEntity;
 	
 	@Override
-	public String getId() {
+	public ObjectId getId() {
 		return _id;
 	}
 
