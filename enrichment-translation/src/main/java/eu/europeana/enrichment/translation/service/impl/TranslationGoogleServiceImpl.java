@@ -2,6 +2,7 @@ package eu.europeana.enrichment.translation.service.impl;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -17,8 +18,8 @@ import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
 import com.google.common.collect.Lists;
 
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 //https://cloud.google.com/translate/docs/reference/libraries
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE)
@@ -112,5 +113,14 @@ public class TranslationGoogleServiceImpl {
 			logger.log(Level.ERROR, "Exception during the translation of the text using Google!", ex);
 			return null;
 		}
-	}	
-}
+	}
+	
+        public List<Translation> translateList(List<String> texts, String sourceLanguage, String targetLanguage) {
+            try {
+                return translate.translate(texts, TranslateOption.targetLanguage(targetLanguage));
+            } catch (Exception ex) {
+                logger.log(Level.ERROR, "Exception during the translation of the text using Google!", ex);
+                return null;
+            }
+        }
+    }

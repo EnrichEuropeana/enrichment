@@ -22,7 +22,7 @@ public class Keyword {
 	private String approvedWikidataId;
 	private KeywordWikidataEntity approvedWikidataEntity;
 	
-	private KeywordPosition keywordNamedEntity;
+	private KeywordPosition keywordPosition;
 	
 	private List<String> wikidataPossibleMatchIds;
 
@@ -109,12 +109,12 @@ public class Keyword {
 		this.approvedWikidataEntity = approvedWikidataEntity;
 	}
 
-	public KeywordPosition getKeywordNamedEntity() {
-		return keywordNamedEntity;
+	public KeywordPosition getKeywordPosition() {
+		return keywordPosition;
 	}
 
-	public void setKeywordNamedEntity(KeywordPosition keywordNamedEntity) {
-		this.keywordNamedEntity = keywordNamedEntity;
+	public void setKeywordPosition(KeywordPosition keywordPosition) {
+		this.keywordPosition = keywordPosition;
 	}
 
 	public List<String> getWikidataPossibleMatchIds() {
