@@ -2,6 +2,8 @@ package eu.europeana.enrichment.model;
 
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
 public interface NamedEntityAnnotation {
 	
 	/**
@@ -18,7 +20,7 @@ public interface NamedEntityAnnotation {
 	 * this is the id that is unique for each object in the db
 	 * @return
 	 */
-	String getId();
+	ObjectId getId();
 	/**
 	 * Getting source which is a wikidataId 
 	 * @return

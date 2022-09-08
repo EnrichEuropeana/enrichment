@@ -22,7 +22,7 @@ public class ItemEntityImpl implements ItemEntity {
 
 	// id will be used for storing MongoDB _id
 	@Id
-	public String _id = new ObjectId().toString();
+	private ObjectId _id;
 
 	@Transient
 	private StoryEntity storyEntity;
@@ -131,7 +131,7 @@ public class ItemEntityImpl implements ItemEntity {
 	}
 
 	@Override
-	public String getId() {
+	public ObjectId getId() {
 		return _id;
 	}
 
