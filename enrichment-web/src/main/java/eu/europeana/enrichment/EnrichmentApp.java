@@ -17,12 +17,13 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.mongodb.datatables.DataTablesRepositoryFactoryBean;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 
 /**
  * Main application. Allows deploying as a war and logs instance data when deployed in Cloud Foundry
  */
-//@SpringBootApplication(scanBasePackages = {"eu.europeana.enrichment"},
 @SpringBootApplication(scanBasePackages = {"eu.europeana.enrichment"},
         exclude = {
                 // Remove these exclusions to re-enable security
@@ -33,6 +34,8 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
         }
 )
 @EnableBatchProcessing
+@EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class, 
+    basePackageClasses = {eu.europeana.enrichment.web.repository.KeywordRepository.class})
 public class EnrichmentApp extends SpringBootServletInitializer {
 
 	static Properties props = new Properties();
