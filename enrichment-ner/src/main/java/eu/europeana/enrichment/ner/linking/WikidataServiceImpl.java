@@ -22,6 +22,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -49,7 +50,7 @@ public class WikidataServiceImpl implements WikidataService {
 	private static final String baseUrlSparql = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
 //	private static final String baseUrlWikidataSearch = "https://wikidata.org/w/api.php";
 	private static final String baseUrlWikidataSearch = "https://www.wikidata.org/w/index.php";
-	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 20;
+	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 10;
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
@@ -370,7 +371,12 @@ public class WikidataServiceImpl implements WikidataService {
 		List<String> retValue = new ArrayList<>();
 		int numberElemToSelect = KEEP_FIRST_N_WIKIDATA_IDS;
 		for(Element el : searchResultsHeadings) {
-			String wikidataId = el.getElementsByTag("a").get(0).attr("href");
+			Elements aTags = el.getElementsByTag("a");
+			if(aTags.isEmpty()) {
+				continue;
+			}
+			
+			String wikidataId = aTags.get(0).attr("href");
 			if(wikidataId==null || wikidataId.isBlank()) {
 				continue;
 			}
@@ -437,21 +443,24 @@ public class WikidataServiceImpl implements WikidataService {
 
 	@Override
 	public List<List<String>> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
-		
-		List<List<String>> result = new ArrayList<List<String>>();
-		JSONObject responseJson = new JSONObject(WikidataJSON);
-		JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
-		Iterator<String> entitiesIterator = responseJsonEntities.keys();
-		while(entitiesIterator.hasNext())
-		{
-			String entityKey = entitiesIterator.next();
-			JSONObject entity = responseJsonEntities.getJSONObject(entityKey);
-						
-			analyseJSONFieldFromWikidataJSON(entity,field,result);
+		try {
+			List<List<String>> result = new ArrayList<List<String>>();
+			JSONObject responseJson = new JSONObject(WikidataJSON);
+			JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
+			Iterator<String> entitiesIterator = responseJsonEntities.keys();
+			while(entitiesIterator.hasNext())
+			{
+				String entityKey = entitiesIterator.next();
+				JSONObject entity = responseJsonEntities.getJSONObject(entityKey);
+							
+				analyseJSONFieldFromWikidataJSON(entity,field,result);
+			}
+			
+			return result;
 		}
-		
-		return result;
-		
+		catch (JSONException ex) {
+			return null;
+		}
 	}
 
 	/**

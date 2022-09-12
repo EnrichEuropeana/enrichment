@@ -15,6 +15,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE= "persistentNamedEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_POSITION_ENTITY_SERVICE= "persistentPositionEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_NAMED_ENTITY_SERVICE= "persistentKeywordNamedEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_SERVICE= "persistentKeywordService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE= "persistentStoryEntityService";

@@ -1,12 +1,14 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Transient;
 
 @Entity(value="NamedEntityImpl")
 public class NamedEntityImpl {
@@ -23,6 +25,7 @@ public class NamedEntityImpl {
 	protected List<String> preferredWikidataIds;
 	String preferedWikidataId;
 
+	@Transient
 	protected List<PositionEntityImpl> positionEntities;
 
 	//id will be used for storing MongoDB _id
@@ -31,28 +34,6 @@ public class NamedEntityImpl {
 	
 	public ObjectId get_id() {
 		return _id;
-	}
-	
-	public NamedEntityImpl (NamedEntityImpl copy)
-	{
-		this.type=copy.getType();
-		this.label=copy.getLabel();
-		this.preferedWikidataId=copy.getPreferedWikidataId();
-		if(copy.getEuropeanaIds()!=null) this.europeanaIds = new ArrayList<String>(copy.getEuropeanaIds());
-		if(copy.getWikidataLabelMatchIds()!=null) this.wikidataLabelMatchIds = new ArrayList<String>(copy.getWikidataLabelMatchIds());
-		if(copy.getWikidataLabelAndTypeMatchIds()!=null) this.wikidataLabelAndTypeMatchIds = new ArrayList<String>(copy.getWikidataLabelAndTypeMatchIds());
-		if(copy.getWikidataLabelAltLabelMatchIds()!=null) this.wikidataLabelAltLabelMatchIds = new ArrayList<String>(copy.getWikidataLabelAltLabelMatchIds());
-		if(copy.getWikidataLabelAltLabelAndTypeMatchIds()!=null) this.wikidataLabelAltLabelAndTypeMatchIds = new ArrayList<String>(copy.getWikidataLabelAltLabelAndTypeMatchIds());
-		if(copy.getDBpediaIds()!=null) this.dbpediaIds = new ArrayList<String>(copy.getDBpediaIds());
-		if(copy.getDbpediaWikidataIds()!=null) this.dbpediaWikidataIds = new ArrayList<String>(copy.getDbpediaWikidataIds());
-		if(copy.getPreferredWikidataIds()!=null) this.preferredWikidataIds = new ArrayList<String>(copy.getPreferredWikidataIds());
-		if(copy.getPositionEntities()!=null) {
-			this.positionEntities = new ArrayList<PositionEntityImpl>();
-			for(PositionEntityImpl pe : copy.getPositionEntities()) {
-				PositionEntityImpl pe_new = new PositionEntityImpl(pe);
-				this.positionEntities.add(pe_new);
-			}
-		}
 	}
 	
 	public NamedEntityImpl() {
