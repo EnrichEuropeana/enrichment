@@ -52,3 +52,8 @@ enrich.web.book.dumitru.output.formatted.translatedText.pdf=
 enrich.web.book.dumitru.output.formatted.originalText.pdf=
 enrich.stories.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\StoriesExport.json
 enrich.items.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\ItemsExport.json
+
+enrich.wikidata.directory = /home/ait/enrich/wikidata
+
+transcribathon.base.url.stories.minimal=https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal/
+transcribathon.base.url.items=https://europeana.fresenia.man.poznan.pl/tp-api/items/
