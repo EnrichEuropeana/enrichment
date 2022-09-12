@@ -37,12 +37,17 @@
   			<artifactId>enrichment-mongo</artifactId>
 			<version>${version.enrichmentAPI}</version>
 		</dependency>
-		<dependency>
-			<groupId>eu.europeana.entity</groupId>
-  			<artifactId>entity-client</artifactId>
-			<version>${version.entityApi}</version>
-		</dependency>
-	
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!--   			<artifactId>entity-client</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
+<!-- 		</dependency> -->
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!--   			<artifactId>entity-definitions</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
@@ -70,30 +75,31 @@
 			<version>${version.json}</version>
 		</dependency>
 			
-		<dependency>
-			<groupId>eu.europeana.entity</groupId>
-			<artifactId>entity-utils</artifactId>
-			<version>${version.entityApi}</version>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!-- 			<artifactId>entity-utils</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
 			
-			<exclusions>
-				<exclusion>
-					<artifactId>slf4j-jdk14</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jcl-over-slf4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>slf4j-jdk14</artifactId> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>slf4j-api</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>jcl-over-slf4j</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>slf4j-log4j12</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
 		
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

@@ -1,21 +1,14 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
-import dev.morphia.annotations.Transient;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
+import dev.morphia.annotations.Id;
 
 @Entity(value="PositionEntityImpl")
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId")}, options = @IndexOptions(unique = true)))
 public class PositionEntityImpl {
 
 	private List<Integer> offsetsTranslatedText;
@@ -24,25 +17,11 @@ public class PositionEntityImpl {
 	private String itemId;
 	private List<String> nerTools;
 	private String fieldUsedForNER;
-	private String namedEntityType;
-	private String namedEntityLabel;
-	
+	private ObjectId namedEntityId;
+	@Id
+    private ObjectId _id;
+
 	public PositionEntityImpl() {		
-	}
-	
-	public PositionEntityImpl(PositionEntityImpl copy) {
-		if(offsetsTranslatedText!=null) {
-			this.offsetsTranslatedText = new ArrayList<Integer>(copy.getOffsetsTranslatedText());
-		}
-		if(offsetsOriginalText!=null) {
-			this.offsetsOriginalText = new ArrayList<Integer>(copy.getOffsetsOriginalText());
-		}
-		this.storyId=copy.getStoryId();
-		this.itemId=copy.getItemId();
-		if(nerTools!=null) {
-			this.nerTools = new ArrayList<String>(copy.getNerTools());
-		}
-		this.fieldUsedForNER = copy.getFieldUsedForNER();
 	}
 	
 	public String getFieldUsedForNER() {
@@ -136,5 +115,13 @@ public class PositionEntityImpl {
 
 	public void setNerTools(List<String> nerTools) {
 		this.nerTools = nerTools;
+	}
+	
+	public ObjectId getNamedEntityId() {
+		return namedEntityId;
+	}
+
+	public void setNamedEntityId(ObjectId namedEntityId) {
+		this.namedEntityId = namedEntityId;
 	}
 }

@@ -195,7 +195,7 @@ public class NERController extends BaseRest {
 		
 	}	
 	
-	@ApiOperation(value = "Compute named entities for all stories")
+	@ApiOperation(value = "Compute named entities for all stories descriptions")
 	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesAllStories(
 			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrNamedEntityServiceException {
@@ -210,10 +210,10 @@ public class NERController extends BaseRest {
 					logger.info("NER analysis for the storyId: " + story.getStoryId());
 					
 					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);
+					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
 					
 					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);				
+					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);				
 
 				}			
 			}
