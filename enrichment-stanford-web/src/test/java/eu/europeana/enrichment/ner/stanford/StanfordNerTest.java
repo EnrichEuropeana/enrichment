@@ -23,7 +23,7 @@ import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.web.NERStanfordServiceImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:stanford-context.xml")
+@ContextConfiguration(locations = "classpath:enrichment-web-context.xml")
 public class StanfordNerTest {
 	
 	Logger logger = LogManager.getLogger(getClass());
@@ -34,11 +34,7 @@ public class StanfordNerTest {
 	@Test
 	public void nerAnalysisStanford() {
 		
-		String text = "Michael Jeffrey Jordan, also known by his initials MJ, is an American businessman and former professional basketball player."
-				+ " Michael Jeffrey Jordan was born at Cumberland Hospital in Fort Greene, Brooklyn, New York City, on February 17, 1963, the son of "
-				+ "bank employee Deloris (née Peoples) and equipment supervisor James R. Jordan Sr. In 1968, he moved with his family to Wilmington, "
-				+ "North Carolina. Jordan attended Emsley A. Laney High School in Wilmington, where he highlighted his athletic career by playing "
-				+ "basketball, baseball, and football.";
+		String text = "The toy-doll is decorated with hand-sewn national clothes. Date embroidered on the skirt - 1989. || Europeana 1989 - Vilnius, 9-10.08.2013 &quot;Berlin&quot;";
 		
 		String response = nerStanfordServiceOrigin.getEntities(text);
 				

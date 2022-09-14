@@ -21,13 +21,12 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
-import eu.europeana.enrichment.ner.exception.NERAnnotateException;
 import eu.europeana.enrichment.ner.service.NERService;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
 public class NERDBpediaSpotlightServiceImpl implements NERService{
@@ -54,7 +53,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	}
 
 	@Override
-	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws NERAnnotateException {
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws Exception {
 		String response = createRequest(text);
 		if (response==null) return null;
 		
@@ -243,7 +242,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * 								for named entity recognition and classification
 	 * @return						response body which should be a JSON or empty string
 	 */
-	private String createRequest(String text) {
+	private String createRequest(String text) throws Exception {
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			
@@ -262,7 +261,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 
 		} catch (Exception ex) {
 			logger.log(Level.ERROR, "Exception raised during creating a DBPedia Spotlight query!" + ex.getMessage(), ex);
-			return null;
+			throw ex;
 		}
 	}
 

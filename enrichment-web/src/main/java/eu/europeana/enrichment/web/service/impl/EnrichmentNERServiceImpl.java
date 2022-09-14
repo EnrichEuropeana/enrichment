@@ -40,6 +40,7 @@ import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
@@ -107,6 +108,9 @@ public class EnrichmentNERServiceImpl {
 	
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
+    
+    @Autowired
+    PersistentPositionEntityServiceImpl persistentPositionEntityService;
 
 	private static final Map<String, String> languageCodeMap;
     static {
@@ -246,15 +250,14 @@ public class EnrichmentNERServiceImpl {
 		{
 			type=typeNERField; 
 			
-			TranslationEntity dbTranslationEntity = null;
-			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type, dbTranslationEntity);
+			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type);
 			String textForNer = textAndLanguage[0];
 			String languageForNer = textAndLanguage[1];
 
 			//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 			for(String tool : tools) {
 				List<NamedEntityImpl> tmpResult = getUpdatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking);
-				updateNamedEntitiesDbAndSolr(tmpResult);
+				updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
 				updateNamedEntityResultList (result, tmpResult);
 			}
 	
@@ -294,7 +297,7 @@ public class EnrichmentNERServiceImpl {
 		main=newOnes;
 	}
 	
-	public List<NamedEntityImpl> getUpdatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws IOException, ParamValidationException {
+	public List<NamedEntityImpl> getUpdatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws Exception {
 		/*
 		 * Here for each ner tool the analysis is done separately because different tools may find
 		 * the same entities on different positions in the text and we would like to separate those results,
@@ -314,39 +317,41 @@ public class EnrichmentNERServiceImpl {
 				NamedEntityImpl dbEntity = null;
 				boolean oldNamedEntityChanged = false;
 				if (tmpNamedEntity.getLabel()!=null) {
-					dbEntity = persistentNamedEntityService.findNamedEntity(tmpNamedEntity.getLabel(), tmpNamedEntity.getType());
+					dbEntity = persistentNamedEntityService.findNamedEntityByLabelAndType(tmpNamedEntity.getLabel(), tmpNamedEntity.getType());
 				}
 				
 				if(dbEntity != null) {
 					//check if there are new position entities to be added						
 					if(tmpNamedEntity.getPositionEntities()!=null) {
-						if(dbEntity.getPositionEntities()!=null) {
-							int addPositionEntitiesCheck = 1;
-							for(PositionEntityImpl pe : dbEntity.getPositionEntities())
+						List<PositionEntityImpl> existingPositions = persistentPositionEntityService.findPositionEntities(dbEntity.get_id());
+						if(existingPositions.size()>0) {
+							boolean addNewPositionEntity = true;
+							for(PositionEntityImpl pe : existingPositions)
 							{
 								if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
 								{
-									addPositionEntitiesCheck = 0;
+									addNewPositionEntity=false;
 									/*
 									 * only if all fields of the position entities are the same including the positions in the translated text
 									 * 2 or more ner tools are added to the same position entity
 									 */
 									if(pe.getNerTools()!=null && !pe.getNerTools().contains(nerTool)) { 
 										pe.getNerTools().add(nerTool);
-										oldNamedEntityChanged=true;
+										persistentPositionEntityService.savePositionEntity(pe);
 									}
 									break;
 								}
 							}
-							if(addPositionEntitiesCheck==1) {
-								dbEntity.addPositionEntity(tmpNamedEntity.getPositionEntities().get(0));
-								oldNamedEntityChanged=true;
+							if(addNewPositionEntity) {
+								//saving an existing, changed position, first set the reference to the named entity id
+								tmpNamedEntity.getPositionEntities().get(0).setNamedEntityId(dbEntity.get_id());
+								persistentPositionEntityService.savePositionEntity(tmpNamedEntity.getPositionEntities().get(0));
 							}
 						}
-						else {								
-							List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
-							positionEntities.add(tmpNamedEntity.getPositionEntities().get(0));
-							oldNamedEntityChanged=true;
+						else {		
+							//saving a new position, first set the reference to the named entity id
+							tmpNamedEntity.getPositionEntities().get(0).setNamedEntityId(dbEntity.get_id());
+							persistentPositionEntityService.savePositionEntity(tmpNamedEntity.getPositionEntities().get(0));
 						}							
 					}
 
@@ -396,7 +401,7 @@ public class EnrichmentNERServiceImpl {
 		else return false;
 	}
 	
-	public void updateNamedEntitiesDbAndSolr (List<NamedEntityImpl> result) {
+	public void updateNamedEntitiesAndPositionsInDbAndSolr (List<NamedEntityImpl> result) {
 		if(result==null) return;
 		/*
 		 * Save and update all named entities
@@ -415,8 +420,16 @@ public class EnrichmentNERServiceImpl {
 				} 
 			}
 			
-			//save the NamedEntity to mongo db
+			//save the NamedEntity to the db
 			persistentNamedEntityService.saveNamedEntity(entity);
+			//save the new positions to the db
+			if(entity.getPositionEntities()!=null) {
+				for(PositionEntityImpl position: entity.getPositionEntities()) {
+					//saving a new position, first set the reference to the named entity id
+					position.setNamedEntityId(entity.get_id());
+					persistentPositionEntityService.savePositionEntity(position);
+				}
+			}
 		}
 			
 	}
@@ -441,7 +454,7 @@ public class EnrichmentNERServiceImpl {
 	 * This function checks if the given story or item is present in the db and if not it fetches it from the Transcribathon platform.
 	 * Additionally, if there is not proper translation, it is first done here and the translated text is returned for the NER analysis.
 	 */
-	private String [] updateStoryOrItem (boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type, TranslationEntity returnTranslationEntity) throws Exception
+	private String [] updateStoryOrItem (boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
@@ -485,33 +498,18 @@ public class EnrichmentNERServiceImpl {
 			}
 		}
 		
-		
-		//checking TranslationEntity
-		returnTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
-		
+		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
+		body.setStoryId(storyId);
+		body.setItemId(itemId);
+		body.setTranslationTool(translationTool);
+		body.setType(type);
+		TranslationEntity returnTranslationEntity = enrichmentTranslationService.translate(body, true);
 		if(returnTranslationEntity!=null)
 		{
 			results[0] = returnTranslationEntity.getTranslatedText();
 			results[1] = returnTranslationEntity.getLanguage();
-			
 		}
-		else
-		{
-			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-			body.setStoryId(storyId);
-			body.setItemId(itemId);
-			body.setTranslationTool(translationTool);
-			body.setType(type);
-			enrichmentTranslationService.translate(body, true);
-			returnTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
-			if(returnTranslationEntity!=null)
-			{
-				results[0] = returnTranslationEntity.getTranslatedText();
-				results[1] = returnTranslationEntity.getLanguage();
-			}
 
-		}			
-		
 		return results;
 
 	}
@@ -546,7 +544,7 @@ public class EnrichmentNERServiceImpl {
 		return toolsToRemove.size();
 	}
 
-	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws ParamValidationException, IOException {
+	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws Exception {
 		
 		if(text==null || text.isBlank() || language==null) {
 			return null;
@@ -619,19 +617,19 @@ public class EnrichmentNERServiceImpl {
 				if(dbStoryEntity.getDescription().compareTo(story.getDescription())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "description");
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntity(story.getStoryId(), "all" , "description");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "description");
 				}
 				if(dbStoryEntity.getSummary().compareTo(story.getSummary())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "summary");
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntity(story.getStoryId(), "all" , "summary");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "summary");
 				}
 				if(dbStoryEntity.getTranscriptionText().compareTo(story.getTranscriptionText())!=0)
 				{
 					someStoryPartChanged=true;
-					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(story.getStoryId(), "all" , "transcription");
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntity(story.getStoryId(), "all" , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), "all", "transcription");
 				}		
 				
@@ -680,7 +678,7 @@ public class EnrichmentNERServiceImpl {
 				{
 					logger.debug("Uploading new items : deleting old NamedEntity and TranslationEntity for transcription.");
 					transcriptionChanged = true;
-					persistentNamedEntityService.deletePositionEntitiesFromNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntity(item.getStoryId(), item.getItemId() , "transcription");
 					persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId() , "transcription");
 				}						
 				if(transcriptionChanged)

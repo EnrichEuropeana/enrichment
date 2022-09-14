@@ -22,7 +22,7 @@ public class EntityFields {
     public static final String FIELD_USED_FOR_NER = "fieldUsedForNER";
     public static final String TRANSLATION_KEY = "translationKey";
     public static final String NER_TOOLS = "nerTools";
-    
+    public static final String POSITION_NAMED_ENTITY = "namedEntityId";
     
     // topic management API
     public static final String TOPIC_MODEL_ID = "identifier";
