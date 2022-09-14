@@ -7,6 +7,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_DAO= "namedEntityDao";
+    public static final String BEAN_ENRICHMENT_POSITION_ENTITY_DAO= "positionEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_NAMED_ENTITY_DAO= "keywordNamedEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
@@ -15,6 +16,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE= "persistentNamedEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_POSITION_ENTITY_SERVICE= "persistentPositionEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_NAMED_ENTITY_SERVICE= "persistentKeywordNamedEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_SERVICE= "persistentKeywordService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE= "persistentStoryEntityService";
