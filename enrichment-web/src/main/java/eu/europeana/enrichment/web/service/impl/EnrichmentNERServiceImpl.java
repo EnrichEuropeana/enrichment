@@ -250,8 +250,7 @@ public class EnrichmentNERServiceImpl {
 		{
 			type=typeNERField; 
 			
-			TranslationEntity dbTranslationEntity = null;
-			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type, dbTranslationEntity);
+			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type);
 			String textForNer = textAndLanguage[0];
 			String languageForNer = textAndLanguage[1];
 
@@ -455,7 +454,7 @@ public class EnrichmentNERServiceImpl {
 	 * This function checks if the given story or item is present in the db and if not it fetches it from the Transcribathon platform.
 	 * Additionally, if there is not proper translation, it is first done here and the translated text is returned for the NER analysis.
 	 */
-	private String [] updateStoryOrItem (boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type, TranslationEntity returnTranslationEntity) throws Exception
+	private String [] updateStoryOrItem (boolean original, String storyId, String itemId, String translationTool, String translationLanguage, String type) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
@@ -499,33 +498,18 @@ public class EnrichmentNERServiceImpl {
 			}
 		}
 		
-		
-		//checking TranslationEntity
-		returnTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
-		
+		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
+		body.setStoryId(storyId);
+		body.setItemId(itemId);
+		body.setTranslationTool(translationTool);
+		body.setType(type);
+		TranslationEntity returnTranslationEntity = enrichmentTranslationService.translate(body, true);
 		if(returnTranslationEntity!=null)
 		{
 			results[0] = returnTranslationEntity.getTranslatedText();
 			results[1] = returnTranslationEntity.getLanguage();
-			
 		}
-		else
-		{
-			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-			body.setStoryId(storyId);
-			body.setItemId(itemId);
-			body.setTranslationTool(translationTool);
-			body.setType(type);
-			enrichmentTranslationService.translate(body, true);
-			returnTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, translationLanguage, type);
-			if(returnTranslationEntity!=null)
-			{
-				results[0] = returnTranslationEntity.getTranslatedText();
-				results[1] = returnTranslationEntity.getLanguage();
-			}
 
-		}			
-		
 		return results;
 
 	}

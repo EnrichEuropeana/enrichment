@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
@@ -98,8 +99,8 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			enrichmentTranslationService.translate(body, false);
-			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+			TranslationEntity translation = enrichmentTranslationService.translate(body, false);
+			ResponseEntity<String> response = new ResponseEntity<String>(translation.getTranslatedText(), HttpStatus.OK);
 			
 			return response;
 		
@@ -167,9 +168,9 @@ public class TranslationController extends BaseRest {
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
-			enrichmentTranslationService.translate(body, false);
+			TranslationEntity translation = enrichmentTranslationService.translate(body, false);
 			
-			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+			ResponseEntity<String> response = new ResponseEntity<String>(translation.getTranslatedText(), HttpStatus.OK);
 			
 			return response;
 		

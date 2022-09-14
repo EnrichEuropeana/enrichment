@@ -74,7 +74,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	PersistentItemEntityService persistentItemEntityService;
 
 	@Override
-	public void translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
+	public TranslationEntity translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
 		try {
 			//TODO: check parameters and return other status code
 			String defaultTargetLanguage = "en";
@@ -101,7 +101,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
 			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
 			if(dbTranslationEntity != null) {
-				return;
+				return dbTranslationEntity;
 			}						
 			else if(!process) {
 				//TODO: proper exception (like EnrichmentNERServiceImpl
@@ -173,7 +173,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			if(textToTranslate == null || textToTranslate.isBlank())
 			{
 				logger.debug("The original text is empty or null");
-				return;
+				return null;
 			}
 				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
 
@@ -193,7 +193,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				if(sendRequest) {
 					if(googleTranslationService==null) {
 						logger.debug("The google translation service is currently disabled.");
-						return;
+						return null;
 					}
 					Translation googleResponse = googleTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
 					if(googleResponse!=null) {
@@ -215,7 +215,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			}
 
 			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
-
+			return tmpTranslationEntity;
 			/*
 			 * Check English word ratio based on sentences
 			 */
