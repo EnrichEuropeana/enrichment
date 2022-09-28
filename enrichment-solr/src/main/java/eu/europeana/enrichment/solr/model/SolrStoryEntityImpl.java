@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.common.commons.SolrUtils;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
@@ -129,7 +129,7 @@ public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity 
 	public void setCompletionStatus(Map<String, Integer> completionStatus) {
 		if (MapUtils.isNotEmpty(completionStatus)) {
 			super.setCompletionStatus(new HashMap<>(
-				SolrUtils.normalizeStringMapByAddingPrefix(
+				HelperFunctions.normalizeStringMapByAddingPrefix(
 				StoryEntitySolrFields.COMPLETION_STATUS + EntitySolrFields.DYNAMIC_FIELD_SEPARATOR,
 				completionStatus)));
 	    }
