@@ -19,7 +19,7 @@ import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
 import objects.Dataset;
 import objects.Item;
 import objects.Story;
@@ -45,7 +45,7 @@ public class ImportStoriesFromTranscribathonDataset {
 	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	@Autowired
-	JavaJSONParser javaJSONParser;
+	JavaGsonJSONParser javaJSONParser;
 	
 	@Test
 	public void getDatasetEuropeana1989FromTranscribathon() throws IOException {

@@ -36,9 +36,9 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
-import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
 import eu.europeana.enrichment.solr.commons.LevenschteinDistance;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
@@ -51,7 +51,7 @@ public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl im
 	
 	//@Resource(name = "javaJSONParser")
 	@Autowired
-	JavaJSONParser javaJSONParser;
+	JavaGsonJSONParser javaJSONParser;
 
 	//@Resource(name = "levenschteinDistance")
 	@Autowired
@@ -154,7 +154,7 @@ public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl im
 			response = query(solrCore, query);
 			javaJSONParser.getPositionsFromJSON(response, terms, positions, offsets);
 		} catch (ParseException e) {
-			throw new SolrNamedEntityServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
+			throw new SolrServiceException("Exception occured when parsing JSON response from Solr. Searched for the term: " + termLowerCaseStemmed,e);
 		}
 		
 		if(terms.isEmpty()) return -1;

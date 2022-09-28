@@ -28,7 +28,7 @@ import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -284,7 +284,7 @@ public class AdministrationController extends BaseRest {
 			+ "for all items in the database. It includes both items that are translated and those that have the transcription text in English language.")
 	@RequestMapping(value = "/administration/ner/allitems", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> runNERAllItems(
-			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);

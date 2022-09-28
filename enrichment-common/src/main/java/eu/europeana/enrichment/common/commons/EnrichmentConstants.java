@@ -29,6 +29,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE= "solrBaseClientService";
     public static final String BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE= "solrEntityPositionsService";
     public static final String BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE= "solrWikidataEntityService";
+    public static final String BEAN_ENRICHMENT_SOLR_TOPIC_SERVICE= "solrTopicService";
     public static final String BEAN_ENRICHMENT_E_TRANSLATION_EUROPA_SERVICE= "eTranslationService";
     public static final String BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN= "nerStanfordServiceOrigin";
     public static final String BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE= "googleTranslationService";
@@ -87,6 +88,5 @@ public class EnrichmentConstants {
 	public static final String LOGO_JSONPROP = "claims.P154.mainsnak.datavalue.value";
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
-
 }
 

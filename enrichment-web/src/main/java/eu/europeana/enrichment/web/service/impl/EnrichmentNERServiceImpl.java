@@ -46,8 +46,8 @@ import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.solr.commons.JavaJSONParser;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
@@ -104,7 +104,7 @@ public class EnrichmentNERServiceImpl {
 	
 	//@Resource(name = "javaJSONParser")
 	@Autowired
-	JavaJSONParser javaJSONParser;
+	JavaGsonJSONParser javaJSONParser;
 	
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
@@ -414,7 +414,7 @@ public class EnrichmentNERServiceImpl {
 				{
 					try {
 						solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
-					} catch (SolrNamedEntityServiceException | IOException e) {
+					} catch (SolrServiceException | IOException e) {
 						logger.log(Level.ERROR, "Exception during storing the wikidata entity to Solr.", e);
 					}
 				} 
