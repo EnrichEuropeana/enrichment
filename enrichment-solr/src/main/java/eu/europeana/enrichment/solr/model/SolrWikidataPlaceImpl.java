@@ -6,7 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.beans.Field;
-import eu.europeana.enrichment.common.commons.SolrUtils;
+
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
@@ -38,7 +39,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		if(prefLabel!=null && !prefLabel.isEmpty())
 		{		
 			//normalizedPrefLabel = SolrUtils.normalizeStringMap(EntitySolrFields.PREF_LABEL, prefLabel);
-			normalizedPrefLabel = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
+			normalizedPrefLabel = HelperFunctions.normalizeStringListMapByAddingPrefix(EntitySolrFields.PREF_LABEL+".",prefLabel);
 		}
 		super.setPrefLabel(normalizedPrefLabel);
 	}
@@ -49,7 +50,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		Map<String, List<String>> normalizedAltLabel = altLabel;
 		if(altLabel!=null && !altLabel.isEmpty())
 		{
-			normalizedAltLabel = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.ALT_LABEL+".", altLabel);
+			normalizedAltLabel = HelperFunctions.normalizeStringListMapByAddingPrefix(EntitySolrFields.ALT_LABEL+".", altLabel);
 			//normalizedAltLabel = SolrUtils.normalizeStringListMap(EntitySolrFields.ALT_LABEL, altLabel);
 		}
 				
@@ -88,7 +89,7 @@ public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements Wikidata
 		Map<String, List<String>> normalizedDescription = dcDescription;
 		if(dcDescription!=null && !dcDescription.isEmpty())
 		{
-			normalizedDescription = SolrUtils.normalizeStringListMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
+			normalizedDescription = HelperFunctions.normalizeStringListMapByAddingPrefix(EntitySolrFields.DC_DESCRIPTION+".",dcDescription);
 			//normalizedDescription = SolrUtils.normalizeStringMap(EntitySolrFields.DC_DESCRIPTION, dcDescription);
 		}
 	    super.setDescription(normalizedDescription);

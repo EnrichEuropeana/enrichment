@@ -28,7 +28,7 @@ import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.solr.commons.JavaJSONParser;
+import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:test-ner-config-book-dumitru.xml")
@@ -46,7 +46,7 @@ public class GenerateTextFilesForConceptualSearch {
 	PersistentTranslationEntityService persistentTranslationEntityService;
 	
 	@Resource(name = "javaJSONParser")
-	JavaJSONParser javaJSONParser;
+	JavaGsonJSONParser javaJSONParser;
 	
 	@SuppressWarnings({ "unchecked" })
 	@Test

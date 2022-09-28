@@ -30,7 +30,7 @@ import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
@@ -54,7 +54,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	private final Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
-	public int storeWikidataFromURL(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
+	public int storeWikidataFromURL(String wikidataURL, String type) throws SolrServiceException, IOException {
 		
 		WikidataEntity entity = wikidataService.getWikidataEntityUsingLocalCache(wikidataURL, type);
 
@@ -75,7 +75,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	}
 	
 	@Override
-	public String searchByWikidataURL(String wikidataURL) throws SolrNamedEntityServiceException {
+	public String searchByWikidataURL(String wikidataURL) throws SolrServiceException {
 		
 		logger.debug("Search wikidata entity by its URL: " + wikidataURL);
 
@@ -89,7 +89,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    QueryResponse rsp = null;
 		try {
 			rsp = query(solrCore, query);
-		} catch (SolrNamedEntityServiceException e) {
+		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception during the Solr quering for the wikidata.", e);
 			throw e;
 		}
@@ -189,7 +189,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	}
 	
 	@Override
-	public WikidataEntity getWikidataEntity (String wikidataURL, String type) throws SolrNamedEntityServiceException
+	public WikidataEntity getWikidataEntity (String wikidataURL, String type) throws SolrServiceException
 	{
 		SolrQuery query = new SolrQuery();
 		String solrQueryString = "("+EntitySolrFields.ID+ ":\"" + wikidataURL + "\"" + " AND " + EntitySolrFields.INTERNAL_TYPE+ ":" + type + ")"; 
@@ -201,7 +201,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    QueryResponse rsp = null;
 		try {
 			rsp = query(solrCore, query);
-		} catch (SolrNamedEntityServiceException e) {
+		} catch (SolrServiceException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during getting the wikidata from Solr.", e);
 			throw e;
@@ -250,7 +250,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
-	public String searchByWikidataURL_usingJackson(String wikidataURL, String type) throws SolrNamedEntityServiceException, IOException {
+	public String searchByWikidataURL_usingJackson(String wikidataURL, String type) throws SolrServiceException, IOException {
 		
 		SolrQuery query = new SolrQuery();
 		
@@ -270,7 +270,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		    QueryResponse rsp = null;
 			try {
 				rsp = query(solrCore, query);
-			} catch (SolrNamedEntityServiceException e) {
+			} catch (SolrServiceException e) {
 				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the Solr search with the wikidata url.", e);
 				throw e;
@@ -357,7 +357,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrNamedEntityServiceException, IOException {
+	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrServiceException, IOException {
 		
 		//forming required properties for the class to be serialized
 		String URLPage;
@@ -444,7 +444,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		try {
 			rspOnePage = query(solrCore, queryOnePage);
 			rspAllPages = query(solrCore, queryAllPages);
-		} catch (SolrNamedEntityServiceException e) {
+		} catch (SolrServiceException e) {
 			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during the search for the NamedEntity from Solr.", e);
 			throw e;
