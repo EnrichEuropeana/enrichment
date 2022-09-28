@@ -2,6 +2,7 @@ package eu.europeana.enrichment.web.controller;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.model.vocabulary.EnrichmentModelFields;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
@@ -149,6 +151,35 @@ public class TopicController extends BaseRest{
 		    return new ResponseEntity<String>(jsonLdSerializer.serializeObject(topicEntity), headers, HttpStatus.OK);	
 		}
 	}
+	
+    @ApiOperation(value = "Search topics for the given query. The parameter example values: query (query text) -> identifier:lda*; fq (filter query, can be a comma separated list) -> identifier:*TOPIC8,modelID:lda*; "
+    		+ "fl (list of fields to include in the response, can be a comma separated list) -> identifier,modelID; facet (a comma separated list of facet.field values, i.e. the field for which the facets count will be calculated) -> "
+    		+ "identifier, modelID; sort (a comma separated list of sortings) -> identifier asc, modelID desc; page (the page number); pageSize (the page size)", nickname = "searchTopics", response = java.lang.Void.class)
+    @RequestMapping(value = "/enrichment/topic/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> searchTopics(
+    		@RequestParam(value = "wskey", required = false) String wskey,
+		    @RequestParam(value = "query") String queryString,
+		    @RequestParam(value = "fq", required = false) String fq,
+		    @RequestParam(value = "fl", required = false) String fl,
+		    @RequestParam(value = "facet", required = false) String facet,
+		    @RequestParam(value = "sort", required = false) String sort,
+		    @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+		    @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) throws SolrServiceException, ParamValidationException {
+	
+		    if (StringUtils.isBlank(queryString)) {
+		    	throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "query", queryString);
+		    }
+		    
+		    String topicsJson = enrichmentTopicService.searchTopics(queryString, fq, fl, facet, sort, page, pageSize);
+		    // build response
+		    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
+		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
+		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GET);
+	
+		    ResponseEntity<String> response = new ResponseEntity<String>(topicsJson, headers, HttpStatus.OK);
+	
+		    return response;  	
+    }
 	
 
 }

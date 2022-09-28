@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import eu.europeana.enrichment.common.commons.SolrUtils;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 
@@ -37,7 +37,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	@JsonProperty("prefLabel")
 	public Map<String, String> getEntityPrefLabel() {
 		if(this.getPrefLabel()==null) return null;
-		Map<String, String> normalizedPrefLabel = SolrUtils.normalizeToStringMap(WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, this.getPrefLabel());
+		Map<String, String> normalizedPrefLabel = HelperFunctions.normalizeToStringMap(WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, this.getPrefLabel());
 		return normalizedPrefLabel;
 	}
 
@@ -56,7 +56,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	@JsonProperty("altLabel")
 	public Map<String, List<String>> getEntityAltLabel() {
 		if(this.getAltLabel()==null) return null;
-		Map<String, List<String>> normalizedAltLabel = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED, this.getAltLabel());
+		Map<String, List<String>> normalizedAltLabel = HelperFunctions.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED, this.getAltLabel());
 		return normalizedAltLabel;
 
 	}
@@ -122,7 +122,7 @@ public class WikidataEntityImpl implements WikidataEntity {
 	@JsonProperty("description")
 	public Map<String, List<String>> getEntityDescription() {
 		if(this.getDescription()==null) return null;
-		Map<String, List<String>> normalizedDescription = SolrUtils.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED, this.getDescription());
+		Map<String, List<String>> normalizedDescription = HelperFunctions.normalizeStringListMap(WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED, this.getDescription());
 		return normalizedDescription;
 
 	}
