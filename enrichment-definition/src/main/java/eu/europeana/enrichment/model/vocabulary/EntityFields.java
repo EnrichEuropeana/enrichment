@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.mongo.dao;
+package eu.europeana.enrichment.model.vocabulary;
 
 // Collection field names
 public class EntityFields {
@@ -17,14 +17,23 @@ public class EntityFields {
     public static final String TYPE = "type";
     public static final String WIKIDATA_ID = "wikidataId";
     public static final String PROPERTY = "property";
+    public static final String TARGET = "target";
+    public static final String MOTIVATION = "motivation";
+    public static final String BODY = "body";
     public static final String LABEL = "label";
     public static final String POSITION_ENTITIES = "positionEntities";
     public static final String FIELD_USED_FOR_NER = "fieldUsedForNER";
     public static final String TRANSLATION_KEY = "translationKey";
     public static final String NER_TOOLS = "nerTools";
+    public static final String PROCESSING = "processing";
+    public static final String FOUND_BY_NER_TOOLS = "foundByNerTools";
     public static final String POSITION_NAMED_ENTITY = "namedEntityId";
+    public static final String TOTAL = "total";
+    public static final String PART_OF = "partOf";
+    public static final String ITEMS = "items";
+    public static final String CREATOR = "creator";
     
-    // topic management API
+    // topics
     public static final String TOPIC_MODEL_ID = "identifier";
     public static final String TOPIC_ENTITY_ID = "topicID";
     public static final String TOPIC_ENTITY_IDENTIFIER = "identifier";

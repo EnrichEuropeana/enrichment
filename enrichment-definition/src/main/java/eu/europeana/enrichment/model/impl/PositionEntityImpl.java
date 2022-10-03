@@ -3,6 +3,7 @@ package eu.europeana.enrichment.model.impl;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
@@ -96,7 +97,7 @@ public class PositionEntityImpl {
         
         // Compare the data members and return accordingly  
         return pe_new.getStoryId().compareTo(storyId)==0
-                && pe_new.getItemId().compareTo(itemId)==0
+                && StringUtils.compare(pe_new.getItemId(),itemId)==0
                 && pe_new.getOffsetsTranslatedText().equals(offsetsTranslatedText) //compare the 2 lists including the order of elements, that is why we first sorted them
                 && pe_new.getFieldUsedForNER().compareTo(fieldUsedForNER)==0;
     }     
@@ -104,7 +105,9 @@ public class PositionEntityImpl {
     public int hashCode() {
         int result = 17;
         result = 31 * result + storyId.hashCode();
-        result = 31 * result + itemId.hashCode();
+        if(itemId!=null) {
+        	result = 31 * result + itemId.hashCode();
+        }
         result = 31 * result + fieldUsedForNER.hashCode();
         return result;
     }

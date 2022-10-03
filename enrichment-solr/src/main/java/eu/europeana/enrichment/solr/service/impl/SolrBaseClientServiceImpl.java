@@ -1,6 +1,8 @@
 package eu.europeana.enrichment.solr.service.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,13 +10,18 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
 import eu.europeana.enrichment.solr.service.SolrBaseClientService;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE)
@@ -63,15 +70,16 @@ public class SolrBaseClientServiceImpl implements SolrBaseClientService {
 		/**
 		 * Query the server
 		 */
+		QueryResponse rsp=null;
 		try {
-			QueryResponse rsp = solrServer.query(solrCollection, query);
+			rsp = solrServer.query(solrCollection, query);
 			log.debug("query response: " + rsp.toString());
 			
 		} catch (IOException | SolrServerException e) {
 			throw new SolrServiceException("Unexpected exception occured when searching StoryEntity in Solr for the term: " + term,
 					e);
 		}
-
+		
 	}
 
 	@Override

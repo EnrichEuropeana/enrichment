@@ -2,8 +2,6 @@ package eu.europeana.enrichment.mongo.dao;
 
 import static dev.morphia.query.experimental.filters.Filters.eq;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +15,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_ITEM_ENTITY_DAO)
@@ -143,16 +142,5 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	public List<String> getNerToolsForItem(String itemId) {
 		return nerToolsForItem.get(itemId);
 	}
-
-//	@Override
-//	public int getNumerAnalysedNamedEntities(String field) {
-//		return numberAnalysedNamedEntities.get(field).intValue();
-//	}
-//
-//	@Override
-//	public void setNumerAnalysedNamedEntities(String field, int num) {
-//		numberAnalysedNamedEntities.put(field, Integer.valueOf(num));
-//	}
-
 
 }
