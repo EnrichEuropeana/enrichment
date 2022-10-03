@@ -17,7 +17,7 @@ public interface PersistentNamedEntityService {
 	
 	public NamedEntityImpl findNamedEntityByLabelAndType(String label, String type);
 	
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
 
 	/*
 	 * This method retrieves all named entities from the Mongo database

@@ -28,11 +28,9 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 	}
 	
 	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryItemIdAndProperty(String storyId, String itemId, String property) {
-		
-		return namedEntityAnnotationDao.findNamedEntityAnnotationWithStoryItemIdAndProperty(storyId, itemId, property);
+	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, List<String> nerTools) {
+		return namedEntityAnnotationDao.findNamedEntityAnnotation(storyId, itemId, property, nerTools);
 	}
-
 
 	@Override
 	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) {
@@ -55,7 +53,4 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 	public void deleteNamedEntityAnnotation(String storyId,String itemId) {
 		namedEntityAnnotationDao.deleteNamedEntityAnnotation(storyId,itemId);
 	}
-
-
-
 }

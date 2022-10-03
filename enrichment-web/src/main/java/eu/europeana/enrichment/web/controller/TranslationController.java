@@ -69,7 +69,6 @@ public class TranslationController extends BaseRest {
 			
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
@@ -95,7 +94,6 @@ public class TranslationController extends BaseRest {
 			
 			EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setType(property);
 			
