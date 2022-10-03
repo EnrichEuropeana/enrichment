@@ -300,7 +300,7 @@ public class AdministrationController extends BaseRest {
 			{
 				for(TranslationEntity tr_entity : all_translation_entities) {	
 					
-					if(!tr_entity.getItemId().equalsIgnoreCase("all"))
+					if(tr_entity.getItemId()!=null)
 					{
 					
 						body.setStoryId(tr_entity.getStoryId());

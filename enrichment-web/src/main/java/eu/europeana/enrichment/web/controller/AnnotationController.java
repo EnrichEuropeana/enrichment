@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.Arrays;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -29,166 +31,82 @@ public class AnnotationController extends BaseRest {
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
 	
-    /**
-     * This method represents the /enrichment/annotation/{storyId}/{itemId} end point,
-	 * where the annotations for all NamedEntities of an item are retrieved using the class NamedEntityAnnotationCollection.
+	/**
+	 * This method represents the /enrichment/annotation end point, where the annotations for all NamedEntities 
+     * of a story/item are retrieved using the class NamedEntityAnnotationCollection.
 	 * All requests on this end point are processed here.
-     * @param wskey
-     * @param storyId
-     * @return
-     * @throws Exception
-     * @throws HttpException
-     */
-	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionItems", notes = "This method retrieves the annotations of "
-			+ "items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"itemId\" further restricts retrieving the annotations related to the given story item."
-			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
-	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAnnotationCollectionItems(
-			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
-			@PathVariable("storyId") String storyId,			
-			@PathVariable("itemId") String itemId) throws Exception, HttpException {
+	 * @param wskey
+	 * @param nerTools
+	 * @param property
+	 * @param storyId
+	 * @param itemId
+	 * @return
+	 * @throws Exception
+	 * @throws HttpException
+	 */
+	@ApiOperation(value = "Get annotations", nickname = "getAnnotations", notes = "This method retrieves the annotations of "
+			+ "stories/items. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
+			+ " The \"itemId\" parameter further restricts retrieving the annotations related to the given story item (in case of all items of "
+			+ "a story please do not specify any value). The \"property\" parameter refers to the part of the story/item being analyzed, i.e. description or transcription, etc."
+			+ " The \"nerTools\" refers to the annotations for the named entity that is found by the given NER tools.")
+	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getAnnotations(
+			@RequestParam(value="wskey", required=true) String wskey,
+			@RequestParam(value="nerTools", required=true) String nerTools,
+			@RequestParam(value="property", required=true) String property,
+			@RequestParam(value="storyId", required=true) String storyId,			
+			@RequestParam(value="itemId", required=false) String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
-			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, false, crosschecked, "transcription");
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
-					
-			return response;
-		
-		
-	}
-	
-    /**
-     * This method represents the /enrichment/annotation/{storyId}/{itemId} end point,
-	 * where the annotations for all NamedEntities of an item are saved to the db using the class NamedEntityAnnotationCollection.
-	 * All requests on this end point are processed here.
-     * @param wskey
-     * @param storyId
-     * @return
-     * @throws Exception
-     * @throws HttpException
-     */
-	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionItemsPOST", notes = "This method stores the annotations of "
-			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item. "
-			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
-	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAnnotationCollectionItemsPOST(
-			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "crosschecked", required = false,defaultValue = "true") boolean crosschecked,
-			@PathVariable("storyId") String storyId,
-			@PathVariable("itemId") String itemId) throws Exception, HttpException {
-
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-//			if(storyId.equalsIgnoreCase("all") && itemId.equalsIgnoreCase("all"))
-//			{
-//				List<ItemEntity> all_item_entities = persistentItemEntityService.getAllItemEntities();
-//
-//				if(all_item_entities!=null)
-//				{
-//					for(ItemEntity item_entity : all_item_entities) {
-//						
-//						enrichmentNerService.getStoryOrItemAnnotationCollection(item_entity.getStoryId(), item_entity.getItemId(), true, crosschecked, null);
-//					}
-//				}
-//				
-//				ResponseEntity<String> response = new ResponseEntity<String>("Annotations have been generated for all items!", HttpStatus.OK);
-//				return response;
-//
-//			}
-
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, itemId, true, crosschecked, null);
+			String result = enrichmentNerService.getAnnotations(storyId, itemId, property, Arrays.asList(nerTools.trim().split("\\s*,\\s*")));
 			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 			return response;
-		
-						
-					
-			
-		
-		
 	}
 	
-    /**
-     * This method represents the /enrichment/annotation/{storyId} end point,
-	 * where the annotations for all NamedEntities of a story are retrieved using the class NamedEntityAnnotationCollection.
+	/**
+	 * This method represents the /enrichment/annotation end point, where the annotations for all NamedEntities 
+     * of an item are saved to the db using the class NamedEntityAnnotationCollection.
 	 * All requests on this end point are processed here.
-     * @param wskey
-     * @param storyId
-     * @return
-     * @throws Exception
-     * @throws HttpException
-     */
-	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionStory", notes = "This method retrieves the annotations of "
-			+ "stories or items, that are stored using the corresponding POST request. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
-	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAnnotationCollectionStory(
-			@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestParam(value = "property", required = true, defaultValue = "transcription") String property,
-			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
-			@PathVariable("storyId") String storyId) throws Exception, HttpException {
-
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", false,crosschecked, property);
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
-					
-			return response;
-		
-		
-	}
-	
-    /**
-     * This method represents the /enrichment/annotation/{storyId} end point,
-	 * where the annotations for all NamedEntities of a story are saved to the db using the class NamedEntityAnnotationCollection.
-	 * All requests on this end point are processed here.
-     * @param wskey
-     * @param storyId
-     * @return
-     * @throws Exception
-     * @throws HttpException
-     */
-	@ApiOperation(value = "Get annotation collection preview", nickname = "getAnnotationCollectionStoryPOST", notes = "This method stores the annotations of "
+	 * @param wskey
+	 * @param nerTools
+	 * @param property
+	 * @param storyId
+	 * @param itemId
+	 * @return
+	 * @throws Exception
+	 * @throws HttpException
+	 */
+	@ApiOperation(value = "Create annotations", nickname = "createAnnotations", notes = "This method stores the annotations of "
 			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"crosschecked\" enables retrieving the annotations for the wikidata resources found by both Stanford and DBpedia_Spotlight.")
-	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getAnnotationCollectionStoryPOST(
-			@RequestParam(value = "wskey", required = false) String wskey,
-			@RequestParam(value = "crosschecked", required = false, defaultValue = "true") boolean crosschecked,
-			@PathVariable("storyId") String storyId) throws Exception, HttpException {
+			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item (in case of all items of a story please do not specify any value)."
+			+ " The \"property\" parameter refers to the part of the story/item being analyzed, either description or transcription, etc."
+			+ " The parameter \"nerTools\" refers to the annotations which named entity is found by the given NER tools.")
+	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> createAnnotations(
+			@RequestParam(value = "wskey", required = true) String wskey,
+			@RequestParam(value="nerTools", required=true) String nerTools,
+			@RequestParam(value="property", required=true) String property,
+			@RequestParam(value="storyId", required=true) String storyId,			
+			@RequestParam(value="itemId", required=false) String itemId) throws Exception, HttpException {
 
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
-			
-			String result = enrichmentNerService.getStoryOrItemAnnotationCollection(storyId, "all", true,crosschecked, null);
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
-					
-			return response;
-		
-		
+			String result = enrichmentNerService.createAnnotations(storyId, itemId, property, Arrays.asList(nerTools.trim().split("\\s*,\\s*")));
+			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
+			return response;		
 	}
 	
    /**
     * This method represents the /enrichment/annotation/{storyId}/{itemId}/{wikidataIdentifier} end point,
-	 * where the annotations for some NamedEntity of the given item for the specified story are retrieved using the class NamedEntityAnnotationImpl.
-	 * All requests on this end point are processed here.
-	 * 
+	* where the annotations for some NamedEntity of the given item for the specified story are retrieved using the class NamedEntityAnnotationImpl.
+	* All requests on this end point are processed here. 
     * @param wskey
     * @param storyId
     * @return
     * @throws Exception
     * @throws HttpException
     */
-	
 	@ApiOperation(value = "Get annotation preview for items", nickname = "getAnnotationItem", notes = "This method retrieves the annotations of "
 			+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}/{itemId}"
 			+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
@@ -235,7 +153,7 @@ public class AnnotationController extends BaseRest {
 				// Check client access (a valid “wskey” must be provided)
 				validateApiKey(wskey);
 				
-				String result = enrichmentNerService.getStoryOrItemAnnotation(storyId, "all", wikidataIdentifier);
+				String result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
 							
 				ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
 						

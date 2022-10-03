@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;

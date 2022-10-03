@@ -1,77 +1,74 @@
 package eu.europeana.enrichment.model.impl;
 
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
+import eu.europeana.enrichment.model.NamedEntityAnnotation;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD, 
-	"id", 
-	"type", 
-	"creator",
-	"total",
-	"items"
+	EntityFields.ID, 
+	EntityFields.TYPE, 
+	EntityFields.CREATOR,
+	EntityFields.TOTAL,
+	EntityFields.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
 
-	List<NamedEntityAnnotationImpl> items;
+	private static String idBaseUrl;
+	private static String creator;
+
+	List<NamedEntityAnnotation> items;
 //	private String context = "http://www.w3.org/ns/anno.jsonld";
-	private String idBase = "http://dsi-demo.ait.ac.at/enrichment-web/enrichment/annotation/";
 	private String id;
 	private String type = "AnnotationCollection";
-	private String creator = "https://pro.europeana.eu/project/enrich-europeana";
 	private String total; 
 
-	public NamedEntityAnnotationCollection(List<NamedEntityAnnotationImpl> itemsParam, String storyId, String itemId) {
+	public NamedEntityAnnotationCollection(String idBaseUrlPar, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
 		
+		idBaseUrl=idBaseUrlPar;
+		creator=creatorPar;
 		items = itemsParam;
 		total = String.valueOf(items.size());
-		if(itemId.compareTo("all")==0)
+		if(itemId==null)
 		{
-			id = idBase + storyId;
+			id = storyId;
 		}
 		else
 		{
-			id = idBase + storyId + "/" + itemId;
+			id = storyId + "/" + itemId;
 		}
 		
 		
 	}
 	
-	@JsonProperty("items")
-	public List<NamedEntityAnnotationImpl> getItems() {
+	@JsonProperty(EntityFields.ITEMS)
+	public List<NamedEntityAnnotation> getItems() {
 		return items;
 	}
 	
-	public void setItems(List<NamedEntityAnnotationImpl> items) {
+	public void setItems(List<NamedEntityAnnotation> items) {
 		this.items = items;
 	}
 	
-//	@JsonProperty("@context")
-//	public String getContext() {
-//		return context;
-//	}
-//	
-//	public void setContext(String context) {
-//		this.context = context;
-//	}
-	
-	@JsonProperty("id")
 	public String getId() {
 		return id;
 	}
 	
-	public void setId(String storyId) {
-		this.id = idBase + storyId;
+	@JsonProperty(EntityFields.ID)
+	public String getIdSerialization() {
+		return idBaseUrl + id;
 	}
 	
-	@JsonProperty("type")
+	@JsonProperty(EntityFields.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -80,16 +77,12 @@ public class NamedEntityAnnotationCollection {
 		this.type = type;
 	}
 	
-	@JsonProperty("creator")
+	@JsonProperty(EntityFields.CREATOR)
 	public String getCreator() {
 		return creator;
 	}
-	
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
 
-	@JsonProperty("total")
+	@JsonProperty(EntityFields.TOTAL)
 	public String getTotal() {
 		return total;
 	}
@@ -101,6 +94,5 @@ public class NamedEntityAnnotationCollection {
 	@JsonProperty(CONTEXT_FIELD)
 	public String getContext() {
 		return ANNOTATION_CONTEXT;
-	}
-	
+	}	
 }

@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO)
@@ -62,39 +64,51 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 	@Override
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId),
-                eq(EntityFields.TOOL, tool),
-                eq(EntityFields.LANGUAGE, language),
-                eq(EntityFields.TYPE, type),
-                eq(EntityFields.KEY, key)
-                )
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.TOOL, tool));
+	    filters.add(eq(EntityFields.LANGUAGE, language));
+	    filters.add(eq(EntityFields.TYPE, type));
+	    filters.add(eq(EntityFields.KEY, key));
+
+		return enrichmentDatastore.find(TranslationEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
                 .first();
 	}
 	
 	@Override
 	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId,
 			String tool, String language, String type) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId),
-                eq(EntityFields.TOOL, tool),
-                eq(EntityFields.LANGUAGE, language),
-                eq(EntityFields.TYPE, type)
-                )
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.TOOL, tool));
+	    filters.add(eq(EntityFields.LANGUAGE, language));
+	    filters.add(eq(EntityFields.TYPE, type));
+
+		return enrichmentDatastore.find(TranslationEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
                 .first();
 	}
 	
 	@Override
 	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId),
-                eq(EntityFields.TOOL, tool),
-                eq(EntityFields.LANGUAGE, language),
-                eq(EntityFields.TYPE, type)
-                )
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.TOOL, tool));
+	    filters.add(eq(EntityFields.LANGUAGE, language));
+	    filters.add(eq(EntityFields.TYPE, type));
+
+		return enrichmentDatastore.find(TranslationEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
                 .iterator().toList();
 	}
 
@@ -120,14 +134,17 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	
 	@Override
 	public long deleteTranslationEntity(String storyId, String itemId, String type) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID,storyId),
-                eq(EntityFields.ITEM_ID,itemId),
-                eq(EntityFields.TYPE,type)
-                )
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.TYPE, type));
+
+		return enrichmentDatastore.find(TranslationEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
-		
 	}
 
 

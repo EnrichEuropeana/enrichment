@@ -89,8 +89,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			 */
 			if(storyId == null || storyId.isBlank())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-			else if(itemId == null || itemId.isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
 			else if(translationTool == null || translationTool.isBlank())
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
 
@@ -114,7 +112,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			String sourceLanguage = null;			
 			
 			Object foundStoryOrItem = null;
-			if(itemId.compareTo("all")==0)
+			if(itemId==null)
 			{		
 				foundStoryOrItem = persistentStoryEntityService.findStoryEntity(storyId);
 				if(foundStoryOrItem==null) foundStoryOrItem = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(storyId);
@@ -127,7 +125,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			
 			//TODO: the "if" part below takes into account story and item, can be improved not to hardcode it in if 
 			//translate text for the whole story including all items
-			if(itemId.compareTo("all")==0)
+			if(itemId==null)
 			{		
 				dbStoryEntity = (StoryEntity) foundStoryOrItem;
 				if(dbStoryEntity != null)
@@ -260,9 +258,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		
 		if(storyId.isEmpty() || storyId==null) {
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-		}
-		else if(itemId.isEmpty() || itemId==null) {
-			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
 		}
 		else if(translatedText.isEmpty() || translatedText==null) {
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TEXT, null);
