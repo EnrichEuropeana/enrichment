@@ -2,6 +2,7 @@ package eu.europeana.enrichment.mongo.dao;
 
 import static dev.morphia.query.experimental.filters.Filters.eq;
 import static dev.morphia.query.experimental.filters.Filters.in;
+import static dev.morphia.query.experimental.filters.Filters.all;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
@@ -68,12 +71,18 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}	
 
 	@Override
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type) {
-		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class).filter(
-            eq(EntityFields.STORY_ID, storyId),
-            eq(EntityFields.ITEM_ID, itemId),
-            eq(EntityFields.FIELD_USED_FOR_NER, type)	            
-			)
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, type));
+	    filters.add(all(EntityFields.NER_TOOLS, nerTools));
+
+		List<PositionEntityImpl> positions = enrichmentDatastore
+			.find(PositionEntityImpl.class)
+			.filter(filters.toArray(Filter[]::new))
             .iterator()
 			.toList();
 		
@@ -105,27 +114,27 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public void deletePositionEntitiesAndNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
-		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId),
-                eq(EntityFields.FIELD_USED_FOR_NER, fieldUsedForNER)
-                )
+	    List<Filter> filters = new ArrayList<>();
+	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    if(itemId!=null) {
+	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    }
+	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, fieldUsedForNER));
+
+		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
 				.iterator()
 				.toList();
 		Set<ObjectId> namedEntityIdsSet = positions.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
 
-		enrichmentDatastore.find(PositionEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId),
-                eq(EntityFields.FIELD_USED_FOR_NER, fieldUsedForNER)
-                )
-                .delete(MorphiaUtils.MULTI_DELETE_OPTS);
+		enrichmentDatastore.find(PositionEntityImpl.class)
+			.filter(filters.toArray(Filter[]::new))
+            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
 		
 		enrichmentDatastore.find(NamedEntityImpl.class).filter(
-				in(EntityFields.OBJECT_ID, namedEntityIdsSet)
-	            )
-	            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
-
+			in(EntityFields.OBJECT_ID, namedEntityIdsSet)
+            )
+            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
 	}
 
 }

@@ -77,7 +77,6 @@ public class NERController extends BaseRest {
 
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
@@ -110,7 +109,6 @@ public class NERController extends BaseRest {
 			
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
@@ -209,10 +207,10 @@ public class NERController extends BaseRest {
 				if(story.getDescriptionEn()!=null) {
 					logger.info("NER analysis for the storyId: " + story.getStoryId());
 					
-					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
+					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
 					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
 					
-					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
+					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
 					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);				
 
 				}			

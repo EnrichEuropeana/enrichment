@@ -14,6 +14,7 @@ import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_STORY_ENTITY_DAO)
 public class StoryEntityDaoImpl implements StoryEntityDao{
@@ -94,15 +95,4 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	public List<String> getNerToolsForStory(String storyId) {
 		return nerToolsForStory.get(storyId);
 	}
-	
-//	@Override
-//	public int getNumerAnalysedNamedEntities(String field) {
-//		return numberAnalysedNamedEntities.get(field).intValue();
-//	}
-//
-//	@Override
-//	public void setNumerAnalysedNamedEntities(String field, int num) {
-//		numberAnalysedNamedEntities.put(field, Integer.valueOf(num));
-//	}
-
 }

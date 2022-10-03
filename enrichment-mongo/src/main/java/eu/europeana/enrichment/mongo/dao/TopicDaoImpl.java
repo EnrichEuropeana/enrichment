@@ -12,9 +12,8 @@ import dev.morphia.Datastore;
 import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TopicImpl;
-import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicDaoImpl implements TopicDao{
