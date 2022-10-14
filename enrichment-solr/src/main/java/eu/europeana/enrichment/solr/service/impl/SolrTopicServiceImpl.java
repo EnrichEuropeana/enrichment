@@ -33,18 +33,18 @@ public class SolrTopicServiceImpl extends SolrBaseClientServiceImpl {
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setQuery(query);
 		if (fq != null) {
-		    solrQuery.addFilterQuery(HelperFunctions.toArray(fq));
+		    solrQuery.addFilterQuery(HelperFunctions.toArray(fq,","));
 		}
 		if (fl != null) {
-		    solrQuery.setFields(HelperFunctions.toArray(fl));
+		    solrQuery.setFields(HelperFunctions.toArray(fl,","));
 		}
 		if (facets != null) {
 		    solrQuery.setFacet(true);
-		    solrQuery.addFacetField(HelperFunctions.toArray(facets));
+		    solrQuery.addFacetField(HelperFunctions.toArray(facets,","));
 		    solrQuery.setFacetLimit(SolrUtils.FACET_LIMIT);
 		}
 		if (sort != null) {
-		    SolrUtils.buildSortQuery(solrQuery, HelperFunctions.toArray(sort));
+		    SolrUtils.buildSortQuery(solrQuery, HelperFunctions.toArray(sort,","));
 		}
 		solrQuery.setRows(pageSize);
 		solrQuery.setStart(page * pageSize);

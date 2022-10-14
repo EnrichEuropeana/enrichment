@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
@@ -57,7 +57,7 @@ public class NERController extends BaseRest {
 	 * @throws HttpException
 	 * @throws SolrServiceException
 	 */
-	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
+	@ApiOperation(value = "Create named entities for a story", nickname = "createNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
@@ -79,12 +79,12 @@ public class NERController extends BaseRest {
 			body.setStoryId(storyId);
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
-			body.setLinking(Arrays.asList(linking.split(",")));
-			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 			body.setOriginal(original);
 			
-			String jsonLd = enrichmentNerService.getEntities(body, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			enrichmentNerService.createNamedEntities(body);
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 			
 			return response;
 		
@@ -111,11 +111,11 @@ public class NERController extends BaseRest {
 			body.setStoryId(storyId);
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
-			body.setLinking(Arrays.asList(linking.split(",")));
-			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 			body.setOriginal(false);
 			
-			String jsonLd = enrichmentNerService.getEntities(body, false);
+			String jsonLd = enrichmentNerService.getEntities(body);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
@@ -126,7 +126,7 @@ public class NERController extends BaseRest {
 	 * NER services for items
 	 */
 	
-	@ApiOperation(value = "Get named entities for an item", nickname = "getNEREntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
+	@ApiOperation(value = "Create named entities for an item", nickname = "createNEREntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
@@ -149,12 +149,12 @@ public class NERController extends BaseRest {
 			body.setItemId(itemId);
 			body.setTranslationTool("Google");
 			body.setProperty(property);
-			body.setLinking(Arrays.asList(linking.split(",")));
-			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 			body.setOriginal(original);
 			
-			String jsonLd = enrichmentNerService.getEntities(body, true);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+			enrichmentNerService.createNamedEntities(body);
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 			
 			return response;
 		
@@ -182,11 +182,11 @@ public class NERController extends BaseRest {
 			body.setItemId(itemId);
 			body.setTranslationTool("Google");
 			body.setProperty(property);
-			body.setLinking(Arrays.asList(linking.split(",")));
-			body.setNerTools(Arrays.asList(nerTools.split(",")));
+			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 			body.setOriginal(false);
 			
-			String jsonLd = enrichmentNerService.getEntities(body, false);
+			String jsonLd = enrichmentNerService.getEntities(body);
 			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 			
 			return response;
@@ -207,16 +207,14 @@ public class NERController extends BaseRest {
 				if(story.getDescriptionEn()!=null) {
 					logger.info("NER analysis for the storyId: " + story.getStoryId());
 					
-					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
+					enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")));
 					
-					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);				
+					enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")));
 
 				}			
 			}
 
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"result\":\"Done.\"}", HttpStatus.OK);
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
 			return response;
 	}
 

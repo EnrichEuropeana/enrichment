@@ -6,13 +6,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -26,6 +23,7 @@ import org.springframework.stereotype.Service;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
@@ -150,16 +148,21 @@ public class EnrichmentNERServiceImpl {
     private static int cascadeCall = 0;
 		
 	//@Cacheable("nerResults")
-	public String getEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
+	public String getEntities(EnrichmentNERRequest requestParam) throws Exception {
 
-		List<NamedEntityImpl> result = getNamedEntities(requestParam, process);
+		List<NamedEntityImpl> result = 
+				persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(
+						requestParam.getStoryId(),
+						requestParam.getItemId(),
+						requestParam.getProperty(),
+						requestParam.getNerTools()
+				);
 
 		if(result == null || result.isEmpty()) {
 			return "{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
 		}
 		else
 		{
-//			return new JSONObject(result).toString();
 			return jsonLdSerializer.serializeObject(result);
 		}
 	}
@@ -167,7 +170,7 @@ public class EnrichmentNERServiceImpl {
 	/*
 	 * TODO: refactor this method, is too long 
 	 */
-	public List<NamedEntityImpl> getNamedEntities(EnrichmentNERRequest requestParam, boolean process) throws Exception {
+	public void createNamedEntities(EnrichmentNERRequest requestParam) throws Exception {
 		
 		List<NamedEntityImpl> result = new ArrayList<NamedEntityImpl>();
 		
@@ -186,14 +189,16 @@ public class EnrichmentNERServiceImpl {
 		String translationTool = requestParam.getTranslationTool();
 		String translationLanguage = "en";
 		
-		if(storyId == null || storyId.isEmpty())
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
-			
 		/*
 		 * Check parameters
 		 */
+		if(storyId == null || storyId.isEmpty())
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
 		if(tools == null || tools.isEmpty())
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_NER_TOOL, null);
+		if(tools.size()>1 && !tools.get(0).equalsIgnoreCase(NERConstants.dbpediaSpotlightName)) {
+			throw new ParamValidationException("In case of multiple NER tools, the first one must be the DBpedia_Spotlight.", EnrichmentNERRequest.PARAM_NER_TOOL, null);
+		}
 		if(!original && (translationTool == null || translationTool.isEmpty()))
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_TRANSLATION_TOOL, null);
 		if(!original && (translationLanguage == null || translationLanguage.isEmpty()))
@@ -211,24 +216,10 @@ public class EnrichmentNERServiceImpl {
 		}
 		if(invalidLinkinParams.size() > 0)
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentNERRequest.PARAM_LINKING, String.join(",", invalidLinkinParams));
-		
-		/*
-		 * This part from here down only executes for POST requests.
-		 * Here in case of items we run the analysis for all types of the NER field (summary, description, or transcription)
-		 */
-		List<NamedEntityImpl> tmpNamedEntities = new ArrayList<>();
 
-		//fetching NamedEntity-ies to check if they are found with the required ner tools
-		tmpNamedEntities.addAll(persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, requestParam.getNerTools()));
-	
-		int numberNERTools = tools.size();
-		//check if for the given story/item the NER anaylysis for all required NER tools is already pursued, returned is the number of 
-		//ner tools for which the analysis remained undone (the list "tools" is also updated, i.e. only the not analyzed tools remain in the list)
-		int numberNERToolsFound = checkAllNerToolsAlreadyCompleted(tools, tmpNamedEntities);
-				
-		//in case of GET API (process==FALSE) or POST API where all ner tools have been processed and no new provided text is given
-		if(!process || numberNERToolsFound==numberNERTools) {
-			return tmpNamedEntities;
+		boolean allNERToolsCompleted = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, tools);
+		if(allNERToolsCompleted) {
+			return;
 		}
 
 		//from this part down only POST method is executed and the NER analysis is done for all story or item fields
@@ -240,53 +231,32 @@ public class EnrichmentNERServiceImpl {
 			type=typeNERField; 
 			
 			String [] textAndLanguage = updateStoryOrItem(original, storyId, itemId, translationTool, translationLanguage, type);
+			if(textAndLanguage[0]==null) {
+				continue;
+			}
 			String textForNer = textAndLanguage[0];
 			String languageForNer = textAndLanguage[1];
 
 			//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 			for(String tool : tools) {
-				List<NamedEntityImpl> tmpResult = getUpdatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking);
-				updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
-				updateNamedEntityResultList (result, tmpResult);
+				updatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking);
 			}
 	
-		}	
-		
-		return result;
+		}
 	}
 	
-	private void updateNamedEntityResultList (List<NamedEntityImpl> main, List<NamedEntityImpl> newOnes) {
-		if(main==null) {
-			if(newOnes!=null) {
-				main=newOnes;
-				return;
-			}
-			else return;
-		}
-		else {
-			if(newOnes==null) {
-				return;
+	private boolean checkAllNerToolsAlreadyCompleted(String storyId, String itemId, String fieldForNer, List<String> nerTools) {
+		List<String> toolsToRemove = new ArrayList<String>();
+		for(String tool : nerTools) {
+			if(persistentPositionEntityService.findPositionEntitiesForNerTool(storyId, itemId, fieldForNer, tool)!=null) {
+				toolsToRemove.add(tool);
 			}
 		}
-		//update the main result with new elements (the new list is extended for the entities that are not inside from the previous list, because the new entities are the updated ones)
-		List<NamedEntityImpl> toAdd = new ArrayList<NamedEntityImpl>();
-		for(NamedEntityImpl mainEntity : main) {
-			boolean found = false;
-			for(NamedEntityImpl newEntity : newOnes) {
-				if(newEntity.getLabel().equals(mainEntity.getLabel()) && newEntity.getType().equals(mainEntity.getType())) {
-					found=true;
-					break;
-				}
-			}
-			if(!found) {
-				toAdd.add(mainEntity);
-			}
-		}
-		newOnes.addAll(toAdd);
-		main=newOnes;
+		nerTools.removeAll(toolsToRemove);
+		return nerTools.size()==0;
 	}
 	
-	public List<NamedEntityImpl> getUpdatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws Exception {
+	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws Exception {
 		/*
 		 * Here for each ner tool the analysis is done separately because different tools may find
 		 * the same entities on different positions in the text and we would like to separate those results,
@@ -294,92 +264,25 @@ public class EnrichmentNERServiceImpl {
 		 * belong to which ner tool analyser.
 		 */
 		TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
-		
-		if(tmpResult==null || tmpResult.isEmpty()) return null;
-		
-		List<NamedEntityImpl> result = new ArrayList<NamedEntityImpl>();
+		if(tmpResult==null) {
+			return;
+		}
 		for (String classificationType : tmpResult.keySet()) {
 			
 			if (isRestrictedClassificationType(classificationType)) continue;
 			
 			for (NamedEntityImpl tmpNamedEntity : tmpResult.get(classificationType)) {
-				NamedEntityImpl dbEntity = null;
-				boolean oldNamedEntityChanged = false;
-				if (tmpNamedEntity.getLabel()!=null) {
-					dbEntity = persistentNamedEntityService.findNamedEntityByLabelAndType(tmpNamedEntity.getLabel(), tmpNamedEntity.getType());
-				}
 				
-				if(dbEntity != null) {
-					//check if there are new position entities to be added						
-					if(tmpNamedEntity.getPositionEntities()!=null) {
-						List<PositionEntityImpl> existingPositions = persistentPositionEntityService.findPositionEntities(dbEntity.get_id());
-						if(existingPositions.size()>0) {
-							boolean addNewPositionEntity = true;
-							for(PositionEntityImpl pe : existingPositions)
-							{
-								if(tmpNamedEntity.getPositionEntities().get(0).equals(pe))
-								{
-									addNewPositionEntity=false;
-									/*
-									 * only if all fields of the position entities are the same including the positions in the translated text
-									 * 2 or more ner tools are added to the same position entity
-									 */
-									if(pe.getNerTools()!=null && !pe.getNerTools().contains(nerTool)) { 
-										pe.getNerTools().add(nerTool);
-										persistentPositionEntityService.savePositionEntity(pe);
-									}
-									break;
-								}
-							}
-							if(addNewPositionEntity) {
-								//saving an existing, changed position, first set the reference to the named entity id
-								tmpNamedEntity.getPositionEntities().get(0).setNamedEntityId(dbEntity.get_id());
-								persistentPositionEntityService.savePositionEntity(tmpNamedEntity.getPositionEntities().get(0));
-							}
-						}
-						else {		
-							//saving a new position, first set the reference to the named entity id
-							tmpNamedEntity.getPositionEntities().get(0).setNamedEntityId(dbEntity.get_id());
-							persistentPositionEntityService.savePositionEntity(tmpNamedEntity.getPositionEntities().get(0));
-						}							
-					}
+				//agent entities should have at least 2 parts to be linked (name and surname)
+				if(tmpNamedEntity.getType().equalsIgnoreCase(NERClassification.AGENT.toString()) && HelperFunctions.toArray(tmpNamedEntity.getLabel(),null).length<2) {
+					continue;
+				}
 
-					if(tmpNamedEntity.getDBpediaIds()!=null) {
-						if(dbEntity.getDBpediaIds()!=null) {
-							for(int dbpediaIndex = 0; dbpediaIndex < tmpNamedEntity.getDBpediaIds().size(); dbpediaIndex++) {
-								int tmpIndex = dbpediaIndex;
-								boolean found = dbEntity.getDBpediaIds().stream().anyMatch(x -> x.equals(tmpNamedEntity.getDBpediaIds().get(tmpIndex)));
-								if(!found){
-									dbEntity.addDBpediaId(tmpNamedEntity.getDBpediaIds().get(tmpIndex));
-									oldNamedEntityChanged=true;
-								}
-							}
-						}
-						else {
-							List<String> newDbpediaIds = new ArrayList<String>(tmpNamedEntity.getDBpediaIds());
-							dbEntity.setDBpediaIds(newDbpediaIds);
-							oldNamedEntityChanged=true;
-						}
-					}
-					
-					/*
-					 * Add the entity to the new ones if it is found in the db and it is changed
-					 */
-					if(oldNamedEntityChanged) {
-						result.add(dbEntity);
-					}
-				}
-				else {
-					result.add(tmpNamedEntity);
-				}
+				NamedEntityImpl dbEntity = persistentNamedEntityService.findExistingNamedEntity(tmpNamedEntity);
+				nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool);
+				saveNamedEntityAndPositionsToDbAndSolr(tmpNamedEntity, dbEntity);
 			}	
 		}
-		/*
-		 * Add linking information to named entity
-		 */
-		addLinkingInformation(result, linking, languageForNer, nerTool);
-		
-		return result;
 	}
 	
 	private boolean isRestrictedClassificationType(String type) {
@@ -390,55 +293,51 @@ public class EnrichmentNERServiceImpl {
 		else return false;
 	}
 	
-	public void updateNamedEntitiesAndPositionsInDbAndSolr (List<NamedEntityImpl> result) {
-		if(result==null) return;
-		/*
-		 * Save and update all named entities
-		 */
-		for (NamedEntityImpl entity : result) {
-			//save the wikidata ids to solr
-			List<String> wikidataIdsForSolr = getWikidataIdsSolr(entity);
-			if(wikidataIdsForSolr!=null) {
-				for(String wikidataId : wikidataIdsForSolr)
-				{
-					try {
-						solrWikidataEntityService.storeWikidataFromURL(wikidataId, entity.getType());
-					} catch (SolrServiceException | IOException e) {
-						logger.log(Level.ERROR, "Exception during storing the wikidata entity to Solr.", e);
+	private void saveNamedEntityAndPositionsToDbAndSolr (NamedEntityImpl newNamedEntity, NamedEntityImpl existingNamedEntity) throws SolrServiceException, IOException {
+		if(existingNamedEntity!=null) {
+			//save the position entity only
+			List<Integer> existingOffsets = new ArrayList<Integer>();
+			List<Integer> offsetsTranslatedText = newNamedEntity.getPositionEntity().getOffsetsTranslatedText();
+			for(int offset : offsetsTranslatedText) {
+				PositionEntityImpl existingPosition = 
+						persistentPositionEntityService.findPositionEntities(
+								existingNamedEntity.get_id(),
+								newNamedEntity.getPositionEntity().getStoryId(),
+								newNamedEntity.getPositionEntity().getItemId(),
+								offset,
+								newNamedEntity.getPositionEntity().getFieldUsedForNER()
+								);
+				//update ner tools
+				if(existingPosition!=null) {
+					if(!existingPosition.getNerTools().contains(newNamedEntity.getPositionEntity().getNerTools().get(0))) {
+						existingPosition.getNerTools().add(newNamedEntity.getPositionEntity().getNerTools().get(0));
+						persistentPositionEntityService.savePositionEntity(existingPosition);
 					}
-				} 
-			}
-			
-			//save the NamedEntity to the db
-			persistentNamedEntityService.saveNamedEntity(entity);
-			//save the new positions to the db
-			if(entity.getPositionEntities()!=null) {
-				for(PositionEntityImpl position: entity.getPositionEntities()) {
-					//saving a new position, first set the reference to the named entity id
-					position.setNamedEntityId(entity.get_id());
-					persistentPositionEntityService.savePositionEntity(position);
+					existingOffsets.add(offset);
 				}
 			}
-		}
-			
-	}
-	
-	private List<String> getWikidataIdsSolr(NamedEntityImpl ne) {
-		if(ne.getPreferredWikidataIds()!=null) {
-			return ne.getPreferredWikidataIds();
+			if(existingOffsets.size()>0) {
+				offsetsTranslatedText.removeAll(existingOffsets);
+			}
+			if(offsetsTranslatedText.size()>0) {
+				newNamedEntity.getPositionEntity().setNamedEntityId(existingNamedEntity.get_id());
+				persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
+			}
 		}
 		else {
-			return null;
+			persistentNamedEntityService.saveNamedEntity(newNamedEntity);
+			if(newNamedEntity.getPreferedWikidataId()!=null) {
+				if(!solrWikidataEntityService.existWikidataURL(newNamedEntity.getPreferedWikidataId())) {
+					solrWikidataEntityService.storeWikidataFromURL(newNamedEntity.getPreferedWikidataId(), newNamedEntity.getType());
+				}
+			}
+			newNamedEntity.getPositionEntity().setNamedEntityId(newNamedEntity.get_id());
+			persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
+
 		}
+		
 	}
-	
-	private void addLinkingInformation(List<NamedEntityImpl> result, List<String> linking, String languageForNer, String nerTool) throws IOException {
-		if(result==null) return;
-		for (NamedEntityImpl namedEntity : result) {
-			nerLinkingService.addLinkingInformation(namedEntity, linking, languageForNer, nerTool);
-		}
-	}
-	
+
 	/*
 	 * This function checks if the given story or item is present in the db and if not it fetches it from the Transcribathon platform.
 	 * Additionally, if there is not proper translation, it is first done here and the translated text is returned for the NER analysis.
@@ -502,43 +401,8 @@ public class EnrichmentNERServiceImpl {
 
 	}
 	
-	/*
-	 * This function returns the number of NER-tools that are present in the found NamedEntities  
-	 */
-	private int checkAllNerToolsAlreadyCompleted (List<String> tools, List<NamedEntityImpl> tmpNamedEntities)
-	{		
-		Set<String> nerToolsForStoryOrItem = new HashSet<String>();
-		if(tmpNamedEntities!=null) {
-			for (NamedEntityImpl ne : tmpNamedEntities)
-			{
-				if(ne.getPositionEntities()!=null) {
-					for(PositionEntityImpl pe : ne.getPositionEntities())
-					{
-						nerToolsForStoryOrItem.addAll(pe.getNerTools());
-					}
-				}
-			}
-		}
-				
-		List<String> toolsToRemove = new ArrayList<String>();
-		if(tools!=null) {
-			for (String nerToolsNew : tools)
-			{
-				if(nerToolsForStoryOrItem.contains(nerToolsNew)) toolsToRemove.add(nerToolsNew);
-			}
-		}
-		tools.removeAll(toolsToRemove);
-		
-		return toolsToRemove.size();
-	}
-
 	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws Exception {
-		
-		if(text==null || text.isBlank() || language==null) {
-			return null;
-		}
-			
-		NERService tmpTool;
+		NERService tmpTool=null;
 		switch(nerTool){
 			case NERConstants.stanfordNer:
 				tmpTool = nerStanfordService;
@@ -564,8 +428,8 @@ public class EnrichmentNERServiceImpl {
 		
 		for(Map.Entry<String, List<NamedEntityImpl>> categoryList : mapCurrentResult.entrySet()) {
 			for(NamedEntityImpl entity : categoryList.getValue()) {
-				if(entity.getPositionEntities()==null || entity.getPositionEntities().size()==0) continue;
-				PositionEntityImpl pos = entity.getPositionEntities().get(0);
+				if(entity.getPositionEntity()==null) continue;
+				PositionEntityImpl pos = entity.getPositionEntity();
 				pos.setStoryId(storyId);
 				pos.setItemId(itemId);
 				pos.setFieldUsedForNER(fieldUsedForNER);
@@ -792,7 +656,7 @@ public class EnrichmentNERServiceImpl {
 					}
 					//computing score
 					float score;
-					if(ne.getWikidataLabelAltLabelMatchIds()!=null && ne.getWikidataLabelAltLabelMatchIds().contains(ne.getPreferedWikidataId()) 
+					if(ne.getWikidataLabelAltLabelAndTypeMatchIds()!=null && ne.getWikidataLabelAltLabelAndTypeMatchIds().contains(ne.getPreferedWikidataId()) 
 							&& ne.getDbpediaWikidataIds()!=null && ne.getDbpediaWikidataIds().contains(ne.getPreferedWikidataId())) {
 						score=1;
 					}

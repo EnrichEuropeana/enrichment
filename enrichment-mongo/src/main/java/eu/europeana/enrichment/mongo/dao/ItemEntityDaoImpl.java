@@ -88,7 +88,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
                 eq(EntityFields.STORY_ID, storyId))
                 .iterator()
                 .toList();
-		if(queryResult == null)
+		if(queryResult.isEmpty())
 			return null;
 		else
 		{

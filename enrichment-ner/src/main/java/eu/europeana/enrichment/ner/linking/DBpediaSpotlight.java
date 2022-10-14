@@ -1,9 +1,7 @@
 package eu.europeana.enrichment.ner.linking;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -17,7 +15,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -58,7 +55,7 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 	 * 
 	 */
 	
-	public DBpediaResponse getDBpediaResponse(String dbpediaUrl) throws JAXBException {
+	public DBpediaResponse getDBpediaResponse(String dbpediaUrl) throws Exception {
 		String response = createRequest(dbpediaUrl);
 		if(response==null) return null;
 //		JacksonXmlModule xmlModule = new JacksonXmlModule();
@@ -69,12 +66,16 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 //		if(value==null) return null;
 //		return value.getResult();
 	    InputStream stream = new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
-	    return ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+	    try {
+			return ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+		} catch (JAXBException e) {
+			logger.error("Cannot unmarschall the dbpedia response. Probably no valid data within it.", e);
+			return null;
+		}
 		
 	}
 	
-	private String createRequest(String dbpediaUrl) {
-		try {
+	private String createRequest(String dbpediaUrl) throws Exception {
 			String query = String.format(DBPEDIA_SPARQL_QUERY_PATTERN, dbpediaUrl);
 			String wholeUrl = DBPEDIA_SPARQL_URL;
 			wholeUrl += "&query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
@@ -101,12 +102,6 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 			
 			// TODO: check status code
 			return responeString;
-
-		} catch (URISyntaxException | IOException e) {
-			logger.log(Level.ERROR, "Exception during sending the dbpedia NER request.", e);
-			return null;
-		}
-
 	}
 	
 	private void setupJaxb() {
