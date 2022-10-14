@@ -62,7 +62,7 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	@Override
 	public List<StoryEntity> findAllStoryEntities() {
 		List<StoryEntityImpl> queryResult = enrichmentDatastore.find(StoryEntityImpl.class).iterator().toList();
-		if(queryResult == null)
+		if(queryResult.isEmpty())
 			return null;
 		else
 		{

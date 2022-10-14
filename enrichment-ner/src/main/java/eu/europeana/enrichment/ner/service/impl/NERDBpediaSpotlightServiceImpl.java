@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -96,8 +95,6 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			JSONObject entity = findings.getJSONObject(index);
 			String entityTypes = entity.getString(typeKey);
 			
-			
-			String correctType = NERDBpediaClassification.MISC.toString();
 			//TODO:check if type contains more then one type (like person and location for one entity)
 			boolean classificationFound = false;
 			if(NERDBpediaClassification.isAgent(entityTypes)) {
@@ -147,8 +144,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			logger.log(Level.ERROR, "An Exception during the the json rocessing of the dbpedia NER.", e);
 		}
 		
-		//the name must exist
-		if(entityName==null) {
+		if(entityName==null || entityOffset==-1 || dbpediaUrl==null) {
 			return;
 		}
 				
@@ -162,7 +158,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		
 		NamedEntityImpl alreadyExistNamedEntityImpl = null;
 		for(int index = 0; index < tmp.size(); index++) {
-			if(entityName.equals(tmp.get(index).getLabel())) {
+			if(existingNamedEntity(tmp.get(index), dbpediaUrl)) {
 				alreadyExistNamedEntityImpl = tmp.get(index);
 				break;
 			}
@@ -173,36 +169,21 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 			tmp.add(newNamedEntityImpl);
 		}
 		else {
-			//update the dbpedia ids
-			if(dbpediaUrl!=null) {
-			    if(alreadyExistNamedEntityImpl.getDBpediaIds()==null) {
-					List<String> dbpediaIds = new ArrayList<String>();
-					dbpediaIds.add(dbpediaUrl);
-					alreadyExistNamedEntityImpl.setDBpediaIds(dbpediaIds);
-			    }
-				else if(!alreadyExistNamedEntityImpl.getDBpediaIds().contains(dbpediaUrl)) {
-					alreadyExistNamedEntityImpl.addDBpediaId(dbpediaUrl);
-				}
-			}
 			//update the offset(position) of the entity
-			if(entityOffset!=-1) {
-				if(alreadyExistNamedEntityImpl.getPositionEntities()==null) {
-					List<Integer> offsetTranslatedText = new ArrayList<Integer>();
-					offsetTranslatedText.add(Integer.valueOf(entityOffset));
-					PositionEntityImpl positionEntity = new PositionEntityImpl();
-					// default: Offset position will be added to the translated
-					positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
-					List<String> nerTools = new ArrayList<String>();
-					nerTools.add(NERConstants.dbpediaSpotlightName);
-					positionEntity.setNerTools(nerTools);
-					List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
-					positionEntities.add(positionEntity);
-					alreadyExistNamedEntityImpl.setPositionEntities(positionEntities);
-				}
-				else if(!alreadyExistNamedEntityImpl.getPositionEntities().get(0).getOffsetsTranslatedText().contains(entityOffset)){
-					alreadyExistNamedEntityImpl.getPositionEntities().get(0).addOfssetsTranslatedText(entityOffset);
-				}
-			}
+			alreadyExistNamedEntityImpl.getPositionEntity().addOfssetsTranslatedText(entityOffset);
+		}
+	}
+	
+	/*
+	 * Please note that the rules for checking the existence of the same named entity for the dbpedia
+	 * NER tool must be consistent through the whole application. 
+	 */
+	private boolean existingNamedEntity(NamedEntityImpl neToCheckAgainst, String dbpediaUrl) {
+		if(neToCheckAgainst.getDBpediaId().equals(dbpediaUrl)) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	
@@ -210,26 +191,18 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		NamedEntityImpl namedEntity = new NamedEntityImpl(label);
 		
 		namedEntity.setType(type);
-		
-		if(offset!=-1) {
-			List<Integer> offsetTranslatedText = new ArrayList<Integer>();
-			offsetTranslatedText.add(Integer.valueOf(offset));
-			PositionEntityImpl positionEntity = new PositionEntityImpl();
-			// default: Offset position will be added to the translated
-			positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
-			List<String> nerTools = new ArrayList<String>();
-			nerTools.add(NERConstants.dbpediaSpotlightName);
-			positionEntity.setNerTools(nerTools);
-			List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
-			positionEntities.add(positionEntity);
-			namedEntity.setPositionEntities(positionEntities);
-		}
 
-		if(dbpediaUrl!=null) {
-			List<String> dbpediaIds = new ArrayList<String>();
-			dbpediaIds.add(dbpediaUrl);
-			namedEntity.setDBpediaIds(dbpediaIds);
-		}
+		List<Integer> offsetTranslatedText = new ArrayList<Integer>();
+		offsetTranslatedText.add(Integer.valueOf(offset));
+		PositionEntityImpl positionEntity = new PositionEntityImpl();
+		// default: Offset position will be added to the translated
+		positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
+		List<String> nerTools = new ArrayList<String>();
+		nerTools.add(NERConstants.dbpediaSpotlightName);
+		positionEntity.setNerTools(nerTools);
+		namedEntity.setPositionEntity(positionEntity);
+
+		namedEntity.setDBpediaId(dbpediaUrl);
 
 		return namedEntity;
 	}
@@ -245,9 +218,6 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	private String createRequest(String text) throws Exception {
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();
-			
-			URIBuilder builder = new URIBuilder(baseUrl);
-			//builder.setParameter("text", text);
 			
 			HttpPost request = new HttpPost(baseUrl);
 			String requestString = String.format("text=%s", URLEncoder.encode(text, "UTF-8"));

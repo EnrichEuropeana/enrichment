@@ -33,6 +33,7 @@ import org.tartarus.snowball.ext.romanianStemmer;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
@@ -116,7 +117,7 @@ public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl im
 				logger.log(Level.ERROR, "Exception during reading the solr entity positions from a file.", e);
 				throw e;
 			}
-			String[] entities = data.split(",");
+			String[] entities = HelperFunctions.toArray(data,",");
 			for(int i=0;i<entities.length;i++)
 			{
 				String[] entityType = entities[i].split("\\s+",2);

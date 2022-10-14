@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 
@@ -25,10 +25,10 @@ public class Keyword {
 	
 	private KeywordPosition keywordPosition;
 	
-	private List<String> wikidataLabelAltLabelMatchIds;
-	private List<String> dbpediaIds;
-	private List<String> dbpediaWikidataIds;
-	private List<String> preferredWikidataIds;
+	private Set<String> wikidataLabelAltLabelMatchIds;
+	private String dbpediaId;
+	private Set<String> dbpediaWikidataIds;
+	private Set<String> preferredWikidataIds;
 
 	//id will be used for storing MongoDB _id
 	@Id
@@ -121,35 +121,35 @@ public class Keyword {
 		this.keywordPosition = keywordPosition;
 	}
 
-	public List<String> getWikidataLabelAltLabelMatchIds() {
+	public Set<String> getWikidataLabelAltLabelMatchIds() {
 		return wikidataLabelAltLabelMatchIds;
 	}
 
-	public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
+	public void setWikidataLabelAltLabelMatchIds(Set<String> wikidataLabelAltLabelMatchIds) {
 		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
 	}
 
-	public List<String> getDbpediaIds() {
-		return dbpediaIds;
+	public String getDbpediaId() {
+		return dbpediaId;
 	}
 
-	public void setDbpediaIds(List<String> dbpediaIds) {
-		this.dbpediaIds = dbpediaIds;
+	public void setDbpediaId(String dbpediaId) {
+		this.dbpediaId = dbpediaId;
 	}
 
-	public List<String> getDbpediaWikidataIds() {
+	public Set<String> getDbpediaWikidataIds() {
 		return dbpediaWikidataIds;
 	}
 
-	public void setDbpediaWikidataIds(List<String> dbpediaWikidataIds) {
+	public void setDbpediaWikidataIds(Set<String> dbpediaWikidataIds) {
 		this.dbpediaWikidataIds = dbpediaWikidataIds;
 	}
 
-	public List<String> getPreferredWikidataIds() {
+	public Set<String> getPreferredWikidataIds() {
 		return preferredWikidataIds;
 	}
 
-	public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
+	public void setPreferredWikidataIds(Set<String> preferredWikidataIds) {
 		this.preferredWikidataIds = preferredWikidataIds;
 	}
 	

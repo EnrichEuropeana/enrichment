@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 
@@ -88,7 +89,7 @@ public class ETranslationEuropaServiceImpl {
 			
 			String line;
 			while ((line = br.readLine()) != null) {
-				String[] splitString = line.split("=");
+				String[] splitString = HelperFunctions.toArray(line,"=");
 				if (splitString[0].equals("user"))
 					credentialUsername = splitString[1];
 				else if (splitString[0].equals("pwd"))

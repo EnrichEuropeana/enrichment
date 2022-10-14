@@ -75,7 +75,8 @@ public class PositionEntityImpl {
 		
 	}
 
-	// Overriding equals() to compare two PositionEntity objects     
+	// Overriding equals() to compare two PositionEntity objects  
+	@Override
     public boolean equals(Object pe){ 
   
         // If the object is compared with itself then return true   
@@ -102,12 +103,14 @@ public class PositionEntityImpl {
                 && pe_new.getFieldUsedForNER().compareTo(fieldUsedForNER)==0;
     }     
     
+	@Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + storyId.hashCode();
         if(itemId!=null) {
         	result = 31 * result + itemId.hashCode();
         }
+        result = 31 * result + offsetsTranslatedText.hashCode();
         result = 31 * result + fieldUsedForNER.hashCode();
         return result;
     }

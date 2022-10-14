@@ -46,7 +46,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 				.filter(filters.toArray(Filter[]::new))			
 				.iterator()
 				.toList();
-		if(queryResult == null)
+		if(queryResult.isEmpty())
 			return null;
 		else
 		{

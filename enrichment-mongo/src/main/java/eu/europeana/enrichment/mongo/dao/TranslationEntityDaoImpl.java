@@ -49,7 +49,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	@Override
 	public List<TranslationEntity> findAllTranslationEntities() {
 		List<TranslationEntityImpl> queryResult = enrichmentDatastore.find(TranslationEntityImpl.class).iterator().toList();
-		if(queryResult == null)
+		if(queryResult.isEmpty())
 			return null;
 		else
 		{

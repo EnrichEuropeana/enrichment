@@ -16,6 +16,7 @@ public class EntityFields {
     public static final String LANGUAGE = "language";
     public static final String TYPE = "type";
     public static final String WIKIDATA_ID = "wikidataId";
+    public static final String DBPEDIA_ID = "dbpediaId";
     public static final String PROPERTY = "property";
     public static final String TARGET = "target";
     public static final String MOTIVATION = "motivation";
@@ -32,6 +33,7 @@ public class EntityFields {
     public static final String PART_OF = "partOf";
     public static final String ITEMS = "items";
     public static final String CREATOR = "creator";
+    public static final String OFFSETS_TRANSLATED_TEXT = "offsetsTranslatedText";
     
     // topics
     public static final String TOPIC_MODEL_ID = "identifier";
