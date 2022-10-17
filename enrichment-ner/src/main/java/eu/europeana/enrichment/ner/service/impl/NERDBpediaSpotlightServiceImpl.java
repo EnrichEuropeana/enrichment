@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -54,7 +55,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	@Override
 	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws Exception {
 		String response = createRequest(text);
-		if (response==null) return null;
+		if (StringUtils.isBlank(response)) return null;
 		
 		TreeMap<String, List<NamedEntityImpl>> map = readJSON(response);
 		return map;
@@ -68,8 +69,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 	 * @return						a TreeMap of named entities which are separated
 	 * 								based on their classification type
 	 */
-	private TreeMap<String, List<NamedEntityImpl>> readJSON(String jsonString){
+	private TreeMap<String, List<NamedEntityImpl>> readJSON(String jsonString) {
 		JSONObject responseJson = new JSONObject(jsonString);
+
 		//TODO: exception handling 
 		if(!responseJson.has(resourceKey))
 			return null;		
