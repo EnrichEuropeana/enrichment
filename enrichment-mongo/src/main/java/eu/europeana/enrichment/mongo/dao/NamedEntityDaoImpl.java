@@ -3,6 +3,7 @@ package eu.europeana.enrichment.mongo.dao;
 import static dev.morphia.query.experimental.filters.Filters.all;
 import static dev.morphia.query.experimental.filters.Filters.eq;
 import static dev.morphia.query.experimental.filters.Filters.in;
+import static dev.morphia.query.experimental.filters.Filters.size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,14 +95,19 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}	
 
 	@Override
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
 	    List<Filter> filters = new ArrayList<>();
 	    filters.add(eq(EntityFields.STORY_ID, storyId));
 	    if(itemId!=null) {
 	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
 	    }
 	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, type));
-	    filters.add(all(EntityFields.NER_TOOLS, nerTools));
+	    if(nerTools!=null) {
+	    	filters.add(all(EntityFields.NER_TOOLS, nerTools));
+	    	if(matchNerToolsExactly) {
+	    		filters.add(size(EntityFields.NER_TOOLS, nerTools.size()));
+	    	}
+	    }
 
 		List<PositionEntityImpl> positions = enrichmentDatastore
 			.find(PositionEntityImpl.class)

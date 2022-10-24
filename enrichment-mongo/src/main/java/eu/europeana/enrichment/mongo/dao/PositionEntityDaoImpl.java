@@ -60,5 +60,21 @@ public class PositionEntityDaoImpl {
 				.filter(filters.toArray(Filter[]::new))
 				.first();
 	}
+	
+	public List<PositionEntityImpl> getAllPositionEntities() {
+		List<PositionEntityImpl> queryResult = enrichmentDatastore.find(PositionEntityImpl.class).iterator().toList();
+		if(queryResult.size()>0)
+		{
+			List<PositionEntityImpl> tmpResult = new ArrayList<>();
+			for(int index = queryResult.size()-1; index >= 0; index--) {
+				PositionEntityImpl dbEntity = queryResult.get(index);
+				tmpResult.add(dbEntity);
+			}
+			return tmpResult;
+		}
+		else {
+			return queryResult;
+		}
+	}
 
 }

@@ -16,7 +16,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Property;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.vocabulary.EntityFields;
@@ -31,6 +35,7 @@ import eu.europeana.enrichment.model.vocabulary.EntityFields;
 	EntityFields.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId") }, options = @IndexOptions(unique = true)))
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
 	@JsonIgnore
@@ -90,7 +95,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	}
 	
 	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
-			float score, List<String> nerTools) {
+			double score, List<String> nerTools) {
 
 		idBaseUrl=idBaseUrlPar;
 		targetItemsBaseUrl=targetItemsBaseUrlPar;

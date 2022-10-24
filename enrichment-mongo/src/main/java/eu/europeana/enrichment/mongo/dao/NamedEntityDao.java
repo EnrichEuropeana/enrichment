@@ -12,7 +12,7 @@ public interface NamedEntityDao {
 	public NamedEntityImpl findNamedEntityByLabel(String label);
 	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne);
 	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type);
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type, List<String> nerTools);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly);
 
 	//public List<NamedEntityImpl> getAllNamedEntities();
 	public void saveNamedEntity(NamedEntityImpl entity);

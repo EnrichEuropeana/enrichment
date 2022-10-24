@@ -207,9 +207,9 @@ public class NERController extends BaseRest {
 				if(story.getDescriptionEn()!=null) {
 					logger.info("NER analysis for the storyId: " + story.getStoryId());
 					
-					enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+					enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
 					
-					enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+					enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
 
 				}			
 			}

@@ -115,7 +115,9 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
 	    }
 	    filters.add(eq(EntityFields.PROPERTY, property));
-	    filters.add(all(EntityFields.PROCESSING + "." + EntityFields.FOUND_BY_NER_TOOLS, nerTools));
+	    if(nerTools!=null) {
+	    	filters.add(all(EntityFields.PROCESSING + "." + EntityFields.FOUND_BY_NER_TOOLS, nerTools));
+	    }
 
 		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore
 				.find(NamedEntityAnnotationImpl.class)

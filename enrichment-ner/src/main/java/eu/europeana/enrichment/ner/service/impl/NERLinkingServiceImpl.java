@@ -1,8 +1,7 @@
 package eu.europeana.enrichment.ner.service.impl;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +38,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	PersistentNamedEntityService persistentNamedEntityService;
 
 	@Override
-	public void addLinkingInformation(NamedEntityImpl newNamedEntity, NamedEntityImpl dbNamedEntity, List<String> linkingTools, String sourceLanguage, String nerTool) throws Exception {
+	public void addLinkingInformation(NamedEntityImpl newNamedEntity, NamedEntityImpl dbNamedEntity, List<String> linkingTools, String sourceLanguage, String nerTool, boolean matchType) throws Exception {
 		// TODO: change classification and language from all to specific
 		if(linkingTools.contains(NERLinkingService.TOOL_EUROPEANA) && newNamedEntity.getEuropeanaIds()==null) {
 			/*
@@ -58,45 +57,45 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		
 		if(linkingTools.contains(NERLinkingService.TOOL_WIKIDATA)) {
 			if(dbNamedEntity==null) {
-				//fetch the wikidata ids from the wikidata search
-				Set<String> wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(newNamedEntity.getLabel());
-				newNamedEntity.setWikidataLabelAltLabelAndTypeMatchIds(wikidataLabelAltLabelAndTypeMatchIDs);
-
-				setWikidataAndDbpediaIds(newNamedEntity, nerTool);
-					
-				setPreferredWikidataIds(newNamedEntity);
+				
+				setWikidataIdsAndDbpediaWikidataIds(newNamedEntity, nerTool);
+				
+				//compute the preferred wikidata id as the main, one id
+				String preferedWikidataId = wikidataService.computePreferedWikidataId(newNamedEntity, matchType);
+				if(preferedWikidataId!=null) { 
+					newNamedEntity.setPreferedWikidataId(preferedWikidataId);
+				}
 			}
 		}
 	}
 	
-	private void setWikidataAndDbpediaIds(NamedEntityImpl ne, String nerTool) throws Exception {
+	private void setWikidataIdsAndDbpediaWikidataIds(NamedEntityImpl ne, String nerTool) throws Exception {
 		if(nerTool.equalsIgnoreCase(NERConstants.dbpediaSpotlightName)) {
 			//set the dbpedia wikidata ids
-			Set<String> dbpediaWikidataIds = new HashSet<String>();
+			List<String> dbpediaWikidataIds = new ArrayList<String>();
 			DBpediaResponse dbpediaResponse = dbpediaSpotlight.getDBpediaResponse(ne.getDBpediaId());
 			if(dbpediaResponse!=null && dbpediaResponse.getWikidataUrls()!=null) {
 				dbpediaWikidataIds.addAll(dbpediaResponse.getWikidataUrls().stream().collect(Collectors.toSet()));
 			}
-			ne.setDbpediaWikidataIds(dbpediaWikidataIds);
+			if(dbpediaWikidataIds.size()>0) {
+				ne.setDbpediaWikidataIds(dbpediaWikidataIds);
+			}
+			//in a very rare situations it can be the case that the dbpediaId exists but no dbpedia wikidata ids are found
+			else {
+				//fetch the wikidata ids from the wikidata search
+				List<String> wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(ne.getLabel());
+				if(wikidataLabelAltLabelAndTypeMatchIDs.size()>0) {
+					ne.setWikidataLabelAltLabelAndTypeMatchIds(wikidataLabelAltLabelAndTypeMatchIDs);
+				}				
+			}
+		}
+		else if(nerTool.equalsIgnoreCase(NERConstants.stanfordNer)) {
+			//fetch the wikidata ids from the wikidata search
+			List<String> wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(ne.getLabel());
+			if(wikidataLabelAltLabelAndTypeMatchIDs.size()>0) {
+				ne.setWikidataLabelAltLabelAndTypeMatchIds(wikidataLabelAltLabelAndTypeMatchIDs);
+			}
 		}
 	}
-	
-	private void setPreferredWikidataIds(NamedEntityImpl ne) {
-		if(ne.getDbpediaWikidataIds()!=null) {
-			Set<String> preferredWikidataIds=ne.getWikidataLabelAltLabelAndTypeMatchIds()
-				.stream()
-				.filter(el -> ne.getDbpediaWikidataIds().contains(el))
-				.collect(Collectors.toSet());
-			ne.setPreferredWikidataIds(preferredWikidataIds);			
-		}	
 		
-		//compute the preferred wikidata id as the main, one id
-		String preferedWikidataId = wikidataService.computePreferedWikidataId(ne);
-		if(preferedWikidataId!=null) { 
-			ne.setPreferedWikidataId(preferedWikidataId);
-		}
-
-	}
-	
-	
 }
