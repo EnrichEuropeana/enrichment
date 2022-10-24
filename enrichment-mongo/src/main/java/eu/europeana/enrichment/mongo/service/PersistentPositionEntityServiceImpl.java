@@ -31,5 +31,9 @@ public class PersistentPositionEntityServiceImpl {
 	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
 		return positionEntityDao.findPositionEntities(namedEntityId, storyId, itemId, offsetTranslatedText, fieldForNer);
 	}
+	
+	public List<PositionEntityImpl> getAllPositionEntities() {
+		return positionEntityDao.getAllPositionEntities();
+	}
 
 }

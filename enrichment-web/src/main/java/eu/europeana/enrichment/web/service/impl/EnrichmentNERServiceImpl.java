@@ -155,7 +155,8 @@ public class EnrichmentNERServiceImpl {
 						requestParam.getStoryId(),
 						requestParam.getItemId(),
 						requestParam.getProperty(),
-						requestParam.getNerTools()
+						requestParam.getNerTools(),
+						false
 				);
 
 		if(result == null || result.isEmpty()) {
@@ -239,7 +240,7 @@ public class EnrichmentNERServiceImpl {
 
 			//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 			for(String tool : tools) {
-				updatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking);
+				updatedNamedEntitiesForText(tool, textForNer, languageForNer, typeNERField, storyId, itemId, linking, true);
 			}
 	
 		}
@@ -256,7 +257,7 @@ public class EnrichmentNERServiceImpl {
 		return nerTools.size()==0;
 	}
 	
-	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking) throws Exception {
+	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
 		/*
 		 * Here for each ner tool the analysis is done separately because different tools may find
 		 * the same entities on different positions in the text and we would like to separate those results,
@@ -279,7 +280,7 @@ public class EnrichmentNERServiceImpl {
 				}
 
 				NamedEntityImpl dbEntity = persistentNamedEntityService.findExistingNamedEntity(tmpNamedEntity);
-				nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool);
+				nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool, matchType);
 				saveNamedEntityAndPositionsToDbAndSolr(tmpNamedEntity, dbEntity);
 			}	
 		}
@@ -625,8 +626,8 @@ public class EnrichmentNERServiceImpl {
 		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
 	}
 
-	public String getAnnotations(String storyId, String itemId, String property, List<String> nerTools) throws Exception {
-		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, nerTools);
+	public String getAnnotations(String storyId, String itemId, String property) throws Exception {
+		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
 		if(!entities.isEmpty())
 		{
 			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsCreator(), entities, storyId, itemId));
@@ -637,13 +638,38 @@ public class EnrichmentNERServiceImpl {
 		}
 	}
 	
-	public String createAnnotations(String storyId, String itemId, String property, List<String> nerTools) throws SolrServiceException, IOException {
-		List<NamedEntityAnnotation> namedEntityAnnos = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, nerTools);
+	public String createAnnotations(String storyId, String itemId, String property) throws SolrServiceException, IOException {
+		List<NamedEntityAnnotation> namedEntityAnnos = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
 		if(namedEntityAnnos.isEmpty()) {
 			namedEntityAnnos = new ArrayList<NamedEntityAnnotation> ();
-			List<NamedEntityImpl> namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools);
-			for(NamedEntityImpl ne : namedEntities) {
-				if(ne.getPreferedWikidataId()!=null) {
+			List<String> nerTools = new ArrayList<String>();
+			nerTools.add(NERConstants.dbpediaSpotlightName);
+			nerTools.add(NERConstants.stanfordNer);
+			//first the annos for both ner tools are created, which will also have the highest score
+			List<NamedEntityImpl> namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
+			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
+			
+			nerTools.clear();
+			nerTools.add(NERConstants.dbpediaSpotlightName);
+			//second the annos for the dbpedia ner tool are created (the ones that do not already exist for both ner tools), these annos will have the second highest score
+			namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
+			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
+			
+			nerTools.clear();
+			nerTools.add(NERConstants.stanfordNer);
+			//third the annos for the stanford ner tool are created (the ones that are not already created before), these annos will have the third highest score
+			namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
+			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
+			
+		}
+		return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId));
+	}
+	
+	private void createAnnotationsPerNerTool(List<NamedEntityImpl> namedEntities, List<NamedEntityAnnotation> annos, List<String> nerTools, String storyId, String itemId, String property) throws SolrServiceException {
+		for(NamedEntityImpl ne : namedEntities) {
+			if(ne.getPreferedWikidataId()!=null) {
+				boolean alreadyExist = annos.stream().filter(el -> el.getWikidataId().equals(ne.getPreferedWikidataId())).findFirst().isPresent();
+				if(!alreadyExist) {
 					//getting Solr WikidataEntity prefLabel
 					WikidataEntity wikiEntity = solrWikidataEntityService.getWikidataEntity(ne.getPreferedWikidataId(), ne.getType());
 					String entityPrefLabel = ne.getLabel();
@@ -655,23 +681,16 @@ public class EnrichmentNERServiceImpl {
 							entityPrefLabel = prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").get(0);
 					}
 					//computing score
-					float score;
-					if(ne.getWikidataLabelAltLabelAndTypeMatchIds()!=null && ne.getWikidataLabelAltLabelAndTypeMatchIds().contains(ne.getPreferedWikidataId()) 
-							&& ne.getDbpediaWikidataIds()!=null && ne.getDbpediaWikidataIds().contains(ne.getPreferedWikidataId())) {
-						score=1;
-					}
-					else {
-						score=2;
-					}
+					double score=computeScoreForAnnotations(nerTools,ne);
 											
 					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),storyId,itemId, ne.getPreferedWikidataId(), ne.getLabel(), entityPrefLabel, property, ne.getType(), score, nerTools); 
-					namedEntityAnnos.add(tmpNamedEntityAnnotation);					
+					annos.add(tmpNamedEntityAnnotation);					
 					//saving the entity to the db
 					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
 				}
 			}
 		}
-		return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId));
+
 	}
 
 	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
@@ -690,5 +709,22 @@ public class EnrichmentNERServiceImpl {
 			logger.debug("No valid entries found! Please use the POST method first to save the data to the database or provide a valid Wikidata identifier.");
 			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
 		}
+	}
+	
+	private double computeScoreForAnnotations(List<String> nerTools, NamedEntityImpl ne) {
+		int linkedByDbpedia=0;
+		int linkedByWikidataSearch=0;
+		if(ne.getDbpediaWikidataIds()!=null && nerTools.contains(NERConstants.stanfordNer)) {
+			linkedByDbpedia=1;
+			//if there is a dbpedia wikidata id, we assume it also exist in the wikidata search
+			linkedByWikidataSearch=1;
+		}
+		else if(ne.getDbpediaWikidataIds()!=null) {
+			linkedByDbpedia=1;
+		}
+		else {
+			linkedByWikidataSearch=1;
+		}
+		return 0.3 + 0.4*linkedByDbpedia + 0.3*linkedByWikidataSearch;
 	}
 }

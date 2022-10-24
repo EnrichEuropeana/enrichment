@@ -21,5 +21,5 @@ public interface NERLinkingService {
 	 * @return
 	 * @throws Exception
 	 */
-	void addLinkingInformation(NamedEntityImpl newNamedEntity, NamedEntityImpl dbNamedEntity, List<String> linkingTools, String sourceLanguage, String nerTool) throws Exception;
+	void addLinkingInformation(NamedEntityImpl newNamedEntity, NamedEntityImpl dbNamedEntity, List<String> linkingTools, String sourceLanguage, String nerTool, boolean matchType) throws Exception;
 }

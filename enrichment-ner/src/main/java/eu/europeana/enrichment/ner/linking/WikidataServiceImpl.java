@@ -183,7 +183,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public Set<String> getWikidataIdWithWikidataSearch(String label) {
+	public List<String> getWikidataIdWithWikidataSearch(String label) {
 		/*
 		 * the params for the direct request to the wikidata search results page, in which case
 		 * the html as output would be received. An example: https://www.wikidata.org/w/index.php?search=Festung+Semendria&title=Special:Search&profile=advanced&fulltext=1&ns0=1
@@ -342,19 +342,19 @@ public class WikidataServiceImpl implements WikidataService {
 		}
 	}
 	
-	private Set<String> processWikidataSearchHtml(String response) {
+	private List<String> processWikidataSearchHtml(String response) {
 		if(response==null || response.isBlank()) {
-			return Collections.<String>emptySet();
+			return Collections.<String>emptyList();
 		}
 		Document html = Jsoup.parse(response);
 		if(html==null) {
-			return Collections.<String>emptySet();
+			return Collections.<String>emptyList();
 		}
 		Elements searchResultsHeadings = html.body().getElementsByClass("mw-search-result-heading");
 		if(searchResultsHeadings==null) {
-			return Collections.<String>emptySet();
+			return Collections.<String>emptyList();
 		}
-		Set<String> retValue = new HashSet<String>();
+		List<String> retValue = new ArrayList<String>();
 		int numberElemToSelect = KEEP_FIRST_N_WIKIDATA_IDS;
 		for(Element el : searchResultsHeadings) {
 			Elements aTags = el.getElementsByTag("a");
@@ -908,58 +908,84 @@ public class WikidataServiceImpl implements WikidataService {
 
 	}
 	
-	public String computePreferedWikidataId(NamedEntityImpl namedEntity) { 
+	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) { 
 		List<String> savedWikidataIds=new ArrayList<String>();
 		List<String> savedWikidataJsons=new ArrayList<String>();
-		//first check the match for the pref label and type
-		if(namedEntity.getPreferredWikidataIds()!=null) {
-			for(String wikidataId : namedEntity.getPreferredWikidataIds()) {
-				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
-				if(validWikidataPage(wikidataJSONResponse) && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
-					savedWikidataIds.add(wikidataId);
-					savedWikidataJsons.add(wikidataJSONResponse);
-					if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-						return wikidataId;
-					}
-				}
-				
-			}
-		}
 		if(namedEntity.getDbpediaWikidataIds()!=null) {
+			//first check if any of the ids match the prefLabel
 			for(String wikidataId : namedEntity.getDbpediaWikidataIds()) {
 				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
-				if(validWikidataPage(wikidataJSONResponse) && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
-					savedWikidataIds.add(wikidataId);
-					savedWikidataJsons.add(wikidataJSONResponse);
-					if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-						return wikidataId;
+				if(validWikidataPage(wikidataJSONResponse)) {
+					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+					}
+					else {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+						
 					}
 				}
 			}
+			//then check if any of the ids match the altLabel
+			for(int i=0;i<savedWikidataJsons.size();i++) {
+				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					return savedWikidataIds.get(i);
+				}
+			}
+			return getTheLowestWikidataId(namedEntity.getDbpediaWikidataIds());
 		}		
-		if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
+		else if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
+			//first check if any of the ids match the prefLabel
 			for(String wikidataId : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
 				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
-				if(validWikidataPage(wikidataJSONResponse) && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
-					savedWikidataIds.add(wikidataId);
-					savedWikidataJsons.add(wikidataJSONResponse);
-					if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-						return wikidataId;
+				if(validWikidataPage(wikidataJSONResponse)) {
+					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+					}
+					else {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
 					}
 				}
 			}
-		}	
-		
-		//second check the match for the alt label and type
-		for(int i=0;i<savedWikidataJsons.size();i++) {
-			if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
-				return savedWikidataIds.get(i);
+			//then check if any of the ids match the altLabel
+			for(int i=0;i<savedWikidataJsons.size();i++) {
+				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					return savedWikidataIds.get(i);
+				}
 			}
 		}
-		
+
 		return null;
 	}
 
+	private String getTheLowestWikidataId(List<String> wikidataIds) {
+		if(wikidataIds.size()==0) {
+			return null;
+		}
+		int lowestQId=Integer.valueOf(wikidataIds.get(0).substring(wikidataIds.get(0).lastIndexOf("/") + 2).trim());
+		for(String id : wikidataIds) {
+			int wikidataIdInt = Integer.valueOf(id.substring(id.lastIndexOf("/") + 2).trim());
+			if(wikidataIdInt<lowestQId) {
+				lowestQId=wikidataIdInt;
+			}
+		}
+		return EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + "Q" + lowestQId;
+	}
 	
 	private Set<String> readWikidataSubclasses(String path) throws IOException {
 		Set<String> wikidataIdentifiers = new HashSet<String>();

@@ -1,6 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.Set;
+import java.util.List;
 
 import org.bson.types.ObjectId;
 
@@ -25,10 +25,9 @@ public class Keyword {
 	
 	private KeywordPosition keywordPosition;
 	
-	private Set<String> wikidataLabelAltLabelMatchIds;
+	private List<String> wikidataLabelAltLabelMatchIds;
 	private String dbpediaId;
-	private Set<String> dbpediaWikidataIds;
-	private Set<String> preferredWikidataIds;
+	private List<String> dbpediaWikidataIds;
 
 	//id will be used for storing MongoDB _id
 	@Id
@@ -121,11 +120,11 @@ public class Keyword {
 		this.keywordPosition = keywordPosition;
 	}
 
-	public Set<String> getWikidataLabelAltLabelMatchIds() {
+	public List<String> getWikidataLabelAltLabelMatchIds() {
 		return wikidataLabelAltLabelMatchIds;
 	}
 
-	public void setWikidataLabelAltLabelMatchIds(Set<String> wikidataLabelAltLabelMatchIds) {
+	public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
 		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
 	}
 
@@ -137,22 +136,14 @@ public class Keyword {
 		this.dbpediaId = dbpediaId;
 	}
 
-	public Set<String> getDbpediaWikidataIds() {
+	public List<String> getDbpediaWikidataIds() {
 		return dbpediaWikidataIds;
 	}
 
-	public void setDbpediaWikidataIds(Set<String> dbpediaWikidataIds) {
+	public void setDbpediaWikidataIds(List<String> dbpediaWikidataIds) {
 		this.dbpediaWikidataIds = dbpediaWikidataIds;
 	}
 
-	public Set<String> getPreferredWikidataIds() {
-		return preferredWikidataIds;
-	}
-
-	public void setPreferredWikidataIds(Set<String> preferredWikidataIds) {
-		this.preferredWikidataIds = preferredWikidataIds;
-	}
-	
 	public String getTypeFoundByNER() {
 		return typeFoundByNER;
 	}

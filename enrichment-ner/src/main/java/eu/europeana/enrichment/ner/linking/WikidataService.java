@@ -2,7 +2,6 @@ package eu.europeana.enrichment.ner.linking;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
@@ -129,7 +128,7 @@ public interface WikidataService {
 
 	boolean validWikidataPage(String wikidataJSONResponse);
 
-	Set<String> getWikidataIdWithWikidataSearch(String label);
+	List<String> getWikidataIdWithWikidataSearch(String label);
 	
-	String computePreferedWikidataId(NamedEntityImpl namedEntity);
+	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType);
 }
