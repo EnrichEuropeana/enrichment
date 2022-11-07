@@ -6,7 +6,7 @@ import java.util.TreeMap;
 
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 
 public interface SolrEntityPositionsService {
@@ -20,10 +20,10 @@ public interface SolrEntityPositionsService {
 		 * @param offsetTranslatedText
 		 * @param rangeToObserve
 		 * @return
-		 * @throws SolrNamedEntityServiceException
+		 * @throws SolrServiceException
 		 * @throws Exception 
 		 */
-		 public int findTermPositionsInStory(String term, int startAfterOffset,int offsetTranslatedText, int rangeToObserve) throws SolrNamedEntityServiceException, Exception;
+		 public int findTermPositionsInStory(String term, int startAfterOffset,int offsetTranslatedText, int rangeToObserve) throws SolrServiceException, Exception;
 
 		/**
 		 * This function implements finding the positions of the identified entities (using the given NER tool) 
@@ -34,10 +34,10 @@ public interface SolrEntityPositionsService {
 		 * @param targetLanguage
 		 * @param translatedText
 		 * @param identifiedNER
-		 * @throws SolrNamedEntityServiceException
+		 * @throws SolrServiceException
 		 * @throws Exception
 		 */
-		 public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws SolrNamedEntityServiceException, Exception;
+		 public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws SolrServiceException, Exception;
 
 
 }

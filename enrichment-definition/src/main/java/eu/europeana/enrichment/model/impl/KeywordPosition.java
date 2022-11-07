@@ -5,7 +5,7 @@ import java.util.List;
 import dev.morphia.annotations.Embedded;
 
 @Embedded
-public class KeywordNamedEntityNew {
+public class KeywordPosition {
 	private List<Integer> offsetsTranslatedText;
 	private List<String> nerTools;	
 	public List<Integer> getOffsetsTranslatedText() {

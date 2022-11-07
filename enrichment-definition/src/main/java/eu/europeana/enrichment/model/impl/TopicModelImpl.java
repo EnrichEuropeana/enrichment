@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.TopicModel;
-import eu.europeana.enrichment.model.vocabulary.TopicConst;
 
 
 //@Entity(value="TopicModelImpl")

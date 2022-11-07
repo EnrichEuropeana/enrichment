@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 
-@Entity(value="Keyword")
+@Entity(value="keyword")
 public class Keyword {
 
 	private String propertyId;
@@ -15,22 +15,26 @@ public class Keyword {
 	private String value;
 	private String translatedValue;
 	private String detectedOriginalLanguage;
-	
+	private String typeFoundByNER;
+
 	private String preferredWikidataId;
 	private KeywordWikidataEntity prefferedWikidataEntity;
 	
 	private String approvedWikidataId;
 	private KeywordWikidataEntity approvedWikidataEntity;
 	
-	private KeywordNamedEntityNew keywordNamedEntity;
+	private KeywordPosition keywordPosition;
 	
-	private List<String> wikidataPossibleMatchIds;
+	private List<String> wikidataLabelAltLabelMatchIds;
+	private List<String> dbpediaIds;
+	private List<String> dbpediaWikidataIds;
+	private List<String> preferredWikidataIds;
 
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id = new ObjectId().toString();
+    private ObjectId _id;
 	
-	public String get_id() {
+	public ObjectId get_id() {
 		return _id;
 	}
 		
@@ -109,20 +113,52 @@ public class Keyword {
 		this.approvedWikidataEntity = approvedWikidataEntity;
 	}
 
-	public KeywordNamedEntityNew getKeywordNamedEntity() {
-		return keywordNamedEntity;
+	public KeywordPosition getKeywordPosition() {
+		return keywordPosition;
 	}
 
-	public void setKeywordNamedEntity(KeywordNamedEntityNew keywordNamedEntity) {
-		this.keywordNamedEntity = keywordNamedEntity;
+	public void setKeywordPosition(KeywordPosition keywordPosition) {
+		this.keywordPosition = keywordPosition;
 	}
 
-	public List<String> getWikidataPossibleMatchIds() {
-		return wikidataPossibleMatchIds;
+	public List<String> getWikidataLabelAltLabelMatchIds() {
+		return wikidataLabelAltLabelMatchIds;
 	}
 
-	public void setWikidataPossibleMatchIds(List<String> wikidataPossibleMatchIds) {
-		this.wikidataPossibleMatchIds = wikidataPossibleMatchIds;
+	public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
+		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
+	}
+
+	public List<String> getDbpediaIds() {
+		return dbpediaIds;
+	}
+
+	public void setDbpediaIds(List<String> dbpediaIds) {
+		this.dbpediaIds = dbpediaIds;
+	}
+
+	public List<String> getDbpediaWikidataIds() {
+		return dbpediaWikidataIds;
+	}
+
+	public void setDbpediaWikidataIds(List<String> dbpediaWikidataIds) {
+		this.dbpediaWikidataIds = dbpediaWikidataIds;
+	}
+
+	public List<String> getPreferredWikidataIds() {
+		return preferredWikidataIds;
+	}
+
+	public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
+		this.preferredWikidataIds = preferredWikidataIds;
+	}
+	
+	public String getTypeFoundByNER() {
+		return typeFoundByNER;
+	}
+
+	public void setTypeFoundByNER(String typeFoundByNER) {
+		this.typeFoundByNER = typeFoundByNER;
 	}
 
 }

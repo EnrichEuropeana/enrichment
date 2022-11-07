@@ -20,7 +20,7 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -55,7 +55,7 @@ public class NERController extends BaseRest {
 	 * @return											a list of named entities converted to a json format
 	 * @throws Exception
 	 * @throws HttpException
-	 * @throws SolrNamedEntityServiceException
+	 * @throws SolrServiceException
 	 */
 	@ApiOperation(value = "Get named entities for a story", nickname = "getNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
@@ -70,14 +70,13 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original) throws Exception, HttpException, SolrServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
@@ -103,14 +102,13 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools
 			//@RequestParam(value = "original", required = true) Boolean original
-			) throws Exception, HttpException, SolrNamedEntityServiceException {
+			) throws Exception, HttpException, SolrServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
 			EnrichmentNERRequest body = new EnrichmentNERRequest();
 			body.setStoryId(storyId);
-			body.setItemId("all");
 			body.setTranslationTool(translationTool);
 			body.setProperty(property);
 			body.setLinking(Arrays.asList(linking.split(",")));
@@ -141,7 +139,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original) throws Exception, HttpException, SolrServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -174,7 +172,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools
 			//@RequestParam(value = "original", required = true) Boolean original
-			) throws Exception, HttpException, SolrNamedEntityServiceException {
+			) throws Exception, HttpException, SolrServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -195,10 +193,10 @@ public class NERController extends BaseRest {
 		
 	}	
 	
-	@ApiOperation(value = "Compute named entities for all stories")
+	@ApiOperation(value = "Compute named entities for all stories descriptions")
 	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesAllStories(
-			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrServiceException {
 	
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -209,11 +207,11 @@ public class NERController extends BaseRest {
 				if(story.getDescriptionEn()!=null) {
 					logger.info("NER analysis for the storyId: " + story.getStoryId());
 					
-					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);
+					List<NamedEntityImpl> tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
+					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);
 					
-					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), "all", Arrays.asList(linking_local.split(",")));
-					enrichmentNerService.updateNamedEntitiesDbAndSolr(tmpResult);				
+					tmpResult = enrichmentNerService.getUpdatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(linking_local.split(",")));
+					enrichmentNerService.updateNamedEntitiesAndPositionsInDbAndSolr(tmpResult);				
 
 				}			
 			}

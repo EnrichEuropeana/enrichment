@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.common.commons.SolrUtils;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
@@ -17,6 +17,10 @@ import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 
 public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
+	public SolrTopicEntityImpl() {
+		super();
+	}
+
 	@Field(TopicSolrFields.TERMS)
 	private List<String> solrTerms;
 	
@@ -71,7 +75,7 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	public void setDescriptions(Map<String,String> descr) {
 		if (MapUtils.isNotEmpty(descr)) {
 			super.setDescriptions(new HashMap<>(
-				SolrUtils.normalizeStringMapByAddingPrefix(
+				HelperFunctions.normalizeStringMapByAddingPrefix(
 						TopicSolrFields.DESCRIPTION + EntitySolrFields.DYNAMIC_FIELD_SEPARATOR,
 						descr)));
 	    }

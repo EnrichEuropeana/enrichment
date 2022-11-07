@@ -16,11 +16,11 @@ import com.google.gson.Gson;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 @Component(EnrichmentConstants.BEAN_ENRICHMENT_JAVA_JSON_PARSER)
-public class JavaJSONParser {
+public class JavaGsonJSONParser {
 
 	private Gson gson; 
 	
-	public JavaJSONParser () {
+	public JavaGsonJSONParser () {
 		gson = new Gson(); 
 	}
 	

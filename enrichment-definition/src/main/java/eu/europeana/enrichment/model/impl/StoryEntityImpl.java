@@ -34,10 +34,10 @@ public class StoryEntityImpl implements StoryEntity {
 	private int itemCount;
 
 	@Id
-    private String _id = new ObjectId().toString();
+    private ObjectId _id;
 	
 	@Override
-	public String getId() {
+	public ObjectId getId() {
 		return _id;
 	}
 	

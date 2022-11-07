@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -33,7 +33,7 @@ public class SolrEntityPositionsServiceTest {
 	private final Logger log = LogManager.getLogger(getClass());
 	
 	@Test
-	public void test() throws SolrNamedEntityServiceException {
+	public void test() throws SolrServiceException {
 		
 		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");
 		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("1495");

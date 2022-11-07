@@ -13,11 +13,11 @@ public interface PersistentNamedEntityService {
 	 * @param label						label of the named entity
 	 * @return							a database named entity 
 	 */
-	public NamedEntityImpl findNamedEntity(String label);
+	public NamedEntityImpl findNamedEntityByLabel(String label);
 	
-	public NamedEntityImpl findNamedEntity(String label, String type);
+	public NamedEntityImpl findNamedEntityByLabelAndType(String label, String type);
 	
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type);
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools);
 
 	/*
 	 * This method retrieves all named entities from the Mongo database
@@ -47,8 +47,6 @@ public interface PersistentNamedEntityService {
 	 */
 	public void deleteAllNamedEntities ();
 	
-	public void deletePositionEntitiesFromNamedEntity(String storyId,String itemId, String fieldUsedForNER);
-	List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type,
-			List<String> nerTools);
+	public void deletePositionEntitiesAndNamedEntity(String storyId,String itemId, String fieldUsedForNER);
 
 }
