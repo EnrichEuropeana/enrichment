@@ -2,6 +2,15 @@ package eu.europeana.enrichment.model;
 
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.model.impl.Processing;
+import eu.europeana.enrichment.model.impl.SpecificResource;
+
+@JsonSerialize(as=NamedEntityAnnotationImpl.class)
 public interface NamedEntityAnnotation {
 	
 	/**
@@ -18,17 +27,7 @@ public interface NamedEntityAnnotation {
 	 * this is the id that is unique for each object in the db
 	 * @return
 	 */
-	String getId();
-	/**
-	 * Getting source which is a wikidataId 
-	 * @return
-	 */
-	String getSource ();
-	/**
-	 * Setting source which is a wikidataId
-	 * @param source
-	 */
-	void setSource (String source);
+	ObjectId getId();
 	
 	/**
 	 * Getting property (can be description, transcription, or summary) 
@@ -40,21 +39,20 @@ public interface NamedEntityAnnotation {
 	 * @param property
 	 */
 	void setProperty (String property);
-
 	
 	/**
 	 * Getting target which is a "source" field 
 	 * in the corresponding story entity 
 	 * @return
 	 */
-	String getTarget ();
+	SpecificResource getTarget ();
 	
 	/**
 	 * Setting target which is a "source" field 
 	 * in the corresponding story entity  
 	 * @param target
 	 */
-	void setTarget (String target);
+	void setTarget (SpecificResource target);
  
 	String getType ();
 	void setType (String typeParam);
@@ -78,5 +76,9 @@ public interface NamedEntityAnnotation {
 	String getEntityType();
 
 	void setEntityType(String type);
+	
+	Processing getProcessing();
+
+	void setProcessing(Processing processing);
 
 }

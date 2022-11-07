@@ -104,8 +104,20 @@ public class EnrichmentConfiguration  {
     
 	@Value("${transcribathon.base.url.items}")
     private String transcribathonBaseUrlItems;
+
+	@Value("${enrich.annotations.id.base.url}")
+    private String annotationsIdBaseUrl;
+
+	@Value("${enrich.annotations.target.items.base.url}")
+    private String annotationsTargetItemsBaseUrl;
+
+	@Value("${enrich.annotations.target.stories.base.url}")
+    private String annotationsTargetStoriesBaseUrl;
+	
+	@Value("${enrich.annotations.creator}")
+    private String annotationsCreator;	
     
-  	public EnrichmentConfiguration() {
+	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
 
@@ -239,5 +251,21 @@ public class EnrichmentConfiguration  {
 
 	public void setTranslationDeeplFreeAuthenticationKey(String translationDeeplFreeAuthenticationKey) {
 		this.translationDeeplFreeAuthenticationKey = translationDeeplFreeAuthenticationKey;
+	}
+	
+	public String getAnnotationsIdBaseUrl() {
+		return annotationsIdBaseUrl;
+	}
+
+	public String getAnnotationsTargetItemsBaseUrl() {
+		return annotationsTargetItemsBaseUrl;
+	}
+
+	public String getAnnotationsTargetStoriesBaseUrl() {
+		return annotationsTargetStoriesBaseUrl;
+	}
+	
+  	public String getAnnotationsCreator() {
+		return annotationsCreator;
 	}
 }

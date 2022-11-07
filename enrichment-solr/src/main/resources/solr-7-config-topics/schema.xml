@@ -481,7 +481,7 @@
   </fieldType>
   <!-- FIELDS -->
   <field name="_version_" type="plong" indexed="false" stored="false"/>
-  <dynamicField name="description.*" type="string" multiValued="true" indexed="false" required="false" stored="true"/>
+  <dynamicField name="description.*" type="string" multiValued="false" indexed="false" required="false" stored="true"/>
   <field name="identifier" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="keywords" type="string" multiValued="true" indexed="true" required="true" stored="true"/>
   <field name="labels" type="string" multiValued="true" indexed="true" required="true" stored="true"/>

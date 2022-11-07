@@ -1,9 +1,11 @@
 package eu.europeana.enrichment.model.impl;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
 import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
+import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bson.types.ObjectId;
@@ -15,62 +17,70 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Property;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
+import eu.europeana.enrichment.model.vocabulary.EntityFields;
 
 @Entity(value="NamedEntityAnnotationImpl")
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD,
-	"id", 
-	"type", 
-	"motivation",
-	"body",
-	"target"
+	EntityFields.ID, 
+	EntityFields.TYPE, 
+	EntityFields.MOTIVATION,
+	EntityFields.BODY,
+	EntityFields.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
-	private final String idBase = "http://dsi-demo.ait.ac.at/enrichment-web/enrichment/annotation/";
-	private final String targetBaseItems = "https://europeana.transcribathon.eu/documents/story/item/?";
-	private final String targetBaseStories = "https://europeana.transcribathon.eu/documents/story/?";
+	@JsonIgnore
+	private static String idBaseUrl;
+	@JsonIgnore
+	private static String targetItemsBaseUrl;
 	
 	private String annoId;
-	private String source;
-	private String target;
+	private SpecificResource target;
 	private String type;
 	private String motivation;
+		
+	@Property(EntityFields.PROPERTY)
 	private String property;
-	private String entityType;
 	
+	private String entityType;	
 	private Map<String,Object> body;
-
+	
+	@Property(EntityFields.WIKIDATA_ID)
 	private String wikidataId;
+	
+	@Property(EntityFields.STORY_ID)
 	private String storyId;
+	
+	@Property(EntityFields.ITEM_ID)
 	private String itemId;
 	
+	@Property(EntityFields.PROCESSING)
+	private Processing processing;
+
 	//id will be used for storing MongoDB _id
 	@Id
-    public String _id = new ObjectId().toString();
-
-	@Override
 	@JsonIgnore
-	public String getId() {
+    private ObjectId _id;
+
+	@JsonIgnore
+	public ObjectId getId() {
 		return _id;
 	}
 	
-	@Override
 	@JsonIgnore
 	public String getWikidataId() {
 		return wikidataId;
 	}
 
-	
-	@Override
 	@JsonIgnore
 	public String getStoryId() {
 		return storyId;
 	}
 	
-	@Override
 	@JsonIgnore
 	public String getItemId() {
 		return itemId;
@@ -79,69 +89,24 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public NamedEntityAnnotationImpl () {
 	}
 	
-	public NamedEntityAnnotationImpl (NamedEntityAnnotation entity) {
-		this.source = entity.getWikidataId();
-		if(!entity.getItemId().equalsIgnoreCase("all"))
+	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
+			float score, List<String> nerTools) {
+
+		idBaseUrl=idBaseUrlPar;
+		targetItemsBaseUrl=targetItemsBaseUrlPar;
+		target = new SpecificResource();
+		if(itemId!=null)
 		{
-			this.target = targetBaseItems + "story="+entity.getStoryId()+"&item="+entity.getItemId();
+			target.setId("story="+storyId+"&item="+itemId);	
+			target.setSource(target.getId() + "#" + prop);
+			this.itemId = itemId;
+			this.annoId = storyId + "/" + itemId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
 		}
 		else
 		{
-			this.target = targetBaseStories + "story="+entity.getStoryId();
-		}
-		this.annoId = entity.getAnnoId();
-		this.type = "Annotation";
-		this.motivation = "tagging";
-		if(entity.getWikidataId()!=null) {
-			this.body = new HashMap<String, Object> ();
-			this.body.put("id", entity.getWikidataId());
-		}
-		if(entity.getEntityType()!=null) {
-			if(this.body==null) this.body = new HashMap<String, Object> ();
-			this.body.put("type", entity.getEntityType());
-		}
-		if(entity.getBody()!=null && entity.getBody().get("hiddenLabel")!=null) {
-			Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
-			Map<String,String> bodyHiddenLableOld = (Map<String, String>) entity.getBody().get("hiddenLabel");
-			bodyHiddenLabel.put("en",bodyHiddenLableOld.get("en"));
-			if(this.body==null) this.body = new HashMap<String, Object> ();
-			this.body.put("hiddenLabel", bodyHiddenLabel);
-		}
-		
-		if(entity.getBody()!=null && entity.getBody().get("prefLabel")!=null) {
-			Map<String,String> bodyPrefLabel = new HashMap<String, String>();
-			Map<String,String> bodyPrefLableOld = (Map<String,String>)entity.getBody().get("prefLabel");
-			bodyPrefLabel.put("en",bodyPrefLableOld.get("en"));
-			if(this.body==null) this.body = new HashMap<String, Object> ();
-			this.body.put("prefLabel", bodyPrefLabel);
-		}
-		
-		this.wikidataId = entity.getWikidataId();
-		this.storyId = entity.getStoryId();
-		this.itemId = entity.getItemId();
-		this.property = entity.getProperty();
-		this.entityType = entity.getEntityType();
-
-	}
-
-	public NamedEntityAnnotationImpl (String storyId, String itemId, String wikidataId, String storyOrItemSource, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam) {
-
-		this.source = wikidataId;
-		if(!itemId.equalsIgnoreCase("all"))
-		{
-			this.target = targetBaseItems + "story="+storyId+"&item="+itemId;	
-		}
-		else
-		{
-			this.target = targetBaseStories + "story="+storyId;
-		}
-		if(itemId.compareTo("all")==0)
-		{
-			this.annoId = idBase + storyId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
-		}
-		else
-		{
-			this.annoId = idBase + storyId + "/" + itemId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
+			target.setId("story="+storyId);
+			target.setSource(target.getId() + "#" + prop);
+			this.annoId = storyId + "/" + wikidataId.substring(wikidataId.lastIndexOf("/")+1);
 		}
 		this.type = "Annotation";
 		this.motivation = "tagging";
@@ -164,86 +129,74 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
 		bodyHiddenLabel.put("en", entityHiddenLabel);
 		this.body.put("hiddenLabel", bodyHiddenLabel);
-
 		
 		this.wikidataId = wikidataId;
-		this.storyId = storyId;
-		this.itemId = itemId;
+		this.storyId = storyId;		
 		this.property = prop;
+		
+		Processing processing = new Processing();
+		processing.setScore(score);
+		processing.setFoundByNerTools(new ArrayList<String>(nerTools));
+		this.processing=processing;
 	}
 
-	@Override
+	@JsonProperty(EntityFields.TARGET)
+	public SpecificResource getTargetSerialization() {
+		SpecificResource newTarget = new SpecificResource();
+		newTarget.setId(targetItemsBaseUrl + target.getId());
+		newTarget.setSource(targetItemsBaseUrl + target.getSource());
+		return newTarget;
+	}
+
 	@JsonIgnore
-	public String getSource() {
-		return source;
-	}
-
-	@Override
-	public void setSource(String sourceParam) {
-		source = sourceParam;	
-	}
-
-	@Override
-	@JsonProperty("target")
-	public String getTarget() {
+	public SpecificResource getTarget() {
 		return target;
 	}
-
-	@Override
-	public void setTarget(String targetParam) {
+	
+	public void setTarget(SpecificResource targetParam) {
 		target = targetParam;
-		
 	}
 
-	@Override
-	@JsonProperty("id")
-	public String getAnnoId() {
-		
+	@JsonProperty(EntityFields.ID)
+	public String getAnnoIdSerialization() {		
+		return idBaseUrl + annoId;
+	}
+
+	@JsonIgnore
+	public String getAnnoId() {		
 		return annoId;
 	}
-
-	@Override
+	
 	public void setAnnoId(String idParam) {
 		annoId = idParam; 
 		
 	}
 
-	@Override
-	@JsonProperty("type")
-	public String getType() {
-		
+	@JsonProperty(EntityFields.TYPE)
+	public String getType() {	
 		return type;
 	}
 
-	@Override
 	public void setType(String typeParam) {
-		type = typeParam;
-		
+		type = typeParam;		
 	}
 
-	@Override
-	@JsonProperty("motivation")
+	@JsonProperty(EntityFields.MOTIVATION)
 	public String getMotivation() {
 		return motivation;
 	}
 
-	@Override
 	public void setMotivation(String motivationParam) {
 		motivation = motivationParam;
-		
 	}
 
-	@Override
-	@JsonProperty("body")
-	public Map<String,Object> getBody() {
-		
+	@JsonProperty(EntityFields.BODY)
+	public Map<String,Object> getBody() {	
 		return body;
 	}
 
-	@Override
 	public void setBody(Map<String,Object> bodyParam) {
-		body = bodyParam;
-		
+		body = bodyParam;		
 	}
 	
 	// Overriding equals() to compare two NamedEntityAnnotation objects 
@@ -281,24 +234,20 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
     }
 
 
-	@Override
 	@JsonIgnore
 	public String getProperty() {
 		return property;
 	}
 
-	@Override
 	public void setProperty(String prop) {
 		this.property = prop;
 	}
-	
-	@Override
+
 	@JsonIgnore
 	public String getEntityType() {
 		return entityType;
 	}
 
-	@Override
 	public void setEntityType(String type) {
 		this.entityType = type;
 	}
@@ -307,6 +256,13 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public String getContext() {
 		return ANNOTATION_CONTEXT;
 	}
+	
+	@JsonProperty(EntityFields.PROCESSING)
+	public Processing getProcessing() {
+		return processing;
+	}
 
-
+	public void setProcessing(Processing processing) {
+		this.processing = processing;
+	}
 }

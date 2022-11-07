@@ -7,13 +7,16 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_DAO= "namedEntityDao";
+    public static final String BEAN_ENRICHMENT_POSITION_ENTITY_DAO= "positionEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_NAMED_ENTITY_DAO= "keywordNamedEntityDao";
     public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
     public static final String BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO= "translationEntityDao";
+    public static final String BEAN_ENRICHMENT_RECORD_TRANSLATION_DAO= "recordTranslationDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_SERVICE= "persistentNamedEntityService";
+    public static final String BEAN_ENRICHMENT_PERSISTENT_POSITION_ENTITY_SERVICE= "persistentPositionEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_NAMED_ENTITY_SERVICE= "persistentKeywordNamedEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_KEYWORD_SERVICE= "persistentKeywordService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE= "persistentStoryEntityService";
@@ -26,12 +29,14 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE= "solrBaseClientService";
     public static final String BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE= "solrEntityPositionsService";
     public static final String BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE= "solrWikidataEntityService";
+    public static final String BEAN_ENRICHMENT_SOLR_TOPIC_SERVICE= "solrTopicService";
     public static final String BEAN_ENRICHMENT_E_TRANSLATION_EUROPA_SERVICE= "eTranslationService";
     public static final String BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN= "nerStanfordServiceOrigin";
     public static final String BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE= "googleTranslationService";
     public static final String BEAN_ENRICHMENT_NER_SERVICE= "enrichmentNerService";
     public static final String BEAN_ENRICHMENT_UI_SERVICE= "enrichmentUIService";
     public static final String BEAN_ENRICHMENT_TRANSLATION_SERVICE= "enrichmentTranslationService";
+    public static final String BEAN_RECORD_TRANSLATION_SERVICE= "recordTranslationService";
     public static final String BEAN_ENRICHMENT_DATASTORE= "enrichmentDatastore";
     public static final String BEAN_ENRICHMENT_JACKSON_SERIALIZER= "jacksonSerializer";
     public static final String BEAN_ENRICHMENT_JAVA_JSON_PARSER= "javaJSONParser";
@@ -83,6 +88,5 @@ public class EnrichmentConstants {
 	public static final String LOGO_JSONPROP = "claims.P154.mainsnak.datavalue.value";
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
-
 }
 

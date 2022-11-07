@@ -21,7 +21,7 @@ import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.ner.linking.WikidataService;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -55,7 +55,7 @@ public class WikidataController extends BaseRest {
      * @return
      * @throws Exception
      * @throws HttpException
-     * @throws SolrNamedEntityServiceException
+     * @throws SolrServiceException
      */
 	
 	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
@@ -64,7 +64,7 @@ public class WikidataController extends BaseRest {
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "wikidataId", required = true) String wikidataId,
-			@RequestParam(value = "type", required = true) String type) throws Exception, HttpException, SolrNamedEntityServiceException {
+			@RequestParam(value = "type", required = true) String type) throws Exception, HttpException, SolrServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -95,7 +95,7 @@ public class WikidataController extends BaseRest {
 	 * @return
 	 * @throws Exception
 	 * @throws HttpException
-	 * @throws SolrNamedEntityServiceException
+	 * @throws SolrServiceException
 	 */
 	
 	@ApiOperation(value = "Get named entities from Solr", nickname = "getNamedEntitiesFromSolr", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
@@ -112,7 +112,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page
-			) throws Exception, HttpException, SolrNamedEntityServiceException {
+			) throws Exception, HttpException, SolrServiceException {
 		
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
@@ -140,7 +140,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page
-			) throws Exception, HttpException, SolrNamedEntityServiceException {
+			) throws Exception, HttpException, SolrServiceException {
 		
 
 			// Check client access (a valid “wskey” must be provided)

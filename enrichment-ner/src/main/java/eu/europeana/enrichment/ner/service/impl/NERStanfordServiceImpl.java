@@ -44,7 +44,7 @@ public class NERStanfordServiceImpl implements NERService{
 	}
 		
 	@Override
-	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws IOException {
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws Exception {
 		TreeMap<String, List<NamedEntityImpl>> result = null;
 		String serializedRequest = null;
 		try {
@@ -72,7 +72,7 @@ public class NERStanfordServiceImpl implements NERService{
 		return result;
 	}
 	
-	private String createRequest(String requestJson) {
+	private String createRequest(String requestJson) throws Exception {
 		try {
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			HttpPost request = new HttpPost(endpoint);
@@ -84,7 +84,7 @@ public class NERStanfordServiceImpl implements NERService{
 
 		} catch (Exception ex) {
 			System.err.println(ex.getMessage());
-			return null;
+			throw ex;
 		}
 	}
 

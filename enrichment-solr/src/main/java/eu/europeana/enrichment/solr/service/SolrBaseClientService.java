@@ -8,7 +8,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.solr.exception.SolrNamedEntityServiceException;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 public interface SolrBaseClientService {
 	
@@ -21,9 +21,9 @@ public interface SolrBaseClientService {
 	 * @param solrCollection
 	 * @param query
 	 * @return
-	 * @throws SolrNamedEntityServiceException
+	 * @throws SolrServiceException
 	 */
-	public QueryResponse query (String solrCollection, SolrQuery query) throws SolrNamedEntityServiceException ;
+	public QueryResponse query (String solrCollection, SolrQuery query) throws SolrServiceException ;
 	
 	/**
 	 * This method stores an object to Solr.
@@ -31,27 +31,27 @@ public interface SolrBaseClientService {
 	 * @param solrObject
 	 * @param doCommit
 	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException
+	 * @throws SolrServiceException
 	 */
 
-	public void store(String solrCollection, Object solrObject, boolean doCommit) throws SolrNamedEntityServiceException ;
+	public void store(String solrCollection, Object solrObject, boolean doCommit) throws SolrServiceException ;
 
 	/**
 	 * This method searches for a term in Solr.
 	 * @param term
 	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
+	 * @throws SolrServiceException 
 	 */
 	
-	public void search (String solrCollection, String term) throws SolrNamedEntityServiceException ;
+	public void search (String solrCollection, String term) throws SolrServiceException ;
 	
 	/**
 	 * This method deletes an object or more objects from Solr based on the fields in the query.
 	 * @param query
 	 * @param solrCollection
-	 * @throws SolrNamedEntityServiceException 
+	 * @throws SolrServiceException 
 	 */
-	public void deleteByQuery(String solrCollection, String query) throws SolrNamedEntityServiceException;
+	public void deleteByQuery(String solrCollection, String query) throws SolrServiceException;
 	
 	/**
 	 * This method retrieves the list of positions of the given entity
@@ -59,16 +59,16 @@ public interface SolrBaseClientService {
 	 * @param entityName
 	 * @param solrCollection
 	 * @return
-	 * @throws SolrNamedEntityServiceException 
+	 * @throws SolrServiceException 
 	 */
-	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrNamedEntityServiceException;
+	public List<Integer> searchByEntityName(String solrCollection, String entityName) throws SolrServiceException;
 	
 	/**
 	 * This method deletes an object from Solr based on its unique key
 	 * @param solrCollection
 	 * @param id
-	 * @throws SolrNamedEntityServiceException
+	 * @throws SolrServiceException
 	 */
-	public void deleteById(String solrCollection, String id) throws SolrNamedEntityServiceException;
+	public void deleteById(String solrCollection, String id) throws SolrServiceException;
 
 }

@@ -57,7 +57,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				europeana = true;
 		}
 
-		NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findNamedEntity(namedEntity.getLabel(), namedEntity.getType());
+		NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findNamedEntityByLabelAndType(namedEntity.getLabel(), namedEntity.getType());
 		
 		// TODO: change classification and language from all to specific
 		if(europeana && namedEntity.getEuropeanaIds()==null) {
@@ -118,7 +118,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				
 				wikidataLabelAltLabelMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(namedEntity.getLabel());
 				if(wikidataLabelAltLabelMatchIDs!=null)
-				namedEntity.setWikidataLabelAltLabelMatchIds(wikidataLabelAltLabelMatchIDs);
+					namedEntity.setWikidataLabelAltLabelMatchIds(wikidataLabelAltLabelMatchIDs);
 			}
 			
 			//populate the dbpediaWikidataIds

@@ -29,9 +29,9 @@ public interface NERService {
 	 * @param text					translated text in English
 	 * @return 						a TreeMap based on the classification type
 	 * 								including all named entities findings 
-	 * @throws IOException 
+	 * @throws Exception 
 	 * @throws NERAnnotateException	
 	 */
-	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws IOException;
+	public TreeMap<String, List<NamedEntityImpl>> identifyNER(String text) throws Exception;
 
 }
