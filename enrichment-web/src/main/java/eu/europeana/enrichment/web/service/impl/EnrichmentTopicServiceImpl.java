@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -104,19 +105,11 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 
 	@Override
 	public String searchTopics(String query, String fq, String fl, String facets, String sort, int page, int pageSize) throws SolrServiceException {
-		List<TopicImpl> topics = solrTopicService.searchTopics(query, fq, fl, facets, sort, page, pageSize);
-		if(topics==null) {
+		String topics = solrTopicService.searchTopics(query, fq, fl, facets, sort, page, pageSize);
+		if(StringUtils.isBlank(topics)) {
 			return "[]";
 		}
-		String serializedJsonLdStr=null;
-    	try {
-    		serializedJsonLdStr = jsonLdSerializer.serializeObject(topics);
-		} catch (IOException e) {
-			throw new SolrServiceException("Exception during the json serialization of the solr topics.", e);
-		}
-    	
-    	return serializedJsonLdStr;
-
+		return topics;
 	}
 
 }

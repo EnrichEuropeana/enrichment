@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
@@ -116,7 +117,7 @@ public class AdministrationController extends BaseRest {
 			// Check client access (a valid “wskey” must be provided)
 			validateApiKey(wskey);
 			
-			List<String> storyIdsList = new ArrayList<String>(Arrays.asList(storiesIds.split(",")));
+			List<String> storyIdsList = new ArrayList<String>(Arrays.asList(HelperFunctions.toArray(storiesIds,",")));
 			Instant start = Instant.now();
 			String notFetchedStoryIds = "";
 			int numberNotFetchedStories = 0;
@@ -306,13 +307,13 @@ public class AdministrationController extends BaseRest {
 						body.setStoryId(tr_entity.getStoryId());
 						body.setItemId(tr_entity.getItemId());
 						body.setTranslationTool("Google");
-						body.setLinking(Arrays.asList(linking_local.split(",")));
-						body.setNerTools(Arrays.asList(nerTools_local.split(",")));
+						body.setLinking(Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+						body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools_local,",")));
 						body.setOriginal(false);
 											
 						if(tr_entity.getTranslatedText()!=null && !tr_entity.getTranslatedText().equalsIgnoreCase(""))
 						{
-							jsonLd = enrichmentNerService.getEntities(body, true);
+							enrichmentNerService.createNamedEntities(body);
 						}
 					}				
 				}
@@ -328,13 +329,13 @@ public class AdministrationController extends BaseRest {
 					body.setStoryId(item_entity.getStoryId());
 					body.setItemId(item_entity.getItemId());
 					body.setTranslationTool("Google");
-					body.setLinking(Arrays.asList(linking_local.split(",")));
-					body.setNerTools(Arrays.asList(nerTools_local.split(",")));
+					body.setLinking(Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+					body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools_local,",")));
 					body.setOriginal(true);
 										
 					if(item_entity.getTranscriptionText()!=null && !item_entity.getTranscriptionText().equalsIgnoreCase(""))
 					{
-						jsonLd = enrichmentNerService.getEntities(body, true);
+						enrichmentNerService.createNamedEntities(body);
 					}				
 				}
 			}

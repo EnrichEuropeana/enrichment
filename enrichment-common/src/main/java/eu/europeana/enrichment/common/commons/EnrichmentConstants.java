@@ -88,5 +88,6 @@ public class EnrichmentConstants {
 	public static final String LOGO_JSONPROP = "claims.P154.mainsnak.datavalue.value";
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
+	public static final String INSTANCE_OF_JSONPROP = "claims.P31.mainsnak.datavalue.value.id";
 }
 

@@ -116,7 +116,13 @@ public class EnrichmentConfiguration  {
 	
 	@Value("${enrich.annotations.creator}")
     private String annotationsCreator;	
-    
+	
+	@Value("${enrich.wikidata.subclasses.geographic-location}")
+    private String wikidataSubclassesGeographicLocation;	
+
+	@Value("${enrich.wikidata.subclasses.human}")
+    private String wikidataSubclassesHuman;	
+
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -268,4 +274,13 @@ public class EnrichmentConfiguration  {
   	public String getAnnotationsCreator() {
 		return annotationsCreator;
 	}
+  	
+	public String getWikidataSubclassesGeographicLocation() {
+		return wikidataSubclassesGeographicLocation;
+	}
+	
+	public String getWikidataSubclassesHuman() {
+		return wikidataSubclassesHuman;
+	}
+	
 }

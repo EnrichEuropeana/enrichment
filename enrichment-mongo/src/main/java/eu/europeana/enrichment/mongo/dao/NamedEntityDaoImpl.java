@@ -1,8 +1,9 @@
 package eu.europeana.enrichment.mongo.dao;
 
+import static dev.morphia.query.experimental.filters.Filters.all;
 import static dev.morphia.query.experimental.filters.Filters.eq;
 import static dev.morphia.query.experimental.filters.Filters.in;
-import static dev.morphia.query.experimental.filters.Filters.all;
+import static dev.morphia.query.experimental.filters.Filters.size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +46,35 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
                 .first();
 	}
 	
+	/*
+	 * This function check if there is an existing named entity that is equal to the named entity provided.
+	 * First the dbpedia id is checked. If it does not exist (e.g. in case of the staford analyzer),
+	 * the matching position is checked. In case of stanford, simply checking the named entity label and type
+	 * would not be enough, since the type is very broad (e.g. place or agent) and there can be many different 
+	 * entities with the same label, e.g. for Berlin, it can be Berlin in Germany, Berlin in New Hampshire, etc. 
+	 */
 	@Override
-	public NamedEntityImpl findNamedEntityByLabelAndType(String label, String type) {
+	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne) {
+		//for the dbpedia ner, every entity will have a dbpedia id
+		if(ne.getDBpediaId()!=null) {
+			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+	                eq(EntityFields.DBPEDIA_ID, ne.getDBpediaId()))
+	                .first();
+		}
+		else {
+			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+				eq(EntityFields.LABEL, ne.getLabel()),
+				eq(EntityFields.TYPE, ne.getType()))
+				.first();
+		}
+	}
+	
+	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
                 eq(EntityFields.LABEL, label),
                 eq(EntityFields.TYPE, type))
-                .first();
+				.iterator()
+				.toList();
 	}
 	
 	@Override
@@ -71,14 +95,19 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}	
 
 	@Override
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
 	    List<Filter> filters = new ArrayList<>();
 	    filters.add(eq(EntityFields.STORY_ID, storyId));
 	    if(itemId!=null) {
 	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
 	    }
 	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, type));
-	    filters.add(all(EntityFields.NER_TOOLS, nerTools));
+	    if(nerTools!=null) {
+	    	filters.add(all(EntityFields.NER_TOOLS, nerTools));
+	    	if(matchNerToolsExactly) {
+	    		filters.add(size(EntityFields.NER_TOOLS, nerTools.size()));
+	    	}
+	    }
 
 		List<PositionEntityImpl> positions = enrichmentDatastore
 			.find(PositionEntityImpl.class)
