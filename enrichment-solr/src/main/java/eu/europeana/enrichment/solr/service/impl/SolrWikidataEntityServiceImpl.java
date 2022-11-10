@@ -74,6 +74,22 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		return 0;
 	}
 	
+	public boolean existWikidataURL(String wikidataURL) throws SolrServiceException {
+		SolrQuery query = new SolrQuery();
+		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		
+	    QueryResponse rsp = null;
+		try {
+			rsp = query(solrCore, query);
+		} catch (SolrServiceException e) {
+			logger.log(Level.ERROR, "Exception during the Solr quering for the wikidata.", e);
+			throw e;
+		}
+	    SolrDocumentList docs = rsp.getResults();
+	    if (docs.getNumFound()>0) return true;
+	    else return false;
+	}
+	
 	@Override
 	public String searchByWikidataURL(String wikidataURL) throws SolrServiceException {
 		

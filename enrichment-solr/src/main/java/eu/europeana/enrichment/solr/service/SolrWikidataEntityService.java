@@ -9,6 +9,7 @@ public interface SolrWikidataEntityService {
 	
 	public String searchByWikidataURL_usingJackson (String wikidataURL, String type) throws SolrServiceException, IOException;
 	public String searchByWikidataURL (String wikidataURL) throws SolrServiceException;
+	public boolean existWikidataURL(String wikidataURL) throws SolrServiceException;
 
 	/**
 	 * This function aims at storing the Wikidata Entity obtained from its URL, i.e.

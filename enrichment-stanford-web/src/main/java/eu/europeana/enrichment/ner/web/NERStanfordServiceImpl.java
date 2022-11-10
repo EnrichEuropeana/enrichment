@@ -118,50 +118,51 @@ public class NERStanfordServiceImpl{
 			map.put(category, tmp);
 		}
 		
+//		NamedEntityImpl namedEntity = new NamedEntityImpl(word);
+//		namedEntity.setType(category);
+//		//setting the offsets(positions) of the found entity in the text
+//		PositionEntityImpl positionEntity = new PositionEntityImpl();
+//		List<Integer> offsetList = new ArrayList<Integer>();
+//		offsetList.add(offset);
+//		// default: Offset position will be added to the translated 
+//		positionEntity.setOffsetsTranslatedText(offsetList);
+//		List<String> nerTools = new ArrayList<String>();
+//		nerTools.add(NERConstants.stanfordNer);
+//		positionEntity.setNerTools(nerTools);
+//		namedEntity.setPositionEntity(positionEntity);
+//		tmp.add(namedEntity);
+		
+		/*
+		 * Please note that the rules for checking the existence of the same named entity for the stanford
+		 * NER tool must be consistent through the whole application. 
+		 */
 		NamedEntityImpl alreadyExistNamedEntity = null;
 		for(int index = 0; index < tmp.size(); index++) {
-			if(tmp.get(index).getLabel().equals(word)) {
+			if(tmp.get(index).getLabel().equals(word) && tmp.get(index).getType().equals(category)) {
 				alreadyExistNamedEntity = tmp.get(index);
 				break;
 			}
 		}
+
 		if(alreadyExistNamedEntity == null) {
 			NamedEntityImpl namedEntity = new NamedEntityImpl(word);
 			namedEntity.setType(category);
-			//setting the offsets(positions) of the found entity in the text
-			if(offset!=-1) {
-				PositionEntityImpl positionEntity = new PositionEntityImpl();
-				List<Integer> offsetList = new ArrayList<Integer>();
-				offsetList.add(offset);
-				// default: Offset position will be added to the translated 
-				positionEntity.setOffsetsTranslatedText(offsetList);
-				List<String> nerTools = new ArrayList<String>();
-				nerTools.add(NERConstants.stanfordNer);
-				positionEntity.setNerTools(nerTools);
-				List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
-				positionEntities.add(positionEntity);
-				namedEntity.setPositionEntities(positionEntities);
-			}
+
+			PositionEntityImpl positionEntity = new PositionEntityImpl();
+			List<Integer> offsetList = new ArrayList<Integer>();
+			offsetList.add(offset);
+			// default: Offset position will be added to the translated 
+			positionEntity.setOffsetsTranslatedText(offsetList);
+			List<String> nerTools = new ArrayList<String>();
+			nerTools.add(NERConstants.stanfordNer);
+			positionEntity.setNerTools(nerTools);
+			namedEntity.setPositionEntity(positionEntity);
+
 			tmp.add(namedEntity);
 		}
 		else {
-			if(alreadyExistNamedEntity.getPositionEntities()==null) {
-				if(offset!=-1) {
-					PositionEntityImpl positionEntity = new PositionEntityImpl();
-					List<Integer> offsetList = new ArrayList<Integer>();
-					offsetList.add(offset);
-					// default: Offset position will be added to the translated 
-					positionEntity.setOffsetsTranslatedText(offsetList);
-					List<String> nerTools = new ArrayList<String>();
-					nerTools.add(NERConstants.stanfordNer);
-					positionEntity.setNerTools(nerTools);
-					List<PositionEntityImpl> positionEntities = new ArrayList<PositionEntityImpl>();
-					positionEntities.add(positionEntity);
-					alreadyExistNamedEntity.setPositionEntities(positionEntities);
-				}
-			}
-			else if(!alreadyExistNamedEntity.getPositionEntities().get(0).getOffsetsTranslatedText().contains(offset)) {
-				alreadyExistNamedEntity.getPositionEntities().get(0).addOfssetsTranslatedText(offset);
+			if(!alreadyExistNamedEntity.getPositionEntity().getOffsetsTranslatedText().contains(offset)) {
+				alreadyExistNamedEntity.getPositionEntity().addOfssetsTranslatedText(offset);
 			}
 		}
 	}

@@ -24,12 +24,16 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 		return namedEntityDao.findNamedEntityByLabel(label);
 	}
 	
-	public NamedEntityImpl findNamedEntityByLabelAndType(String label, String type) {
-		return namedEntityDao.findNamedEntityByLabelAndType(label, type);
+	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne) {
+		return namedEntityDao.findExistingNamedEntity(ne);
 	}
 	
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools) {
-		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, nerTools);
+	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
+		return namedEntityDao.findAllNamedEntitiesByLabelAndType(label, type);
+	}
+	
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
+		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, nerTools, matchNerToolsExactly);
 	}
 	
 	public List<NamedEntityImpl> getAllNamedEntities() {

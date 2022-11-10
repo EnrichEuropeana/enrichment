@@ -16,7 +16,7 @@ public class Processing {
 	private List<String> foundByNerTools;
 	
 	private String matching;
-	private float score;
+	private double score;
 
 	public List<String> getFoundByNerTools() {
 		return foundByNerTools;
@@ -30,10 +30,10 @@ public class Processing {
 	public void setMatching(String matching) {
 		this.matching = matching;
 	}
-	public float getScore() {
+	public double getScore() {
 		return score;
 	}
-	public void setScore(float score) {
+	public void setScore(double score) {
 		this.score = score;
 	}	
 	
