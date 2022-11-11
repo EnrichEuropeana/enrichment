@@ -3,6 +3,8 @@ package eu.europeana.enrichment.web.controller;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
@@ -45,7 +48,6 @@ public class NERController extends BaseRest {
 	 * where a request with a translated text is send and the named entities based on this text are retrieved.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey
 	 * @param storyId
 	 * @param translationTool
 	 * @param property
@@ -64,30 +66,28 @@ public class NERController extends BaseRest {
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
-			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 	
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
+		verifyWriteAccess(Operations.CREATE, request);
 
-			EnrichmentNERRequest body = new EnrichmentNERRequest();
-			body.setStoryId(storyId);
-			body.setTranslationTool(translationTool);
-			body.setProperty(property);
-			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-			body.setOriginal(original);
-			
-			enrichmentNerService.createNamedEntities(body);
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
-			
-			return response;
+		EnrichmentNERRequest body = new EnrichmentNERRequest();
+		body.setStoryId(storyId);
+		body.setTranslationTool(translationTool);
+		body.setProperty(property);
+		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+		body.setOriginal(original);
 		
+		enrichmentNerService.createNamedEntities(body);
+		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
+		
+		return response;
 	}
 	
 	@ApiOperation(value = "Get named entities for a story", nickname = "getEntitiesStory", notes = "This method retrieves the Named Entity (NER) objects "
@@ -95,30 +95,27 @@ public class NERController extends BaseRest {
 			+ "corresponding POST method.")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getEntitiesStory(
-			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools
-			//@RequestParam(value = "original", required = true) Boolean original
-			) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			EnrichmentNERRequest body = new EnrichmentNERRequest();
-			body.setStoryId(storyId);
-			body.setTranslationTool(translationTool);
-			body.setProperty(property);
-			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-			body.setOriginal(false);
-			
-			String jsonLd = enrichmentNerService.getEntities(body);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-			
-			return response;
+		verifyReadAccess(request);
+		
+		EnrichmentNERRequest body = new EnrichmentNERRequest();
+		body.setStoryId(storyId);
+		body.setTranslationTool(translationTool);
+		body.setProperty(property);
+		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+		body.setOriginal(false);
+		
+		String jsonLd = enrichmentNerService.getEntities(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+		
+		return response;
 		
 	}
 	
@@ -133,31 +130,29 @@ public class NERController extends BaseRest {
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesItem(
-			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
-			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
+
+		verifyWriteAccess(Operations.CREATE, request);
+
+		EnrichmentNERRequest body = new EnrichmentNERRequest();
+		body.setStoryId(storyId);
+		body.setItemId(itemId);
+		body.setTranslationTool("Google");
+		body.setProperty(property);
+		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+		body.setOriginal(original);
 		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			EnrichmentNERRequest body = new EnrichmentNERRequest();
-			body.setStoryId(storyId);
-			body.setItemId(itemId);
-			body.setTranslationTool("Google");
-			body.setProperty(property);
-			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-			body.setOriginal(original);
-			
-			enrichmentNerService.createNamedEntities(body);
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
-			
-			return response;
+		enrichmentNerService.createNamedEntities(body);
+		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 		
+		return response;		
 	}
 	
 	@ApiOperation(value = "Get named entities for an item", nickname = "getEntitiesItem", notes = "This method retrieves the Named Entity (NER) objects "
@@ -165,57 +160,53 @@ public class NERController extends BaseRest {
 			+ " corresponding POST method." )
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getEntitiesItem(
-			@RequestParam(value = "wskey", required = true) String wskey,
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools
-			//@RequestParam(value = "original", required = true) Boolean original
-			) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "nerTools", required = true) String nerTools,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			EnrichmentNERRequest body = new EnrichmentNERRequest();
-			body.setStoryId(storyId);
-			body.setItemId(itemId);
-			body.setTranslationTool("Google");
-			body.setProperty(property);
-			body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-			body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-			body.setOriginal(false);
-			
-			String jsonLd = enrichmentNerService.getEntities(body);
-			ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
-			
-			return response;
+		verifyReadAccess(request);
+
+		EnrichmentNERRequest body = new EnrichmentNERRequest();
+		body.setStoryId(storyId);
+		body.setItemId(itemId);
+		body.setTranslationTool("Google");
+		body.setProperty(property);
+		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+		body.setOriginal(false);
+		
+		String jsonLd = enrichmentNerService.getEntities(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+		
+		return response;
 		
 	}	
 	
 	@ApiOperation(value = "Compute named entities for all stories descriptions")
 	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesAllStories(
-			@RequestParam(value = "wskey", required = true) String wskey) throws Exception, HttpException, SolrServiceException {
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 	
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
+		verifyWriteAccess(Operations.CREATE, request);
 
-			String linking_local = "Wikidata";
-			List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
-			for(StoryEntity story : stories) {
-				if(story.getDescriptionEn()!=null) {
-					logger.info("NER analysis for the storyId: " + story.getStoryId());
-					
-					enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
-					
-					enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
+		String linking_local = "Wikidata";
+		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
+		for(StoryEntity story : stories) {
+			if(story.getDescriptionEn()!=null) {
+				logger.info("NER analysis for the storyId: " + story.getStoryId());
+				
+				enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
+				
+				enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
 
-				}			
-			}
+			}			
+		}
 
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
-			return response;
+		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
+		return response;
 	}
 
 }
