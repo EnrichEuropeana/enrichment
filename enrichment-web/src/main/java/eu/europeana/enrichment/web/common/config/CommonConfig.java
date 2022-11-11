@@ -8,6 +8,8 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -19,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.api.commons.config.i18n.I18nService;
 import eu.europeana.api.commons.config.i18n.I18nServiceImpl;
+import eu.europeana.api.commons.oauth2.service.impl.EuropeanaClientDetailsService;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.ner.linking.model.DBpediaResponseHeader;
 
@@ -28,6 +32,10 @@ public class CommonConfig {
 	private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	
     private static final Logger logger = LogManager.getLogger(CommonConfig.class);
+    
+	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
+	EnrichmentConfiguration config;
 
     @Bean(EnrichmentConstants.BEAN_ENRICHMENT_I18N_SERVICE)
     public I18nService europeanaApiClient() {
@@ -62,6 +70,13 @@ public class CommonConfig {
               .build();
       mapper.findAndRegisterModules();
       return mapper;
+    }
+    
+    @Bean(name = EnrichmentConstants.BEAN_CLIENT_DETAILS_SERVICE)
+    public EuropeanaClientDetailsService getClientDetailsService() {
+      EuropeanaClientDetailsService clientDetailsService = new EuropeanaClientDetailsService();
+      clientDetailsService.setApiKeyServiceUrl(config.getApiKeyUrl());
+      return clientDetailsService;
     }
 
 }

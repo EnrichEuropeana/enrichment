@@ -28,8 +28,7 @@ public class NERController {
 	 * where a request with a translated text is send and 
 	 * the named entities based on this text is retrieved.
 	 * All requests on this end point are processed here.
-	 * 
-	 * @param wskey						is the application key which is required
+	 *
 	 * @param nerRequest				is the Rest Post body which contains 
 	 * 									the text for the named entity recognition tools
 	 * @return							a map of all named entities including 

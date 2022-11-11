@@ -3,6 +3,8 @@ package eu.europeana.enrichment.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,6 @@ public class WikidataController extends BaseRest {
 	 * the wikidata entities are retrieved.
 	 * All requests on this end point are processed here.
 	 * 
-     * @param wskey									is the application key which is required
      * @param wikidataRequest						Rest Get Body containing a wikidata URl
      * @return
      * @throws Exception
@@ -62,21 +63,17 @@ public class WikidataController extends BaseRest {
 			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677) and its type (agent or place) from the Solr local storage.")
 	@RequestMapping(value = "/enrichment/resolve", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getWikidataEntity(
-			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "wikidataId", required = true) String wikidataId,
-			@RequestParam(value = "type", required = true) String type) throws Exception, HttpException, SolrServiceException {
-		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
-			String solrResponse = solrWikidataEntityService.searchByWikidataURL_usingJackson(wikidataId,type);
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+			@RequestParam(value = "type", required = true) String type,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
+
+		verifyReadAccess(request);
+		//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
+		String solrResponse = solrWikidataEntityService.searchByWikidataURL_usingJackson(wikidataId,type);
 					
-			return response;
-		
-		
+		ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+				
+		return response;		
 	} 
 	
 	/**
@@ -84,7 +81,6 @@ public class WikidataController extends BaseRest {
 	 * The result is serialized to JSON using Jackson Jsonld serialization library.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey
 	 * @param query									Solr query to search for entities (e.g. "Glas*","Glasgow", etc.)
 	 * @param type									comma separated list, used to indicate which entity types (i.e. place,person) should be included in the results. If the parameter is not provided, all entities should be searched
 	 * @param lang									list of comma separated values for language filtering, if not provided “en” is used as default
@@ -104,27 +100,23 @@ public class WikidataController extends BaseRest {
 			+ "\"pageSize\" = the number of results returned, if not provided defaults to 5, \"page\" = the results page, if not provided defaults to 0.")
 	@RequestMapping(value = "/enrichment/search", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNamedEntitiesFromSolr(
-			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "query", required = true) String query,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "qf", required = false) String qf,
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
-			@RequestParam(value = "page", required = false) String page
-			) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "page", required = false) String page,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
-			
-			//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
-			String solrResponse = solrWikidataEntityService.searchNamedEntities_usingJackson(wskey, query, type, lang, qf, sort, pageSize, page);
-						
-			ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+		verifyReadAccess(request);
+		
+		//String solrResponse = solrWikidataEntityService.searchByWikidataURL(wikidataId);
+		String solrResponse = solrWikidataEntityService.searchNamedEntities_usingJackson(query, type, lang, qf, sort, pageSize, page);
 					
-			return response;
-		
-		
+		ResponseEntity<String> response = new ResponseEntity<String>(solrResponse, HttpStatus.OK);			
+				
+		return response;		
 	} 
 	
 	
@@ -134,84 +126,78 @@ public class WikidataController extends BaseRest {
 			+ "\"pageSize\" = the number of results returned, if not provided defaults to 5, \"page\" = the results page, if not provided defaults to 0.")
 	@RequestMapping(value = "/enrichment/places", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getPlacesFromWikidata(
-			@RequestParam(value = "wskey", required = false) String wskey,
 			@RequestParam(value = "query", required = true) String query,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
-			@RequestParam(value = "page", required = false) String page
-			) throws Exception, HttpException, SolrServiceException {
+			@RequestParam(value = "page", required = false) String page,
+			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
+		verifyReadAccess(request);
+		if(pageSize==null || pageSize.isEmpty())
+		{	
+			pageSize="5";
+		}
+		
+		if(page==null || page.isEmpty())
+		{	
+			page="0";
+		}
 
-			// Check client access (a valid “wskey” must be provided)
-			validateApiKey(wskey);
+		if(lang==null || lang.isEmpty())
+		{
+			lang="en";
+		}
 
-			if(pageSize==null || pageSize.isEmpty())
-			{	
-				pageSize="5";
-			}
+		if(type==null || type.isEmpty())
+		{
+			type="place";
+		}
+
+		List<WikidataEntity> items = new ArrayList<WikidataEntity>();
+
+		List<String> wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(query, lang);
+		if(wikidataIDs==null) {
+			return new ResponseEntity<>(HttpStatus.OK);			
+		}
+		
+		String URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?" + "query=" + query + "&type=" + type + "&lang="+ lang;
+		String URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?" + "query=" + query + "&type=" + type + "&lang="+ lang;
+		URLPage+="&page="+ page +"&pageSize=" + pageSize;
+		
+		int totalResultsAll = wikidataIDs.size();
+		int totalResultsPerPage = (totalResultsAll < Integer.valueOf(pageSize)) ? totalResultsAll : Integer.valueOf(pageSize);
+
+		for(int i=0;i<wikidataIDs.size();i++)
+		{
+			int startIndex = totalResultsPerPage*Integer.valueOf(page);
+			int endIndex = totalResultsPerPage*Integer.valueOf(page) + totalResultsPerPage;
 			
-			if(page==null || page.isEmpty())
-			{	
-				page="0";
-			}
-
-			if(lang==null || lang.isEmpty())
+			if(i>=startIndex && i<endIndex)
 			{
-				lang="en";
-			}
-
-			if(type==null || type.isEmpty())
-			{
-				type="place";
-			}
-
-			List<WikidataEntity> items = new ArrayList<WikidataEntity>();
-
-			List<String> wikidataIDs = wikidataService.getWikidataPlaceIdWithLabelAltLabel(query, lang);
-			if(wikidataIDs==null) {
-				return new ResponseEntity<>(HttpStatus.OK);			
-			}
-			
-			String URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;
-			String URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?wskey=" + wskey + "&query=" + query + "&type=" + type + "&lang="+ lang;
-			URLPage+="&page="+ page +"&pageSize=" + pageSize;
-			
-			int totalResultsAll = wikidataIDs.size();
-			int totalResultsPerPage = (totalResultsAll < Integer.valueOf(pageSize)) ? totalResultsAll : Integer.valueOf(pageSize);
-
-			for(int i=0;i<wikidataIDs.size();i++)
-			{
-				int startIndex = totalResultsPerPage*Integer.valueOf(page);
-				int endIndex = totalResultsPerPage*Integer.valueOf(page) + totalResultsPerPage;
+				//getting WikidataEntity, either from local cache or from the wikidata
+				WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
 				
-				if(i>=startIndex && i<endIndex)
-				{
-					//getting WikidataEntity, either from local cache or from the wikidata
-					WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
+				if (wikidataEntity!=null) { 
+					items.add(wikidataEntity);						
+					logger.debug("Wikidata place found is: ");						
 					
-					if (wikidataEntity!=null) { 
-						items.add(wikidataEntity);						
-						logger.debug("Wikidata place found is: ");						
-						
-						//adjust for languages, i.e. remove the fields for other not required languages
-						if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
-						if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
-						if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
-					}
-
+					//adjust for languages, i.e. remove the fields for other not required languages
+					if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),null, lang);
+					if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),null,lang);
+					if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),null,lang);
 				}
 			}
-			
-			String serializedNamedEntityCollection=null;
-			
-			if(items.size()>0) {
-				NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);   	
-		    	serializedNamedEntityCollection = jsonLdSerializer.serializeObject(neColl);
-			}
-			ResponseEntity<String> response = new ResponseEntity<String>(serializedNamedEntityCollection, HttpStatus.OK);			
-
-			return response;		
+		}
 		
+		String serializedNamedEntityCollection=null;
+		
+		if(items.size()>0) {
+			NamedEntitySolrCollection neColl = new NamedEntitySolrCollection(items, URLPage, URLWithoutPage, totalResultsPerPage, totalResultsAll);   	
+	    	serializedNamedEntityCollection = jsonLdSerializer.serializeObject(neColl);
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>(serializedNamedEntityCollection, HttpStatus.OK);			
+
+		return response;			
 	}
 }
