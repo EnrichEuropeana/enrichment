@@ -77,3 +77,12 @@ enrich.annotations.creator=
 
 enrich.wikidata.subclasses.geographic-location=/home/ait/enrich/wikidata-types/Q2221906-geographic-location-subclasses.json
 enrich.wikidata.subclasses.human=/home/ait/enrich/wikidata-types/Q5-human-subclasses.json
+
+#string value representing the key used for JWT signature verification 
+europeana.apikey.jwttoken.signaturekey=
+# Resource name embedded in JWT token
+authorization.api.name=
+# Useful for local development. If false, unauthenticated read/write requests can be sent to API
+auth.read.enabled=
+auth.write.enabled=
+europeana.apikey.serviceurl=

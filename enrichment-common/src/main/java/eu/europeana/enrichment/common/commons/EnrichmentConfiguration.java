@@ -122,6 +122,21 @@ public class EnrichmentConfiguration  {
 
 	@Value("${enrich.wikidata.subclasses.human}")
     private String wikidataSubclassesHuman;	
+	
+	@Value("${auth.read.enabled: true}")
+	private boolean authReadEnabled;
+	
+	@Value("${auth.write.enabled: true}")
+	private boolean authWriteEnabled;
+	
+	@Value("${europeana.apikey.jwttoken.signaturekey}")
+	private String apiKeyPublicKey;
+	
+	@Value("${authorization.api.name}")
+	private String authorizationApiName;
+	
+	@Value("${europeana.apikey.serviceurl}")
+	private String apiKeyUrl;
 
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
@@ -281,6 +296,26 @@ public class EnrichmentConfiguration  {
 	
 	public String getWikidataSubclassesHuman() {
 		return wikidataSubclassesHuman;
+	}
+	
+	public boolean isAuthReadEnabled() {
+	    return authReadEnabled;
+	}
+	
+	public boolean isAuthWriteEnabled() {
+		return authWriteEnabled;
+	}
+	
+	public String getApiKeyPublicKey() {
+		return apiKeyPublicKey;
+	}
+
+	public String getAuthorizationApiName() {
+	    return authorizationApiName;
+	}
+
+	public String getApiKeyUrl() {
+	    return apiKeyUrl;
 	}
 	
 }

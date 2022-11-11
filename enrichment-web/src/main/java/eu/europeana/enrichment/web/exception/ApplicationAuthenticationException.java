@@ -1,10 +1,7 @@
 package eu.europeana.enrichment.web.exception;
 
-import javax.annotation.Resource;
-
 import org.springframework.http.HttpStatus;
 
-import eu.europeana.api.commons.config.i18n.I18nService;
 import eu.europeana.api.commons.web.exception.HttpException;
 
 public class ApplicationAuthenticationException extends HttpException {

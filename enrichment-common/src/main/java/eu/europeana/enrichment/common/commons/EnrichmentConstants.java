@@ -37,6 +37,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_UI_SERVICE= "enrichmentUIService";
     public static final String BEAN_ENRICHMENT_TRANSLATION_SERVICE= "enrichmentTranslationService";
     public static final String BEAN_RECORD_TRANSLATION_SERVICE= "recordTranslationService";
+    public static final String BEAN_AUTHORIZATIOON_SERVICE= "authorizationService";
     public static final String BEAN_ENRICHMENT_DATASTORE= "enrichmentDatastore";
     public static final String BEAN_ENRICHMENT_JACKSON_SERIALIZER= "jacksonSerializer";
     public static final String BEAN_ENRICHMENT_JAVA_JSON_PARSER= "javaJSONParser";
@@ -48,6 +49,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
     public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
+    public static final String BEAN_CLIENT_DETAILS_SERVICE = "clientDetailsService";
     // topic management API
     public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
     public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
