@@ -24,7 +24,7 @@ public interface SolrWikidataEntityService {
 	 */
 	public int storeWikidataFromURL (String wikidataURL, String type) throws SolrServiceException, IOException;
 	
-	String searchNamedEntities_usingJackson(String wskey, String query, String type, String lang, String solrQuery, String solrSort,
+	String searchNamedEntities_usingJackson(String query, String type, String lang, String solrQuery, String solrSort,
 			String pageSize, String page) throws SolrServiceException, IOException;
 	WikidataEntity getWikidataEntity(String wikidataURL, String type) throws SolrServiceException;
 		

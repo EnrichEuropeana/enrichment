@@ -2,6 +2,8 @@ package eu.europeana.enrichment.web.controller;
 
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,15 +21,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.web.definitions.WebFields;
+import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.http.HttpHeaders;
+import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.model.vocabulary.EnrichmentModelFields;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
-import eu.europeana.enrichment.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 import io.swagger.annotations.Api;
@@ -51,16 +54,15 @@ public class TopicController extends BaseRest{
 	 * where a topic creation request will be processed.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey
 	 * @return
 	 * @throws Exception 
 	 */
 	@ApiOperation(value = "Create Topics", nickname = "postTopicCreation", notes = "This method stores the topics into the database\n")
 	@RequestMapping(value = "/enrichment/topic/", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> postTopicCreation (@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestBody(required = true) TopicImpl [] topics) throws Exception
+	public ResponseEntity<String> postTopicCreation (@RequestBody(required = true) TopicImpl [] topics,
+			HttpServletRequest request) throws Exception
 	{
-		validateApiKey(wskey);
+		verifyWriteAccess(Operations.CREATE, request);
 
 		for(TopicImpl topic : topics) {
 			// check mandatory fields
@@ -94,17 +96,18 @@ public class TopicController extends BaseRest{
 	 * where a topic creation request will be processed.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey, topicIdentifier
-	 * @return 
-	 * @throws Exception 
+	 * @param topic
+	 * @param request
+	 * @return
+	 * @throws Exception
 	 */
 	@ApiOperation(value = "Update Topic", nickname = "postTopicUpdate", notes = "This method updates the topics in the database\n"
 			+ "Non-updatable fields: identifier, model")
 	@RequestMapping(value = "/enrichment/topic/update", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> postTopicUpdate (@RequestParam(value = "wskey", required = true) String wskey,
-			@RequestBody(required = true) TopicImpl topic) throws Exception
+	public ResponseEntity<String> postTopicUpdate (
+			@RequestBody(required = true) TopicImpl topic, HttpServletRequest request) throws Exception
 	{
-		validateApiKey(wskey);
+		verifyWriteAccess(Operations.UPDATE, request);
 		
 		Date date = new Date();
 		topic.setModified(date);
@@ -129,16 +132,18 @@ public class TopicController extends BaseRest{
 	 * where a topic creation request will be processed.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param wskey, topicIdentifier
+	 * @param topicIdentifier
 	 * @return 
 	 * @throws Exception 
 	 */
 	@ApiOperation(value = "Delete Topic", nickname = "postTopicDelete", notes = "This method deletes topics in the database\n"
 			+ "Mandatory parameter: identifier")
 	@RequestMapping(value = "/enrichment/topic/delete", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> postTopicDelete (@RequestParam(value = "wskey", required = true) String wskey, @RequestParam(value = "identifier", required = true) String identifier) throws Exception
+	public ResponseEntity<String> postTopicDelete (
+			@RequestParam(value = "identifier", required = true) String identifier,
+			HttpServletRequest request) throws Exception
 	{
-		validateApiKey(wskey);
+		verifyWriteAccess(Operations.DELETE, request);
 	
 		Topic topicEntity = enrichmentTopicService.deleteTopic(identifier);
 		
@@ -158,30 +163,30 @@ public class TopicController extends BaseRest{
     		+ "identifier, modelID; sort (a comma separated list of sortings) -> identifier asc, modelID desc; page (the page number); pageSize (the page size)", nickname = "searchTopics", response = java.lang.Void.class)
     @RequestMapping(value = "/enrichment/topic/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchTopics(
-    		@RequestParam(value = "wskey", required = true) String wskey,
 		    @RequestParam(value = "query") String queryString,
 		    @RequestParam(value = "fq", required = false) String fq,
 		    @RequestParam(value = "fl", required = false) String fl,
 		    @RequestParam(value = "facet", required = false) String facet,
 		    @RequestParam(value = "sort", required = false) String sort,
 		    @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-		    @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) throws SolrServiceException, ParamValidationException, ApplicationAuthenticationException {
+		    @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+		    HttpServletRequest request) throws SolrServiceException, ParamValidationException, ApplicationAuthenticationException {
 	
-    		validateApiKey(wskey);
+    	verifyReadAccess(request);
     		
-		    if (StringUtils.isBlank(queryString)) {
-		    	throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "query", queryString);
-		    }
-		    
-		    String topicsJson = enrichmentTopicService.searchTopics(queryString, fq, fl, facet, sort, page, pageSize);
-		    // build response
-		    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
-		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
-		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GET);
-	
-		    ResponseEntity<String> response = new ResponseEntity<String>(topicsJson, headers, HttpStatus.OK);
-	
-		    return response;  	
+	    if (StringUtils.isBlank(queryString)) {
+	    	throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "query", queryString);
+	    }
+	    
+	    String topicsJson = enrichmentTopicService.searchTopics(queryString, fq, fl, facet, sort, page, pageSize);
+	    // build response
+	    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
+	    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
+	    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GET);
+
+	    ResponseEntity<String> response = new ResponseEntity<String>(topicsJson, headers, HttpStatus.OK);
+
+	    return response;  	
     }
 	
 
