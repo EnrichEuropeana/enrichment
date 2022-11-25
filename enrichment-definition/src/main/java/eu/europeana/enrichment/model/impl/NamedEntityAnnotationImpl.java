@@ -146,14 +146,6 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	}
 
 	@JsonProperty(EntityFields.TARGET)
-	public SpecificResource getTargetSerialization() {
-		SpecificResource newTarget = new SpecificResource();
-		newTarget.setId(targetItemsBaseUrl + target.getId());
-		newTarget.setSource(targetItemsBaseUrl + target.getSource());
-		return newTarget;
-	}
-
-	@JsonIgnore
 	public SpecificResource getTarget() {
 		return target;
 	}
@@ -163,11 +155,6 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	}
 
 	@JsonProperty(EntityFields.ID)
-	public String getAnnoIdSerialization() {		
-		return idBaseUrl + annoId;
-	}
-
-	@JsonIgnore
 	public String getAnnoId() {		
 		return annoId;
 	}
