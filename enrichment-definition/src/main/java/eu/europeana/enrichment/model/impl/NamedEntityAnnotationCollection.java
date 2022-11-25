@@ -12,6 +12,11 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.vocabulary.EntityFields;
 
+/**
+ * This class is used for the annotations serialization.
+ * @author StevaneticS
+ *
+ */
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD, 
 	EntityFields.ID, 
@@ -23,7 +28,6 @@ import eu.europeana.enrichment.model.vocabulary.EntityFields;
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
 
-	private static String idBaseUrl;
 	private static String creator;
 
 	List<NamedEntityAnnotation> items;
@@ -32,21 +36,32 @@ public class NamedEntityAnnotationCollection {
 	private String type = "AnnotationCollection";
 	private String total; 
 
-	public NamedEntityAnnotationCollection(String idBaseUrlPar, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
+	public NamedEntityAnnotationCollection(String idBaseUrlPar, String storyBaseUrl, String itemBaseUrl, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
 		
-		idBaseUrl=idBaseUrlPar;
 		creator=creatorPar;
+		
+		for(NamedEntityAnnotation item : itemsParam) {
+			item.setAnnoId(idBaseUrlPar + item.getAnnoId());
+			if(itemId!=null) {
+				item.getTarget().setId(itemBaseUrl + item.getTarget().getId());
+				item.getTarget().setSource(itemBaseUrl + item.getTarget().getSource());
+			}
+			else {
+				item.getTarget().setId(storyBaseUrl + item.getTarget().getId());
+				item.getTarget().setSource(storyBaseUrl + item.getTarget().getSource());				
+			}
+		}
 		items = itemsParam;
+		
 		total = String.valueOf(items.size());
 		if(itemId==null)
 		{
-			id = storyId;
+			id = idBaseUrlPar + storyId;
 		}
 		else
 		{
-			id = storyId + "/" + itemId;
+			id = idBaseUrlPar + storyId + "/" + itemId;
 		}
-		
 		
 	}
 	
@@ -65,7 +80,7 @@ public class NamedEntityAnnotationCollection {
 	
 	@JsonProperty(EntityFields.ID)
 	public String getIdSerialization() {
-		return idBaseUrl + id;
+		return id;
 	}
 	
 	@JsonProperty(EntityFields.TYPE)

@@ -630,7 +630,7 @@ public class EnrichmentNERServiceImpl {
 		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
 		if(!entities.isEmpty())
 		{
-			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsCreator(), entities, storyId, itemId));
+			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId));
 		}
 		else
 		{
@@ -662,7 +662,7 @@ public class EnrichmentNERServiceImpl {
 			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
 			
 		}
-		return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId));
+		return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId));
 	}
 	
 	private void createAnnotationsPerNerTool(List<NamedEntityImpl> namedEntities, List<NamedEntityAnnotation> annos, List<String> nerTools, String storyId, String itemId, String property) throws SolrServiceException {
