@@ -51,6 +51,18 @@
         	<artifactId>morphia-core</artifactId>
         	<version>${version.morphia}</version>        	
         </dependency>  
+     	<dependency>
+			<groupId>eu.europeana.api.commons</groupId>
+			<artifactId>commons-definitions</artifactId>
+			<version>${version.commonsApi}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mongodb</groupId>
+					<artifactId>mongo-java-driver</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        
     	
   </dependencies>
 </project>

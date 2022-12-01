@@ -395,5 +395,4 @@ public class HelperFunctions {
 		return itemArr;
 	}
 
-
 }

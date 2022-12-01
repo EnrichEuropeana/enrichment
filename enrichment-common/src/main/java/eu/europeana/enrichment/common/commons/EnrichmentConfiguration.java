@@ -17,8 +17,11 @@ import org.springframework.context.annotation.PropertySources;
 public class EnrichmentConfiguration  {
 
 	Logger logger = LogManager.getLogger(getClass());
+	
+    @Value("${enrich.api.endpoint}")
+    private String enrichApiEndpoint;
 
-    @Value("${enrich.mongodb.connectionUri}")
+	@Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
 
     @Value("${enrich.mongodb.truststore}")
@@ -141,6 +144,10 @@ public class EnrichmentConfiguration  {
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
+
+    public String getEnrichApiEndpoint() {
+		return enrichApiEndpoint;
+	}
 
   	public String getMongodbConnectionUri() {
 		return mongodbConnectionUri;

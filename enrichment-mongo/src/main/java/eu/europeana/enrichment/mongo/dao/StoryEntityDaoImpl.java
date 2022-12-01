@@ -14,7 +14,7 @@ import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_STORY_ENTITY_DAO)
 public class StoryEntityDaoImpl implements StoryEntityDao{
@@ -27,14 +27,14 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	@Override
 	public StoryEntity findStoryEntity(String key) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, key))
+                eq(EnrichmentFields.STORY_ID, key))
                 .first();
 	}
 	
 	@Override
 	public List<StoryEntityImpl> findStoryEntities(String key) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, key))
+                eq(EnrichmentFields.STORY_ID, key))
 				.iterator().toList();
 	}
 
@@ -47,14 +47,14 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	@Override
 	public void deleteStoryEntity(StoryEntity entity) {
 		enrichmentDatastore.find(StoryEntityImpl.class).filter(
-            eq(EntityFields.OBJECT_ID,entity.getId()))
+            eq(EnrichmentFields.OBJECT_ID,entity.getId()))
 			.delete();
 	}
 
 	@Override
 	public long deleteStoryEntityByStoryId(String key) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID,key))
+                eq(EnrichmentFields.STORY_ID,key))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}

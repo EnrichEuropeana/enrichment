@@ -15,7 +15,7 @@ import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_POSITION_ENTITY_DAO)
 public class PositionEntityDaoImpl {
@@ -27,17 +27,17 @@ public class PositionEntityDaoImpl {
 		
 	public List<PositionEntityImpl> findPositionEntities(ObjectId namedEntityId) {
 		return enrichmentDatastore.find(PositionEntityImpl.class).filter(
-                eq(EntityFields.POSITION_NAMED_ENTITY, namedEntityId))
+                eq(EnrichmentFields.POSITION_NAMED_ENTITY, namedEntityId))
 				.iterator()
 				.toList();
 	}
 	
 	public PositionEntityImpl findPositionEntitiesForNerTool(String storyId, String itemId, String fieldForNer, String nerTool) {
 		return enrichmentDatastore.find(PositionEntityImpl.class).filter(
-				eq(EntityFields.STORY_ID, storyId),
-				eq(EntityFields.ITEM_ID, itemId),
-				eq(EntityFields.FIELD_USED_FOR_NER, fieldForNer),
-                eq(EntityFields.NER_TOOLS, nerTool))
+				eq(EnrichmentFields.STORY_ID, storyId),
+				eq(EnrichmentFields.ITEM_ID, itemId),
+				eq(EnrichmentFields.FIELD_USED_FOR_NER, fieldForNer),
+                eq(EnrichmentFields.NER_TOOLS, nerTool))
 				.first();
 	}
 	
@@ -47,13 +47,13 @@ public class PositionEntityDaoImpl {
 	
 	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EntityFields.POSITION_NAMED_ENTITY, namedEntityId));
-	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    filters.add(eq(EnrichmentFields.POSITION_NAMED_ENTITY, namedEntityId));
+	    filters.add(eq(EnrichmentFields.STORY_ID, storyId));
 	    if(itemId!=null) {
-	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    	filters.add(eq(EnrichmentFields.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, fieldForNer));
-    	filters.add(eq(EntityFields.OFFSETS_TRANSLATED_TEXT, offsetTranslatedText));
+	    filters.add(eq(EnrichmentFields.FIELD_USED_FOR_NER, fieldForNer));
+    	filters.add(eq(EnrichmentFields.OFFSETS_TRANSLATED_TEXT, offsetTranslatedText));
 	    
 		return enrichmentDatastore
 				.find(PositionEntityImpl.class)

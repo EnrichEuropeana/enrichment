@@ -15,7 +15,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_ITEM_ENTITY_DAO)
@@ -54,8 +54,8 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	public ItemEntity findItemEntityFromStory(String storyId, String itemId)
 	{
 		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId),
-                eq(EntityFields.ITEM_ID, itemId)
+                eq(EnrichmentFields.STORY_ID, storyId),
+                eq(EnrichmentFields.ITEM_ID, itemId)
                 )
                 .first();		
 		if (dbEntity!=null) 
@@ -67,7 +67,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	public ItemEntity findItemEntity(String itemId)
 	{
 		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EntityFields.ITEM_ID, itemId)
+                eq(EnrichmentFields.ITEM_ID, itemId)
                 )
                 .first();		
 		return dbEntity;
@@ -77,15 +77,15 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId)
 	{
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-            eq(EntityFields.STORY_ID, storyId),
-            eq(EntityFields.ITEM_ID, itemId))
+            eq(EnrichmentFields.STORY_ID, storyId),
+            eq(EnrichmentFields.ITEM_ID, itemId))
             .iterator().toList();
 	}
 	
 	@Override
 	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId){
 		List<ItemEntityImpl> queryResult = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EntityFields.STORY_ID, storyId))
+                eq(EnrichmentFields.STORY_ID, storyId))
                 .iterator()
                 .toList();
 		if(queryResult.isEmpty())
@@ -110,14 +110,14 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	@Override
 	public void deleteItemEntity(ItemEntity entity) {
 		enrichmentDatastore.find(ItemEntityImpl.class).filter(
-            eq(EntityFields.OBJECT_ID,entity.getId()))
+            eq(EnrichmentFields.OBJECT_ID,entity.getId()))
 			.delete();
 	}
 
 	@Override
 	public long deleteItemEntityByStoryItemId(String key) {
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EntityFields.ITEM_ID,key))
+                eq(EnrichmentFields.ITEM_ID,key))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}

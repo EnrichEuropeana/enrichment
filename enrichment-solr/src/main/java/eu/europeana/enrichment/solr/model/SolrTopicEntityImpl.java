@@ -2,29 +2,36 @@ package eu.europeana.enrichment.solr.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.impl.TermImpl;
 import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
 	public SolrTopicEntityImpl() {
 		super();
 	}
-
-	@Field(TopicSolrFields.TERMS)
-	private List<String> solrTerms;
 	
-	@Field(TopicSolrFields.KEYWORDS)
+	@JsonProperty("keywords")
 	private List<String> solrKeywords;
 	
 	public SolrTopicEntityImpl(Topic copy)
@@ -47,15 +54,13 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 		}
 		this.setCreated(copy.getCreated());
 		this.setModified(copy.getModified());
-	}
-	
+	}	
 
 	@Override
 	@Field(TopicSolrFields.TOPIC_ID)
 	public void setTopicID(String id) {
 		super.setTopicID(id);
-	}
-	
+	}	
 
 	@Override
 	@Field(TopicSolrFields.IDENTIFIER)
@@ -81,29 +86,32 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	    }
 	}
 	
-	@Override
-	public void setTerms(List<Term> terms) {
-		this.solrTerms = new ArrayList<String>();
-		for (Term te: terms)
-		{
-			for (int i = 0; i<te.getScore();i++) {
-				String solrTerm = te.getTerm();
-				this.solrTerms.add(solrTerm);
-				}
-				
+	@Field(TopicSolrFields.TERMS)
+	public void setTermsFromSolr(List<String> termsSolr) {
+		Map<String, Long> termsCount = termsSolr.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+		List<Term> terms = new ArrayList<Term>();
+		List<String> uniqueTerms = termsSolr.stream().distinct().collect(Collectors.toList());
+		int rank=1;
+		for(String term : uniqueTerms) {
+			TermImpl newTerm = new TermImpl(term, rank, termsCount.get(term).intValue());
+			rank++;
+			terms.add(newTerm);
 		}
+		super.setTerms(terms);
 	}
 
-	@Override
-	public void setKeywords(List<Term> keywords) {
-		this.solrKeywords = new ArrayList<String>();
-		for (Term te : keywords)
-		{
-			for (int i=0;i<te.getScore();i++) {
-				String solrTerm = te.getTerm();
-				this.solrKeywords.add(solrTerm);
-			}
+	@Field(TopicSolrFields.KEYWORDS)
+	public void setKeywordsFromSolr(List<String> keywordsSolr) {
+		LinkedHashMap<String, Long> keywordsCount = new LinkedHashMap<>(keywordsSolr.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting())));
+		List<Term> keywords = new ArrayList<Term>();
+		List<String> uniqueKeywords = keywordsSolr.stream().distinct().collect(Collectors.toList());
+		int rank=1;
+		for(String keyword : uniqueKeywords) {
+			TermImpl newTerm = new TermImpl(keyword, rank, keywordsCount.get(keyword).intValue());
+			rank++;
+			keywords.add(newTerm);
 		}
+		super.setKeywords(keywords);
 	}
 
 	@Override

@@ -32,7 +32,7 @@ public class TopicImpl implements Topic {
 	@JsonIgnore
 	public ObjectId _id;
 	
-	@JsonProperty("model")
+	@JsonIgnore
 	private TopicModel model;
 	
 	// <{baseurl}/topic/1>
@@ -59,7 +59,7 @@ public class TopicImpl implements Topic {
 	@JsonProperty("keywords")
 	private List<Term> keywords;
 	
-	@JsonIgnore
+	@JsonProperty("modelID")
 	private String modelId;	
 	
 	@JsonProperty("created")
@@ -143,6 +143,7 @@ public class TopicImpl implements Topic {
 	@Override
 	public void setModel(TopicModel model) {
 		this.model = model;
+		this.modelId = model.getIdentifier();
 	}
 
 	@Override
@@ -197,7 +198,6 @@ public class TopicImpl implements Topic {
 			this.modelId = this.model.getIdentifier();
 		else
 			this.modelId = modelId;
-		
 	}
 
 }
