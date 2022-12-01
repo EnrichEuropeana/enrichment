@@ -1,4 +1,6 @@
 
+enrich.api.endpoint=
+
 # MongoDB configuration
 enrich.mongodb.connectionUri=mongodb://localhost:27017
 enrich.mongodb.database=enrichment

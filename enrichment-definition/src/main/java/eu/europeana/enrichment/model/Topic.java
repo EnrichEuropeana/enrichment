@@ -1,15 +1,12 @@
 package eu.europeana.enrichment.model;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
-import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import eu.europeana.enrichment.model.impl.TopicImpl;
-
-import java.util.Date;
 
 @JsonDeserialize(as = TopicImpl.class)
 public interface Topic {
@@ -43,7 +40,7 @@ public interface Topic {
 	public void setModified(Date date);
 	//public ObjectId getObjectId();
 	//public String toJSON() throws JsonProcessingException;
+	String getModelId();
+	void setModelId(String modelId);
 	
-	public String getModelId();
-	public void setModelId(String modelId);
 }

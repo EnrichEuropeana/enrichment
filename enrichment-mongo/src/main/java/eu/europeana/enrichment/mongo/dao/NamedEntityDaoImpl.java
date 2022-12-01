@@ -21,7 +21,7 @@ import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
@@ -42,7 +42,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public NamedEntityImpl findNamedEntityByLabel(String label) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-                eq(EntityFields.LABEL, label))
+                eq(EnrichmentFields.LABEL, label))
                 .first();
 	}
 	
@@ -58,21 +58,21 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		//for the dbpedia ner, every entity will have a dbpedia id
 		if(ne.getDBpediaId()!=null) {
 			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-	                eq(EntityFields.DBPEDIA_ID, ne.getDBpediaId()))
+	                eq(EnrichmentFields.DBPEDIA_ID, ne.getDBpediaId()))
 	                .first();
 		}
 		else {
 			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-				eq(EntityFields.LABEL, ne.getLabel()),
-				eq(EntityFields.TYPE, ne.getType()))
+				eq(EnrichmentFields.LABEL, ne.getLabel()),
+				eq(EnrichmentFields.TYPE, ne.getType()))
 				.first();
 		}
 	}
 	
 	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-                eq(EntityFields.LABEL, label),
-                eq(EntityFields.TYPE, type))
+                eq(EnrichmentFields.LABEL, label),
+                eq(EnrichmentFields.TYPE, type))
 				.iterator()
 				.toList();
 	}
@@ -97,15 +97,15 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    filters.add(eq(EnrichmentFields.STORY_ID, storyId));
 	    if(itemId!=null) {
-	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    	filters.add(eq(EnrichmentFields.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, type));
+	    filters.add(eq(EnrichmentFields.FIELD_USED_FOR_NER, type));
 	    if(nerTools!=null) {
-	    	filters.add(all(EntityFields.NER_TOOLS, nerTools));
+	    	filters.add(all(EnrichmentFields.NER_TOOLS, nerTools));
 	    	if(matchNerToolsExactly) {
-	    		filters.add(size(EntityFields.NER_TOOLS, nerTools.size()));
+	    		filters.add(size(EnrichmentFields.NER_TOOLS, nerTools.size()));
 	    	}
 	    }
 
@@ -118,7 +118,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		Set<ObjectId> namedEntityIds = positions.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
 
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-			in(EntityFields.OBJECT_ID, namedEntityIds)
+			in(EnrichmentFields.OBJECT_ID, namedEntityIds)
 			)
 			.iterator()
 			.toList();
@@ -144,11 +144,11 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public void deletePositionEntitiesAndNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EntityFields.STORY_ID, storyId));
+	    filters.add(eq(EnrichmentFields.STORY_ID, storyId));
 	    if(itemId!=null) {
-	    	filters.add(eq(EntityFields.ITEM_ID, itemId));
+	    	filters.add(eq(EnrichmentFields.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EntityFields.FIELD_USED_FOR_NER, fieldUsedForNER));
+	    filters.add(eq(EnrichmentFields.FIELD_USED_FOR_NER, fieldUsedForNER));
 
 		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))
@@ -161,7 +161,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
             .delete(MorphiaUtils.MULTI_DELETE_OPTS);
 		
 		enrichmentDatastore.find(NamedEntityImpl.class).filter(
-			in(EntityFields.OBJECT_ID, namedEntityIdsSet)
+			in(EnrichmentFields.OBJECT_ID, namedEntityIdsSet)
             )
             .delete(MorphiaUtils.MULTI_DELETE_OPTS);
 	}
