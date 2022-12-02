@@ -38,6 +38,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_KEYWORD_SERVICE= "enrichmenKeywordService";
     public static final String BEAN_ENRICHMENT_TRANSLATION_SERVICE= "enrichmentTranslationService";
     public static final String BEAN_RECORD_TRANSLATION_SERVICE= "recordTranslationService";
+    public static final String BEAN_AUTHORIZATIOON_SERVICE= "authorizationService";
     public static final String BEAN_ENRICHMENT_DATASTORE= "enrichmentDatastore";
     public static final String BEAN_ENRICHMENT_JACKSON_SERIALIZER= "jacksonSerializer";
     public static final String BEAN_ENRICHMENT_JAVA_JSON_PARSER= "javaJSONParser";
@@ -49,6 +50,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_I18N_SERVICE = "i18nService";
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
     public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
+    public static final String BEAN_CLIENT_DETAILS_SERVICE = "clientDetailsService";
     // topic management API
     public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
     public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
@@ -89,5 +91,6 @@ public class EnrichmentConstants {
 	public static final String LOGO_JSONPROP = "claims.P154.mainsnak.datavalue.value";
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
+	public static final String INSTANCE_OF_JSONPROP = "claims.P31.mainsnak.datavalue.value.id";
 }
 

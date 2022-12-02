@@ -10,20 +10,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
+/**
+ * This class is used for the annotations serialization.
+ * @author StevaneticS
+ *
+ */
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD, 
-	EntityFields.ID, 
-	EntityFields.TYPE, 
-	EntityFields.CREATOR,
-	EntityFields.TOTAL,
-	EntityFields.ITEMS
+	EnrichmentFields.ID, 
+	EnrichmentFields.TYPE, 
+	EnrichmentFields.CREATOR,
+	EnrichmentFields.TOTAL,
+	EnrichmentFields.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
 
-	private static String idBaseUrl;
 	private static String creator;
 
 	List<NamedEntityAnnotation> items;
@@ -32,25 +36,36 @@ public class NamedEntityAnnotationCollection {
 	private String type = "AnnotationCollection";
 	private String total; 
 
-	public NamedEntityAnnotationCollection(String idBaseUrlPar, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
+	public NamedEntityAnnotationCollection(String idBaseUrlPar, String storyBaseUrl, String itemBaseUrl, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
 		
-		idBaseUrl=idBaseUrlPar;
 		creator=creatorPar;
+		
+		for(NamedEntityAnnotation item : itemsParam) {
+			item.setAnnoId(idBaseUrlPar + item.getAnnoId());
+			if(itemId!=null) {
+				item.getTarget().setId(itemBaseUrl + item.getTarget().getId());
+				item.getTarget().setSource(itemBaseUrl + item.getTarget().getSource());
+			}
+			else {
+				item.getTarget().setId(storyBaseUrl + item.getTarget().getId());
+				item.getTarget().setSource(storyBaseUrl + item.getTarget().getSource());				
+			}
+		}
 		items = itemsParam;
+		
 		total = String.valueOf(items.size());
 		if(itemId==null)
 		{
-			id = storyId;
+			id = idBaseUrlPar + storyId;
 		}
 		else
 		{
-			id = storyId + "/" + itemId;
+			id = idBaseUrlPar + storyId + "/" + itemId;
 		}
-		
 		
 	}
 	
-	@JsonProperty(EntityFields.ITEMS)
+	@JsonProperty(EnrichmentFields.ITEMS)
 	public List<NamedEntityAnnotation> getItems() {
 		return items;
 	}
@@ -63,12 +78,12 @@ public class NamedEntityAnnotationCollection {
 		return id;
 	}
 	
-	@JsonProperty(EntityFields.ID)
+	@JsonProperty(EnrichmentFields.ID)
 	public String getIdSerialization() {
-		return idBaseUrl + id;
+		return id;
 	}
 	
-	@JsonProperty(EntityFields.TYPE)
+	@JsonProperty(EnrichmentFields.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -77,12 +92,12 @@ public class NamedEntityAnnotationCollection {
 		this.type = type;
 	}
 	
-	@JsonProperty(EntityFields.CREATOR)
+	@JsonProperty(EnrichmentFields.CREATOR)
 	public String getCreator() {
 		return creator;
 	}
 
-	@JsonProperty(EntityFields.TOTAL)
+	@JsonProperty(EnrichmentFields.TOTAL)
 	public String getTotal() {
 		return total;
 	}

@@ -26,7 +26,7 @@ public class Keyword {
 	private KeywordPosition keywordPosition;
 	
 	private List<String> wikidataLabelAltLabelMatchIds;
-	private List<String> dbpediaIds;
+	private String dbpediaId;
 	private List<String> dbpediaWikidataIds;
 	private List<String> preferredWikidataIds;
 	private List<Long> tpItemIds;
@@ -39,7 +39,7 @@ public class Keyword {
         	
 	//id will be used for storing MongoDB _id
 	@Id
-        private ObjectId _id;
+  private ObjectId _id;
 	
 	public ObjectId get_id() {
 		return _id;
@@ -136,12 +136,12 @@ public class Keyword {
 		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
 	}
 
-	public List<String> getDbpediaIds() {
-		return dbpediaIds;
+	public String getDbpediaId() {
+		return dbpediaId;
 	}
 
-	public void setDbpediaIds(List<String> dbpediaIds) {
-		this.dbpediaIds = dbpediaIds;
+	public void setDbpediaId(String dbpediaId) {
+		this.dbpediaId = dbpediaId;
 	}
 
 	public List<String> getDbpediaWikidataIds() {
@@ -152,14 +152,6 @@ public class Keyword {
 		this.dbpediaWikidataIds = dbpediaWikidataIds;
 	}
 
-	public List<String> getPreferredWikidataIds() {
-		return preferredWikidataIds;
-	}
-
-	public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
-		this.preferredWikidataIds = preferredWikidataIds;
-	}
-	
 	public String getTypeFoundByNER() {
 		return typeFoundByNER;
 	}

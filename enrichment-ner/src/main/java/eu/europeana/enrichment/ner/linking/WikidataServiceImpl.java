@@ -3,13 +3,17 @@ package eu.europeana.enrichment.ner.linking;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
@@ -37,9 +41,11 @@ import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
+import eu.europeana.enrichment.ner.enumeration.NERClassification;
 
 //import net.arnx.jsonic.JSONException;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_WIKIDATA_SERVICE)
@@ -50,7 +56,7 @@ public class WikidataServiceImpl implements WikidataService {
 	private static final String baseUrlSparql = "https://query.wikidata.org/bigdata/namespace/wdq/sparql"; // "https://query.wikidata.org/sparql";
 //	private static final String baseUrlWikidataSearch = "https://wikidata.org/w/api.php";
 	private static final String baseUrlWikidataSearch = "https://www.wikidata.org/w/index.php";
-	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 10;
+	private static final int KEEP_FIRST_N_WIKIDATA_IDS = 20;
 	/*
 	 * Defining Wikidata sparql query construct for Geonames ID and Label search
 	 */
@@ -117,14 +123,22 @@ public class WikidataServiceImpl implements WikidataService {
 	private final String wikidataItemKey = "item";
 	private final String wikidataDescriptionKey = "description";
 	private final String wikidataValueKey = "value";
-	
-	
+		
 	private String wikidataDirectory;
+	/*
+	 * Saving the wikidata identifiers for all wikidata subclasses related to the place and agent entities.
+	 * This is used to check the wikidata type during the linking process in the named entity recognition analysis.
+	 */
+	private Set<String> wikidataSubclassesForPlace;
+	private Set<String> wikidataSubclassesForAgent;
 	
 	@Autowired
-	public WikidataServiceImpl (EnrichmentConfiguration enrichmentConfiguration)
+	public WikidataServiceImpl (EnrichmentConfiguration enrichmentConfiguration) throws IOException
 	{
 		wikidataDirectory = enrichmentConfiguration.getEnrichWikidataDirectory();
+		//reading the files for the wikidata subclasses
+		wikidataSubclassesForPlace = new HashSet<String>(readWikidataSubclasses(enrichmentConfiguration.getWikidataSubclassesGeographicLocation()));
+		wikidataSubclassesForAgent = new HashSet<String>(readWikidataSubclasses(enrichmentConfiguration.getWikidataSubclassesHuman()));
 	}
 	
 	
@@ -150,11 +164,7 @@ public class WikidataServiceImpl implements WikidataService {
 				}
 			}
 		}
-		/*
-		 * in case the previous query does not find the results,
-		 * get the wikidata ids using the wikidata search apis 
-		 */		
-		return getWikidataIdWithWikidataSearch(label);
+		return null;
 	}
 
 	@Override
@@ -169,41 +179,18 @@ public class WikidataServiceImpl implements WikidataService {
 				}
 			}
 		}		
-		//get the wikidata ids using the wikidata search api
-		return getWikidataIdWithWikidataSearch(label);
-
+		return null;
 	}
 	
 	@Override
 	public List<String> getWikidataIdWithWikidataSearch(String label) {
-		
-		Map<String, String> params = new HashMap<>();
-		
-		/*
-		 * the params for the wikidata search with the exact label match over the wikidata api.
-		 * The difference between this search and the sparql search is that this request will return the results
-		 * even if the spelling of the label is not correct, e.g. Sajudis, instead of Sąjūdis
-		 */
-//		params.put("action", "wbsearchentities");
-//		params.put("search", label);
-//		params.put("language", "en");
-//		params.put("format", "json");
-//		
-//		List<String> results = processWikidataSearchResponse(createRequest(baseUrlWikidataSearch, params));
-//		if(results != null) {
-//			for(String wikidataIdEach : results) {
-//				if(validWikidataId(wikidataIdEach)) {
-//					return results;					
-//				}
-//			}
-//		}
-
 		/*
 		 * the params for the direct request to the wikidata search results page, in which case
 		 * the html as output would be received. An example: https://www.wikidata.org/w/index.php?search=Festung+Semendria&title=Special:Search&profile=advanced&fulltext=1&ns0=1
 		 * This is an advanced search which recognizes the parts of the label, does some language adaptations, etc., e.g.
 		 * when searching for "Festung Semendria", the result found is: Smederevo Fortress (Q2588696).
 		 */
+		Map<String, String> params = new HashMap<>();
 		params.clear();
 		params.put("search", label);
 		params.put("title", "Special:Search");
@@ -211,7 +198,6 @@ public class WikidataServiceImpl implements WikidataService {
 		params.put("fulltext", "1");
 		params.put("ns0", "1");
 		return processWikidataSearchHtml(createRequest(baseUrlWikidataSearch, params));
-
 	}
 
 	@Override
@@ -358,17 +344,17 @@ public class WikidataServiceImpl implements WikidataService {
 	
 	private List<String> processWikidataSearchHtml(String response) {
 		if(response==null || response.isBlank()) {
-			return null;
+			return Collections.<String>emptyList();
 		}
 		Document html = Jsoup.parse(response);
 		if(html==null) {
-			return null;
+			return Collections.<String>emptyList();
 		}
 		Elements searchResultsHeadings = html.body().getElementsByClass("mw-search-result-heading");
 		if(searchResultsHeadings==null) {
-			return null;
+			return Collections.<String>emptyList();
 		}
-		List<String> retValue = new ArrayList<>();
+		List<String> retValue = new ArrayList<String>();
 		int numberElemToSelect = KEEP_FIRST_N_WIKIDATA_IDS;
 		for(Element el : searchResultsHeadings) {
 			Elements aTags = el.getElementsByTag("a");
@@ -385,13 +371,8 @@ public class WikidataServiceImpl implements WikidataService {
 				break;
 			}
 		}
-		
-		if(retValue.size()>0) {
-			return retValue;
-		}
-		else {
-			return null;
-		}
+
+		return retValue;
 	}
 	
 	/*
@@ -841,8 +822,7 @@ public class WikidataServiceImpl implements WikidataService {
 			return null;
 	}
 	
-	@Override
-	public boolean containsNameInLabelOrAltLabelField(String wikidataJSONResponse, String name) {
+	private boolean matchPrefLabelInWikidata(String wikidataJSONResponse, String name) {
 		//search through the prefLabel
 		Map<String,List<String>> prefLabelMap = null;
 		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.PREFLABEL_JSONPROP);
@@ -871,9 +851,12 @@ public class WikidataServiceImpl implements WikidataService {
 				}
 			}
 		}
-		
-		//search through the altLabel
-		jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.ALTLABEL_JSONPROP);
+		return false;
+
+	}
+	
+	private boolean matchAltLabelInWikidata(String wikidataJSONResponse, String name) {
+		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.ALTLABEL_JSONPROP);
 		Map<String,List<String>> altLabelMap = null;
 		if(jsonElement!=null && !jsonElement.isEmpty()) 
 		{
@@ -900,9 +883,130 @@ public class WikidataServiceImpl implements WikidataService {
 				}
 			}
 		}
-		
 		return false;
-		
 	}
 	
+	private boolean matchTypeInWikidata(String wikidataJSONResponse, String type) {
+		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.INSTANCE_OF_JSONPROP);
+		if(jsonElement!=null)	
+		{
+			for(int i=0;i<jsonElement.size();i++)
+			{
+				if(type.equalsIgnoreCase(NERClassification.AGENT.toString())) {
+					if(wikidataSubclassesForAgent.contains(jsonElement.get(i).get(0))) {
+						return true;
+					}
+				}
+				else if(type.equalsIgnoreCase(NERClassification.PLACE.toString())) {
+					if(wikidataSubclassesForPlace.contains(jsonElement.get(i).get(0))) {
+						return true;
+					}
+				}
+			}				
+		}
+		return false;
+
+	}
+	
+	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) { 
+		List<String> savedWikidataIds=new ArrayList<String>();
+		List<String> savedWikidataJsons=new ArrayList<String>();
+		if(namedEntity.getDbpediaWikidataIds()!=null) {
+			//first check if any of the ids match the prefLabel
+			for(String wikidataId : namedEntity.getDbpediaWikidataIds()) {
+				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
+				if(validWikidataPage(wikidataJSONResponse)) {
+					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+					}
+					else {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+						
+					}
+				}
+			}
+			//then check if any of the ids match the altLabel
+			for(int i=0;i<savedWikidataJsons.size();i++) {
+				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					return savedWikidataIds.get(i);
+				}
+			}
+			return getTheLowestWikidataId(namedEntity.getDbpediaWikidataIds());
+		}		
+		else if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
+			//first check if any of the ids match the prefLabel
+			for(String wikidataId : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
+				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
+				if(validWikidataPage(wikidataJSONResponse)) {
+					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+					}
+					else {
+						savedWikidataIds.add(wikidataId);
+						savedWikidataJsons.add(wikidataJSONResponse);
+						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
+							return wikidataId;
+						}
+					}
+				}
+			}
+			//then check if any of the ids match the altLabel
+			for(int i=0;i<savedWikidataJsons.size();i++) {
+				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					return savedWikidataIds.get(i);
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private String getTheLowestWikidataId(List<String> wikidataIds) {
+		if(wikidataIds.size()==0) {
+			return null;
+		}
+		int lowestQId=Integer.valueOf(wikidataIds.get(0).substring(wikidataIds.get(0).lastIndexOf("/") + 2).trim());
+		for(String id : wikidataIds) {
+			int wikidataIdInt = Integer.valueOf(id.substring(id.lastIndexOf("/") + 2).trim());
+			if(wikidataIdInt<lowestQId) {
+				lowestQId=wikidataIdInt;
+			}
+		}
+		return EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + "Q" + lowestQId;
+	}
+	
+	private Set<String> readWikidataSubclasses(String path) throws IOException {
+		Set<String> wikidataIdentifiers = new HashSet<String>();
+		Path subclassesPlacePath = Path.of(path);
+		String subclassesPlaceString = Files.readString(subclassesPlacePath);
+		JSONArray subclassesPlaceJson = new JSONArray(subclassesPlaceString);
+		for(int index = 0; subclassesPlaceJson.length() > index; index++) {
+			JSONObject item = subclassesPlaceJson.getJSONObject(index);
+			String identifierUrl = item.getString("s");
+			//extracts the Q identifier, e.g. "Q64"
+			String identifier = identifierUrl.substring(identifierUrl.lastIndexOf("/") + 1);
+			wikidataIdentifiers.add(identifier);
+		}
+		return wikidataIdentifiers;
+	}
+	
+	public Set<String> getWikidataSubclassesForPlace() {
+		return wikidataSubclassesForPlace;
+	}
+
+	public Set<String> getWikidataSubclassesForAgent() {
+		return wikidataSubclassesForAgent;
+	}
 }

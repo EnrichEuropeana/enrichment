@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 
 @Service
 public class DeeplTranslationServiceImpl {
@@ -51,7 +52,7 @@ public class DeeplTranslationServiceImpl {
 		try (BufferedReader br = new BufferedReader(new FileReader(credentialFilePath))) {
 			String line;
 			while ((line = br.readLine()) != null) {
-				String[] splitString = line.split("=");
+				String[] splitString = HelperFunctions.toArray(line,"=");
 				if (splitString[0].equals("AuthenticationKey")) {
 					authenticationKey = splitString[1];
 					break;

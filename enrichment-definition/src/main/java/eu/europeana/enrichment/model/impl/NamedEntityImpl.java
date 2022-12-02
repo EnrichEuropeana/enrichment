@@ -1,30 +1,32 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Transient;
 
 @Entity(value="NamedEntityImpl")
+@Indexes(@Index(fields = { @Field("label"), @Field("type"), @Field("dbpediaId") }, options = @IndexOptions(unique = true)))
 public class NamedEntityImpl {
 
 	protected String type;
 	protected String label;
 	protected List<String> europeanaIds;
-	protected List<String> wikidataLabelMatchIds;
-	protected List<String> wikidataLabelAndTypeMatchIds;
-	protected List<String> wikidataLabelAltLabelMatchIds;
 	protected List<String> wikidataLabelAltLabelAndTypeMatchIds;
-	protected List<String> dbpediaIds;
+	protected String dbpediaId;
 	protected List<String> dbpediaWikidataIds;
-	protected List<String> preferredWikidataIds;
 	String preferedWikidataId;
 
 	@Transient
-	protected List<PositionEntityImpl> positionEntities;
+	protected PositionEntityImpl positionEntity;
 
 	//id will be used for storing MongoDB _id
 	@Id
@@ -74,14 +76,6 @@ public class NamedEntityImpl {
 		this.europeanaIds.add(id);
 	}
 	
-	public List<String> getWikidataLabelAndTypeMatchIds() {
-		return wikidataLabelAndTypeMatchIds;
-	}
-	
-	public void setWikidataLabelAndTypeMatchIds(List<String> ids) {
-		this.wikidataLabelAndTypeMatchIds = ids;
-	}	
-	
 	public List<String> getDbpediaWikidataIds(){
 		return dbpediaWikidataIds;
 	}	
@@ -89,37 +83,21 @@ public class NamedEntityImpl {
 	public void setDbpediaWikidataIds(List<String> ids) {
 		dbpediaWikidataIds = ids;
 	}
-
-	public void addPositionEntity(PositionEntityImpl positionEntity) {
-		positionEntities.add(positionEntity);
+	
+	public void setPositionEntity(PositionEntityImpl position) {
+		positionEntity = position;
 	}
 	
-	public void setPositionEntities(List<PositionEntityImpl> positions) {
-		positionEntities = positions;
+	public PositionEntityImpl getPositionEntity() {
+		return positionEntity;
 	}
 	
-	public List<PositionEntityImpl> getPositionEntities() {
-		return positionEntities;
+	public String getDBpediaId() {
+		return dbpediaId;
 	}
 	
-	public List<String> getDBpediaIds() {
-		return dbpediaIds;
-	}
-	
-	public void setDBpediaIds(List<String> ids) {
-		dbpediaIds = ids;
-	}
-	
-	public void addDBpediaId(String id) {
-		dbpediaIds.add(id);
-	}
-
-	public List<String> getWikidataLabelMatchIds() {
-		return wikidataLabelMatchIds;
-	}
-
-	public void setWikidataLabelMatchIds(List<String> wikidataLabelMatchIds) {
-		this.wikidataLabelMatchIds = wikidataLabelMatchIds;
+	public void setDBpediaId(String id) {
+		dbpediaId = id;
 	}
 
 	public String getPreferedWikidataId() {
@@ -130,14 +108,6 @@ public class NamedEntityImpl {
 		this.preferedWikidataId = preferedWikidataId;
 	}
 	
-	public List<String> getWikidataLabelAltLabelMatchIds() {
-		return wikidataLabelAltLabelMatchIds;
-	}
-
-	public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
-		this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
-	}
-
 	public List<String> getWikidataLabelAltLabelAndTypeMatchIds() {
 		return wikidataLabelAltLabelAndTypeMatchIds;
 	}
@@ -145,13 +115,4 @@ public class NamedEntityImpl {
 	public void setWikidataLabelAltLabelAndTypeMatchIds(List<String> wikidataLabelAltLabelAndTypeMatchIds) {
 		this.wikidataLabelAltLabelAndTypeMatchIds = wikidataLabelAltLabelAndTypeMatchIds;
 	}
-
-	public List<String> getPreferredWikidataIds() {
-		return preferredWikidataIds;
-	}
-
-	public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
-		this.preferredWikidataIds = preferredWikidataIds;
-	}
-
 }

@@ -27,6 +27,7 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import fr.dudie.nominatim.client.JsonNominatimClient;
 import fr.dudie.nominatim.model.Address;
 
@@ -246,7 +247,7 @@ public class GeolocationServiceTest {
 	
 	public void distanceComparison(List<String> coords, Double latitude, Double longitutde) {
 		for(String coord : coords) {
-			String[] split = coord.split(",");
+			String[] split = HelperFunctions.toArray(coord,",");
 			Double lat = Double.parseDouble(split[0]);
 			Double lon =  Double.parseDouble(split[1]);
 			Double distance = Math.abs(lat-latitude) + Math.abs(lon-longitutde);

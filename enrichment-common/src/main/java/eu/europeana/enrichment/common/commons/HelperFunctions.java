@@ -246,10 +246,16 @@ public class HelperFunctions {
 		return altLabelMap;
 	}
 	
-    public static String[] toArray(String concatenatedStrings) {
+	/**
+	 * Splitting a string into an array. A null separator splits on whitespace.
+	 * @param concatenatedStrings
+	 * @param separator
+	 * @return
+	 */
+    public static String[] toArray(String concatenatedStrings, String separator) {
 		if (StringUtils.isEmpty(concatenatedStrings))
 		    return null;
-		String[] array = StringUtils.splitByWholeSeparator(concatenatedStrings, ",");
+		String[] array = StringUtils.splitByWholeSeparator(concatenatedStrings, separator);
 		return StringUtils.stripAll(array);
     }	
 
@@ -388,6 +394,5 @@ public class HelperFunctions {
 		itemArr = itemList.toArray(itemArr);
 		return itemArr;
 	}
-
 
 }

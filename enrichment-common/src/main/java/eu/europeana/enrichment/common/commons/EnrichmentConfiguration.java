@@ -17,8 +17,11 @@ import org.springframework.context.annotation.PropertySources;
 public class EnrichmentConfiguration  {
 
 	Logger logger = LogManager.getLogger(getClass());
+	
+    @Value("${enrich.api.endpoint}")
+    private String enrichApiEndpoint;
 
-    @Value("${enrich.mongodb.connectionUri}")
+	@Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
 
     @Value("${enrich.mongodb.truststore}")
@@ -116,10 +119,35 @@ public class EnrichmentConfiguration  {
 	
 	@Value("${enrich.annotations.creator}")
     private String annotationsCreator;	
-    
+	
+	@Value("${enrich.wikidata.subclasses.geographic-location}")
+    private String wikidataSubclassesGeographicLocation;	
+
+	@Value("${enrich.wikidata.subclasses.human}")
+    private String wikidataSubclassesHuman;	
+	
+	@Value("${auth.read.enabled: true}")
+	private boolean authReadEnabled;
+	
+	@Value("${auth.write.enabled: true}")
+	private boolean authWriteEnabled;
+	
+	@Value("${europeana.apikey.jwttoken.signaturekey}")
+	private String apiKeyPublicKey;
+	
+	@Value("${authorization.api.name}")
+	private String authorizationApiName;
+	
+	@Value("${europeana.apikey.serviceurl}")
+	private String apiKeyUrl;
+
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
+
+    public String getEnrichApiEndpoint() {
+		return enrichApiEndpoint;
+	}
 
   	public String getMongodbConnectionUri() {
 		return mongodbConnectionUri;
@@ -268,4 +296,33 @@ public class EnrichmentConfiguration  {
   	public String getAnnotationsCreator() {
 		return annotationsCreator;
 	}
+  	
+	public String getWikidataSubclassesGeographicLocation() {
+		return wikidataSubclassesGeographicLocation;
+	}
+	
+	public String getWikidataSubclassesHuman() {
+		return wikidataSubclassesHuman;
+	}
+	
+	public boolean isAuthReadEnabled() {
+	    return authReadEnabled;
+	}
+	
+	public boolean isAuthWriteEnabled() {
+		return authWriteEnabled;
+	}
+	
+	public String getApiKeyPublicKey() {
+		return apiKeyPublicKey;
+	}
+
+	public String getAuthorizationApiName() {
+	    return authorizationApiName;
+	}
+
+	public String getApiKeyUrl() {
+	    return apiKeyUrl;
+	}
+	
 }

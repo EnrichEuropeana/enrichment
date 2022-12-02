@@ -74,6 +74,22 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		return 0;
 	}
 	
+	public boolean existWikidataURL(String wikidataURL) throws SolrServiceException {
+		SolrQuery query = new SolrQuery();
+		query.set("q", EntitySolrFields.ID+ ":\"" + wikidataURL + "\"");
+		
+	    QueryResponse rsp = null;
+		try {
+			rsp = query(solrCore, query);
+		} catch (SolrServiceException e) {
+			logger.log(Level.ERROR, "Exception during the Solr quering for the wikidata.", e);
+			throw e;
+		}
+	    SolrDocumentList docs = rsp.getResults();
+	    if (docs.getNumFound()>0) return true;
+	    else return false;
+	}
+	
 	@Override
 	public String searchByWikidataURL(String wikidataURL) throws SolrServiceException {
 		
@@ -357,7 +373,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public String searchNamedEntities_usingJackson(String wskey, String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrServiceException, IOException {
+	public String searchNamedEntities_usingJackson(String queryText, String entityType, String lang, String solrQuery, String solrSortText, String pageSize, String page) throws SolrServiceException, IOException {
 		
 		//forming required properties for the class to be serialized
 		String URLPage;
@@ -397,8 +413,8 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			
 //			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 //			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
-			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
-			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			
 		}
 		else
@@ -406,8 +422,8 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			
-			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
-			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?wskey=" + wskey + "&query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place" + "&lang="+ lang;
 		}
 		
 		if(solrSortText!=null && !solrSortText.isEmpty())

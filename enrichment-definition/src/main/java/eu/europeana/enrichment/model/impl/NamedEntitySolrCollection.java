@@ -12,15 +12,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD, 
-	EntityFields.ID, 
-	EntityFields.TYPE, 
-	EntityFields.TOTAL,
-	EntityFields.PART_OF, 
-	EntityFields.ITEMS
+	EnrichmentFields.ID, 
+	EnrichmentFields.TYPE, 
+	EnrichmentFields.TOTAL,
+	EnrichmentFields.PART_OF, 
+	EnrichmentFields.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntitySolrCollection {
@@ -42,7 +42,7 @@ public class NamedEntitySolrCollection {
 		total = String.valueOf(totalPage);			
 	}
 	
-	@JsonProperty(EntityFields.ITEMS)
+	@JsonProperty(EnrichmentFields.ITEMS)
 	public List<WikidataEntity> getItems() {
 		return items;
 	}
@@ -51,7 +51,7 @@ public class NamedEntitySolrCollection {
 		this.items = items;
 	}
 	
-	@JsonProperty(EntityFields.PART_OF)
+	@JsonProperty(EnrichmentFields.PART_OF)
 	public Map<String,String> getPartOf() {
 		return partOf;
 	}
@@ -61,7 +61,7 @@ public class NamedEntitySolrCollection {
 	}
 	
 	
-	@JsonProperty(EntityFields.ID)
+	@JsonProperty(EnrichmentFields.ID)
 	public String getId() {
 		return id;
 	}
@@ -70,7 +70,7 @@ public class NamedEntitySolrCollection {
 		this.id = url;
 	}
 	
-	@JsonProperty(EntityFields.TYPE)
+	@JsonProperty(EnrichmentFields.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -79,7 +79,7 @@ public class NamedEntitySolrCollection {
 		this.type = type;
 	}
 
-	@JsonProperty(EntityFields.TOTAL)
+	@JsonProperty(EnrichmentFields.TOTAL)
 	public String getTotal() {
 		return total;
 	}
