@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 /**
  * This class is used for the annotations serialization.
@@ -19,11 +19,11 @@ import eu.europeana.enrichment.model.vocabulary.EntityFields;
  */
 @JsonPropertyOrder({ 
 	CONTEXT_FIELD, 
-	EntityFields.ID, 
-	EntityFields.TYPE, 
-	EntityFields.CREATOR,
-	EntityFields.TOTAL,
-	EntityFields.ITEMS
+	EnrichmentFields.ID, 
+	EnrichmentFields.TYPE, 
+	EnrichmentFields.CREATOR,
+	EnrichmentFields.TOTAL,
+	EnrichmentFields.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
@@ -65,7 +65,7 @@ public class NamedEntityAnnotationCollection {
 		
 	}
 	
-	@JsonProperty(EntityFields.ITEMS)
+	@JsonProperty(EnrichmentFields.ITEMS)
 	public List<NamedEntityAnnotation> getItems() {
 		return items;
 	}
@@ -78,12 +78,12 @@ public class NamedEntityAnnotationCollection {
 		return id;
 	}
 	
-	@JsonProperty(EntityFields.ID)
+	@JsonProperty(EnrichmentFields.ID)
 	public String getIdSerialization() {
 		return id;
 	}
 	
-	@JsonProperty(EntityFields.TYPE)
+	@JsonProperty(EnrichmentFields.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -92,12 +92,12 @@ public class NamedEntityAnnotationCollection {
 		this.type = type;
 	}
 	
-	@JsonProperty(EntityFields.CREATOR)
+	@JsonProperty(EnrichmentFields.CREATOR)
 	public String getCreator() {
 		return creator;
 	}
 
-	@JsonProperty(EntityFields.TOTAL)
+	@JsonProperty(EnrichmentFields.TOTAL)
 	public String getTotal() {
 		return total;
 	}

@@ -17,6 +17,7 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
+import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
@@ -32,7 +33,7 @@ public class TopicImpl implements Topic {
 	@JsonIgnore
 	public ObjectId _id;
 	
-	@JsonProperty("model")
+	@JsonIgnore
 	private TopicModel model;
 	
 	// <{baseurl}/topic/1>
@@ -59,7 +60,8 @@ public class TopicImpl implements Topic {
 	@JsonProperty("keywords")
 	private List<Term> keywords;
 	
-	@JsonIgnore
+	@Transient
+	@JsonProperty("modelID")
 	private String modelId;	
 	
 	@JsonProperty("created")
@@ -197,7 +199,6 @@ public class TopicImpl implements Topic {
 			this.modelId = this.model.getIdentifier();
 		else
 			this.modelId = modelId;
-		
 	}
 
 }
