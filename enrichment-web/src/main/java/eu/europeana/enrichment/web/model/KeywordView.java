@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.model;
 
-import org.springframework.data.annotation.Id;
+import java.util.List;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.datatables.DataTablesOutput.View;
 
@@ -15,8 +16,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 public class KeywordView {
 
 //    private KeywordNamedEntity kne;
-    @Id
-    private String id;
+//    @Id
+    private String objectId;
+    private String propertyId;
     private String keyword;
     private String lang;
     private String keywordEn;
@@ -24,11 +26,15 @@ public class KeywordView {
     private String type;
     private int position;
     private String wikidataTypes;
-    private String dbpId;
-    private String dbpWkdId;
+    //private String dbpId;
+    //private String dbpWkdId;
+    private List<String> dbpediaWikidataIds;
     private String prefWkdId;
     private String wkdIds;
     private String wkdAltLabelIds;
+    private List<Long> tpItemIds;
+    private String status;
+    
 
     public KeywordView() {
     }
@@ -37,12 +43,12 @@ public class KeywordView {
 //        this.kne = kne;
 //    }
 
-    public String getId() {
-        return id;
+    public String getPropertyId() {
+        return propertyId;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setPropertyId(String propertyId) {
+        this.propertyId = propertyId;
     }
 
     public String getKeyword() {
@@ -93,21 +99,21 @@ public class KeywordView {
         this.wikidataTypes = wikidataTypes;
     }
 
-    public String getDbpId() {
-        return dbpId;
-    }
-
-    public void setDbpId(String dbpId) {
-        this.dbpId = dbpId;
-    }
-
-    public String getDbpWkdId() {
-        return dbpWkdId;
-    }
-
-    public void setDbpWkdId(String dbpWkdId) {
-        this.dbpWkdId = dbpWkdId;
-    }
+//    public String getDbpId() {
+//        return dbpId;
+//    }
+//
+//    public void setDbpId(String dbpId) {
+//        this.dbpId = dbpId;
+//    }
+//
+//    public String getDbpWkdId() {
+//        return dbpWkdId;
+//    }
+//
+//    public void setDbpWkdId(String dbpWkdId) {
+//        this.dbpWkdId = dbpWkdId;
+//    }
 
     public String getPrefWkdId() {
         return prefWkdId;
@@ -139,6 +145,38 @@ public class KeywordView {
 
     public void setLang(String lang) {
         this.lang = lang;
+    }
+
+    public List<Long> getTpItemIds() {
+        return tpItemIds;
+    }
+
+    public void setTpItemIds(List<Long> tpItemIds) {
+        this.tpItemIds = tpItemIds;
+    }
+
+    public List<String> getDbpediaWikidataIds() {
+        return dbpediaWikidataIds;
+    }
+
+    public void setDbpediaWikidataIds(List<String> dbpediaWikidataIds) {
+        this.dbpediaWikidataIds = dbpediaWikidataIds;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
 }

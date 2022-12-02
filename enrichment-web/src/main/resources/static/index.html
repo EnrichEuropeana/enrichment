@@ -15,34 +15,56 @@
     <table id="keyword" class="display" style="width:100%">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Pref Label (EN)</th>
+            	<th>Id</th>
+                <th>K-Id</th>
                 <th>Keyword text</th>
                 <th>Keyword (EN)</th>
+                <th>Pref Label (EN)</th>
+                <th>Pref-WKD ID</th>
+                <th>Status</th>
+                <th>TP Items</th>
+                <!-- 
                 <th>Type</th>
+                 -->
+                <!-- 
                 <th>Position</th>
+                 -->
                 <th>Wikidata Types</th>
+                <th>Spotlight WKD Ids</th>
+                <!-- 
                 <th>Dbpedia ID</th>
                 <th>Dbpedia-WKD ID</th>
-                <th>Pref-WKD ID</th>
+                
                 <th>WKD IDs</th>
                 <th>WKD Alt IDs</th>
+                 -->
             </tr>
         </thead>
         <tfoot>
             <tr>
-                <th>Id</th>
+            	<th>objectId</th>
+                <th>propertyId</th>
                 <th>Keyword_Orig</th>
                 <th>Keyword_EN</th>
                 <th>PrefLabel_EN</th>
+                <th>PrefWKD_ID</th>
+                <th>status</th>
+                <th>tpItemIds</th>
+                <!--  
                 <th>Type</th>
+                -->
+                 <!-- 
                 <th>Position</th>
+                 -->
                 <th>WikidataTypes</th>
+                <th>dbpediaWikidataIds</th>
+                <!-- 
                 <th>Dbp_ID</th>
                 <th>DbpWKD_ID</th>
-                <th>PrefWKD_ID</th>
+                
                 <th>WKD_IDs</th>
                 <th>WKD_AltLabel_IDs</th>
+                 -->
             </tr>
         </tfoot>
     </table>
@@ -57,14 +79,97 @@
     <script type="text/javascript">
     	function getDbpLink(url){
     		if(url){
-    			return '<a href="' + url + '">'+ url.replace('http://dbpedia.org/resource/', '') + '</a>';
+    			return '<a href="' + url + '" target="_blank">'+ url.replace('http://dbpedia.org/resource/', '') + '</a>';
     		}
     		return ''; 
     	}
     
+    	function approve(objectId, prefWkdId){
+    		//alert('approve: ' + objectId);
+    		let confirmed = confirm("Approve wikidata entity for keyword", prefWkdId);
+    		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
+    		if(confirmed){
+    			$.ajax({
+    				  url: "/keyword/approve?objectId=" + objectId,
+    				})
+    				  .done(function( data ) {
+    					  alert("update operation succeded! ");
+    					  $('#keyword').DataTable().ajax.reload();
+    				  })
+    				  .fail(function( data ) {
+    				    alert("update operation failed: " + data);
+    				    console.log(data);
+    				  })
+    		}
+    	}
+    	
+    	function reject(objectId, prefWkdId){
+    		let confirmed = confirm("Confirm rejection of keyword to wikidata entity linking: " + prefWkdId);
+    		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
+    		if(confirmed){
+    			$.ajax({
+    				  url: "/keyword/reject?objectId=" + objectId,
+    				})
+    				  .done(function( data ) {
+    					  alert("update operation succeded!");
+    					  $('#keyword').DataTable().ajax.reload();
+    				  })
+    				  .fail(function( data ) {
+    				    alert("update operation failed: " + data);
+    				    console.log(data);
+    				  })
+    		}
+    	}
+    	
+    	function buildButtons(objectId, prefWkdId){
+    		var links = ' <a href="javascript:" onclick="approve(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/approve1.png" width="20" /> ' + '</a>';
+    		links = links + ' <a href="javascript:" onclick="reject(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/reject1.png" width="20" /> ' + '</a>';
+    		return links	 
+    	}
+    	
+    	
     	function getWkdLink(url){
     		if(url){
-    			return '<a href="' + url + '">'+ url.replace('http://www.wikidata.org/entity/', '') + '</a>';
+    			return '<a href="' + url + '" target="_blank">'+ url.replace('http://www.wikidata.org/entity/', '') + '</a>';
+    		}
+    		return ''; 
+    	}
+    	
+    	function getTpLink(tpItemId){
+    		if(tpItemId){
+    			//https://europeana.transcribathon.eu/documents/story/item/?item=451984
+    			return '<a href="https://europeana.transcribathon.eu/documents/story/item/?item=' + tpItemId + '" target="_blank">'+ tpItemId + '</a>';
+    		}
+    		return ''; 
+    	}
+    	
+    	function getValue(dataObject, attributeName){
+    		if(dataObject && dataObject[attributeName]){
+    			return dataObject[attributeName];
+    		}
+    		return ''; 
+    	}
+
+    	function buildTpLinks(tpItemIds){
+    		if(tpItemIds){
+    			res = '';
+    			for (let i = 0; i < tpItemIds.length; i++){
+    				 res += getTpLink(tpItemIds[i]);
+    				 res += ", ";
+    			}
+    			return res;
+    		}
+    		return ''; 
+    	}
+    	
+    	function buildWkdLinks(urls){
+    		if(urls){
+    			res = '';
+    			for (let i = 0; i < urls.length; i++){
+    				 res += getWkdLink(urls[i]);
+    				 res += ", ";
+    			}
+    			return res;
     		}
     		return ''; 
     	}
@@ -99,18 +204,22 @@
 
                         for (let i = 0; i < data.data.length; i++) {
                             renderData.push({
-                                Id: data.data[i].id,
+                            	objectId: data.data[i].objectId,
+                                propertyId: data.data[i].propertyId,
                                 Keyword_Orig: data.data[i].keyword,
                                 Keyword_EN: data.data[i].keywordEn,
-                                PrefLabel_EN: data.data[i].prefLabelEn,
-                                Type: data.data[i].type,
-                                Position: data.data[i].position,
+                                PrefLabel_EN: getValue(data.data[i], 'prefLabelEn'),
+                                PrefWKD_ID: getWkdLink(data.data[i].prefWkdId) + buildButtons(data.data[i].objectId, data.data[i].prefWkdId),
+                                status: '' + data.data[i].status,
+                                tpItemIds: buildTpLinks(data.data[i].tpItemIds),
+                                //Type: getValue(data.data[i], 'type'),
+                                //Position: data.data[i].position,
                                 WikidataTypes: '' + data.data[i].wikidataTypes,
-                                Dbp_ID: getDbpLink(data.data[i].dbpId),
-                                DbpWKD_ID: getWkdLink(data.data[i].dbpWkdId),
-                                PrefWKD_ID: getWkdLink(data.data[i].prefWkdId),
-                                WKD_IDs: getWkdLinks(data.data[i].wkdIds),
-                                WKD_AltLabel_IDs: getWkdLinks(data.data[i].wkdAltLabelIds) 
+                                dbpediaWikidataIds: buildWkdLinks(data.data[i].dbpediaWikidataIds),
+                                //Dbp_ID: getDbpLink(data.data[i].dbpId),
+                                //DbpWKD_ID: getWkdLink(data.data[i].dbpWkdId),
+                                //WKD_IDs: getWkdLinks(data.data[i].wkdIds),
+                                //WKD_AltLabel_IDs: getWkdLinks(data.data[i].wkdAltLabelIds) 
                             });
                         }
 
@@ -118,18 +227,22 @@
                     }
                 },
                 columns: [
-                    { data: 'Id' },
+                	{ data: 'objectId' },
+                    { data: 'propertyId' },
                     { data: 'Keyword_Orig' },
                     { data: 'Keyword_EN' },
                     { data: 'PrefLabel_EN' },
-                    { data: 'Type' },
-                    { data: 'Position' },
-                    { data: 'WikidataTypes' },
-                    { data: 'Dbp_ID' },
-                    { data: 'DbpWKD_ID' },
                     { data: 'PrefWKD_ID' },
-                    { data: 'WKD_IDs' },
-                    { data: 'WKD_AltLabel_IDs' },
+                    { data: 'status' },
+                    //{ data: 'Type' },
+                    //{ data: 'Position' },
+                    { data: 'tpItemIds' },
+                    { data: 'WikidataTypes' },
+                    { data: 'dbpediaWikidataIds' },
+                    //{ data: 'Dbp_ID' },
+                    //{ data: 'DbpWKD_ID' },
+                    //{ data: 'WKD_IDs' },
+                    //{ data: 'WKD_AltLabel_IDs' },
                 ]
             } );
 

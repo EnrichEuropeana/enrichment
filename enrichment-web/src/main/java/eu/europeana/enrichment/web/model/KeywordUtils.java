@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.model;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,17 +15,21 @@ public class KeywordUtils {
     public static KeywordView createView(Keyword keyword) {
         try {
         KeywordView view = new KeywordView();
-        view.setId(keyword.getPropertyId());
+        view.setObjectId(keyword.get_id().toHexString());
+        view.setPropertyId(keyword.getPropertyId());
         view.setLang(keyword.getDetectedOriginalLanguage());
         view.setKeyword(keyword.getValue());
         view.setKeywordEn(keyword.getTranslatedValue());
-        
+        view.setStatus(keyword.getStatus());
+                
         if(keyword.getPreferredWikidataId()!= null && keyword.getPrefferedWikidataEntity() != null) {
             view.setPrefWkdId(keyword.getPreferredWikidataId());
             view.setPrefLabelEn(
                     getLabel(keyword.getPrefferedWikidataEntity().getPrefLabel(), LANG_EN));
             view.setWikidataTypes(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
             view.setType(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
+            view.setTpItemIds(top5(keyword.getTpItemIds()));
+            view.setDbpediaWikidataIds(keyword.getDbpediaWikidataIds());
 //            view.setDbpId(getDbpediaId(keyword));
 //            view.setDbpWkdId(getDbpWkdId(keyword));
 //            view.setPosition(getPosition(keyword));
@@ -42,17 +47,10 @@ public class KeywordUtils {
 
 
 
-//    private static String getWkdAltLabelIds(Keyword keyword) {
-//        return StringUtils.join(keyword.getWikidataLabelAltLabelMatchIds(), ", ");
-//    }
-//
-//
-//
-//    private static String getWkdIds(Keyword keyword) {
-//        return StringUtils.join(keyword.getPreferredWikidataIds(), ", ");
-//    }
-
-
+    private static List<Long> top5(List<Long> tpItemIds) {
+        int count = Math.min(5, tpItemIds.size());
+        return tpItemIds.subList(0, count);
+    }
 
     private static String getWikidataTypes(KeywordWikidataEntity entity) {
         if(entity.getWikidataType() == null) {
@@ -60,32 +58,6 @@ public class KeywordUtils {
         }
         return StringUtils.join(entity.getWikidataType().values(), ", ");  
     }
-
-
-
-//    private static int getPosition(Keyword keyword) {
-//        if(keyword.getKeywordPositionEntities() == null) {
-//            return -1;
-//        }
-//        return keyword.getKeywordPositionEntities().get(0).getOffsetsTranslatedText().get(0);
-//    }
-//
-//
-//
-//    private static String getDbpWkdId(Keyword keyword) {
-//        if(keyword.getDbpediaWikidataIds() == null) {
-//            return null;
-//        }
-//        return keyword.getDbpediaWikidataIds().get(0);        
-//    }
-//
-//    private static String getDbpediaId(Keyword keyword) {
-//        if(keyword.getDBpediaIds() == null) {
-//            return null;
-//        }
-//        return keyword.getDBpediaIds().get(0);
-//    }
-
 
     private static String getLabel(Map<String, String> languageMap, String lang) {
         if(lang == null || languageMap == null) {
@@ -98,16 +70,4 @@ public class KeywordUtils {
         return null;
     }
     
-//    private static String getLabel(Keyword keyword, String lang) {
-//        if(lang == null) {
-//            return null;
-//        }
-//            
-//        if(keyword.getPrefLabel() != null && keyword.getPrefLabel().containsKey(lang)) {
-//            return keyword.getPrefLabel().get(lang);
-//        }
-//        return null;
-//    }
-
-
 }
