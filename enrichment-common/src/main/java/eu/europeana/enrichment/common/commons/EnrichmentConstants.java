@@ -35,6 +35,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_TRANSLATION_GOOGLE_SERVICE= "googleTranslationService";
     public static final String BEAN_ENRICHMENT_NER_SERVICE= "enrichmentNerService";
     public static final String BEAN_ENRICHMENT_UI_SERVICE= "enrichmentUIService";
+    public static final String BEAN_ENRICHMENT_KEYWORD_SERVICE= "enrichmenKeywordService";
     public static final String BEAN_ENRICHMENT_TRANSLATION_SERVICE= "enrichmentTranslationService";
     public static final String BEAN_RECORD_TRANSLATION_SERVICE= "recordTranslationService";
     public static final String BEAN_ENRICHMENT_DATASTORE= "enrichmentDatastore";
