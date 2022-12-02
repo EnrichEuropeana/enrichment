@@ -143,11 +143,9 @@ public class JavaPDFWriter
 	        		
 	        		NamedEntityImpl nextNEREntity=NEREntitiesIterator.next();
 	        		
-	        		if(nextNEREntity.getPositionEntities()!=null) {
-		        		Iterator<PositionEntityImpl> PositionsIterator = nextNEREntity.getPositionEntities().iterator();		        		
-		            	while(PositionsIterator.hasNext()) {
+	        		if(nextNEREntity.getPositionEntity()!=null) {
 		            		
-		            		PositionEntityImpl nextPosition=PositionsIterator.next();   
+		            		PositionEntityImpl nextPosition=nextNEREntity.getPositionEntity();
 		            		
 		            		/*
 		            		 * check if the position is valid, if the value is <0 it is not valid meaning the NamedEntity is not found
@@ -217,7 +215,6 @@ public class JavaPDFWriter
 		            			logger.debug("Invalid position: " + String.valueOf(checkIfPositionIsValid) + " of the named entity! Text length: " + textString.length());
 		            		
 		            		}
-		            	}
 	        		}
 	        	}
         	}

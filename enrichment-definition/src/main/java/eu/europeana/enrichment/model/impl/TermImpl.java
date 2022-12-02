@@ -22,7 +22,7 @@ public class TermImpl implements Term {
 		
 	}
 	
-	public TermImpl(String term, Integer rank, Integer score) throws UnsupportedRangeTermEntityException {
+	public TermImpl(String term, Integer rank, Integer score) {
 //		if (!(1<=rank.intValue() && rank.intValue()<=250))
 //			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
 //		

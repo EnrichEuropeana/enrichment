@@ -6,17 +6,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import dev.morphia.annotations.Embedded;
 import dev.morphia.annotations.Property;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Embedded
 public class Processing {
 
-	@Property(EntityFields.FOUND_BY_NER_TOOLS)
+	@Property(EnrichmentFields.FOUND_BY_NER_TOOLS)
 	private List<String> foundByNerTools;
 	
 	private String matching;
-	private float score;
+	private double score;
 
 	public List<String> getFoundByNerTools() {
 		return foundByNerTools;
@@ -30,10 +30,10 @@ public class Processing {
 	public void setMatching(String matching) {
 		this.matching = matching;
 	}
-	public float getScore() {
+	public double getScore() {
 		return score;
 	}
-	public void setScore(float score) {
+	public void setScore(double score) {
 		this.score = score;
 	}	
 	
