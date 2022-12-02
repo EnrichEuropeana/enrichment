@@ -137,41 +137,19 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, CommonApiConstants.QUERY_PARAM_PAGE, String.valueOf(pageSize));
 	    }    
 	    
-	    //create items based on profile
+	    //set the result page items based on profile
 	    LdProfile profile = LdProfile.getByStringValue(requestParams.get(CommonApiConstants.QUERY_PARAM_PROFILE)[0]);
 	    if(LdProfile.MINIMAL.equals(profile)) {
 	    	//only serialize the topic ids 
 	    	resPage =  new TopicIdsResultPage();
-	    	List<String> solrTopicsIds = new ArrayList<>();
-	    	if(solrResults.size()>0) {
-				DocumentObjectBinder binder = new DocumentObjectBinder();
-			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
-			    while (iteratorSolrDocs.hasNext()) {
-			    	SolrDocument doc = iteratorSolrDocs.next();
-			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
-			    }
-	    	}
-		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
 	    }
 	    else if(LdProfile.STANDARD.equals(profile)) {
 	    	//serialize the whole topic
 	    	resPage =  new TopicResultPage();
-	    	List<Topic> solrTopics = new ArrayList<>();
-	    	if(solrResults.size()>0) {
-				DocumentObjectBinder binder = new DocumentObjectBinder();
-			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
-			    while (iteratorSolrDocs.hasNext()) {
-			    	SolrDocument doc = iteratorSolrDocs.next();
-			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopic.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
-			    	solrTopics.add(solrTopic);
-			    }		
-	    	}
-	    	((TopicResultPage)resPage).setItems(solrTopics);
-	    }
+	    }	    
+	    setResultPageItems(profile, solrResults, resPage);
 	    
-	    //create a collection overview
+	    //set the collection overview
 	    String collOverviewUrl = config.getEnrichApiEndpoint() + "/topic/search?";
 	    String wholePageUrlWithoutPageAndPageSize = config.getEnrichApiEndpoint() + "/topic/search?";
 	    int counter=1;
@@ -198,11 +176,49 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    		+ "&" + CommonApiConstants.QUERY_PARAM_PAGE_SIZE + "=" + pageSize;
 	    CollectionOverview resultList = new CollectionOverview(collOverviewUrl, totalInCollection, firstPage, lastPage);
 	    resPage.setPartOf(resultList);
-	    
-	    //setting the total found items
+	    	    
+	    //set the total found items
 	    resPage.setTotalInPage(solrResults.size());
 	
-	    //adding pagination
+	    //set the pagination
+	    setResultPagePagination(currentPageNum, firstPage, lastPage, wholePageUrlWithoutPageAndPageSize, lastPageNum, pageSize, resPage);
+	    
+	    return resPage;
+	}
+	
+	private void setResultPageItems (LdProfile profile, SolrDocumentList solrResults, BaseTopicResultPage<?> resPage) {
+	    if(LdProfile.MINIMAL.equals(profile)) {
+	    	List<String> solrTopicsIds = new ArrayList<>();
+	    	if(solrResults.size()>0) {
+				DocumentObjectBinder binder = new DocumentObjectBinder();
+			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
+			    while (iteratorSolrDocs.hasNext()) {
+			    	SolrDocument doc = iteratorSolrDocs.next();
+			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
+			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
+			    }
+	    	}
+		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
+	    }
+	    else if(LdProfile.STANDARD.equals(profile)) {
+	    	List<Topic> solrTopics = new ArrayList<>();
+	    	if(solrResults.size()>0) {
+				DocumentObjectBinder binder = new DocumentObjectBinder();
+			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
+			    while (iteratorSolrDocs.hasNext()) {
+			    	SolrDocument doc = iteratorSolrDocs.next();
+			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
+			    	solrTopic.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
+			    	solrTopic.setModelId(config.getEnrichApiEndpoint() + "/model/" + solrTopic.getModelId());
+			    	solrTopics.add(solrTopic);
+			    }		
+	    	}
+	    	((TopicResultPage)resPage).setItems(solrTopics);
+	    }
+	}
+	
+	private void setResultPagePagination(int currentPageNum, String firstPage, String lastPage, 
+			String wholePageUrlWithoutPageAndPageSize, long lastPageNum, int pageSize, BaseTopicResultPage<?> resPage) {
 	    String prevPage = null;
 	    String nextPage = null;
 	    if(currentPageNum==0) {
@@ -220,9 +236,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    	nextPage = wholePageUrlWithoutPageAndPageSize + "&" + CommonApiConstants.QUERY_PARAM_PAGE + "=" + (currentPageNum+1)
 	        		+ "&" + CommonApiConstants.QUERY_PARAM_PAGE_SIZE + "=" + pageSize;    	
 	    }
-	    resPage.setNextPageUri(nextPage);    
-	    
-	    return resPage;
-  }
+	    resPage.setNextPageUri(nextPage);		
+	}
 	
 }
