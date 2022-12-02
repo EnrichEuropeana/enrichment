@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.solr.common.SolrDocumentList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -20,18 +21,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.definitions.WebFields;
-import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.http.HttpHeaders;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentModelFields;
-import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
+import eu.europeana.enrichment.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
+import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 import eu.europeana.enrichment.web.service.EnrichmentTopicService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -67,11 +69,11 @@ public class TopicController extends BaseRest{
 		for(TopicImpl topic : topics) {
 			// check mandatory fields
 			if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicIdentifier, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_ENTITY_IDENTIFIER, null);
 			if (topic.getDescriptions()==null)
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicDescriptions, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_DESCRIPTIONS, null);
 			if (topic.getTerms()==null)
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentModelFields.topicTerms, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_TERMS, null);
 			
 			//TODO: add apiVersion to the generateETag method
 			Date date = new Date();
@@ -158,33 +160,44 @@ public class TopicController extends BaseRest{
 		}
 	}
 	
-    @ApiOperation(value = "Search topics for the given query. The parameter example values: query (query text) -> identifier:lda*; fq (filter query, can be a comma separated list) -> identifier:*TOPIC8,modelID:lda*; "
-    		+ "fl (list of fields to include in the response, can be a comma separated list) -> identifier,modelID; facet (a comma separated list of facet.field values, i.e. the field for which the facets count will be calculated) -> "
-    		+ "identifier, modelID; sort (a comma separated list of sortings) -> identifier asc, modelID desc; page (the page number); pageSize (the page size)", nickname = "searchTopics", response = java.lang.Void.class)
+    @ApiOperation(value = "Search topics for the given query. The parameter example values: query (query text) -> identifier:lda*; qf (query filter, can be a comma separated list) -> identifier:*TOPIC8,modelID:lda*; "
+    		+ "profile (a profile used for the serialization, can be minimal or standard) -> minimal; "
+    		+ "sort (a comma separated list of sortings) -> identifier asc, modelID desc; page (the page number); pageSize (the page size)", nickname = "searchTopics", response = java.lang.Void.class)
     @RequestMapping(value = "/enrichment/topic/search", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> searchTopics(
-		    @RequestParam(value = "query") String queryString,
-		    @RequestParam(value = "fq", required = false) String fq,
-		    @RequestParam(value = "fl", required = false) String fl,
-		    @RequestParam(value = "facet", required = false) String facet,
-		    @RequestParam(value = "sort", required = false) String sort,
-		    @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-		    @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
-		    HttpServletRequest request) throws SolrServiceException, ParamValidationException, ApplicationAuthenticationException {
-	
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_QUERY) String query,
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_QF, required = false) String qf,
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_PROFILE, required = false, defaultValue = "standard") String profile,
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_SORT, required = false) String sort,
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_PAGE, required = false, defaultValue = "0") int page,
+		    @RequestParam(value = CommonApiConstants.QUERY_PARAM_PAGE_SIZE, required = false, defaultValue = "10") int pageSize,
+		    @RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
+		    HttpServletRequest request) throws Exception {
+    	
     	verifyReadAccess(request);
+    	
+    	Date date = new Date();
     		
-	    if (StringUtils.isBlank(queryString)) {
-	    	throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "query", queryString);
+	    if (StringUtils.isBlank(query)) {
+	    	throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "query", query);
 	    }
 	    
-	    String topicsJson = enrichmentTopicService.searchTopics(queryString, fq, fl, facet, sort, page, pageSize);
+	    String fl=null;
+	    if(LdProfile.MINIMAL.getStringValue().equals(profile)) {
+	    	fl="topicID";
+	    }
+	    SolrDocumentList solrTopics = enrichmentTopicService.searchTopics(query, qf, fl, null, sort, page, pageSize);
 	    // build response
+	    @SuppressWarnings("rawtypes")
+		BaseTopicResultPage resultsPage = enrichmentTopicService.buildResultsPage(request.getParameterMap(), solrTopics);
+
 	    MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 	    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 	    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GET);
+	    String etag = generateETag(date, WebFields.JSON_LD_REST);
+	    headers.add(HttpHeaders.ETAG, etag);
 
-	    ResponseEntity<String> response = new ResponseEntity<String>(topicsJson, headers, HttpStatus.OK);
+	    ResponseEntity<String> response = new ResponseEntity<String>(jsonLdSerializer.serializeObject(resultsPage), headers, HttpStatus.OK);
 
 	    return response;  	
     }
