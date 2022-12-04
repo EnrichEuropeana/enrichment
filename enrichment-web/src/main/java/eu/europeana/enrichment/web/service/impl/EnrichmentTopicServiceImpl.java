@@ -1,25 +1,43 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.api.commons.web.exception.ParamValidationException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
@@ -32,7 +50,6 @@ import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 import eu.europeana.enrichment.solr.service.impl.SolrTopicServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
-import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 import eu.europeana.enrichment.web.model.topic.search.CollectionOverview;
 import eu.europeana.enrichment.web.model.topic.search.TopicIdsResultPage;
@@ -104,6 +121,58 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		}
 		return null;
 	}
+	
+	public List<Topic> detectTopics (String text, int topics) throws URISyntaxException, ClientProtocolException, IOException, HttpException {
+		
+	    CloseableHttpClient client = HttpClients.createDefault();
+	    
+	    //check if the language of the text is only English
+	    HttpPost httpPost = new HttpPost(config.getSparkLanguageDetectionUrl());
+		StringEntity httpEntity = new StringEntity(text);
+	    httpPost.setEntity(httpEntity);	    
+	    CloseableHttpResponse response = client.execute(httpPost);
+	    String responseString = EntityUtils.toString(response.getEntity());
+	    JSONObject responseJson = new JSONObject(responseString);
+	    boolean textOnlyEn = true;
+	    Iterator<String> responseLanguagesIter = responseJson.keys();
+	    while(responseLanguagesIter.hasNext()) {
+	    	if(!responseLanguagesIter.next().equals("en")) {
+	    		textOnlyEn=false;
+	    		break;
+	    	}
+	    }
+	    if(!textOnlyEn) {
+	    	throw new HttpException(null, "The text of the topic should be in English.", null, HttpStatus.BAD_REQUEST);
+	    }
+	    
+	    //topic detection request
+	    List<NameValuePair> postParameters = new ArrayList<>();
+	    postParameters.add(new BasicNameValuePair("num_topics", String.valueOf(topics)));
+	    //Build the server URI together with the parameters and the body
+	    URIBuilder uriBuilder = new URIBuilder(config.getSparkTopicDetectionUrl());
+	    uriBuilder.addParameters(postParameters);
+	    httpPost = new HttpPost(uriBuilder.build());
+		httpEntity = new StringEntity(text);
+	    httpPost.setEntity(httpEntity);	    
+	    response = client.execute(httpPost);
+
+	    responseString = EntityUtils.toString(response.getEntity());
+	    responseJson = new JSONObject(responseString);
+	    Iterator<String> responseTopicIdIter = responseJson.keys();
+	    Map<String,Double> unsortedResponseMap = new HashMap<>();
+	    while(responseTopicIdIter.hasNext()) {
+	    	String topicId = responseTopicIdIter.next();
+	    	unsortedResponseMap.put(topicId, responseJson.getDouble(topicId));
+	    }	    
+	    LinkedHashMap<String, Double> sortedResponseMap = new LinkedHashMap<>();
+	    unsortedResponseMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+	        .forEachOrdered(x -> sortedResponseMap.put(x.getKey(), x.getValue()));
+
+	    List<Topic> result = new ArrayList<>();
+	    client.close();
+	    return result;
+
+	}
 
 	@Override
 	public Topic deleteTopic(String topicIdentifier) {
@@ -133,8 +202,9 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    long totalInCollection = solrResults.getNumFound();
 	    
 	    //validate the page number
-	    if(totalInCollection-pageSize*currentPageNum<0) {
-			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, CommonApiConstants.QUERY_PARAM_PAGE, String.valueOf(pageSize));
+	    if(totalInCollection-pageSize*currentPageNum<=0) {
+	    	throw new HttpException(null, "Invalid combination of the " + CommonApiConstants.QUERY_PARAM_PAGE + " and " +
+	    			CommonApiConstants.QUERY_PARAM_PAGE_SIZE + " parameters (out of range).", null, HttpStatus.BAD_REQUEST);
 	    }    
 	    
 	    //set the result page items based on profile

@@ -1,16 +1,13 @@
 package eu.europeana.enrichment.model.impl;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
-
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 /**
  * This class is used for the annotations serialization.
@@ -18,12 +15,12 @@ import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
  *
  */
 @JsonPropertyOrder({ 
-	CONTEXT_FIELD, 
-	EnrichmentFields.ID, 
-	EnrichmentFields.TYPE, 
-	EnrichmentFields.CREATOR,
-	EnrichmentFields.TOTAL,
-	EnrichmentFields.ITEMS
+	EnrichmentConstants.CONTEXT_FIELD, 
+	EnrichmentConstants.ID, 
+	EnrichmentConstants.TYPE, 
+	EnrichmentConstants.CREATOR,
+	EnrichmentConstants.TOTAL,
+	EnrichmentConstants.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntityAnnotationCollection {
@@ -65,7 +62,7 @@ public class NamedEntityAnnotationCollection {
 		
 	}
 	
-	@JsonProperty(EnrichmentFields.ITEMS)
+	@JsonProperty(EnrichmentConstants.ITEMS)
 	public List<NamedEntityAnnotation> getItems() {
 		return items;
 	}
@@ -78,12 +75,12 @@ public class NamedEntityAnnotationCollection {
 		return id;
 	}
 	
-	@JsonProperty(EnrichmentFields.ID)
+	@JsonProperty(EnrichmentConstants.ID)
 	public String getIdSerialization() {
 		return id;
 	}
 	
-	@JsonProperty(EnrichmentFields.TYPE)
+	@JsonProperty(EnrichmentConstants.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -92,12 +89,12 @@ public class NamedEntityAnnotationCollection {
 		this.type = type;
 	}
 	
-	@JsonProperty(EnrichmentFields.CREATOR)
+	@JsonProperty(EnrichmentConstants.CREATOR)
 	public String getCreator() {
 		return creator;
 	}
 
-	@JsonProperty(EnrichmentFields.TOTAL)
+	@JsonProperty(EnrichmentConstants.TOTAL)
 	public String getTotal() {
 		return total;
 	}
@@ -106,8 +103,8 @@ public class NamedEntityAnnotationCollection {
 		this.total = total;
 	}
 	
-	@JsonProperty(CONTEXT_FIELD)
+	@JsonProperty(EnrichmentConstants.CONTEXT_FIELD)
 	public String getContext() {
-		return ANNOTATION_CONTEXT;
+		return EnrichmentConstants.ANNOTATION_CONTEXT;
 	}	
 }

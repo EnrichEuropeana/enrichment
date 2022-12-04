@@ -13,7 +13,6 @@ import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicDaoImpl implements TopicDao{
@@ -29,7 +28,7 @@ public class TopicDaoImpl implements TopicDao{
 	@Override
 	public Topic getByIdentifier(String identifier) {
 		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
-                eq(EnrichmentFields.TOPIC_ENTITY_IDENTIFIER, identifier)
+                eq(EnrichmentConstants.TOPIC_ENTITY_IDENTIFIER, identifier)
                 )
                 .first();		
 		return dbEntity;
@@ -54,7 +53,7 @@ public class TopicDaoImpl implements TopicDao{
 
 	@Override
 	public List<Topic> getByModelIdentifier(String modelIdentifier) {
-		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class).filter(eq(EnrichmentFields.MODEL_ID,modelIdentifier)).iterator();
+		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class).filter(eq(EnrichmentConstants.MODEL_ID,modelIdentifier)).iterator();
 		List<Topic> list = new ArrayList<Topic>();
 		while (iter.hasNext())
 		{
