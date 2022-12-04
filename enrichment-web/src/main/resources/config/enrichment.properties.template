@@ -88,3 +88,6 @@ authorization.api.name=
 auth.read.enabled=
 auth.write.enabled=
 europeana.apikey.serviceurl=
+
+spark.topic.detection.serviceurl=
+spark.language.detection.serviceurl=

@@ -8,8 +8,6 @@ import eu.europeana.enrichment.web.common.config.I18nConstants;
 
 public class InternalServerException extends HttpException{
 
-	public static final String MESSAGE_UNEXPECTED_EXCEPTION = "An unexpected server exception occured!";
-	
 	/**
 	 * 
 	 */
