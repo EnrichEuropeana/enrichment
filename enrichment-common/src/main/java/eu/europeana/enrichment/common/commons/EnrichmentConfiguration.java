@@ -140,7 +140,13 @@ public class EnrichmentConfiguration  {
 	
 	@Value("${europeana.apikey.serviceurl}")
 	private String apiKeyUrl;
+	
+	@Value("${spark.topic.detection.serviceurl}")
+	private String sparkTopicDetectionUrl;
 
+	@Value("${spark.language.detection.serviceurl}")
+	private String sparkLanguageDetectionUrl;
+	
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -324,5 +330,12 @@ public class EnrichmentConfiguration  {
 	public String getApiKeyUrl() {
 	    return apiKeyUrl;
 	}
+
+	public String getSparkTopicDetectionUrl() {
+		return sparkTopicDetectionUrl;
+	}	
 	
+	public String getSparkLanguageDetectionUrl() {
+		return sparkLanguageDetectionUrl;
+	}		
 }

@@ -1,7 +1,12 @@
 package eu.europeana.enrichment.web.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.solr.common.SolrDocumentList;
 
 import eu.europeana.api.commons.web.exception.HttpException;
@@ -15,6 +20,8 @@ public interface EnrichmentTopicService {
 	public Topic createTopic(Topic topic) throws HttpException, UnsupportedEntityTypeException;
 
 	public Topic updateTopic(Topic topic);
+	
+	public List<Topic> detectTopics (String text, int topics) throws URISyntaxException, UnsupportedEncodingException, ClientProtocolException, IOException, HttpException;
 
 	public Topic deleteTopic(String identifier);
 	

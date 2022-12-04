@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,10 +27,10 @@ import eu.europeana.api.commons.web.definitions.WebFields;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.http.HttpHeaders;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 import eu.europeana.enrichment.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -69,11 +70,11 @@ public class TopicController extends BaseRest{
 		for(TopicImpl topic : topics) {
 			// check mandatory fields
 			if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_ENTITY_IDENTIFIER, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_ENTITY_IDENTIFIER, null);
 			if (topic.getDescriptions()==null)
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_DESCRIPTIONS, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_DESCRIPTIONS, null);
 			if (topic.getTerms()==null)
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentFields.TOPIC_TERMS, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_TERMS, null);
 			
 			//TODO: add apiVersion to the generateETag method
 			Date date = new Date();
@@ -126,6 +127,36 @@ public class TopicController extends BaseRest{
 		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
 		    return new ResponseEntity<String>(jsonLdSerializer.serializeObject(topicEntity), headers, HttpStatus.OK);
 		}
+	}
+
+	/**
+	 * This method represents the /enrichment/topic/detect end point,
+	 * for detecting the topics for the given text based on the already machine learning model.
+	 * 
+	 * @param topics
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@ApiOperation(value = "Detect Topics", nickname = "detectTopics", notes = "This method detects the topics for the given text. \n")
+	@RequestMapping(value = "/enrichment/topic/detect", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> detectTopics (
+			@RequestBody(required = true) String text, 
+			@RequestParam(required = true, value = "topics") int topics,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
+			HttpServletRequest request) throws Exception
+	{
+		verifyReadAccess(request);
+		
+		Date date = new Date();
+		List<Topic> result = enrichmentTopicService.detectTopics(text, topics);
+
+		String etag = generateETag(date, WebFields.JSON_LD_REST);
+		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
+	    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
+	    headers.add(HttpHeaders.ETAG, etag);
+	    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
+    	return new ResponseEntity<String>(jsonLdSerializer.serializeObject(result), headers, HttpStatus.OK);
 	}
 
 	
