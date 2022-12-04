@@ -25,7 +25,6 @@ import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.service.NERService;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
@@ -200,7 +199,7 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		// default: Offset position will be added to the translated
 		positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
 		List<String> nerTools = new ArrayList<String>();
-		nerTools.add(NERConstants.dbpediaSpotlightName);
+		nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
 		positionEntity.setNerTools(nerTools);
 		namedEntity.setPositionEntity(positionEntity);
 

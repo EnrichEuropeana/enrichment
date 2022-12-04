@@ -28,7 +28,6 @@ import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
-import eu.europeana.enrichment.model.vocabulary.WikidataEntitySolrDenormalizationFields;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
@@ -517,9 +516,9 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			}
 			
 			//adjust for languages, i.e. remove the fields for other not required languages
-			if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),WikidataEntitySolrDenormalizationFields.PREF_LABEL_DENORMALIZED, lang);
-			if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),WikidataEntitySolrDenormalizationFields.ALT_LABEL_DENORMALIZED,lang);
-			if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),WikidataEntitySolrDenormalizationFields.DC_DESCRIPTION_DENORMALIZED,lang);
+			if(wikidataEntity.getPrefLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getPrefLabel(),EnrichmentConstants.PREF_LABEL_DENORMALIZED, lang);
+			if(wikidataEntity.getAltLabel()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getAltLabel(),EnrichmentConstants.ALT_LABEL_DENORMALIZED,lang);
+			if(wikidataEntity.getDescription()!=null) HelperFunctions.removeDataForLanguages(wikidataEntity.getDescription(),EnrichmentConstants.DC_DESCRIPTION_DENORMALIZED,lang);
 		}
 		
 		logger.debug("Serializing Solr data using Jackson to JSON string.");

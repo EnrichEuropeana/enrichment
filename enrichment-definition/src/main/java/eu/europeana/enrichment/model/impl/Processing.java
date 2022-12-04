@@ -6,13 +6,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import dev.morphia.annotations.Embedded;
 import dev.morphia.annotations.Property;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Embedded
 public class Processing {
 
-	@Property(EnrichmentFields.FOUND_BY_NER_TOOLS)
+	@Property(EnrichmentConstants.FOUND_BY_NER_TOOLS)
 	private List<String> foundByNerTools;
 	
 	private String matching;

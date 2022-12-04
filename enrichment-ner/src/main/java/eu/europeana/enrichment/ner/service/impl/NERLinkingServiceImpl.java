@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.DBpediaSpotlight;
@@ -70,7 +69,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 	}
 	
 	private void setWikidataIdsAndDbpediaWikidataIds(NamedEntityImpl ne, String nerTool) throws Exception {
-		if(nerTool.equalsIgnoreCase(NERConstants.dbpediaSpotlightName)) {
+		if(nerTool.equalsIgnoreCase(EnrichmentConstants.dbpediaSpotlightName)) {
 			//set the dbpedia wikidata ids
 			List<String> dbpediaWikidataIds = new ArrayList<String>();
 			DBpediaResponse dbpediaResponse = dbpediaSpotlight.getDBpediaResponse(ne.getDBpediaId());
@@ -89,7 +88,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 				}				
 			}
 		}
-		else if(nerTool.equalsIgnoreCase(NERConstants.stanfordNer)) {
+		else if(nerTool.equalsIgnoreCase(EnrichmentConstants.stanfordNer)) {
 			//fetch the wikidata ids from the wikidata search
 			List<String> wikidataLabelAltLabelAndTypeMatchIDs = wikidataService.getWikidataIdWithWikidataSearch(ne.getLabel());
 			if(wikidataLabelAltLabelAndTypeMatchIDs.size()>0) {

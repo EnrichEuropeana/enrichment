@@ -1,8 +1,5 @@
 package eu.europeana.enrichment.model.impl;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.ANNOTATION_CONTEXT;
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,17 +19,17 @@ import dev.morphia.annotations.Index;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Property;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @Entity(value="NamedEntityAnnotationImpl")
 @JsonPropertyOrder({ 
-	CONTEXT_FIELD,
-	EnrichmentFields.ID, 
-	EnrichmentFields.TYPE, 
-	EnrichmentFields.MOTIVATION,
-	EnrichmentFields.BODY,
-	EnrichmentFields.TARGET
+	EnrichmentConstants.CONTEXT_FIELD,
+	EnrichmentConstants.ID, 
+	EnrichmentConstants.TYPE, 
+	EnrichmentConstants.MOTIVATION,
+	EnrichmentConstants.BODY,
+	EnrichmentConstants.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId") }, options = @IndexOptions(unique = true)))
@@ -48,22 +45,22 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	private String type;
 	private String motivation;
 		
-	@Property(EnrichmentFields.PROPERTY)
+	@Property(EnrichmentConstants.PROPERTY)
 	private String property;
 	
 	private String entityType;	
 	private Map<String,Object> body;
 	
-	@Property(EnrichmentFields.WIKIDATA_ID)
+	@Property(EnrichmentConstants.WIKIDATA_ID)
 	private String wikidataId;
 	
-	@Property(EnrichmentFields.STORY_ID)
+	@Property(EnrichmentConstants.STORY_ID)
 	private String storyId;
 	
-	@Property(EnrichmentFields.ITEM_ID)
+	@Property(EnrichmentConstants.ITEM_ID)
 	private String itemId;
 	
-	@Property(EnrichmentFields.PROCESSING)
+	@Property(EnrichmentConstants.PROCESSING)
 	private Processing processing;
 
 	//id will be used for storing MongoDB _id
@@ -145,7 +142,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.processing=processing;
 	}
 
-	@JsonProperty(EnrichmentFields.TARGET)
+	@JsonProperty(EnrichmentConstants.TARGET)
 	public SpecificResource getTarget() {
 		return target;
 	}
@@ -154,7 +151,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		target = targetParam;
 	}
 
-	@JsonProperty(EnrichmentFields.ID)
+	@JsonProperty(EnrichmentConstants.ID)
 	public String getAnnoId() {		
 		return annoId;
 	}
@@ -164,7 +161,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		
 	}
 
-	@JsonProperty(EnrichmentFields.TYPE)
+	@JsonProperty(EnrichmentConstants.TYPE)
 	public String getType() {	
 		return type;
 	}
@@ -173,7 +170,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		type = typeParam;		
 	}
 
-	@JsonProperty(EnrichmentFields.MOTIVATION)
+	@JsonProperty(EnrichmentConstants.MOTIVATION)
 	public String getMotivation() {
 		return motivation;
 	}
@@ -182,7 +179,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		motivation = motivationParam;
 	}
 
-	@JsonProperty(EnrichmentFields.BODY)
+	@JsonProperty(EnrichmentConstants.BODY)
 	public Map<String,Object> getBody() {	
 		return body;
 	}
@@ -244,12 +241,12 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		this.entityType = type;
 	}
 
-	@JsonProperty(CONTEXT_FIELD)
+	@JsonProperty(EnrichmentConstants.CONTEXT_FIELD)
 	public String getContext() {
-		return ANNOTATION_CONTEXT;
+		return EnrichmentConstants.ANNOTATION_CONTEXT;
 	}
 	
-	@JsonProperty(EnrichmentFields.PROCESSING)
+	@JsonProperty(EnrichmentConstants.PROCESSING)
 	public Processing getProcessing() {
 		return processing;
 	}
