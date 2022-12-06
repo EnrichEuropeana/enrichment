@@ -18,4 +18,6 @@ public interface PersistentTopicService {
 
 	public List<Topic> getAll();
 
+	Topic getById(String topicId);
+
 }
