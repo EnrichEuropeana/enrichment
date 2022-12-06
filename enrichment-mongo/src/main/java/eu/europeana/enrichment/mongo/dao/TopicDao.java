@@ -16,4 +16,6 @@ public interface TopicDao {
 
 	public List<Topic> getAll();
 
+	Topic getByTopicId(String topicId);
+
 }

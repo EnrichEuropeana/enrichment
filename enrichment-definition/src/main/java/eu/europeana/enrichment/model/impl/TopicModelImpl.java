@@ -2,11 +2,15 @@ package eu.europeana.enrichment.model.impl;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.TopicModel;
 
-
 //@Entity(value="TopicModelImpl")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class TopicModelImpl implements TopicModel {
 	
 	private String url;
@@ -15,6 +19,7 @@ public class TopicModelImpl implements TopicModel {
 	private String identifier;
 	private String description;
 	private String algorithm;
+	private String id;
 
 	@Override
 	public int hashCode() {
@@ -79,4 +84,12 @@ public class TopicModelImpl implements TopicModel {
 //			throw new UnsupportedEntityTypeException("Algorithm must be one of: LDA or LDA2Vec");
 		this.algorithm = alg;
 	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}	
 }

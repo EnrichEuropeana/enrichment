@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.dao.TopicDao;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_TOPIC_SERVICE)
@@ -23,9 +22,13 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 
 	@Override
 	public Topic getByIdentifier(String topicIdentifier) {
-		
 		//TODO: check if exists, otherwise throw exception
 		return topicDao.getByIdentifier(topicIdentifier);
+	}
+	
+	@Override
+	public Topic getById(String topicId) {
+		return topicDao.getByTopicId(topicId);
 	}
 
 	@Override

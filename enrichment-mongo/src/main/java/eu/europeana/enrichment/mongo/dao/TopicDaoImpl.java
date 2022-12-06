@@ -26,6 +26,15 @@ public class TopicDaoImpl implements TopicDao{
 	}
 
 	@Override
+	public Topic getByTopicId(String topicId) {
+		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
+                eq(EnrichmentConstants.TOPIC_ENTITY_ID, topicId)
+                )
+                .first();		
+		return dbEntity;
+	}
+
+	@Override
 	public Topic getByIdentifier(String identifier) {
 		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
                 eq(EnrichmentConstants.TOPIC_ENTITY_IDENTIFIER, identifier)

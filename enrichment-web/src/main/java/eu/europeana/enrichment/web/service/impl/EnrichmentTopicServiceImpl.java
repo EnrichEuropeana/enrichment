@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.api.commons.web.exception.ParamValidationException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
@@ -49,7 +48,6 @@ import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 import eu.europeana.enrichment.solr.service.impl.SolrTopicServiceImpl;
-import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 import eu.europeana.enrichment.web.model.topic.search.CollectionOverview;
 import eu.europeana.enrichment.web.model.topic.search.TopicIdsResultPage;
@@ -271,19 +269,22 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
 	    }
 	    else if(LdProfile.STANDARD.equals(profile)) {
-	    	List<Topic> solrTopics = new ArrayList<>();
+	    	List<Topic> dbTopics = new ArrayList<>();
 	    	if(solrResults.size()>0) {
 				DocumentObjectBinder binder = new DocumentObjectBinder();
 			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopic.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
-			    	solrTopic.setModelId(config.getEnrichApiEndpoint() + "/model/" + solrTopic.getModelId());
-			    	solrTopics.add(solrTopic);
+					Topic dbtopicEntity = persistentTopicService.getById(solrTopic.getTopicID());
+					if (dbtopicEntity != null) {
+						dbtopicEntity.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + dbtopicEntity.getTopicID());
+						dbtopicEntity.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + dbtopicEntity.getModel().getIdentifier());
+				    	dbTopics.add(dbtopicEntity);
+					}			    	
 			    }		
 	    	}
-	    	((TopicResultPage)resPage).setItems(solrTopics);
+	    	((TopicResultPage)resPage).setItems(dbTopics);
 	    }
 	}
 	
