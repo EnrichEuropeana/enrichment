@@ -10,13 +10,13 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.datatables.DataTablesRepositoryFactoryBean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -28,14 +28,15 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
         exclude = {
                 // Remove these exclusions to re-enable security
                 SecurityAutoConfiguration.class,
-                ManagementWebSecurityAutoConfiguration.class,
+                ManagementWebSecurityAutoConfiguration.class
                 // DataSources are manually configured for the enrichment DB
-                DataSourceAutoConfiguration.class
+//                DataSourceAutoConfiguration.class
         }
 )
 @EnableBatchProcessing
 @EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class, 
     basePackageClasses = {eu.europeana.enrichment.web.repository.KeywordRepository.class})
+@EnableJpaRepositories(basePackages = "eu.europeana.enrichment.web.repository")
 public class EnrichmentApp extends SpringBootServletInitializer {
 
 	static Properties props = new Properties();

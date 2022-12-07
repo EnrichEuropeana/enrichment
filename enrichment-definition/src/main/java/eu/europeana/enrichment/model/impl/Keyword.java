@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -20,7 +21,6 @@ public class Keyword {
 	private String preferredWikidataId;
 	private KeywordWikidataEntity prefferedWikidataEntity;
 	
-	private String approvedWikidataId;
 	private KeywordWikidataEntity approvedWikidataEntity;
 	
 	private KeywordPosition keywordPosition;
@@ -28,10 +28,18 @@ public class Keyword {
 	private List<String> wikidataLabelAltLabelMatchIds;
 	private String dbpediaId;
 	private List<String> dbpediaWikidataIds;
-
+	private List<String> preferredWikidataIds;
+	private List<Long> tpItemIds;
+	
+	private String status;
+	private String approvedWikidataId;
+	
+	Date created;
+	Date modified;
+        	
 	//id will be used for storing MongoDB _id
 	@Id
-    private ObjectId _id;
+  private ObjectId _id;
 	
 	public ObjectId get_id() {
 		return _id;
@@ -151,5 +159,37 @@ public class Keyword {
 	public void setTypeFoundByNER(String typeFoundByNER) {
 		this.typeFoundByNER = typeFoundByNER;
 	}
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+
+    public Date getModified() {
+        return modified;
+    }
+
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
+
+    public List<Long> getTpItemIds() {
+        return tpItemIds;
+    }
+
+    public void setTpItemIds(List<Long> tpItemIds) {
+        this.tpItemIds = tpItemIds;
+    }
 
 }
