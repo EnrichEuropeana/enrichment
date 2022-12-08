@@ -1,0 +1,12 @@
+- to run the app, it is necessary to install the mysql because of the keword ui api. On the test server (Debian 9), please use this tutorial https://linuxconcept.com/install-mysql-on-debian-9-operating-system/.
+When the istallation is finished create a required database (e.g. tp) by logging to the mysql: sudo mysql -u root -p, and then create the database with: CREATE DATABASE tp; To enable accessing the mysql without sudo,
+please follow this guide: https://stackoverflow.com/questions/39281594/error-1698-28000-access-denied-for-user-rootlocalhost, and in particular execute the option 1:
+
+sudo mysql -u root # I had to use "sudo" since it was a new installation
+mysql> USE mysql;
+mysql> UPDATE user SET plugin='mysql_native_password' WHERE User='root';
+mysql> FLUSH PRIVILEGES;
+mysql> exit;
+sudo service mysql restart
+
+For Windows, use the windows installer (https://dev.mysql.com/downloads/installer/) to install the mysql. Set the username and password which correspond to the ones in the application.properties file.
