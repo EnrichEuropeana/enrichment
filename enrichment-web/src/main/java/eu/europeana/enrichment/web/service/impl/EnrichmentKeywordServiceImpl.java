@@ -52,7 +52,7 @@ public class EnrichmentKeywordServiceImpl {
         // TODO: use constants and enable sort in the table
 //        input.addSorting(null);
 //        input.getColumn("Id").get().setName("propertyId");
-        input.addSorting("propertyId", DataTablesInput.Order.Direction.asc);
+        input.AddSorting("propertyId", DataTablesInput.Order.Direction.asc);
         searchConfiguration.setSearchType("position", DataTablesInput.SearchType.Integer);
 //	        searchConfiguration.setExcludedColumns(List.of("country", "geoCoordinates"));
 
