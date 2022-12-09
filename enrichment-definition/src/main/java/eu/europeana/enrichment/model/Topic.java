@@ -38,9 +38,11 @@ public interface Topic {
 	
 	public void setCreated(Date date);
 	public void setModified(Date date);
-	//public ObjectId getObjectId();
-	//public String toJSON() throws JsonProcessingException;
+	
 	String getModelId();
 	void setModelId(String modelId);
+	
+	public Float getScore();
+	public void setScore(Float score);
 	
 }

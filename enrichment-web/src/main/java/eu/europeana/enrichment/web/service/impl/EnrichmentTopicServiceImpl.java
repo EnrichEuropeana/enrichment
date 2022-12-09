@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -157,16 +158,27 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    responseString = EntityUtils.toString(response.getEntity());
 	    responseJson = new JSONObject(responseString);
 	    Iterator<String> responseTopicIdIter = responseJson.keys();
-	    Map<String,Double> unsortedResponseMap = new HashMap<>();
+	    Map<String,Float> unsortedResponseMap = new HashMap<>();
 	    while(responseTopicIdIter.hasNext()) {
 	    	String topicId = responseTopicIdIter.next();
-	    	unsortedResponseMap.put(topicId, responseJson.getDouble(topicId));
+	    	unsortedResponseMap.put(topicId, responseJson.getFloat(topicId));
 	    }	    
-	    LinkedHashMap<String, Double> sortedResponseMap = new LinkedHashMap<>();
+	    LinkedHashMap<String, Float> sortedResponseMap = new LinkedHashMap<>();
 	    unsortedResponseMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 	        .forEachOrdered(x -> sortedResponseMap.put(x.getKey(), x.getValue()));
 
 	    List<Topic> result = new ArrayList<>();
+	    Set<String> topicIdsKeys = sortedResponseMap.keySet();
+	    for(String topicId : topicIdsKeys) {
+			Topic dbtopicEntity = persistentTopicService.getById(String.valueOf(Integer.valueOf(topicId)+1));
+			if (dbtopicEntity != null) {
+				dbtopicEntity.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + dbtopicEntity.getTopicID());
+				dbtopicEntity.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + dbtopicEntity.getModel().getIdentifier());
+				dbtopicEntity.setScore(sortedResponseMap.get(topicId));
+				result.add(dbtopicEntity);
+			}			 
+	    }
+
 	    client.close();
 	    return result;
 
