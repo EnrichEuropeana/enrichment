@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import dev.morphia.annotations.Entity;
@@ -22,6 +23,7 @@ import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.model.utils.TopicTermsDeserializer;
 
+@JsonPropertyOrder({"topicID", "identifier", "score", "labels", "descriptions", "terms", "keywords", "model", "created", "modified" })
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Entity(value="TopicEntity")
@@ -67,6 +69,9 @@ public class TopicImpl implements Topic {
 	
 	@JsonProperty("modified")
 	private Date modified;
+	
+	@JsonProperty("score")
+	private Float score;
 		
 	public TopicImpl()
 	{
@@ -164,10 +169,6 @@ public class TopicImpl implements Topic {
 	public void setModified(Date date) {
 		this.modified = date;
 	}
-	
-	public ObjectId getObjectId() {
-		return _id;
-	}
 
 	@Override
 	public String getModelId() {
@@ -197,6 +198,14 @@ public class TopicImpl implements Topic {
 			this.modelId = this.model.getIdentifier();
 		else
 			this.modelId = modelId;
+	}
+	
+	public Float getScore() {
+		return score;
+	}
+
+	public void setScore(Float score) {
+		this.score = score;
 	}
 
 }
