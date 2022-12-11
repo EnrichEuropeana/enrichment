@@ -11,8 +11,8 @@ import eu.europeana.enrichment.model.impl.TopicImpl;
 @JsonDeserialize(as = TopicImpl.class)
 public interface Topic {
 	
-	public String getTopicID();
-	public void setTopicID(String id);
+	public long getId();
+	public void setId(long id);
 	
 	public String getIdentifier();
 	public void setIdentifier(String identifier);
@@ -45,4 +45,6 @@ public interface Topic {
 	public Float getScore();
 	public void setScore(Float score);
 	
+	public String getUrlId();
+	public void setUrlId(String urlId);	
 }

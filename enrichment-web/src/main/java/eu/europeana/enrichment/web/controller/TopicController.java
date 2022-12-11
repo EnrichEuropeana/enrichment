@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -67,10 +70,11 @@ public class TopicController extends BaseRest{
 	{
 		verifyWriteAccess(Operations.CREATE, request);
 
+		List<Topic> result = new ArrayList<>();
 		for(TopicImpl topic : topics) {
 			// check mandatory fields
 			if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_ENTITY_IDENTIFIER, null);
+				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_IDENTIFIER, null);
 			if (topic.getDescriptions()==null)
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TOPIC_DESCRIPTIONS, null);
 			if (topic.getTerms()==null)
@@ -80,8 +84,11 @@ public class TopicController extends BaseRest{
 			Date date = new Date();
 			topic.setCreated(date);
 			
-			// use create topic service
-			enrichmentTopicService.createTopic(topic);
+			Topic createdTopic = enrichmentTopicService.createTopic(topic);
+			
+			enrichmentTopicService.updateTopicForSerialization(createdTopic);
+			
+			result.add(createdTopic);
 		}
 		
 		String etag = generateETag(new Date(), WebFields.JSON_LD_REST);
@@ -90,49 +97,53 @@ public class TopicController extends BaseRest{
 	    headers.add(HttpHeaders.ETAG, etag);
 	    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
 
-		return new ResponseEntity<String>(jsonLdSerializer.serializeObject("{\"result\":\"Done.\"}"), headers, HttpStatus.OK);
+		return new ResponseEntity<String>(jsonLdSerializer.serializeObject(result), headers, HttpStatus.OK);
 		
 	}
 	
 	/**
-	 * This method represents the /enrichment/topic/<topicIdentifier> end point,
+  	 * This method represents the /enrichment/topic/<topicId> end point,
 	 * where a topic creation request will be processed.
 	 * All requests on this end point are processed here.
-	 * 
+
+	 * @param topicId
 	 * @param topic
 	 * @param request
 	 * @return
 	 * @throws Exception
 	 */
-	@ApiOperation(value = "Update Topic", nickname = "postTopicUpdate", notes = "This method updates the topics in the database\n"
-			+ "Non-updatable fields: identifier, model")
-	@RequestMapping(value = "/enrichment/topic/update", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> postTopicUpdate (
-			@RequestBody(required = true) TopicImpl topic, HttpServletRequest request) throws Exception
+	@ApiOperation(value = "Update Topic", nickname = "updateTopic", notes = "This method updates a topic in the database\n"
+			+ "Non-updatable fields: id, identifier, model")
+	@RequestMapping(value = "/enrichment/topic/{topicId}", method = {RequestMethod.PUT}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> updateTopic (
+			@PathVariable("topicId") long topicId,
+			@RequestBody(required = true) TopicImpl topic, 
+			HttpServletRequest request) throws Exception
 	{
 		verifyWriteAccess(Operations.UPDATE, request);
 		
 		Date date = new Date();
 		topic.setModified(date);
-		Topic topicEntity = enrichmentTopicService.updateTopic(topic);
+		Topic topicEntity = enrichmentTopicService.updateTopic(topicId, topic);
 
 		if (topicEntity == null)
-			throw new HttpException(null, "The required topic does not exist. Invalid topic identifier.", null, HttpStatus.BAD_REQUEST);
+			throw new HttpException(null, "The required topic does not exist. Invalid topic id.", null, HttpStatus.NOT_FOUND);
 		else
 		{
 			String etag = generateETag(date, WebFields.JSON_LD_REST);
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
 		    headers.add(HttpHeaders.ETAG, etag);
-		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
+		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GPuD);
+		    enrichmentTopicService.updateTopicForSerialization(topicEntity);
 		    return new ResponseEntity<String>(jsonLdSerializer.serializeObject(topicEntity), headers, HttpStatus.OK);
 		}
 	}
 
 	/**
 	 * This method represents the /enrichment/topic/detect end point,
-	 * for detecting the topics for the given text based on the already machine learning model.
-	 * 
+	 * for detecting the topics for the given text based on the already created machine learning model.
+	 * @param model
 	 * @param topics
 	 * @param request
 	 * @return
@@ -142,6 +153,7 @@ public class TopicController extends BaseRest{
 	@RequestMapping(value = "/enrichment/topic/detect", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> detectTopics (
 			@RequestBody(required = true) String text, 
+			@RequestParam(required = true, value = "model") String model,
 			@RequestParam(required = true, value = "topics") int topics,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception
@@ -161,33 +173,32 @@ public class TopicController extends BaseRest{
 
 	
 	/**
-	 * This method represents the /enrichment/topic/<topicIdentifier> end point,
-	 * where a topic creation request will be processed.
+	 * This method represents the /enrichment/topic/<topicId> end point,
+	 * where a topic deletion request will be processed.
 	 * All requests on this end point are processed here.
 	 * 
-	 * @param topicIdentifier
+	 * @param topicId
 	 * @return 
 	 * @throws Exception 
 	 */
-	@ApiOperation(value = "Delete Topic", nickname = "postTopicDelete", notes = "This method deletes topics in the database\n"
-			+ "Mandatory parameter: identifier")
-	@RequestMapping(value = "/enrichment/topic/delete", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> postTopicDelete (
-			@RequestParam(value = "identifier", required = true) String identifier,
+	@ApiOperation(value = "Delete Topic", nickname = "deleteTopic", notes = "This method deletes a topic from the database.")
+	@DeleteMapping(value = "/enrichment/topic/{topicId}")
+	public ResponseEntity<String> topicDelete (
+			@PathVariable(value = "topicId") long topicId,
 			HttpServletRequest request) throws Exception
 	{
 		verifyWriteAccess(Operations.DELETE, request);
 	
-		Topic topicEntity = enrichmentTopicService.deleteTopic(identifier);
+		Topic topicEntity = enrichmentTopicService.deleteTopic(topicId);
 		
 		if (topicEntity == null)
-			throw new HttpException(null, "The topic to be deleted does not exist. Invalid topic identifier.", null, HttpStatus.BAD_REQUEST);
+			throw new HttpException(null, "The topic to be deleted does not exist.", null, HttpStatus.UNPROCESSABLE_ENTITY);
 		else
 		{
 			MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
 		    headers.add(HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_TYPE_JSON_UTF8);
-		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_POST);
-		    return new ResponseEntity<String>(jsonLdSerializer.serializeObject(topicEntity), headers, HttpStatus.OK);	
+		    headers.add(HttpHeaders.ALLOW, HttpHeaders.ALLOW_GPuD);
+		    return new ResponseEntity<String>(headers, HttpStatus.NO_CONTENT);	
 		}
 	}
 	
@@ -215,7 +226,7 @@ public class TopicController extends BaseRest{
 	    
 	    String fl=null;
 	    if(LdProfile.MINIMAL.getStringValue().equals(profile)) {
-	    	fl="topicID";
+	    	fl=EnrichmentConstants.TOPIC_ID;
 	    }
 	    SolrDocumentList solrTopics = enrichmentTopicService.searchTopics(query, qf, fl, null, sort, page, pageSize);
 	    // build response
@@ -233,5 +244,4 @@ public class TopicController extends BaseRest{
 	    return response;  	
     }
 	
-
 }

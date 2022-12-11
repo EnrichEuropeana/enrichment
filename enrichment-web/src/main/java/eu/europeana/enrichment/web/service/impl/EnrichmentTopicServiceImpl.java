@@ -43,11 +43,11 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.mongo.service.PersistentTopicService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
-import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 import eu.europeana.enrichment.solr.service.impl.SolrTopicServiceImpl;
 import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 import eu.europeana.enrichment.web.model.topic.search.CollectionOverview;
@@ -82,11 +82,15 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				
 		if (topic.getCreated() == null)
 			topic.setCreated(new Date());
+		
+		// here we need to create topic ID
+		long id = persistentTopicService.generateAutoIncrement(EntityTypes.Topic.getEntityType());
+		topic.setId(id);		
 
 		persistentTopicService.save(topic);
 		
 		try {
-			solrTopicService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(topic), true);
+			solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(topic), true);
 		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 		}
@@ -94,8 +98,8 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public Topic updateTopic(Topic topic) {
-		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
+	public Topic updateTopic(long id, Topic topic) {
+		Topic dbtopicEntity = persistentTopicService.getById(id);
 		if (dbtopicEntity != null)
 		{
 			if (topic.getTerms() != null)
@@ -104,21 +108,21 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				dbtopicEntity.setKeywords(topic.getKeywords());
 			if (topic.getDescriptions() != null)
 				dbtopicEntity.setDescriptions(topic.getDescriptions());
-			if (topic.getTopicID() != null)
-				dbtopicEntity.setTopicID(topic.getTopicID());
 			if (topic.getLabels() != null)
 				dbtopicEntity.setLabels(topic.getLabels());
 			
 			dbtopicEntity.setModified(new Date());
 			persistentTopicService.save(dbtopicEntity);
 			try {
-				solrTopicService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
+				solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
 			} catch (SolrServiceException e) {
 				logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 			}
 			return dbtopicEntity;
 		}
-		return null;
+		else {
+			return null;
+		}
 	}
 	
 	public List<Topic> detectTopics (String text, int topics) throws URISyntaxException, ClientProtocolException, IOException, HttpException {
@@ -170,10 +174,9 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    List<Topic> result = new ArrayList<>();
 	    Set<String> topicIdsKeys = sortedResponseMap.keySet();
 	    for(String topicId : topicIdsKeys) {
-			Topic dbtopicEntity = persistentTopicService.getById(String.valueOf(Integer.valueOf(topicId)+1));
+			Topic dbtopicEntity = persistentTopicService.getById(Integer.valueOf(topicId)+1);
 			if (dbtopicEntity != null) {
-				dbtopicEntity.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + dbtopicEntity.getTopicID());
-				dbtopicEntity.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + dbtopicEntity.getModel().getIdentifier());
+				updateTopicForSerialization(dbtopicEntity);
 				dbtopicEntity.setScore(sortedResponseMap.get(topicId));
 				result.add(dbtopicEntity);
 			}			 
@@ -185,18 +188,19 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public Topic deleteTopic(String topicIdentifier) {
-		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topicIdentifier);
+	public Topic deleteTopic(long topicId) {
+		Topic dbtopicEntity = persistentTopicService.getById(topicId);
 		if (dbtopicEntity == null)
 			return null;
-		
-		persistentTopicService.delete(dbtopicEntity);
-		
+				
 		try {
-			solrTopicService.deleteById(TopicSolrFields.SOLR_CORE, dbtopicEntity.getIdentifier());
+			solrTopicService.deleteById(EnrichmentConstants.TOPIC_SOLR_CORE, String.valueOf(dbtopicEntity.getId()));
 		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception is thrown during the deletion of the topic from Solr.", e);
 		}
+		
+		persistentTopicService.delete(dbtopicEntity);
+
 		return dbtopicEntity;
 	}
 
@@ -275,7 +279,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
+			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getId());
 			    }
 	    	}
 		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
@@ -288,10 +292,9 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-					Topic dbtopicEntity = persistentTopicService.getById(solrTopic.getTopicID());
+					Topic dbtopicEntity = persistentTopicService.getById(solrTopic.getId());
 					if (dbtopicEntity != null) {
-						dbtopicEntity.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + dbtopicEntity.getTopicID());
-						dbtopicEntity.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + dbtopicEntity.getModel().getIdentifier());
+						updateTopicForSerialization(dbtopicEntity);
 				    	dbTopics.add(dbtopicEntity);
 					}			    	
 			    }		
@@ -320,6 +323,11 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	        		+ "&" + CommonApiConstants.QUERY_PARAM_PAGE_SIZE + "=" + pageSize;    	
 	    }
 	    resPage.setNextPageUri(nextPage);		
+	}
+	
+	public void updateTopicForSerialization (Topic topic) {
+		topic.setUrlId(config.getEnrichApiEndpoint() + "/topic/" + topic.getId());
+		topic.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + topic.getModel().getIdentifier());
 	}
 	
 }
