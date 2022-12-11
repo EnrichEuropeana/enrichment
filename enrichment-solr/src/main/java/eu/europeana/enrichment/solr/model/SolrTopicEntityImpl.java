@@ -8,12 +8,12 @@ import java.util.Map;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 
 public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
@@ -21,16 +21,16 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 		super();
 	}
 
-	@Field(TopicSolrFields.TERMS)
+	@Field(EnrichmentConstants.TOPIC_TERMS)
 	private List<String> solrTerms;
 	
-	@Field(TopicSolrFields.KEYWORDS)
+	@Field(EnrichmentConstants.TOPIC_KEYWORDS)
 	private List<String> solrKeywords;
 	
 	public SolrTopicEntityImpl(Topic copy)
 	{
 		this.setIdentifier(copy.getIdentifier());
-		this.setTopicID(copy.getTopicID());
+		this.setId(copy.getId());
 		if(copy.getLabels()!=null) {
 			this.setLabels(new ArrayList<>(copy.getLabels()));
 		}
@@ -51,32 +51,32 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	
 
 	@Override
-	@Field(TopicSolrFields.TOPIC_ID)
-	public void setTopicID(String id) {
-		super.setTopicID(id);
+	@Field(EnrichmentConstants.TOPIC_ID)
+	public void setId(long id) {
+		super.setId(id);
 	}
 	
 
 	@Override
-	@Field(TopicSolrFields.IDENTIFIER)
+	@Field(EnrichmentConstants.TOPIC_IDENTIFIER)
 	public void setIdentifier(String identifier)
 	{
 		super.setIdentifier(identifier);
 	}
 	
 	@Override
-	@Field(TopicSolrFields.LABELS)
+	@Field(EnrichmentConstants.TOPIC_LABELS)
 	public void setLabels(List<String> label) {
 		super.setLabels(label);
 	}
 	
 	@Override
-	@Field(TopicSolrFields.DESCRIPTION_ALL)
+	@Field(EnrichmentConstants.TOPIC_SOLR_DESCRIPTION_ALL)
 	public void setDescriptions(Map<String,String> descr) {
 		if (MapUtils.isNotEmpty(descr)) {
 			super.setDescriptions(new HashMap<>(
 				HelperFunctions.normalizeStringMapByAddingPrefix(
-						TopicSolrFields.DESCRIPTION + EntitySolrFields.DYNAMIC_FIELD_SEPARATOR,
+						EnrichmentConstants.TOPIC_SOLR_DESCRIPTION + EntitySolrFields.DYNAMIC_FIELD_SEPARATOR,
 						descr)));
 	    }
 	}
@@ -107,7 +107,7 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	}
 
 	@Override
-	@Field(TopicSolrFields.MODEL_ID)
+	@Field(EnrichmentConstants.TOPIC_MODELID)
 	public void setModelId(String modelId) {
 		super.setModelId(modelId);
 	}

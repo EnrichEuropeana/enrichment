@@ -27,7 +27,7 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 	}
 	
 	@Override
-	public Topic getById(String topicId) {
+	public Topic getById(long topicId) {
 		return topicDao.getByTopicId(topicId);
 	}
 
@@ -53,5 +53,9 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 	public List<Topic> getAll() {
 		return topicDao.getAll();
 	}
+	
+	public long generateAutoIncrement(String entityType) {
+		return topicDao.generateAutoIncrement(entityType);
+	}	
 
 }

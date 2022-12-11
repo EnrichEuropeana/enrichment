@@ -119,13 +119,22 @@ public class EnrichmentConstants {
 	public static final String ITEMS = "items";
 	public static final String CREATOR = "creator";
 	public static final String OFFSETS_TRANSLATED_TEXT = "offsetsTranslatedText";
-	public static final String TOPIC_MODEL_ID = "identifier";
-	public static final String TOPIC_ENTITY_ID = "topicID";
-	public static final String TOPIC_ENTITY_IDENTIFIER = "identifier";
-	public static final String MODEL = "model";
-	public static final String MODEL_ID = "modelId";
+	public static final String TOPIC_MODEL_ID = "id";
+	public static final String TOPIC_MODEL_IDENTIFIER = "identifier";
+	public static final String TOPIC_ID = "id";
+	public static final String TOPIC_IDENTIFIER = "identifier";
+	public static final String TOPIC_MODEL = "model";
+	public static final String TOPIC_MODELID = "modelId";
 	public static final String TOPIC_DESCRIPTIONS = "descriptions";
 	public static final String TOPIC_TERMS = "terms";
+	public static final String TOPIC_SCORE = "score";
+	public static final String TOPIC_LABELS = "labels";
+	public static final String TOPIC_KEYWORDS = "keywords";
+	public static final String TOPIC_CREATED = "created";
+	public static final String TOPIC_MODIFIED = "modified";
+	public static final String TOPIC_SOLR_CORE = "topics";
+	public static final String TOPIC_SOLR_DESCRIPTION_ALL = "description.*";
+	public static final String TOPIC_SOLR_DESCRIPTION = "description";
 
 	// results page
 	public static final String PART_OF = "partOf";
