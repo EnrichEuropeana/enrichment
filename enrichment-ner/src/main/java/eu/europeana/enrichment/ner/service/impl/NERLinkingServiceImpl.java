@@ -73,9 +73,10 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			//set the dbpedia wikidata ids
 			List<String> dbpediaWikidataIds = new ArrayList<String>();
 			DBpediaResponse dbpediaResponse = dbpediaSpotlight.getDBpediaResponse(ne.getDBpediaId());
-			if(dbpediaResponse!=null && dbpediaResponse.getWikidataUrls()!=null) {
-				dbpediaWikidataIds.addAll(dbpediaResponse.getWikidataUrls().stream().collect(Collectors.toSet()));
+			if(dbpediaResponse!=null && dbpediaResponse.getWikidataUrls().size()>0) {
+				dbpediaWikidataIds.addAll(dbpediaResponse.getWikidataUrls());
 			}
+			
 			if(dbpediaWikidataIds.size()>0) {
 				ne.setDbpediaWikidataIds(dbpediaWikidataIds);
 			}

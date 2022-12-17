@@ -8,6 +8,7 @@ public final class XmlConstants {
   public static final String NAMESPACE_EDM = "http://www.europeana.eu/schemas/edm/";
   public static final String NAMESPACE_RDAGR2 = "http://rdvocab.info/ElementsGr2/";
   public static final String NAMESPACE_OWL = "http://www.w3.org/2002/07/owl#";
+  public static final String NAMESPACE_DBO = "http://dbpedia.org/ontology/";
   public static final String NAMESPACE_DC = "http://purl.org/dc/elements/1.1/";
   public static final String NAMESPACE_ORE = "http://www.openarchives.org/ore/terms/";
   public static final String NAMESPACE_DC_TERMS = "http://purl.org/dc/terms/";
@@ -26,5 +27,6 @@ public final class XmlConstants {
   public static final String XML_DC_SOURCE = "source";
   public static final String XML_DESCRIPTION = "Description";
   public static final String XML_SAME_AS = "sameAs";
+  public static final String XML_WIKIPAGE_REDIRECTS = "wikiPageRedirects";
 
 }
