@@ -20,6 +20,9 @@ public class DBpediaResponse {
 	@XmlElement(namespace = XmlConstants.NAMESPACE_OWL, name = XmlConstants.XML_SAME_AS)
 	private List<RdfResource> resources = new ArrayList<>();
 	
+	@XmlElement(namespace = XmlConstants.NAMESPACE_DBO, name = XmlConstants.XML_WIKIPAGE_REDIRECTS)
+	private RdfResource wikipageRedirect;		
+	
 	//@JacksonXmlProperty(namespace = "owl", localName = XmlConstants.XML_SAME_AS)
 	public List<RdfResource> getResources() {
 		return resources;
@@ -37,4 +40,9 @@ public class DBpediaResponse {
 		}
 		return wikidataUrls;
 	}
+	
+	public RdfResource getWikipageRedirect() {
+		return wikipageRedirect;
+	}
+	
 }
