@@ -147,6 +147,9 @@ public class EnrichmentConfiguration  {
 	@Value("${spark.language.detection.serviceurl}")
 	private String sparkLanguageDetectionUrl;
 	
+	@Value("${enrich.wikidata.save.json.to.local.cache}")
+	private boolean wikidataSaveJsonToLocalCache;
+
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -337,5 +340,9 @@ public class EnrichmentConfiguration  {
 	
 	public String getSparkLanguageDetectionUrl() {
 		return sparkLanguageDetectionUrl;
-	}		
+	}	
+	
+	public boolean getWikidataSaveJsonToLocalCache() {
+		return wikidataSaveJsonToLocalCache;
+	}	
 }

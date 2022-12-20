@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
@@ -100,6 +101,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);
@@ -165,6 +167,7 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = true) String linking,
 			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);
