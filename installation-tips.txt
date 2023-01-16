@@ -9,4 +9,6 @@ mysql> FLUSH PRIVILEGES;
 mysql> exit;
 sudo service mysql restart
 
-For Windows, use the windows installer (https://dev.mysql.com/downloads/installer/) to install the mysql. Set the username and password which correspond to the ones in the application.properties file.
+For Windows, use the windows installer (https://dev.mysql.com/downloads/installer/) to install the mysql. Set the username and password which correspond to the ones in the application.properties file. To create a new
+database called "tp", first add the mysql bin folder: C:\Program Files\MySQL\MySQL Server 8.0\bin, to the system path variable. Then open the cmd editor and connect to the mysql as a root using the command: mysql -u root -p,
+and type password as in the application.properties file. Then create the tp database with: CREATE DATABASE tp;
