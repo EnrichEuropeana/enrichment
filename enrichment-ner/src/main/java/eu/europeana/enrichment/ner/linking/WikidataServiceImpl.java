@@ -33,6 +33,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
@@ -50,6 +51,10 @@ import eu.europeana.enrichment.ner.enumeration.NERClassification;
 //import net.arnx.jsonic.JSONException;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_WIKIDATA_SERVICE)
 public class WikidataServiceImpl implements WikidataService {
+	
+	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
+	EnrichmentConfiguration configuration;
 	
 	Logger logger = LogManager.getLogger(getClass());
 
@@ -550,6 +555,9 @@ public class WikidataServiceImpl implements WikidataService {
 		String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
 		if(WikidataJSON==null) 	
 		{
+			if(!configuration.getWikidataSaveJsonToLocalCache()) { 
+				return null;
+			}
 			logger.debug("Wikidata entity does not exist in a local file cache!");
 			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
 			if(WikidataJSON==null || WikidataJSON.isEmpty()) return null;
