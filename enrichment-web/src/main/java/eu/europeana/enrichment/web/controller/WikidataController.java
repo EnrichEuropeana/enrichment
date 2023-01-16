@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
@@ -65,6 +66,7 @@ public class WikidataController extends BaseRest {
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wikidataId", required = true) String wikidataId,
 			@RequestParam(value = "type", required = true) String type,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 
 		verifyReadAccess(request);
@@ -107,6 +109,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "sort", required = false) String sort,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);
@@ -131,6 +134,7 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);

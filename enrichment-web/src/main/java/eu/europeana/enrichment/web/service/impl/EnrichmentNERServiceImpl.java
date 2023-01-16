@@ -255,14 +255,24 @@ public class EnrichmentNERServiceImpl {
 		nerTools.removeAll(toolsToRemove);
 		return nerTools.size()==0;
 	}
-	
+
+	/**
+ 	 * When this function is called for multiple ner tools one after another, make sure it is first called with the nerTool="DBpedia_Spotlight". 
+ 	 * For each ner tool the analysis is done separately because different tools may find
+	 * the same entities on different positions in the text and we would like to separate those results,
+	 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
+	 * belong to which ner tool analyser.
+	 * @param nerTool
+	 * @param textForNer
+	 * @param languageForNer
+	 * @param fieldType
+	 * @param storyId
+	 * @param itemId
+	 * @param linking
+	 * @param matchType
+	 * @throws Exception
+	 */
 	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
-		/*
-		 * Here for each ner tool the analysis is done separately because different tools may find
-		 * the same entities on different positions in the text and we would like to separate those results,
-		 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
-		 * belong to which ner tool analyser.
-		 */
 		TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
 		if(tmpResult==null) {
 			return;
