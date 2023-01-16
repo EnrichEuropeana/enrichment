@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
@@ -52,6 +53,7 @@ public class AnnotationController extends BaseRest {
 			@RequestParam(value="property", required=true) String property,
 			@RequestParam(value="storyId", required=true) String storyId,			
 			@RequestParam(value="itemId", required=false) String itemId,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyReadAccess(request);
@@ -105,6 +107,7 @@ public class AnnotationController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@PathVariable("wikidataIdentifier") String wikidataIdentifier,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException {
 		
 		verifyReadAccess(request);
@@ -130,6 +133,7 @@ public class AnnotationController extends BaseRest {
 		public ResponseEntity<String> getAnnotationStory(
 				@PathVariable("storyId") String storyId,
 				@PathVariable("wikidataIdentifier") String wikidataIdentifier,
+				@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 				HttpServletRequest request) throws Exception, HttpException {
 			
 			verifyReadAccess(request);
