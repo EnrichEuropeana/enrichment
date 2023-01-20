@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.Keyword;
-import eu.europeana.enrichment.model.vocabulary.EntityFields;
+import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_KEYWORD_DAO)
 public class KeywordDaoImpl {
@@ -33,7 +33,7 @@ public class KeywordDaoImpl {
 
 	public Keyword findByObjectId(String objectId) {
 	    return enrichmentDatastore.find(Keyword.class).filter(
-	                eq(EntityFields.OBJECT_ID, new ObjectId(objectId)))
+	                eq(EnrichmentFields.OBJECT_ID, new ObjectId(objectId)))
 	                .first();
         }
 }

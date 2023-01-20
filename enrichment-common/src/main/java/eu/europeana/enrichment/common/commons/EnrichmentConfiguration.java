@@ -21,7 +21,7 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.api.endpoint}")
     private String enrichApiEndpoint;
 
-	@Value("${enrich.mongodb.connectionUri}")
+    @Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
 
     @Value("${enrich.mongodb.truststore}")

@@ -17,6 +17,7 @@
             <tr>
             	<th>Id</th>
                 <th>K-Id</th>
+                <th>Lang</th>
                 <th>Keyword text</th>
                 <th>Keyword (EN)</th>
                 <th>Pref Label (EN)</th>
@@ -44,8 +45,9 @@
             <tr>
             	<th>objectId</th>
                 <th>propertyId</th>
-                <th>Keyword_Orig</th>
-                <th>Keyword_EN</th>
+                <th>detectedOriginalLanguage</th>
+                <th>value</th>
+                <th>translatedValue</th>
                 <th>PrefLabel_EN</th>
                 <th>PrefWKD_ID</th>
                 <th>status</th>
@@ -197,6 +199,8 @@
             var table = $('#keyword').DataTable( {
                 processing: false,
                 serverSide: true,
+                searching: false,
+                order: [[1, 'asc']],
                 ajax: {
                     url: "/keyword/datatable",
                     dataSrc: function (data) {
@@ -206,8 +210,9 @@
                             renderData.push({
                             	objectId: data.data[i].objectId,
                                 propertyId: data.data[i].propertyId,
-                                Keyword_Orig: data.data[i].keyword,
-                                Keyword_EN: data.data[i].keywordEn,
+                                detectedOriginalLanguage: data.data[i].detectedOriginalLanguage, 
+                                value: data.data[i].value,
+                                translatedValue: data.data[i].translatedValue,
                                 PrefLabel_EN: getValue(data.data[i], 'prefLabelEn'),
                                 PrefWKD_ID: getWkdLink(data.data[i].prefWkdId) + buildButtons(data.data[i].objectId, data.data[i].prefWkdId),
                                 status: '' + data.data[i].status,
@@ -229,16 +234,17 @@
                 columns: [
                 	{ data: 'objectId' },
                     { data: 'propertyId' },
-                    { data: 'Keyword_Orig' },
-                    { data: 'Keyword_EN' },
-                    { data: 'PrefLabel_EN' },
+                    { data: 'detectedOriginalLanguage' },
+                    { data: 'value', name: 'value'},
+                    { data: 'translatedValue' },
+                    { data: 'PrefLabel_EN', searchable: false, orderable: false },
                     { data: 'PrefWKD_ID' },
                     { data: 'status' },
                     //{ data: 'Type' },
                     //{ data: 'Position' },
-                    { data: 'tpItemIds' },
-                    { data: 'WikidataTypes' },
-                    { data: 'dbpediaWikidataIds' },
+                    { data: 'tpItemIds', searchable: false, orderable: false },
+                    { data: 'WikidataTypes', name: 'WikidataTypes', searchable: false, orderable: false},
+                    { data: 'dbpediaWikidataIds', searchable: false, orderable: false },
                     //{ data: 'Dbp_ID' },
                     //{ data: 'DbpWKD_ID' },
                     //{ data: 'WKD_IDs' },
