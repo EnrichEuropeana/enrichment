@@ -47,13 +47,18 @@ public class EnrichmentKeywordServiceImpl {
 
     public DataTablesOutput<KeywordView> getKeywords(DataTablesInput input) {
 
-        DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();
+        DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();      
         input.setSearchConfiguration(searchConfiguration);
-        // TODO: use constants and enable sort in the table
-//        input.addSorting(null);
-//        input.getColumn("Id").get().setName("propertyId");
-        input.addSorting("propertyId", DataTablesInput.Order.Direction.asc);
         searchConfiguration.setSearchType("position", DataTablesInput.SearchType.Integer);
+//        input.setSearch(new DataTablesInput.Search(null, false));
+        
+        if(input.getOrder().isEmpty()) {
+            // TODO: use constants and enable sort in the table
+//            input.addSorting(null);
+//            input.getColumn("Id").get().setName("propertyId");
+            input.addSorting("propertyId", DataTablesInput.Order.Direction.asc);
+        }
+                        
 //	        searchConfiguration.setExcludedColumns(List.of("country", "geoCoordinates"));
 
 //	        searchConfiguration.setSearchType("isEnabled", DataTablesInput.SearchType.Boolean);
@@ -67,7 +72,6 @@ public class EnrichmentKeywordServiceImpl {
 //	        searchConfiguration.addRefConfiguration("product", "product", productRefColumns, "label");
 
 //	        Criteria additionalCriteria = new Criteria();
-        input.setSearch(new DataTablesInput.Search(null, false));
         // TODO: use constants
         Criteria filter = new Criteria("status");
         filter.nin(List.of(KeywordStatus.UNREFERENCED, KeywordStatus.NOT_LINKED));

@@ -17,9 +17,9 @@ public class KeywordUtils {
         KeywordView view = new KeywordView();
         view.setObjectId(keyword.get_id().toHexString());
         view.setPropertyId(keyword.getPropertyId());
-        view.setLang(keyword.getDetectedOriginalLanguage());
-        view.setKeyword(keyword.getValue());
-        view.setKeywordEn(keyword.getTranslatedValue());
+        view.setDetectedOriginalLanguage(keyword.getDetectedOriginalLanguage());
+        view.setValue(keyword.getValue());
+        view.setTranslatedValue(keyword.getTranslatedValue());
         view.setStatus(keyword.getStatus());
                 
         if(keyword.getPreferredWikidataId()!= null && keyword.getPrefferedWikidataEntity() != null) {
