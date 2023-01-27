@@ -49,6 +49,6 @@ public interface PersistentNamedEntityService {
 	 */
 	public void deleteAllNamedEntities ();
 	
-	public void deletePositionEntitiesAndNamedEntity(String storyId,String itemId, String fieldUsedForNER);
+	public void deletePositionEntitiesAndNamedEntities(String storyId,String itemId, String fieldUsedForNER);
 
 }
