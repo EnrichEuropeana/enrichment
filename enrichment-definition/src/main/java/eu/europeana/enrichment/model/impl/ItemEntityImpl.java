@@ -5,14 +5,16 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -177,4 +179,47 @@ public class ItemEntityImpl implements ItemEntity {
 		this.setTranscriptionText(item.getTranscriptionText());
 		this.setType(item.getType());
 	}
+	
+	@Override
+    public boolean equals(Object item){ 
+  
+        if (item == this) { 
+            return true; 
+        } 
+        if (!(item instanceof ItemEntityImpl)) { 
+            return false; 
+        }          
+        ItemEntityImpl item_new = (ItemEntityImpl) item;
+        
+        Collections.sort(transcriptionLanguages);
+        Collections.sort(item_new.getTranscriptionLanguages());
+
+        
+        // Compare the data members and return accordingly  
+        return Objects.equals(item_new.getItemId(), itemId)
+        		&& Objects.equals(item_new.getSource(), source)
+        		&& Objects.equals(item_new.getTitle(), title)
+        		&& Objects.equals(item_new.getTranscriptionLanguages(), transcriptionLanguages)
+        		&& Objects.equals(item_new.getTranscriptionText(), transcriptionText);
+    }     
+    
+	@Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + itemId.hashCode();
+        if(source!=null) {
+        	result = 31 * result + source.hashCode();
+        }
+        if(title!=null) {
+        	result = 31 * result + title.hashCode();
+        }
+        if(transcriptionLanguages!=null) {
+        	result = 31 * result + transcriptionLanguages.hashCode();
+        }
+        if(transcriptionText!=null) {
+        	result = 31 * result + transcriptionText.hashCode();
+        }
+        return result;
+    }
+	
 }

@@ -1,9 +1,11 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
@@ -54,8 +56,8 @@ public class StoryEntityImpl implements StoryEntity {
 		this.languageSummary = copy.getLanguageSummary();
 		this.transcriptionText = copy.getTranscriptionText();
 		if(copy.getKeywords()!=null) this.keywords = new ArrayList<String>(copy.getKeywords());
-		if(copy.getCompletionStatus()!=null) this.completionStatus = new HashMap<String, Integer>(copy.getCompletionStatus());
-		if(copy.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<String>(copy.getTranscriptionLanguages()); 
+		if(copy.getCompletionStatus()!=null) this.completionStatus = new HashMap<>(copy.getCompletionStatus());
+		if(copy.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<>(copy.getTranscriptionLanguages()); 
 		this.itemCount = copy.getItemCount();
 	}
 	
@@ -209,8 +211,68 @@ public class StoryEntityImpl implements StoryEntity {
 		this.languageSummary = story.getLanguageSummary();
 		this.transcriptionText = story.getTranscriptionText();
 		if(story.getKeywords()!=null) this.keywords = new ArrayList<String>(story.getKeywords());
-		if(story.getCompletionStatus()!=null) this.completionStatus = new HashMap<String, Integer>(story.getCompletionStatus());
-		if(story.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<String>(story.getTranscriptionLanguages()); 
+		if(story.getCompletionStatus()!=null) this.completionStatus = new HashMap<>(story.getCompletionStatus());
+		if(story.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<>(story.getTranscriptionLanguages()); 
 		this.itemCount = story.getItemCount();
 	}
+	
+	@Override
+    public boolean equals(Object story){ 
+  
+        if (story == this) { 
+            return true; 
+        } 
+        if (!(story instanceof StoryEntityImpl)) { 
+            return false; 
+        }                   
+        StoryEntityImpl story_new = (StoryEntityImpl) story; 
+        
+        Collections.sort(transcriptionLanguages);
+        Collections.sort(story_new.getTranscriptionLanguages());
+
+        // Compare the data members and return accordingly  
+        return Objects.equals(story_new.getStoryId(), storyId)
+        		&& Objects.equals(story_new.getTitle(), title)
+        		&& Objects.equals(story_new.getSource(), source)
+        		&& Objects.equals(story_new.getDescription(), description)
+        		&& Objects.equals(story_new.getSummary(), summary)
+        		&& Objects.equals(story_new.getLanguageDescription(), languageDescription)
+        		&& Objects.equals(story_new.getLanguageSummary(), languageSummary)
+        		&& Objects.equals(story_new.getCompletionStatus(), completionStatus)
+        		&& Objects.equals(story_new.getTranscriptionLanguages(), transcriptionLanguages)
+        		&& Objects.equals(story_new.getItemCount(), itemCount);
+    }     
+    
+	@Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + storyId.hashCode();
+        if(title!=null) {
+        	result = 31 * result + title.hashCode();
+        }
+        if(source!=null) {
+        	result = 31 * result + source.hashCode();
+        }
+        if(description!=null) {
+        	result = 31 * result + description.hashCode();
+        }
+        if(summary!=null) {
+        	result = 31 * result + summary.hashCode();
+        }
+        if(languageDescription!=null) {
+        	result = 31 * result + languageDescription.hashCode();
+        }
+        if(languageSummary!=null) {
+        	result = 31 * result + languageSummary.hashCode();
+        }
+        if(completionStatus!=null) {
+        	result = 31 * result + completionStatus.hashCode();
+        }
+        if(transcriptionLanguages!=null) {
+        	result = 31 * result + transcriptionLanguages.hashCode();
+        }
+       	result = 31 * result + itemCount;
+        return result;
+    }
+	
 }

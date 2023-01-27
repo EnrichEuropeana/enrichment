@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
-import eu.europeana.enrichment.web.model.EnrichmentNERRequest;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -68,24 +68,28 @@ public class NERController extends BaseRest {
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getNEREntitiesStory(
 			@PathVariable("storyId") String storyId,
-			@RequestParam(value = "translationTool", required = true) String translationTool,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = false) String nerTools,
 			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 	
 		verifyWriteAccess(Operations.CREATE, request);
-
-		EnrichmentNERRequest body = new EnrichmentNERRequest();
-		body.setStoryId(storyId);
-		body.setTranslationTool(translationTool);
-		body.setProperty(property);
-		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-		body.setOriginal(original);
 		
-		enrichmentNerService.createNamedEntities(body);
+		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
+		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(linking==null) linking=EnrichmentConstants.defaultLinkingTool;
+		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(original==null) original=false;
+		
+		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
+		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		validateTranslationParams(storyId, null, translationTool, property, false);
+		validateNERTools(nerToolsList);
+		validateNERLinking(linkingList);
+		
+		enrichmentNerService.createNamedEntities(storyId, null, property, nerToolsList, true, linkingList, translationTool, original, false);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 		
 		return response;
@@ -97,24 +101,21 @@ public class NERController extends BaseRest {
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getEntitiesStory(
 			@PathVariable("storyId") String storyId,
-			@RequestParam(value = "translationTool", required = true) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "nerTools", required = false) String nerTools,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);
 		
-		EnrichmentNERRequest body = new EnrichmentNERRequest();
-		body.setStoryId(storyId);
-		body.setTranslationTool(translationTool);
-		body.setProperty(property);
-		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-		body.setOriginal(false);
+		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+	
+		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		validateBaseParamsForNEROrTranslation(storyId, null, property, false);
+		validateNERTools(nerToolsList);
 		
-		String jsonLd = enrichmentNerService.getEntities(body);
+		String jsonLd = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
 		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 		
 		return response;
@@ -134,24 +135,28 @@ public class NERController extends BaseRest {
 	public ResponseEntity<String> getNEREntitiesItem(
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
+			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "linking", required = false) String linking,
+			@RequestParam(value = "nerTools", required = false) String nerTools,
 			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 
 		verifyWriteAccess(Operations.CREATE, request);
-
-		EnrichmentNERRequest body = new EnrichmentNERRequest();
-		body.setStoryId(storyId);
-		body.setItemId(itemId);
-		body.setTranslationTool("Google");
-		body.setProperty(property);
-		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-		body.setOriginal(original);
 		
-		enrichmentNerService.createNamedEntities(body);
+		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
+		if(property==null) property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
+		if(linking==null) linking=EnrichmentConstants.defaultLinkingTool;
+		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(original==null) original=false;
+		
+		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
+		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		validateTranslationParams(storyId, itemId, translationTool, property, true);
+		validateNERTools(nerToolsList);
+		validateNERLinking(linkingList);
+	
+		enrichmentNerService.createNamedEntities(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 		
 		return response;		
@@ -165,23 +170,20 @@ public class NERController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
-			@RequestParam(value = "linking", required = true) String linking,
-			@RequestParam(value = "nerTools", required = true) String nerTools,
+			@RequestParam(value = "nerTools", required = false) String nerTools,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
 		verifyReadAccess(request);
 
-		EnrichmentNERRequest body = new EnrichmentNERRequest();
-		body.setStoryId(storyId);
-		body.setItemId(itemId);
-		body.setTranslationTool("Google");
-		body.setProperty(property);
-		body.setLinking(Arrays.asList(HelperFunctions.toArray(linking,",")));
-		body.setNerTools(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-		body.setOriginal(false);
+		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+	
+		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		validateBaseParamsForNEROrTranslation(storyId, itemId, property, true);
+		validateNERTools(nerToolsList);
 		
-		String jsonLd = enrichmentNerService.getEntities(body);
+		String jsonLd = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
 		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
 		
 		return response;
@@ -195,15 +197,15 @@ public class NERController extends BaseRest {
 	
 		verifyWriteAccess(Operations.CREATE, request);
 
-		String linking_local = "Wikidata";
+		String linking=EnrichmentConstants.defaultLinkingTool;
+		String nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
+		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+
 		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
 		for(StoryEntity story : stories) {
-			if(story.getDescriptionEn()!=null) {
-				logger.info("NER analysis for the storyId: " + story.getStoryId());
-				enrichmentNerService.updatedNamedEntitiesForText("DBpedia_Spotlight", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
-				enrichmentNerService.updatedNamedEntitiesForText("Stanford_NER", story.getDescriptionEn(), "en", "description", story.getStoryId(), null, Arrays.asList(HelperFunctions.toArray(linking_local,",")), true);
-				
-			}			
+			logger.info("NER analysis for the storyId: " + story.getStoryId());
+			enrichmentNerService.createNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, nerToolsList, true, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
 		}
 
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
