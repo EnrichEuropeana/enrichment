@@ -5,12 +5,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.google.cloud.translate.Translation;
@@ -28,7 +28,6 @@ import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
-import eu.europeana.enrichment.translation.service.TranslationService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
@@ -72,141 +71,132 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
+	
+	@Override
+	public String getTranslation(String storyId, String itemId, String translationTool, String type) {
+		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(dbTranslationEntity==null) return null;
+		return dbTranslationEntity.getTranslatedText();
+	}
+	
+	@Override
+	public String translateStory(String storyId, String type, String translationTool, boolean update) throws Exception {
+		String textToTranslate = null;
+		String sourceLanguage = null;
+		StoryEntity storyUpdated = persistentStoryEntityService.findStoryEntity(storyId);
+		
+		boolean isUpdated=false;
+		//check if the story is updated with new data from Transcribathon
+		if(update) {
+			isUpdated = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyUpdated);
+		}		
+		if(storyUpdated==null) {
+			logger.debug("The story for the translation does not exist!");
+			return null;
+//			throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, "The story for the translation does not exist!");
+		}
+		
+		if(! isUpdated) {
+			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+			if(dbTranslationEntity != null) {
+				return dbTranslationEntity.getTranslatedText();
+			}						
+		}
+
+		if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getTranscriptionText())) {
+			textToTranslate = storyUpdated.getTranscriptionText();
+			sourceLanguage = ModelUtils.getMainTranslationLanguage(storyUpdated);
+		}
+		else if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getDescription())) {
+			textToTranslate = storyUpdated.getDescription();
+			sourceLanguage = storyUpdated.getLanguageDescription();
+		}
+		else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getSummary())) {
+			textToTranslate = storyUpdated.getSummary();
+			sourceLanguage = storyUpdated.getLanguageSummary();
+		}		
+		if(StringUtils.isBlank(textToTranslate))
+		{
+			logger.debug("The text of the story to be translated is empty!");
+			return null;
+		}
+		else if(EnrichmentConstants.defaultTargetTranslationLanguage.equalsIgnoreCase(sourceLanguage)) {
+			return textToTranslate;
+		}
+		
+		
+		TranslationEntity newTranslation = translateAndSave(storyId, null, type, translationTool, sourceLanguage, textToTranslate);
+		if(newTranslation==null) return null;
+		return newTranslation.getTranslatedText();
+	}
 
 	@Override
-	public TranslationEntity translate(EnrichmentTranslationRequest requestParam, boolean process) throws Exception{
-		try {
-			//TODO: check parameters and return other status code
-			String defaultTargetLanguage = "en";
-			String storyId = requestParam.getStoryId();			
-			String itemId = requestParam.getItemId();			
-			String translationTool = requestParam.getTranslationTool();
-			String type = requestParam.getType();
-			Boolean sendRequest = true;//requestParam.getSendRequest() == null? true : requestParam.getSendRequest();
-			String textToTranslate = null;
-			/*
-			 * Parameter check
-			 */
-			if(storyId == null || storyId.isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-			else if(translationTool == null || translationTool.isBlank())
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, null);
-
-			if(type == null || type.isBlank())
-				type = "transcription";
-			else if(!(type.equals("summary") || type.equals("description") || type.equals("transcription")))
-				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TYPE, null);
-
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, defaultTargetLanguage, type);
+	public String translateItem(String storyId, String itemId, String type, String translationTool, boolean update) throws Exception {
+		String textToTranslate = null;
+		String sourceLanguage = null;
+		ItemEntity itemUpdated = persistentItemEntityService.findItemEntity(storyId, itemId);
+		
+		boolean isUpdated=false;
+		//check if the item is updated with new data from Transcribathon
+		if(update) {
+			isUpdated = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(itemUpdated);
+		}		
+		if(itemUpdated==null) {
+			logger.debug("The item for the translation does not exist!");
+			return null;
+//			throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_ITEM_ID, "The item for the translation does not exist!");
+		}
+		
+		if(! isUpdated) {
+			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
 			if(dbTranslationEntity != null) {
-				return dbTranslationEntity;
+				return dbTranslationEntity.getTranslatedText();
 			}						
-			else if(!process) {
-				//TODO: proper exception (like EnrichmentNERServiceImpl
-				//TODO: throw exception 404
-				throw new HttpException(null, "The translation of the required property was not performed yet. Please invoke the POST method, using the same parameters first.", HttpStatus.PRECONDITION_REQUIRED);				
-			}
+		}
 
-			StoryEntity dbStoryEntity = null;
-			ItemEntity dbItemEntity = null;
-			String sourceLanguage = null;			
-			
-			Object foundStoryOrItem = null;
-			if(itemId==null)
-			{		
-				foundStoryOrItem = persistentStoryEntityService.findStoryEntity(storyId);
-				if(foundStoryOrItem==null) foundStoryOrItem = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(storyId);
-			}
-			else
-			{	
-				foundStoryOrItem = persistentItemEntityService.findItemEntity(storyId, itemId);
-				if(foundStoryOrItem==null) foundStoryOrItem = enrichmentStoryAndItemStorageService.fetchAndSaveItemFromTranscribathon(storyId, itemId);
-			}
-			
-			//TODO: the "if" part below takes into account story and item, can be improved not to hardcode it in if 
-			//translate text for the whole story including all items
-			if(itemId==null)
-			{		
-				dbStoryEntity = (StoryEntity) foundStoryOrItem;
-				if(dbStoryEntity != null)
-				{
-					if(type.toLowerCase().equals("transcription") && dbStoryEntity.getTranscriptionText()!=null && !dbStoryEntity.getTranscriptionText().isBlank()) {
-						
-						textToTranslate = dbStoryEntity.getTranscriptionText();
-						sourceLanguage = ModelUtils.getMainTranslationLanguage(dbStoryEntity);
-					}
-					else if(type.toLowerCase().equals("summary") && dbStoryEntity.getSummary()!=null && !dbStoryEntity.getSummary().isBlank()) {
-						
-						textToTranslate = dbStoryEntity.getSummary();
-						sourceLanguage = dbStoryEntity.getLanguageSummary();
-					}
-					else if(type.toLowerCase().equals("description") && dbStoryEntity.getDescription()!=null && !dbStoryEntity.getDescription().isBlank()) {
-						
-						textToTranslate = dbStoryEntity.getDescription();
-						sourceLanguage = dbStoryEntity.getLanguageDescription();
-					}
-				}
-				else
-				{
-					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
-				}
-			}
-			//translate text for the specific item
-			else
-			{
-				dbItemEntity = (ItemEntity) foundStoryOrItem;
-				if(dbItemEntity!=null)
-				{
-					textToTranslate = dbItemEntity.getTranscriptionText();
-					sourceLanguage = ModelUtils.getMainTranslationLanguage(dbItemEntity);
-				}
-				else
-				{
-					throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
-				}
+		textToTranslate = itemUpdated.getTranscriptionText();
+		sourceLanguage = ModelUtils.getMainTranslationLanguage(itemUpdated);
+		if(StringUtils.isBlank(textToTranslate))
+		{
+			logger.debug("The text of the item to be translated is empty!");
+			return null;
+		}
+		else if(EnrichmentConstants.defaultTargetTranslationLanguage.equalsIgnoreCase(sourceLanguage)) {
+			return textToTranslate;
+		}
+		
+		TranslationEntity newTranslation = translateAndSave(storyId, itemId, type, translationTool, sourceLanguage, textToTranslate);
+		if(newTranslation==null) return null;
+		return newTranslation.getTranslatedText();
+	}
 
-			}
-			
-			
-			if(textToTranslate == null || textToTranslate.isBlank())
-			{
-				logger.debug("The original text is empty or null");
-				return null;
-			}
-				//throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_TEXT, null);
-
-			logger.debug("The original text is NOT empty or null.");
-			
+	private TranslationEntity translateAndSave(String storyId, String itemId, String type, String translationTool, String sourceLanguage, String textToTranslate) throws Exception{
+		try {
 			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
-			tmpTranslationEntity.setLanguage(defaultTargetLanguage);
+			tmpTranslationEntity.setLanguage(EnrichmentConstants.defaultTargetTranslationLanguage);
 			tmpTranslationEntity.setTool(translationTool);
 			tmpTranslationEntity.setStoryId(storyId);
 			tmpTranslationEntity.setItemId(itemId);
 			tmpTranslationEntity.setType(type);
 			tmpTranslationEntity.setKey(textToTranslate);
-			//Empty string because of callback
 
 			switch (translationTool) {
 			case googleToolName:
-				if(sendRequest) {
-					if(googleTranslationService==null) {
-						logger.debug("The google translation service is currently disabled.");
-						return null;
-					}
-					Translation googleResponse = googleTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
-					if(googleResponse!=null) {
-						String googleResponseText = Jsoup.parse(googleResponse.getTranslatedText()).text();
-						tmpTranslationEntity.setTranslatedText(googleResponseText);
-						tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
-					}
+				if(googleTranslationService==null) {
+					logger.debug("The google translation service is currently disabled.");
+					return null;
+				}
+				Translation googleResponse = googleTranslationService.translateText(textToTranslate, EnrichmentConstants.defaultTargetTranslationLanguage);
+				if(googleResponse!=null) {
+					String googleResponseText = Jsoup.parse(googleResponse.getTranslatedText()).text();
+					tmpTranslationEntity.setTranslatedText(googleResponseText);
+					tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
 				}
 				break;
 			case eTranslationToolName:
-				if(sendRequest) {
-					String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, defaultTargetLanguage);
-					if(eTranslationResponse!=null)
-						tmpTranslationEntity.setTranslatedText(eTranslationResponse);
-				}
+				String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, EnrichmentConstants.defaultTargetTranslationLanguage);
+				if(eTranslationResponse!=null)
+					tmpTranslationEntity.setTranslatedText(eTranslationResponse);
 				break;
 			default:
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);

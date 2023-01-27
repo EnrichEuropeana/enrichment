@@ -103,6 +103,15 @@ public class EnrichmentConstants {
 	public static final String TYPE = "type";
 	public static final String WIKIDATA_ID = "wikidataId";
 	public static final String DBPEDIA_ID = "dbpediaId";
+	public static final String STORY_ITEM_DESCRIPTION = "description";
+	public static final String LANGUAGE_DESCRIPTION = "languageDescription";
+	public static final String STORY_ITEM_TRANSCRIPTION = "transcription";
+	public static final String LANGUAGE_TRANSCRIPTION = "languageTranscription";
+	public static final String TRANSCRIPTION_LANGUAGES = "transcriptionLanguages";
+	public static final String STORY_ITEM_SUMMARY = "summary";
+	public static final String LANGUAGE_SUMMARY = "languageSummary";
+	public static final String TITLE = "title";
+	public static final String SOURCE = "source";
 	public static final String PROPERTY = "property";
 	public static final String TARGET = "target";
 	public static final String MOTIVATION = "motivation";
@@ -119,6 +128,7 @@ public class EnrichmentConstants {
 	public static final String ITEMS = "items";
 	public static final String CREATOR = "creator";
 	public static final String OFFSETS_TRANSLATED_TEXT = "offsetsTranslatedText";
+
 	public static final String TOPIC_MODEL_ID = "id";
 	public static final String TOPIC_MODEL_IDENTIFIER = "identifier";
 	public static final String TOPIC_ID = "id";
@@ -164,9 +174,12 @@ public class EnrichmentConstants {
 	public static final String BaseURL = "";	
 	public static final String ModelsURL = "";
 
-	//ner tools
+	//ner analysis
 	public static final String stanfordNer = "Stanford_NER";
 	public static final String dbpediaSpotlightName = "DBpedia_Spotlight";
+	public static final String defaultLinkingTool = "Wikidata";
+	public static final String europeanaLinkingTool = "Europeana";
+	public static final String LINKING = "linking";
 	
 	//solr denormalization fields
     public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";
@@ -181,6 +194,10 @@ public class EnrichmentConstants {
 	public static final String LATITUDE_DENORMALIZED = "wgs84_pos";
 	public static final String LONGITUDE_DENORMALIZED = "wgs84_pos";	
 	public static final String PROFESSION_OR_OCCUPATION_DENORMALIZED = "rdagr2_professionOrOccupation";
+
+	public static final String defaultTargetTranslationLanguage = "en";
+	public static final String defaultTranslationTool = "Google";
+	public static final String eTranslationTool = "eTranslation";
 
 }
 

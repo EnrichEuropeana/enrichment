@@ -43,7 +43,9 @@ public class EnrichmentTpApiClient {
 			if(storyMinimal!=null && storyMinimal.size()>0) {
 				return convertTranscribathonStoryToLocalStory(storyMinimal.get(0));
 			}
-			else return null;
+			else {
+				return null;
+			}
 		} catch (JsonProcessingException e) {
 			logger.log(Level.ERROR, "Exception during deserializing a story (minimal profile) from Transcribathon.", e);
 			return null;
@@ -58,7 +60,9 @@ public class EnrichmentTpApiClient {
 			if(itemTranscribathon!=null) {
 				return convertTranscribathonItemToLocalItem(itemTranscribathon);
 			}
-			else return null;
+			else {
+				return null;
+			}
 		}
 		catch (JsonProcessingException e) {
 			logger.log(Level.ERROR, "Exception during deserializing an item from Transcribathon.", e);
