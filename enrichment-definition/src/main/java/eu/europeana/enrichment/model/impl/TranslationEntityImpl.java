@@ -18,7 +18,7 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 @Entity(value="TranslationEntityImpl")
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type") }, options = @IndexOptions(unique = true)))
+@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool") }, options = @IndexOptions(unique = true)))
 public class TranslationEntityImpl implements TranslationEntity{
 
 	protected String key;

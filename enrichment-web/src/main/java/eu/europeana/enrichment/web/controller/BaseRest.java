@@ -92,9 +92,6 @@ public abstract class BaseRest  extends BaseRestController{
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentConstants.NER_TOOLS, nerTool);
 			}
 		}
-		if(tools.size()>1 && !tools.get(0).equalsIgnoreCase(EnrichmentConstants.dbpediaSpotlightName)) {
-			throw new ParamValidationException("In case of multiple NER tools, the first one must be the DBpedia_Spotlight.", EnrichmentConstants.NER_TOOLS + "[0]", tools.get(0));
-		}
 	}
 	
 	protected void validateNERLinking(List<String> linking) throws ParamValidationException {

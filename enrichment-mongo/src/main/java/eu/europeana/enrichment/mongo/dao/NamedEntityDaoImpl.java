@@ -148,7 +148,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 
 	@Override
-	public void deletePositionEntitiesAndNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
+	public void deletePositionEntitiesAndNamedEntities(String storyId, String itemId, String fieldUsedForNER) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));

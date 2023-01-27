@@ -154,9 +154,18 @@ public class EnrichmentNERServiceImpl {
 	public void createNamedEntities(String storyId, String itemId, String type, List<String> nerTools, boolean nerPossiblyDoneForSomeTools ,List<String> linking, String translationTool, boolean original, boolean updateStoryOrItem) throws Exception {
 		
 		if(nerPossiblyDoneForSomeTools) {
-			boolean allNERToolsCompleted = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, nerTools);
-			if(allNERToolsCompleted) {
+			List<String> completedNERTools = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, nerTools);
+			if(completedNERTools.containsAll(nerTools)) {
 				return;
+			}
+			else {
+				if(nerTools.contains(EnrichmentConstants.dbpediaSpotlightName) 
+					&& ! completedNERTools.contains(EnrichmentConstants.dbpediaSpotlightName)) {
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, itemId, type);
+				}
+				else {
+					nerTools.removeAll(completedNERTools);
+				}
 			}
 		}
 		
@@ -167,20 +176,17 @@ public class EnrichmentNERServiceImpl {
 		String textForNer = textAndLanguage[0];
 		String languageForNer = textAndLanguage[1];
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
-		for(String tool : nerTools) {
-			updatedNamedEntitiesForText(tool, textForNer, languageForNer, type, storyId, itemId, linking, true);
-		}
+		updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, type, storyId, itemId, linking, true);
 	}
 	
-	private boolean checkAllNerToolsAlreadyCompleted(String storyId, String itemId, String fieldForNer, List<String> nerTools) {
-		List<String> toolsToRemove = new ArrayList<String>();
+	private List<String> checkAllNerToolsAlreadyCompleted(String storyId, String itemId, String fieldForNer, List<String> nerTools) {
+		List<String> completedTools = new ArrayList<>();
 		for(String tool : nerTools) {
 			if(persistentPositionEntityService.findPositionEntitiesForNerTool(storyId, itemId, fieldForNer, tool)!=null) {
-				toolsToRemove.add(tool);
+				completedTools.add(tool);
 			}
 		}
-		nerTools.removeAll(toolsToRemove);
-		return nerTools.size()==0;
+		return completedTools;
 	}
 
 	/**
@@ -199,26 +205,35 @@ public class EnrichmentNERServiceImpl {
 	 * @param matchType
 	 * @throws Exception
 	 */
-	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
-		TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
-		if(tmpResult==null) {
-			return;
+	public void updatedNamedEntitiesForText(List<String> nerTools, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
+		//the first analyzed NER tool must be DBpedia_Spotlight
+		if(nerTools.contains(EnrichmentConstants.dbpediaSpotlightName)) {
+			int itemPos = nerTools.indexOf(EnrichmentConstants.dbpediaSpotlightName);
+			nerTools.remove(itemPos);
+		    nerTools.add(0, EnrichmentConstants.dbpediaSpotlightName);
 		}
-		for (String classificationType : tmpResult.keySet()) {
-			
-			if (isRestrictedClassificationType(classificationType)) continue;
-			
-			for (NamedEntityImpl tmpNamedEntity : tmpResult.get(classificationType)) {
+		
+		for(String nerTool:nerTools) {
+			TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
+			if(tmpResult==null) {
+				return;
+			}
+			for (String classificationType : tmpResult.keySet()) {
 				
-				//agent entities should have at least 2 parts to be linked (name and surname)
-				if(tmpNamedEntity.getType().equalsIgnoreCase(NERClassification.AGENT.toString()) && HelperFunctions.toArray(tmpNamedEntity.getLabel(),null).length<2) {
-					continue;
-				}
-
-				NamedEntityImpl dbEntity = persistentNamedEntityService.findExistingNamedEntity(tmpNamedEntity);
-				nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool, matchType);
-				saveNamedEntityAndPositionsToDbAndSolr(tmpNamedEntity, dbEntity);
-			}	
+				if (isRestrictedClassificationType(classificationType)) continue;
+				
+				for (NamedEntityImpl tmpNamedEntity : tmpResult.get(classificationType)) {
+					
+					//agent entities should have at least 2 parts to be linked (name and surname)
+					if(tmpNamedEntity.getType().equalsIgnoreCase(NERClassification.AGENT.toString()) && HelperFunctions.toArray(tmpNamedEntity.getLabel(),null).length<2) {
+						continue;
+					}
+	
+					NamedEntityImpl dbEntity = persistentNamedEntityService.findExistingNamedEntity(tmpNamedEntity);
+					nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool, matchType);
+					saveNamedEntityAndPositionsToDbAndSolr(tmpNamedEntity, dbEntity);
+				}	
+			}
 		}
 	}
 	
