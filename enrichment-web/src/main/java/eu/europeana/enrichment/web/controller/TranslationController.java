@@ -19,7 +19,6 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,9 +37,6 @@ public class TranslationController extends BaseRest {
 	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
-	
-	@Autowired
-	PersistentTranslationEntityService persistentTranslationEntityService;
 
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -69,7 +65,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		String result = enrichmentTranslationService.translateStory(storyId, property, translationTool, false);
+		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool);
 		if(result==null) {
 			result="Either story or its property (e.g. description) does not exist!";
 		}
@@ -130,7 +126,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 		
-		String result = enrichmentTranslationService.translateItem(storyId, itemId, property, translationTool, false);
+		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool);
 		if(result==null) {
 			result="Either item or its property (e.g. transcription) does not exist!";
 		}

@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.web.service.impl;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;

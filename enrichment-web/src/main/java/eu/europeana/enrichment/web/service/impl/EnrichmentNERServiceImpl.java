@@ -18,7 +18,6 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.StoryEntity;
@@ -37,10 +36,8 @@ import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
-import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
-import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -58,18 +55,10 @@ public class EnrichmentNERServiceImpl {
 	//@Resource(name = "enrichmentTranslationService")
 	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
-
-	//@Resource(name = "solrEntityService")
-	@Autowired
-	SolrEntityPositionsService solrEntityService;
 	
 	//@Resource(name = "solrWikidataEntityService")
 	@Autowired
 	SolrWikidataEntityService solrWikidataEntityService;
-	
-
-	@Autowired 
-	JsonLdSerializer jsonLdSerializer;
 
 	/*
 	 * Loading all NER services
@@ -83,11 +72,13 @@ public class EnrichmentNERServiceImpl {
 	//@Resource(name = "dbpediaSpotlightService")
 	@Autowired
 	NERService nerDBpediaSpotlightService;
-	
-	//@Resource(name = "javaJSONParser")
+		
 	@Autowired
-	JavaGsonJSONParser javaJSONParser;
+	PersistentStoryEntityService persistentStoryEntityService;
 	
+	@Autowired
+	PersistentItemEntityService persistentItemEntityService;
+
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
     
@@ -100,12 +91,7 @@ public class EnrichmentNERServiceImpl {
 	//@Resource(name = "persistentTranslationEntityService")
 	@Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-	//@Resource(name = "persistentStoryEntityService")
-	@Autowired
-	PersistentStoryEntityService persistentStoryEntityService;
-	//@Resource(name = "persistentItemEntityService")
-	@Autowired
-	PersistentItemEntityService persistentItemEntityService;
+
 	//@Resource(name = "persistentNamedEntityAnnotationService")
 	@Autowired
 	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
@@ -131,37 +117,27 @@ public class EnrichmentNERServiceImpl {
     private static int cascadeCall = 0;
 		
 	//@Cacheable("nerResults")
-	public String getEntities(String storyId, String itemId, String property, List<String> nerTools) throws Exception {
-
-		List<NamedEntityImpl> result = 
-				persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(
+	public List<NamedEntityImpl> getEntities(String storyId, String itemId, String property, List<String> nerTools) throws Exception {
+		return persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(
 						storyId,
 						itemId,
 						property,
 						nerTools,
 						false
 				);
-
-		if(result == null || result.isEmpty()) {
-			return "{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
-		}
-		else
-		{
-			return jsonLdSerializer.serializeObject(result);
-		}
 	}
 	
-	public void createNamedEntities(String storyId, String itemId, String type, List<String> nerTools, boolean nerPossiblyDoneForSomeTools ,List<String> linking, String translationTool, boolean original, boolean updateStoryOrItem) throws Exception {
-		
+	public void createNamedEntitiesForStory(String storyId, String type, List<String> nerTools, boolean nerPossiblyDoneForSomeTools ,List<String> linking, String translationTool, boolean original, boolean updateStory) throws Exception {
+		StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
 		if(nerPossiblyDoneForSomeTools) {
-			List<String> completedNERTools = checkAllNerToolsAlreadyCompleted(storyId, itemId, type, nerTools);
+			List<String> completedNERTools = checkAllNerToolsAlreadyCompleted(story.getStoryId(), null, type, nerTools);
 			if(completedNERTools.containsAll(nerTools)) {
 				return;
 			}
 			else {
 				if(nerTools.contains(EnrichmentConstants.dbpediaSpotlightName) 
 					&& ! completedNERTools.contains(EnrichmentConstants.dbpediaSpotlightName)) {
-					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, itemId, type);
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, type);
 				}
 				else {
 					nerTools.removeAll(completedNERTools);
@@ -169,16 +145,44 @@ public class EnrichmentNERServiceImpl {
 			}
 		}
 		
-		String [] textAndLanguage = getStoryOrItemTextForNER(storyId, itemId, translationTool, type, original, updateStoryOrItem);
+		String [] textAndLanguage = getStoryTextForNER(story, translationTool, type, original, updateStory);
 		if(textAndLanguage[0]==null || textAndLanguage[1]==null) {
 			return;
 		}
 		String textForNer = textAndLanguage[0];
 		String languageForNer = textAndLanguage[1];
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
-		updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, type, storyId, itemId, linking, true);
+		updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, type, story.getStoryId(), null, linking, true);
 	}
-	
+
+	public void createNamedEntitiesForItem(String storyId, String itemId, String type, List<String> nerTools, boolean nerPossiblyDoneForSomeTools ,List<String> linking, String translationTool, boolean original, boolean updateItem) throws Exception {
+		ItemEntity item = persistentItemEntityService.findItemEntity(storyId, itemId);
+		if(nerPossiblyDoneForSomeTools) {
+			List<String> completedNERTools = checkAllNerToolsAlreadyCompleted(item.getStoryId(), item.getItemId(), type, nerTools);
+			if(completedNERTools.containsAll(nerTools)) {
+				return;
+			}
+			else {
+				if(nerTools.contains(EnrichmentConstants.dbpediaSpotlightName) 
+					&& ! completedNERTools.contains(EnrichmentConstants.dbpediaSpotlightName)) {
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), type);
+				}
+				else {
+					nerTools.removeAll(completedNERTools);
+				}
+			}
+		}
+		
+		String [] textAndLanguage = getItemTextForNER(item, translationTool, type, original, updateItem);
+		if(textAndLanguage[0]==null || textAndLanguage[1]==null) {
+			return;
+		}
+		String textForNer = textAndLanguage[0];
+		String languageForNer = textAndLanguage[1];
+		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
+		updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, type, item.getStoryId(), item.getItemId(), linking, true);
+	}
+
 	private List<String> checkAllNerToolsAlreadyCompleted(String storyId, String itemId, String fieldForNer, List<String> nerTools) {
 		List<String> completedTools = new ArrayList<>();
 		for(String tool : nerTools) {
@@ -290,70 +294,51 @@ public class EnrichmentNERServiceImpl {
 		
 	}
 
-	/*
-	 * This function checks if the given story or item is present in the db and if not it fetches it from the Transcribathon platform.
-	 * Additionally, if there is not proper translation, it is first done here and the translated text is returned for the NER analysis.
-	 */
-	private String [] getStoryOrItemTextForNER (String storyId, String itemId, String translationTool, String type, boolean original, boolean updateStoryOrItem) throws Exception
+	private String [] getStoryTextForNER (StoryEntity dbStory, String translationTool, String type, boolean original, boolean updateStory) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
 		results[1]=null;
 
 		if(original) {
-			if(itemId==null)
-			{		
-				StoryEntity story = persistentStoryEntityService.findStoryEntity(storyId);
-				if(updateStoryOrItem) {
-					enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(story);
-				}
-				if(story==null) {
-					return results;
-				}
-				
-				if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type)) 
-				{
-					results[0] = story.getDescription();
-					results[1] = story.getLanguageDescription();
-					
-				}
-				else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type))
-				{
-					results[0] = story.getSummary();
-					results[1] = story.getLanguageSummary();
-				}
-				else if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type))
-				{
-					results[0] = story.getTranscriptionText();
-					results[1] = ModelUtils.getMainTranslationLanguage(story);
-				}
-				return results;
-	
-			}
-			else
-			{	
-				ItemEntity item = persistentItemEntityService.findItemEntity(storyId, itemId);
-				if(updateStoryOrItem) {
-					enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(item);
-				}
-				if(item==null) {
-					return results;
-				}
-				
-				results[0] = item.getTranscriptionText();
-				results[1] = ModelUtils.getMainTranslationLanguage(item);
+			//update story from Transcribathon
+			StoryEntity updatedStory=dbStory;
+			if(updateStory) {
+				updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(dbStory);
+			}		
+			if(updatedStory==null) {
 				return results;
 			}
+			
+			if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type)) 
+			{
+				results[0] = updatedStory.getDescription();
+				results[1] = updatedStory.getLanguageDescription();
+				
+			}
+			else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type))
+			{
+				results[0] = updatedStory.getSummary();
+				results[1] = updatedStory.getLanguageSummary();
+			}
+			else if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type))
+			{
+				results[0] = updatedStory.getTranscriptionText();
+				results[1] = ModelUtils.getMainTranslationLanguage(updatedStory);
+			}
+			return results;	
 		}
 		
-		String translatedText=null;
-		if(itemId==null) {
-			translatedText = enrichmentTranslationService.translateStory(storyId, type, translationTool, updateStoryOrItem);
+		//update story from Transcribathon
+		StoryEntity updatedStory=dbStory;
+		if(updateStory) {
+			updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(dbStory);
+		}		
+		if(updatedStory==null) {
+			return results;
 		}
-		else {
-			translatedText = enrichmentTranslationService.translateItem(storyId, itemId, type, translationTool, updateStoryOrItem);
-		}
-
+		
+		String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool);
 		if(translatedText!=null)
 		{
 			results[0] = translatedText;
@@ -361,7 +346,46 @@ public class EnrichmentNERServiceImpl {
 		}
 		return results;
 	}
-	
+
+	private String [] getItemTextForNER (ItemEntity dbItem, String translationTool, String type, boolean original, boolean updateItem) throws Exception
+	{
+		String [] results =  new String [2];
+		results[0]=null;
+		results[1]=null;
+
+		if(original) {
+			//update item from Transcribathon
+			ItemEntity updatedItem=dbItem;
+			if(updateItem) {
+				updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(dbItem);
+			}		
+			if(updatedItem==null) {
+				return results;
+			}
+			
+			results[0] = updatedItem.getTranscriptionText();
+			results[1] = ModelUtils.getMainTranslationLanguage(updatedItem);
+			return results;
+		}
+
+		//update item from Transcribathon
+		ItemEntity updatedItem=dbItem;
+		if(updateItem) {
+			updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(dbItem);
+		}		
+		if(updatedItem==null) {
+			return results;
+		}
+
+		String translatedText = enrichmentTranslationService.translateItem(updatedItem, type, translationTool);
+		if(translatedText!=null)
+		{
+			results[0] = translatedText;
+			results[1] = EnrichmentConstants.defaultTargetTranslationLanguage;
+		}
+		return results;
+	}
+
 	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws Exception {
 		NERService tmpTool=null;
 		switch(nerTool){
@@ -411,19 +435,12 @@ public class EnrichmentNERServiceImpl {
 		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
 	}
 
-	public String getAnnotations(String storyId, String itemId, String property) throws Exception {
+	public NamedEntityAnnotationCollection getAnnotations(String storyId, String itemId, String property) throws Exception {
 		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
-		if(!entities.isEmpty())
-		{
-			return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId));
-		}
-		else
-		{
-			return "{\"info\" : \"No valid entries found! Please check that the annotations for the given story are created.\"}";
-		}
+		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId);
 	}
 	
-	public String createAnnotations(String storyId, String itemId, String property) throws SolrServiceException, IOException {
+	public NamedEntityAnnotationCollection createAnnotations(String storyId, String itemId, String property) throws SolrServiceException, IOException {
 		List<NamedEntityAnnotation> namedEntityAnnos = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
 		if(namedEntityAnnos.isEmpty()) {
 			namedEntityAnnos = new ArrayList<NamedEntityAnnotation> ();
@@ -447,7 +464,7 @@ public class EnrichmentNERServiceImpl {
 			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
 			
 		}
-		return jsonLdSerializer.serializeObject(new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId));
+		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId);
 	}
 	
 	private void createAnnotationsPerNerTool(List<NamedEntityImpl> namedEntities, List<NamedEntityAnnotation> annos, List<String> nerTools, String storyId, String itemId, String property) throws SolrServiceException {
@@ -478,22 +495,13 @@ public class EnrichmentNERServiceImpl {
 
 	}
 
-	public String getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
+	public NamedEntityAnnotation getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
 		String wikidataIdGenerated=null;
 		if(wikidataEntity.startsWith("Q")) wikidataIdGenerated = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + wikidataEntity;
 		else wikidataIdGenerated = wikidataEntity;		
 		
-		NamedEntityAnnotation entityAnno = persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
-		if(entityAnno!=null)
-		{
-			return jsonLdSerializer.serializeObject(entityAnno);
-		}
-		else
-		{
-			logger.debug("No valid entries found! Please use the POST method first to save the data to the database or provide a valid Wikidata identifier.");
-			return "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
-		}
+		return persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
 	}
 	
 	private double computeScoreForAnnotations(List<String> nerTools, NamedEntityImpl ne) {
