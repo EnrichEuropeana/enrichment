@@ -168,9 +168,8 @@ public class ItemEntityImpl implements ItemEntity {
 	}
 
 	@Override
-	public void copyFromItem(ItemEntity item) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void copyFromItem(ItemEntity item) {
 		this.setItemId(item.getItemId());
-		this.setKey(item.getKey());
 		if(item.getKeywords()!=null) this.setKeywords(new ArrayList<>(item.getKeywords()));
 		this.setSource(item.getSource());
 		this.setStoryId(item.getStoryId());

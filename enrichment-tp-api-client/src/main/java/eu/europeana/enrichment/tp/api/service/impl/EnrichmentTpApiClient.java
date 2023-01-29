@@ -34,42 +34,89 @@ public class EnrichmentTpApiClient {
 
 	@Autowired
 	EnrichmentConfiguration configuration;
+		
+	public StoryEntity getStoryFromTranscribathonMinimalStory(String storyId) {
+		Story storyMinimal = getTranscribathonMinimalStory(storyId);
+		if(storyMinimal!=null) {
+			return convertTranscribathonStoryToLocalStory(storyMinimal);
+		}
+		else {
+			return null;
+		}
+	}
+
+	public ItemEntity getItemFromTranscribathon(String itemId) {
+		Item tpItem = getTranscribathonItem(itemId);
+		if(tpItem!=null) {
+			return convertTranscribathonItemToLocalItem(tpItem);
+		}
+		else {
+			return null;
+		}
+	}
 	
-	public StoryEntity fetchMinimalStoryFromTranscribathon(String storyId) {
+	public List<String> getItemIdsForStoryFromTranscribathon(String storyId) {
+		List<String> itemIds = new ArrayList<>();
+		Story tpStory = getTranscribathonFullStory(storyId);
+		if(tpStory!=null) {
+			if(tpStory.Items!=null) {
+				for(Item tpItem : tpStory.Items) {
+					if(tpItem.ItemId!=null) {
+						itemIds.add(Integer.toString(tpItem.ItemId));
+					}
+				}
+			}
+		}
+		return itemIds;
+	}
+
+	private Story getTranscribathonMinimalStory(String storyId) {
 		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStoriesMinimal() + storyId);
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			List<Story> storyMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
-			if(storyMinimal!=null && storyMinimal.size()>0) {
-				return convertTranscribathonStoryToLocalStory(storyMinimal.get(0));
+			List<Story> storiesMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
+			if(storiesMinimal!=null && storiesMinimal.size()>0) {
+				return storiesMinimal.get(0);
 			}
 			else {
 				return null;
 			}
 		} catch (JsonProcessingException e) {
-			logger.log(Level.ERROR, "Exception during deserializing a story (minimal profile) from Transcribathon.", e);
-			return null;
-		}
-	}
-
-	public ItemEntity fetchItemFromTranscribathon(String itemId) {
-		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			Item itemTranscribathon = objectMapper.readValue(response, new TypeReference<Item>(){});
-			if(itemTranscribathon!=null) {
-				return convertTranscribathonItemToLocalItem(itemTranscribathon);
-			}
-			else {
-				return null;
-			}
-		}
-		catch (JsonProcessingException e) {
-			logger.log(Level.ERROR, "Exception during deserializing an item from Transcribathon.", e);
+			logger.log(Level.ERROR, "Exception during deserializing a minimal story from Transcribathon with storyId=" + storyId, e);
 			return null;
 		}
 	}
 	
+	private Item getTranscribathonItem(String itemId) {
+		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			return objectMapper.readValue(response, new TypeReference<Item>(){});
+		}
+		catch (JsonProcessingException e) {
+			logger.log(Level.ERROR, "Exception during deserializing an item from Transcribathon with itemId=" + itemId, e);
+			return null;
+		}
+	}
+	
+
+	private Story getTranscribathonFullStory(String storyId) {
+		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId);
+		ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			List<Story> storiesFull = objectMapper.readValue(storyFullResponse, new TypeReference<List<Story>>(){});
+			if(storiesFull!=null && storiesFull.size()>0) {
+				return storiesFull.get(0);
+			}
+			else {
+				return null;
+			}
+		} catch (JsonProcessingException e) {
+			logger.log(Level.ERROR, "Exception during deserializing a full story from Transcribathon with storyId= " + storyId, e);
+			return null;
+		}
+	}
+
 	private StoryEntity convertTranscribathonStoryToLocalStory(Story storyMinimal) {	
 		StoryEntity newStory = new StoryEntityImpl();
 		newStory.setStoryId(storyMinimal.StoryId.toString());

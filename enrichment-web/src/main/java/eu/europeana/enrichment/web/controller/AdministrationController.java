@@ -22,27 +22,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.apicatalog.jsonld.StringUtils;
-
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.solr.exception.SolrServiceException;
-import eu.europeana.enrichment.tp.api.service.impl.EnrichmentTpApiClient;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
-import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
-import eu.europeana.enrichment.web.service.impl.TranscribathonConcurrentCallServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -55,28 +46,14 @@ public class AdministrationController extends BaseRest {
 	Logger logger = LogManager.getLogger(getClass());
 	
 	@Autowired
-	EnrichmentNERServiceImpl enrichmentNerService;
-	@Autowired
 	EnrichmentTranslationService enrichmentTranslationService;
-	@Autowired
-	PersistentTranslationEntityService persistentTranslationEntityService;
-	@Autowired
-	PersistentItemEntityService persistentItemEntityService;
-	@Autowired
-	PersistentStoryEntityService persistentStoryEntityService;
 	
 	@Autowired
 	ETranslationEuropaServiceImpl eTranslationService;
 	
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
-    
-    @Autowired
-    TranscribathonConcurrentCallServiceImpl transcribathonConcurrentCallServiceImpl;
-    
-	@Autowired
-	EnrichmentTpApiClient enrichmentTpApiClient;
-	
+   
 	/*
 	 * This method represents the /administration/updateStories endpoint,
 	 * where a request with an array of StoryEntity to be updated in the database is sent.
@@ -119,8 +96,7 @@ public class AdministrationController extends BaseRest {
 		List<String> storyIdsList = new ArrayList<String>(Arrays.asList(HelperFunctions.toArray(storiesIds,",")));
 		Instant start = Instant.now();
 		for (int i = 0; i < storyIdsList.size(); i++) {
-			StoryEntity storyDb = persistentStoryEntityService.findStoryEntity(storyIdsList.get(i));
-			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyDb);
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i));
 		}
 		Instant finish = Instant.now();
 		long timeElapsed = Duration.between(start, finish).getSeconds();
@@ -248,35 +224,35 @@ public class AdministrationController extends BaseRest {
 		return response;
 	}
 
-	@ApiOperation(value = "Run NER analysis for all items", nickname = "runNERAllItems", notes = "This method performs the Named Entity Recognition (NER) analysis "
-			+ "for all items in the database. It includes both items that are translated and those that have the transcription text in English language.")
-	@RequestMapping(value = "/administration/ner/allitems", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> runNERAllItems(
-			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
-	
-		verifyWriteAccess(Operations.CREATE, request);
-
-		String linkingStr = "Wikidata";
-		String nerToolsStr = "Stanford_NER,DBpedia_Spotlight";
-		List<String> linking = Arrays.asList(HelperFunctions.toArray(linkingStr,","));
-		List<String> nerTools = Arrays.asList(HelperFunctions.toArray(nerToolsStr,","));						
-		
-		//run the ner analysis for all items
-		List<ItemEntity> all_item_entities = persistentItemEntityService.getAllItemEntities();
-
-		if(all_item_entities!=null)
-		{
-			for(ItemEntity item : all_item_entities) {	
-				if(! StringUtils.isBlank(item.getTranscriptionText()))
-				{
-					enrichmentNerService.createNamedEntities(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, false);
-				}
-			}
-		}
-		
-		ResponseEntity<String> response = new ResponseEntity<String>("all-items-ner-done", HttpStatus.OK);
-		return response;
-	
-	}
+//	@ApiOperation(value = "Run NER analysis for all items", nickname = "runNERAllItems", notes = "This method performs the Named Entity Recognition (NER) analysis "
+//			+ "for all items in the database. It includes both items that are translated and those that have the transcription text in English language.")
+//	@RequestMapping(value = "/administration/ner/allitems", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.TEXT_PLAIN_VALUE)
+//	public ResponseEntity<String> runNERAllItems(
+//			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
+//	
+//		verifyWriteAccess(Operations.CREATE, request);
+//
+//		String linkingStr = "Wikidata";
+//		String nerToolsStr = "Stanford_NER,DBpedia_Spotlight";
+//		List<String> linking = Arrays.asList(HelperFunctions.toArray(linkingStr,","));
+//		List<String> nerTools = Arrays.asList(HelperFunctions.toArray(nerToolsStr,","));						
+//		
+//		//run the ner analysis for all items
+//		List<ItemEntity> all_item_entities = persistentItemEntityService.getAllItemEntities();
+//
+//		if(all_item_entities!=null)
+//		{
+//			for(ItemEntity item : all_item_entities) {	
+//				if(! StringUtils.isBlank(item.getTranscriptionText()))
+//				{
+//					enrichmentNerService.createNamedEntities(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, false);
+//				}
+//			}
+//		}
+//		
+//		ResponseEntity<String> response = new ResponseEntity<String>("all-items-ner-done", HttpStatus.OK);
+//		return response;
+//	
+//	}
 
 }

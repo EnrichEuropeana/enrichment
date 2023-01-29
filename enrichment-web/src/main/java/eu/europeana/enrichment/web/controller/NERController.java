@@ -23,7 +23,9 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
@@ -41,6 +43,9 @@ public class NERController extends BaseRest {
 	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
+	
+	@Autowired 
+	JsonLdSerializer jsonLdSerializer;
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -89,7 +94,7 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 		
-		enrichmentNerService.createNamedEntities(storyId, null, property, nerToolsList, true, linkingList, translationTool, original, false);
+		enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, true, linkingList, translationTool, original, false);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 		
 		return response;
@@ -115,9 +120,17 @@ public class NERController extends BaseRest {
 		validateBaseParamsForNEROrTranslation(storyId, null, property, false);
 		validateNERTools(nerToolsList);
 		
-		String jsonLd = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
-		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
+		String resultJsonLd = null;
+		if(result.isEmpty()) {
+			resultJsonLd="{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
+		}
+		else
+		{
+			resultJsonLd=jsonLdSerializer.serializeObject(result);
+		}
 		
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;
 		
 	}
@@ -156,7 +169,7 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 	
-		enrichmentNerService.createNamedEntities(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
+		enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
 		
 		return response;		
@@ -183,8 +196,17 @@ public class NERController extends BaseRest {
 		validateBaseParamsForNEROrTranslation(storyId, itemId, property, true);
 		validateNERTools(nerToolsList);
 		
-		String jsonLd = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
-		ResponseEntity<String> response = new ResponseEntity<String>(jsonLd, HttpStatus.OK);
+		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
+		String resultJsonLd = null;
+		if(result.isEmpty()) {
+			resultJsonLd="{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
+		}
+		else
+		{
+			resultJsonLd=jsonLdSerializer.serializeObject(result);
+		}
+
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		
 		return response;
 		
@@ -205,7 +227,7 @@ public class NERController extends BaseRest {
 		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
 		for(StoryEntity story : stories) {
 			logger.info("NER analysis for the storyId: " + story.getStoryId());
-			enrichmentNerService.createNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, nerToolsList, true, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
+			enrichmentNerService.createNamedEntitiesForStory(story.getStoryId(), EnrichmentConstants.STORY_ITEM_DESCRIPTION, nerToolsList, true, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
 		}
 
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);

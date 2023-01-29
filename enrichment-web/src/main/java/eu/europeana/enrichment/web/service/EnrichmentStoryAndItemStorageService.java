@@ -8,9 +8,11 @@ import eu.europeana.enrichment.model.StoryEntity;
 
 public interface EnrichmentStoryAndItemStorageService {
 	
-	public boolean updateStoryFromTranscribathon (StoryEntity updatedStory);
+	public void updateStoryFromTranscribathon (String storyId);
 	
-	public boolean updateItemFromTranscribathon (ItemEntity updatedItem);
+	public StoryEntity updateStoryFromTranscribathon (StoryEntity updatedStory);
+	
+	public ItemEntity updateItemFromTranscribathon (ItemEntity updatedItem);
 	
 	public String updateStoriesFromInput(StoryEntity[] stories);
 	

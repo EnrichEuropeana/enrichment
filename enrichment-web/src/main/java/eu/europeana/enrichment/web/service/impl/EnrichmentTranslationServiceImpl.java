@@ -23,8 +23,6 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.model.utils.ModelUtils;
-import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
@@ -33,7 +31,6 @@ import eu.europeana.enrichment.translation.service.impl.TranslationGoogleService
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
-import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_SERVICE)
@@ -62,15 +59,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
     @Autowired
 	PersistentTranslationEntityService persistentTranslationEntityService;
-
-    @Autowired
-    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
-    
-	@Autowired
-	PersistentStoryEntityService persistentStoryEntityService;
-	
-	@Autowired
-	PersistentItemEntityService persistentItemEntityService;
 	
 	@Override
 	public String getTranslation(String storyId, String itemId, String translationTool, String type) {
@@ -80,40 +68,25 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	}
 	
 	@Override
-	public String translateStory(String storyId, String type, String translationTool, boolean update) throws Exception {
+	public String translateStory(StoryEntity story, String type, String translationTool) throws Exception {
+		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(dbTranslationEntity != null) {
+			return dbTranslationEntity.getTranslatedText();
+		}						
+
 		String textToTranslate = null;
 		String sourceLanguage = null;
-		StoryEntity storyUpdated = persistentStoryEntityService.findStoryEntity(storyId);
-		
-		boolean isUpdated=false;
-		//check if the story is updated with new data from Transcribathon
-		if(update) {
-			isUpdated = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyUpdated);
-		}		
-		if(storyUpdated==null) {
-			logger.debug("The story for the translation does not exist!");
-			return null;
-//			throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_STORY_ID, "The story for the translation does not exist!");
+		if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(story.getTranscriptionText())) {
+			textToTranslate = story.getTranscriptionText();
+			sourceLanguage = ModelUtils.getMainTranslationLanguage(story);
 		}
-		
-		if(! isUpdated) {
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-			if(dbTranslationEntity != null) {
-				return dbTranslationEntity.getTranslatedText();
-			}						
+		else if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(story.getDescription())) {
+			textToTranslate = story.getDescription();
+			sourceLanguage = story.getLanguageDescription();
 		}
-
-		if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getTranscriptionText())) {
-			textToTranslate = storyUpdated.getTranscriptionText();
-			sourceLanguage = ModelUtils.getMainTranslationLanguage(storyUpdated);
-		}
-		else if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getDescription())) {
-			textToTranslate = storyUpdated.getDescription();
-			sourceLanguage = storyUpdated.getLanguageDescription();
-		}
-		else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type) && !StringUtils.isBlank(storyUpdated.getSummary())) {
-			textToTranslate = storyUpdated.getSummary();
-			sourceLanguage = storyUpdated.getLanguageSummary();
+		else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type) && !StringUtils.isBlank(story.getSummary())) {
+			textToTranslate = story.getSummary();
+			sourceLanguage = story.getLanguageSummary();
 		}		
 		if(StringUtils.isBlank(textToTranslate))
 		{
@@ -122,40 +95,22 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		}
 		else if(EnrichmentConstants.defaultTargetTranslationLanguage.equalsIgnoreCase(sourceLanguage)) {
 			return textToTranslate;
-		}
+		}		
 		
-		
-		TranslationEntity newTranslation = translateAndSave(storyId, null, type, translationTool, sourceLanguage, textToTranslate);
+		TranslationEntity newTranslation = translateAndSave(story.getStoryId(), null, type, translationTool, sourceLanguage, textToTranslate);
 		if(newTranslation==null) return null;
 		return newTranslation.getTranslatedText();
 	}
 
 	@Override
-	public String translateItem(String storyId, String itemId, String type, String translationTool, boolean update) throws Exception {
-		String textToTranslate = null;
-		String sourceLanguage = null;
-		ItemEntity itemUpdated = persistentItemEntityService.findItemEntity(storyId, itemId);
-		
-		boolean isUpdated=false;
-		//check if the item is updated with new data from Transcribathon
-		if(update) {
-			isUpdated = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(itemUpdated);
-		}		
-		if(itemUpdated==null) {
-			logger.debug("The item for the translation does not exist!");
-			return null;
-//			throw new ParamValidationException(I18nConstants.RESOURCE_NOT_FOUND, EnrichmentTranslationRequest.PARAM_ITEM_ID, "The item for the translation does not exist!");
-		}
-		
-		if(! isUpdated) {
-			TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-			if(dbTranslationEntity != null) {
-				return dbTranslationEntity.getTranslatedText();
-			}						
-		}
+	public String translateItem(ItemEntity item, String type, String translationTool) throws Exception {
+		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(dbTranslationEntity != null) {
+			return dbTranslationEntity.getTranslatedText();
+		}						
 
-		textToTranslate = itemUpdated.getTranscriptionText();
-		sourceLanguage = ModelUtils.getMainTranslationLanguage(itemUpdated);
+		String textToTranslate = item.getTranscriptionText();
+		String sourceLanguage = ModelUtils.getMainTranslationLanguage(item);
 		if(StringUtils.isBlank(textToTranslate))
 		{
 			logger.debug("The text of the item to be translated is empty!");
@@ -165,7 +120,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return textToTranslate;
 		}
 		
-		TranslationEntity newTranslation = translateAndSave(storyId, itemId, type, translationTool, sourceLanguage, textToTranslate);
+		TranslationEntity newTranslation = translateAndSave(item.getStoryId(), item.getItemId(), type, translationTool, sourceLanguage, textToTranslate);
 		if(newTranslation==null) return null;
 		return newTranslation.getTranslatedText();
 	}
@@ -194,6 +149,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				}
 				break;
 			case eTranslationToolName:
+				if(StringUtils.isBlank(sourceLanguage)) {
+					logger.info("The eTranslation source language is empty! Skipping translation!");
+					return null;					
+				}
 				String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, EnrichmentConstants.defaultTargetTranslationLanguage);
 				if(eTranslationResponse!=null)
 					tmpTranslationEntity.setTranslatedText(eTranslationResponse);

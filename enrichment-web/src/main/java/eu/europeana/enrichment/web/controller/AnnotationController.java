@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
+import eu.europeana.enrichment.model.NamedEntityAnnotation;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -32,6 +35,9 @@ public class AnnotationController extends BaseRest {
 
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
+	
+	@Autowired 
+	JsonLdSerializer jsonLdSerializer;
 	
 	/**
 	 * This method represents the /enrichment/annotation end point, where the annotations for all NamedEntities 
@@ -57,8 +63,9 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyReadAccess(request);
-			String result = enrichmentNerService.getAnnotations(storyId, itemId, property);
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
+			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
+			String resultJson=jsonLdSerializer.serializeObject(result);
+			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;
 	}
 	
@@ -85,8 +92,9 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyWriteAccess(Operations.CREATE, request);
-			String result = enrichmentNerService.createAnnotations(storyId, itemId, property);
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
+			NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, itemId, property);
+			String resultJson = jsonLdSerializer.serializeObject(result);
+			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
 	
@@ -111,8 +119,18 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 		
 		verifyReadAccess(request);
-		String result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);			
-		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
+		NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
+		String resultJson=null;
+		if(result!=null)
+		{
+			resultJson = jsonLdSerializer.serializeObject(result);
+		}
+		else
+		{
+			resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
+		}
+
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 		return response;
 	} 
 	
@@ -137,8 +155,18 @@ public class AnnotationController extends BaseRest {
 				HttpServletRequest request) throws Exception, HttpException {
 			
 			verifyReadAccess(request);
-			String result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
-			ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);			
+			NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
+			String resultJson=null;
+			if(result!=null)
+			{
+				resultJson = jsonLdSerializer.serializeObject(result);
+			}
+			else
+			{
+				resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
+			}
+
+			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 			return response;
 		}
 
