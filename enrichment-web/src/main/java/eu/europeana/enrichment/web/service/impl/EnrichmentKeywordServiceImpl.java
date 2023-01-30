@@ -46,39 +46,7 @@ public class EnrichmentKeywordServiceImpl {
 
         DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();      
         input.setSearchConfiguration(searchConfiguration);
-
-//        input.AddSorting("propertyId", DataTablesInput.Order.Direction.asc);
         searchConfiguration.setSearchType("position", DataTablesInput.SearchType.Integer);
-//        input.setSearch(new DataTablesInput.Search(null, false));
-        
-//        if(!input.getOrder().isEmpty()) {
-//            final int PREF_LABEL_INDEX = 5;
-//            Order order = input.getOrder().get(0);
-//            if(PREF_LABEL_INDEX == order.getColumn()) {
-//                //convert search for preflabel
-//                //NOTE: the sorting sent by browser is not  
-//                input.addSorting("prefferedWikidataEntity.prefLabel.en", order.getDir());
-//            }
-//            
-            // TODO: use constants and enable sort in the table
-//            input.addSorting(null);
-//            input.getColumn("Id").get().setName("propertyId");
-//            input.addSorting("propertyId", DataTablesInput.Order.Direction.asc);
-//        }
-                        
-//	        searchConfiguration.setExcludedColumns(List.of("country", "geoCoordinates"));
-
-//	        searchConfiguration.setSearchType("isEnabled", DataTablesInput.SearchType.Boolean);
-
-//	        searchConfiguration.getExcludedColumns().add("user");
-
-//	        List<String> productRefColumns = new ArrayList<>();
-//	        productRefColumns.add("label");
-//	        productRefColumns.add("isEnabled");
-//	        productRefColumns.add("createdAt");
-//	        searchConfiguration.addRefConfiguration("product", "product", productRefColumns, "label");
-
-//	        Criteria additionalCriteria = new Criteria();
         // TODO: use constants
         Criteria filter = new Criteria("status");
         filter.nin(List.of(KeywordStatus.UNREFERENCED, KeywordStatus.NOT_LINKED));
