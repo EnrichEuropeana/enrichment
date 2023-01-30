@@ -28,7 +28,7 @@ public class Keyword {
 	private List<String> wikidataLabelAltLabelMatchIds;
 	private String dbpediaId;
 	private List<String> dbpediaWikidataIds;
-	private List<String> preferredWikidataIds;
+//	private List<String> preferredWikidataIds;
 	private List<Long> tpItemIds;
 	
 	private String status;

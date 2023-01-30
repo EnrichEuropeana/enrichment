@@ -20,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import eu.europeana.enrichment.EnrichmentApp;
 import eu.europeana.enrichment.web.model.KeywordItemView;
 import eu.europeana.enrichment.web.service.impl.EnrichmentKeywordServiceImpl;
+import eu.europeana.enrichment.web.service.impl.EnrichmentTpKeywordServiceImpl;
 
 @ComponentScan(basePackageClasses = EnrichmentApp.class)
 @AutoConfigureMockMvc
@@ -28,11 +29,14 @@ public class EnrichmentKeywordServiceTest {
 
     Logger logger = LogManager.getLogger(getClass());
 
-    @Autowired
+    @Autowired(required = false)
     KeywordItemRepository keywordItemRepository;
-
+    
     @Autowired
     EnrichmentKeywordServiceImpl enrichmentKeywordService;
+    
+    @Autowired
+    EnrichmentTpKeywordServiceImpl enrichmentTpKeywordService; 
 
     @Test
     @Disabled // only manual execution
@@ -59,21 +63,21 @@ public class EnrichmentKeywordServiceTest {
     @Test
 //    @Disabled // only manual execution
     public void updateWithUnreferencedStatus() throws Exception {
-        int res = enrichmentKeywordService.updateUnreferencedStatus();
+        int res = enrichmentTpKeywordService.updateUnreferencedStatus();
         System.out.println(res);
     }
 
     @Test
 //    @Disabled // only manual execution
     public void updateWithNotLinkedStatus() throws Exception {
-        int res = enrichmentKeywordService.updateNotLinkedStatus();
+        int res = enrichmentTpKeywordService.updateNotLinkedStatus();
         System.out.println(res);
     }
 
     @Test
 //    @Disabled // only manual execution 
     public void updateItemIds() throws Exception {
-        int res = enrichmentKeywordService.updateItemIds();
+        int res = enrichmentTpKeywordService.updateItemIds();
         System.out.println(res);
     }
 

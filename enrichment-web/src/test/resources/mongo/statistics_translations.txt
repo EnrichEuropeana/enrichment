@@ -1,0 +1,13 @@
+### count languages
+db.getCollection('recordTranslationEntity').aggregate([
+{"$match": { "_t" : "EuropeanaRecordTranslationImpl" }},
+{ "$group": {
+       "_id": null,
+       "count": {
+           "$sum": { "$size": "$language" }
+       }
+   }
+}
+])
+
+

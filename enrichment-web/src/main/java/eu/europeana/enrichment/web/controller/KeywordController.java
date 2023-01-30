@@ -40,14 +40,32 @@ public class KeywordController extends BaseRest {
 	
     @GetMapping(value = "/approve")
     @ResponseBody
-//    @JsonView(KeywordView.class)
     public KeywordView approve(@RequestParam(value = "objectId", required = true) String objectId) throws HttpException {
         return enrichmenKeywordService.approve(objectId);
     }
 
+    @GetMapping(value = "/approve/alternative")
+    @ResponseBody
+    public KeywordView approveAlternative(
+            @RequestParam(value = "objectId", required = true) String objectId,
+            @RequestParam(value = "wkdId", required = true) String wkdId
+            ) throws HttpException {
+        
+        return enrichmenKeywordService.approveAlternative(objectId, wkdId);
+    }
+
+    @GetMapping(value = "/approve/broad")
+    @ResponseBody
+    public KeywordView approveBroad(
+            @RequestParam(value = "objectId", required = true) String objectId,
+            @RequestParam(value = "wkdId", required = true) String wkdId
+            ) throws HttpException {
+        return enrichmenKeywordService.approveBroadMatch(objectId, wkdId);
+    }
+
+    
     @GetMapping(value = "/reject")
     @ResponseBody
-//    @JsonView(KeywordView.class)
     public KeywordView reject(@RequestParam(value = "objectId", required = true) String objectId) throws HttpException {
         return enrichmenKeywordService.reject(objectId);
     }

@@ -38,12 +38,12 @@ public class KeywordView {
     //dbpediaWikidataIds
     private List<String> dbpediaWikidataIds;
     //preferedWikidataId
-    private String prefWkdId;
+    private String preferredWikidataId;
     //??
     private String wkdIds;
     private List<String> preferredWikidataIds;
     //wikidataLabelAltLabelMatchIds
-    private String wkdAltLabelIds;
+    private List<String> wikidataLabelAltLabelMatchIds;
     //top5(tpItemIds)
     private List<Long> tpItemIds;
     //status
@@ -129,12 +129,12 @@ public class KeywordView {
 //        this.dbpWkdId = dbpWkdId;
 //    }
 
-    public String getPrefWkdId() {
-        return prefWkdId;
+    public String getPreferredWikidataId() {
+        return preferredWikidataId;
     }
 
-    public void setPrefWkdId(String prefWkdId) {
-        this.prefWkdId = prefWkdId;
+    public void setPreferredWikidataId(String prefWkdId) {
+        this.preferredWikidataId = prefWkdId;
     }
 
     public String getWkdIds() {
@@ -145,12 +145,12 @@ public class KeywordView {
         this.wkdIds = wkdIds;
     }
 
-    public String getWkdAltLabelIds() {
-        return wkdAltLabelIds;
+    public List<String> getWikidataLabelAltLabelMatchIds() {
+        return wikidataLabelAltLabelMatchIds;
     }
 
-    public void setWkdAltLabelIds(String wkdAltLabelIds) {
-        this.wkdAltLabelIds = wkdAltLabelIds;
+    public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
+        this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
     }
 
     public String getDetectedOriginalLanguage() {
