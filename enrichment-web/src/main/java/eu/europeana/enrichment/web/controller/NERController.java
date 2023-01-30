@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,8 +89,8 @@ public class NERController extends BaseRest {
 		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
 		if(original==null) original=false;
 		
-		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
-		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
@@ -116,7 +117,7 @@ public class NERController extends BaseRest {
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
 	
-		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateBaseParamsForNEROrTranslation(storyId, null, property, false);
 		validateNERTools(nerToolsList);
 		
@@ -163,8 +164,8 @@ public class NERController extends BaseRest {
 		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
 		if(original==null) original=false;
 		
-		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
-		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
@@ -192,7 +193,7 @@ public class NERController extends BaseRest {
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
 	
-		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateBaseParamsForNEROrTranslation(storyId, itemId, property, true);
 		validateNERTools(nerToolsList);
 		
@@ -221,8 +222,8 @@ public class NERController extends BaseRest {
 
 		String linking=EnrichmentConstants.defaultLinkingTool;
 		String nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
-		List<String> linkingList=Arrays.asList(HelperFunctions.toArray(linking,","));
-		List<String> nerToolsList=Arrays.asList(HelperFunctions.toArray(nerTools,","));
+		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
+		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 
 		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
 		for(StoryEntity story : stories) {

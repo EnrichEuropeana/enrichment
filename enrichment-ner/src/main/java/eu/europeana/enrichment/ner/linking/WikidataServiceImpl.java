@@ -848,10 +848,10 @@ public class WikidataServiceImpl implements WikidataService {
 					 */
 					String prefLabelSingleUTF8 = new String(prefLabelSingle.getBytes(), StandardCharsets.UTF_8);
 					String prefLabelSingleUTF8LowerCase = prefLabelSingleUTF8.toLowerCase();
-					List<String> prefLabelSingleSplitted = Arrays.asList(prefLabelSingleUTF8LowerCase.split("\\s+"));
+					List<String> prefLabelSingleSplitted = new ArrayList<>(Arrays.asList(prefLabelSingleUTF8LowerCase.split("\\s+")));
 					String nameUTF8 = new String(name.getBytes(), StandardCharsets.UTF_8);
 					String nameUTF8LowerCase = nameUTF8.toLowerCase();
-					List<String> nameSplitted = Arrays.asList(nameUTF8LowerCase.split("\\s+"));
+					List<String> nameSplitted = new ArrayList<>(Arrays.asList(nameUTF8LowerCase.split("\\s+")));
 					if(prefLabelSingleSplitted.containsAll(nameSplitted) 
 						&& prefLabelSingleSplitted.size()==nameSplitted.size()) {
 						return true;
@@ -880,10 +880,10 @@ public class WikidataServiceImpl implements WikidataService {
 					 */
 					String altLabelSingleUTF8 = new String(altLabelSingle.getBytes(), StandardCharsets.UTF_8);
 					String altLabelSingleUTF8LowerCase = altLabelSingleUTF8.toLowerCase();
-					List<String> altLabelSingleSplitted = Arrays.asList(altLabelSingleUTF8LowerCase.split("\\s+"));
+					List<String> altLabelSingleSplitted = new ArrayList<>(Arrays.asList(altLabelSingleUTF8LowerCase.split("\\s+")));
 					String nameUTF8 = new String(name.getBytes(), StandardCharsets.UTF_8);
 					String nameUTF8LowerCase = nameUTF8.toLowerCase();
-					List<String> nameSplitted = Arrays.asList(nameUTF8LowerCase.split("\\s+"));
+					List<String> nameSplitted = new ArrayList<>(Arrays.asList(nameUTF8LowerCase.split("\\s+")));
 					if(altLabelSingleSplitted.containsAll(nameSplitted) 
 						&& altLabelSingleSplitted.size()==nameSplitted.size()) {
 						return true;

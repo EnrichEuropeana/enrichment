@@ -227,8 +227,12 @@ public class StoryEntityImpl implements StoryEntity {
         }                   
         StoryEntityImpl story_new = (StoryEntityImpl) story; 
         
-        Collections.sort(transcriptionLanguages);
-        Collections.sort(story_new.getTranscriptionLanguages());
+        if(transcriptionLanguages!=null) {
+        	Collections.sort(transcriptionLanguages);
+        }
+        if(story_new.getTranscriptionLanguages()!=null) {
+        	Collections.sort(story_new.getTranscriptionLanguages());
+        }
 
         // Compare the data members and return accordingly  
         return Objects.equals(story_new.getStoryId(), storyId)
