@@ -181,7 +181,6 @@ public class ItemEntityImpl implements ItemEntity {
 	
 	@Override
     public boolean equals(Object item){ 
-  
         if (item == this) { 
             return true; 
         } 
@@ -190,9 +189,12 @@ public class ItemEntityImpl implements ItemEntity {
         }          
         ItemEntityImpl item_new = (ItemEntityImpl) item;
         
-        Collections.sort(transcriptionLanguages);
-        Collections.sort(item_new.getTranscriptionLanguages());
-
+        if(transcriptionLanguages!=null) {
+        	Collections.sort(transcriptionLanguages);
+        }
+        if(item_new.getTranscriptionLanguages()!=null) {
+        	Collections.sort(item_new.getTranscriptionLanguages());
+        }
         
         // Compare the data members and return accordingly  
         return Objects.equals(item_new.getItemId(), itemId)

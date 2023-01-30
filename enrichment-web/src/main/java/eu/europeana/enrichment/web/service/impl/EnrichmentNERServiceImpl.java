@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,7 +147,7 @@ public class EnrichmentNERServiceImpl {
 		}
 		
 		String [] textAndLanguage = getStoryTextForNER(story, translationTool, type, original, updateStory);
-		if(textAndLanguage[0]==null || textAndLanguage[1]==null) {
+		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
 			return;
 		}
 		String textForNer = textAndLanguage[0];
@@ -174,7 +175,7 @@ public class EnrichmentNERServiceImpl {
 		}
 		
 		String [] textAndLanguage = getItemTextForNER(item, translationTool, type, original, updateItem);
-		if(textAndLanguage[0]==null || textAndLanguage[1]==null) {
+		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
 			return;
 		}
 		String textForNer = textAndLanguage[0];
@@ -210,14 +211,15 @@ public class EnrichmentNERServiceImpl {
 	 * @throws Exception
 	 */
 	public void updatedNamedEntitiesForText(List<String> nerTools, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
+		List<String> nerToolsReordered = new ArrayList<String>(nerTools);
 		//the first analyzed NER tool must be DBpedia_Spotlight
-		if(nerTools.contains(EnrichmentConstants.dbpediaSpotlightName)) {
-			int itemPos = nerTools.indexOf(EnrichmentConstants.dbpediaSpotlightName);
-			nerTools.remove(itemPos);
-		    nerTools.add(0, EnrichmentConstants.dbpediaSpotlightName);
+		if(nerToolsReordered.contains(EnrichmentConstants.dbpediaSpotlightName)) {
+			int itemPos = nerToolsReordered.indexOf(EnrichmentConstants.dbpediaSpotlightName);
+			nerToolsReordered.remove(itemPos);
+			nerToolsReordered.add(0, EnrichmentConstants.dbpediaSpotlightName);
 		}
 		
-		for(String nerTool:nerTools) {
+		for(String nerTool:nerToolsReordered) {
 			TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
 			if(tmpResult==null) {
 				return;
@@ -339,7 +341,7 @@ public class EnrichmentNERServiceImpl {
 		}
 		
 		String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool);
-		if(translatedText!=null)
+		if(! StringUtils.isBlank(translatedText))
 		{
 			results[0] = translatedText;
 			results[1] = EnrichmentConstants.defaultTargetTranslationLanguage;
@@ -378,7 +380,7 @@ public class EnrichmentNERServiceImpl {
 		}
 
 		String translatedText = enrichmentTranslationService.translateItem(updatedItem, type, translationTool);
-		if(translatedText!=null)
+		if(! StringUtils.isBlank(translatedText))
 		{
 			results[0] = translatedText;
 			results[1] = EnrichmentConstants.defaultTargetTranslationLanguage;
