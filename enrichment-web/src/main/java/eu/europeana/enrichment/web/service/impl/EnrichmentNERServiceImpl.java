@@ -35,7 +35,6 @@ import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.model.utils.ModelUtils;
-import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -197,7 +196,7 @@ public class EnrichmentNERServiceImpl {
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_STORY_ID, null);
 		if(tools == null || tools.isEmpty())
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentNERRequest.PARAM_NER_TOOL, null);
-		if(tools.size()>1 && !tools.get(0).equalsIgnoreCase(NERConstants.dbpediaSpotlightName)) {
+		if(tools.size()>1 && !tools.get(0).equalsIgnoreCase(EnrichmentConstants.dbpediaSpotlightName)) {
 			throw new ParamValidationException("In case of multiple NER tools, the first one must be the DBpedia_Spotlight.", EnrichmentNERRequest.PARAM_NER_TOOL, null);
 		}
 		if(!original && (translationTool == null || translationTool.isEmpty()))
@@ -256,14 +255,24 @@ public class EnrichmentNERServiceImpl {
 		nerTools.removeAll(toolsToRemove);
 		return nerTools.size()==0;
 	}
-	
+
+	/**
+ 	 * When this function is called for multiple ner tools one after another, make sure it is first called with the nerTool="DBpedia_Spotlight". 
+ 	 * For each ner tool the analysis is done separately because different tools may find
+	 * the same entities on different positions in the text and we would like to separate those results,
+	 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
+	 * belong to which ner tool analyser.
+	 * @param nerTool
+	 * @param textForNer
+	 * @param languageForNer
+	 * @param fieldType
+	 * @param storyId
+	 * @param itemId
+	 * @param linking
+	 * @param matchType
+	 * @throws Exception
+	 */
 	public void updatedNamedEntitiesForText(String nerTool, String textForNer, String languageForNer, String fieldType, String storyId, String itemId, List<String> linking, boolean matchType) throws Exception {
-		/*
-		 * Here for each ner tool the analysis is done separately because different tools may find
-		 * the same entities on different positions in the text and we would like to separate those results,
-		 * otherwise all positions of the entities would be in the same list and it cannot be clear which positions
-		 * belong to which ner tool analyser.
-		 */
 		TreeMap<String, List<NamedEntityImpl>> tmpResult = applyNERTools(nerTool, textForNer, languageForNer, fieldType, storyId, itemId);
 		if(tmpResult==null) {
 			return;
@@ -405,10 +414,10 @@ public class EnrichmentNERServiceImpl {
 	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws Exception {
 		NERService tmpTool=null;
 		switch(nerTool){
-			case NERConstants.stanfordNer:
+			case EnrichmentConstants.stanfordNer:
 				tmpTool = nerStanfordService;
 				break;
-			case NERConstants.dbpediaSpotlightName:
+			case EnrichmentConstants.dbpediaSpotlightName:
 				tmpTool = nerDBpediaSpotlightService;
 				break;
 			default:
@@ -643,20 +652,20 @@ public class EnrichmentNERServiceImpl {
 		if(namedEntityAnnos.isEmpty()) {
 			namedEntityAnnos = new ArrayList<NamedEntityAnnotation> ();
 			List<String> nerTools = new ArrayList<String>();
-			nerTools.add(NERConstants.dbpediaSpotlightName);
-			nerTools.add(NERConstants.stanfordNer);
+			nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
+			nerTools.add(EnrichmentConstants.stanfordNer);
 			//first the annos for both ner tools are created, which will also have the highest score
 			List<NamedEntityImpl> namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
 			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
 			
 			nerTools.clear();
-			nerTools.add(NERConstants.dbpediaSpotlightName);
+			nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
 			//second the annos for the dbpedia ner tool are created (the ones that do not already exist for both ner tools), these annos will have the second highest score
 			namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
 			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
 			
 			nerTools.clear();
-			nerTools.add(NERConstants.stanfordNer);
+			nerTools.add(EnrichmentConstants.stanfordNer);
 			//third the annos for the stanford ner tool are created (the ones that are not already created before), these annos will have the third highest score
 			namedEntities = persistentNamedEntityService.findNamedEntitiesWithAdditionalInformation(storyId, itemId, property, nerTools, true);
 			createAnnotationsPerNerTool(namedEntities, namedEntityAnnos, nerTools, storyId, itemId, property);
@@ -713,7 +722,7 @@ public class EnrichmentNERServiceImpl {
 	private double computeScoreForAnnotations(List<String> nerTools, NamedEntityImpl ne) {
 		int linkedByDbpedia=0;
 		int linkedByWikidataSearch=0;
-		if(ne.getDbpediaWikidataIds()!=null && nerTools.contains(NERConstants.stanfordNer)) {
+		if(ne.getDbpediaWikidataIds()!=null && nerTools.contains(EnrichmentConstants.stanfordNer)) {
 			linkedByDbpedia=1;
 			//if there is a dbpedia wikidata id, we assume it also exist in the wikidata search
 			linkedByWikidataSearch=1;

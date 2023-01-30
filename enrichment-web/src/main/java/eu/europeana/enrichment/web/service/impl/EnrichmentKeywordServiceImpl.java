@@ -46,6 +46,8 @@ public class EnrichmentKeywordServiceImpl {
 
         DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();      
         input.setSearchConfiguration(searchConfiguration);
+
+//        input.AddSorting("propertyId", DataTablesInput.Order.Direction.asc);
         searchConfiguration.setSearchType("position", DataTablesInput.SearchType.Integer);
 //        input.setSearch(new DataTablesInput.Search(null, false));
         

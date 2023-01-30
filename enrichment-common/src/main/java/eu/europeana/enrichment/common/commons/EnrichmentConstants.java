@@ -93,5 +93,96 @@ public class EnrichmentConstants {
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
 	public static final String INSTANCE_OF_JSONPROP = "claims.P31.mainsnak.datavalue.value.id";
+	
+	//entity fields
+	public static final String ITEM_ID = "itemId";
+	public static final String STORY_ID = "storyId";
+	public static final String ID = "id";
+	public static final String OBJECT_ID = "_id";
+	public static final String KEY = "key";
+	public static final String TOOL = "tool";
+	public static final String LANGUAGE = "language";
+	public static final String TYPE = "type";
+	public static final String WIKIDATA_ID = "wikidataId";
+	public static final String DBPEDIA_ID = "dbpediaId";
+	public static final String PROPERTY = "property";
+	public static final String TARGET = "target";
+	public static final String MOTIVATION = "motivation";
+	public static final String BODY = "body";
+	public static final String LABEL = "label";
+	public static final String POSITION_ENTITIES = "positionEntities";
+	public static final String FIELD_USED_FOR_NER = "fieldUsedForNER";
+	public static final String TRANSLATION_KEY = "translationKey";
+	public static final String NER_TOOLS = "nerTools";
+	public static final String PROCESSING = "processing";
+	public static final String FOUND_BY_NER_TOOLS = "foundByNerTools";
+	public static final String POSITION_NAMED_ENTITY = "namedEntityId";
+	public static final String TOTAL = "total";
+	public static final String ITEMS = "items";
+	public static final String CREATOR = "creator";
+	public static final String OFFSETS_TRANSLATED_TEXT = "offsetsTranslatedText";
+	public static final String TOPIC_MODEL_ID = "id";
+	public static final String TOPIC_MODEL_IDENTIFIER = "identifier";
+	public static final String TOPIC_ID = "id";
+	public static final String TOPIC_IDENTIFIER = "identifier";
+	public static final String TOPIC_MODEL = "model";
+	public static final String TOPIC_MODELID = "modelId";
+	public static final String TOPIC_DESCRIPTIONS = "descriptions";
+	public static final String TOPIC_TERMS = "terms";
+	public static final String TOPIC_SCORE = "score";
+	public static final String TOPIC_LABELS = "labels";
+	public static final String TOPIC_KEYWORDS = "keywords";
+	public static final String TOPIC_CREATED = "created";
+	public static final String TOPIC_MODIFIED = "modified";
+	public static final String TOPIC_SOLR_CORE = "topics";
+	public static final String TOPIC_SOLR_DESCRIPTION_ALL = "description.*";
+	public static final String TOPIC_SOLR_DESCRIPTION = "description";
+
+	// results page
+	public static final String PART_OF = "partOf";
+	public static final String NEXT = "next";
+	public static final String PREV = "prev";
+	public static final String LAST = "last";
+	public static final String FIRST = "first";
+	public static final String FACETS = "facets";
+	public static final String FIELD = "field";
+	public static final String VALUES = "values";
+	public static final String FACET_TYPE = "facet";
+	public static final String COUNT = "count";
+	// collection page
+	public static final String START_INDEX = "startIndex";
+
+	//web requests fields
+	public static final String QUERY_PARAM_FL = "fl";
+	
+	//serialization constants
+	public static final String CONTEXT_FIELD = "@context";
+	public static final String ANNOTATION_CONTEXT = "http://www.w3.org/ns/anno.jsonld";
+	public static final String WIKIDATA_CONTEXT = "http://www.europeana.eu/schemas/context/entity.jsonld";
+	
+	//topic realted constants
+	public static final String LDA = "LDA";
+	public static final String LDA2Vec = "LDA2Vec";	
+	public static final String BaseURL = "";	
+	public static final String ModelsURL = "";
+
+	//ner tools
+	public static final String stanfordNer = "Stanford_NER";
+	public static final String dbpediaSpotlightName = "DBpedia_Spotlight";
+	
+	//solr denormalization fields
+    public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";
+    public static final String ALT_LABEL_DENORMALIZED = "skos_altLabel";
+	public static final String DEFINITION_DENORMALIZED = "skos";
+	public static final String SAME_AS_DENORMALIZED = "owl";
+	public static final String DEPICTION_DENORMALIZED = "foaf";
+	public static final String DC_DESCRIPTION_DENORMALIZED = "dc_description";
+	public static final String DATE_OF_BIRTH_DENORMALIZED = "rdagr2";
+	public static final String DATE_OF_DEATH_DENORMALIZED = "rdagr2";
+	public static final String LOGO_DENORMALIZED = "foaf";
+	public static final String LATITUDE_DENORMALIZED = "wgs84_pos";
+	public static final String LONGITUDE_DENORMALIZED = "wgs84_pos";	
+	public static final String PROFESSION_OR_OCCUPATION_DENORMALIZED = "rdagr2_professionOrOccupation";
+
 }
 
