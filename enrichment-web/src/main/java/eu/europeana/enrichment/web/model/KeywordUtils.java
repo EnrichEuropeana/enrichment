@@ -17,19 +17,20 @@ public class KeywordUtils {
         KeywordView view = new KeywordView();
         view.setObjectId(keyword.get_id().toHexString());
         view.setPropertyId(keyword.getPropertyId());
-        view.setLang(keyword.getDetectedOriginalLanguage());
-        view.setKeyword(keyword.getValue());
-        view.setKeywordEn(keyword.getTranslatedValue());
+        view.setDetectedOriginalLanguage(keyword.getDetectedOriginalLanguage());
+        view.setValue(keyword.getValue());
+        view.setTranslatedValue(keyword.getTranslatedValue());
         view.setStatus(keyword.getStatus());
                 
         if(keyword.getPreferredWikidataId()!= null && keyword.getPrefferedWikidataEntity() != null) {
-            view.setPrefWkdId(keyword.getPreferredWikidataId());
+            view.setPreferredWikidataId(keyword.getPreferredWikidataId());
             view.setPrefLabelEn(
                     getLabel(keyword.getPrefferedWikidataEntity().getPrefLabel(), LANG_EN));
             view.setWikidataTypes(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
             view.setType(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
             view.setTpItemIds(top5(keyword.getTpItemIds()));
             view.setDbpediaWikidataIds(keyword.getDbpediaWikidataIds());
+            view.setWikidataLabelAltLabelMatchIds(keyword.getWikidataLabelAltLabelMatchIds());
 //            view.setDbpId(getDbpediaId(keyword));
 //            view.setDbpWkdId(getDbpWkdId(keyword));
 //            view.setPosition(getPosition(keyword));
