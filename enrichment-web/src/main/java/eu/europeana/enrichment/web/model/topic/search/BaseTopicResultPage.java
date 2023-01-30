@@ -10,17 +10,17 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import eu.europeana.api.commons.definitions.search.FacetFieldView;
 import eu.europeana.api.commons.definitions.search.result.impl.ResultsPageImpl;
 import eu.europeana.api.commons.definitions.vocabulary.CommonLdConstants;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@JsonPropertyOrder({ EnrichmentFields.ID, EnrichmentFields.TYPE, EnrichmentFields.PART_OF,
-	EnrichmentFields.START_INDEX, EnrichmentFields.TOTAL, EnrichmentFields.ITEMS, EnrichmentFields.PREV, EnrichmentFields.NEXT, EnrichmentFields.FACETS })
+@JsonPropertyOrder({ EnrichmentConstants.ID, EnrichmentConstants.TYPE, EnrichmentConstants.PART_OF,
+	EnrichmentConstants.START_INDEX, EnrichmentConstants.TOTAL, EnrichmentConstants.ITEMS, EnrichmentConstants.PREV, EnrichmentConstants.NEXT, EnrichmentConstants.FACETS })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class BaseTopicResultPage<T> extends ResultsPageImpl<T>{
 
     CollectionOverview partOf;
     String type = CommonLdConstants.RESULT_PAGE;
 
-    @JsonProperty(EnrichmentFields.TYPE)
+    @JsonProperty(EnrichmentConstants.TYPE)
     public String getType() {
         return type;
     }
@@ -28,7 +28,7 @@ public class BaseTopicResultPage<T> extends ResultsPageImpl<T>{
         this.type = type;
     }
 
-    @JsonProperty(EnrichmentFields.PART_OF)
+    @JsonProperty(EnrichmentConstants.PART_OF)
     public CollectionOverview getPartOf() {
         return partOf;
     }
@@ -38,7 +38,7 @@ public class BaseTopicResultPage<T> extends ResultsPageImpl<T>{
     }
 
     @Override
-    @JsonProperty(EnrichmentFields.TOTAL)
+    @JsonProperty(EnrichmentConstants.TOTAL)
     public long getTotalInPage() {
         return super.getTotalInPage();
     }
@@ -68,25 +68,25 @@ public class BaseTopicResultPage<T> extends ResultsPageImpl<T>{
     }
 
     @Override
-    @JsonProperty(EnrichmentFields.ID)
+    @JsonProperty(EnrichmentConstants.ID)
     public String getCurrentPageUri() {
         return super.getCurrentPageUri();
     }
 
     @Override
-    @JsonProperty(EnrichmentFields.NEXT)
+    @JsonProperty(EnrichmentConstants.NEXT)
     public String getNextPageUri() {
         return super.getNextPageUri();
     }
 
     @Override
-    @JsonProperty(EnrichmentFields.PREV)
+    @JsonProperty(EnrichmentConstants.PREV)
     public String getPrevPageUri() {
         return super.getPrevPageUri();
     }
 
     @Override
-    @JsonProperty(EnrichmentFields.FACETS)
+    @JsonProperty(EnrichmentConstants.FACETS)
     public List<FacetFieldView> getFacetFields() {
         return super.getFacetFields();
     }

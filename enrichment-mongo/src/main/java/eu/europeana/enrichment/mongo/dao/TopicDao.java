@@ -16,4 +16,8 @@ public interface TopicDao {
 
 	public List<Topic> getAll();
 
+	Topic getByTopicId(long topicId);
+	
+	public long generateAutoIncrement(String internalType);
+
 }

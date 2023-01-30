@@ -15,7 +15,6 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.solr.commons.SolrUtils;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
-import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_TOPIC_SERVICE)
 public class SolrTopicServiceImpl extends SolrBaseClientServiceImpl {
@@ -45,7 +44,7 @@ public class SolrTopicServiceImpl extends SolrBaseClientServiceImpl {
 		QueryResponse rsp =null;
 		try {
 			logger.debug("Solr topic search query: " + query);
-		    rsp = solrServer.query(TopicSolrFields.SOLR_CORE, solrQuery);
+		    rsp = solrServer.query(EnrichmentConstants.TOPIC_SOLR_CORE, solrQuery);
 		} catch (RemoteSolrException e) {
 			throw handleRemoteSolrException(solrQuery, e);
 		} catch (IOException | SolrServerException | RuntimeException e) {

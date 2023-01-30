@@ -2,6 +2,8 @@ package eu.europeana.enrichment.mongo.dao;
 
 import static dev.morphia.query.experimental.filters.Filters.eq;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -52,4 +54,9 @@ public class RecordTranslationDaoImpl implements RecordTranslationDao {
                 .getDeletedCount();
 	}
 
+	@Override
+	public List<EuropeanaRecordTranslationImpl> getAllTranslationRecords() {
+	    return enrichmentDatastore.find(EuropeanaRecordTranslationImpl.class).iterator().toList();
+	}	
+	
 }

@@ -6,7 +6,8 @@ public enum EntityTypes{
 
 	Organization("Organization", "http://www.europeana.eu/schemas/edm/Organization"),
 	Agent("Agent", "http://www.europeana.eu/schemas/edm/Agent"), 
-	Place("Place", "http://www.europeana.eu/schemas/edm/Place");
+	Place("Place", "http://www.europeana.eu/schemas/edm/Place"),
+	Topic("Topic", "");
 	
 	private String entityType;
 	private String httpUri;

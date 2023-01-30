@@ -9,9 +9,9 @@ import org.json.JSONObject;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NERConstants;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 
@@ -154,7 +154,7 @@ public class NERStanfordServiceImpl{
 			// default: Offset position will be added to the translated 
 			positionEntity.setOffsetsTranslatedText(offsetList);
 			List<String> nerTools = new ArrayList<String>();
-			nerTools.add(NERConstants.stanfordNer);
+			nerTools.add(EnrichmentConstants.stanfordNer);
 			positionEntity.setNerTools(nerTools);
 			namedEntity.setPositionEntity(positionEntity);
 

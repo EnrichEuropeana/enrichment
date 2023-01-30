@@ -2,7 +2,7 @@ package eu.europeana.enrichment.common.commons;
 
 public class EnrichmentConstants {
 
-	//config constants
+	//config bean constants
 	public static final String BEAN_ENRICHMENT_CONFIGURATION= "enrichmentConfiguration";
     public static final String BEAN_ENRICHMENT_ITEM_ENTITY_DAO= "itemEntityDao";
     public static final String BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO= "namedEntityAnnotationDao";
@@ -52,7 +52,6 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_BUILD_INFO = "buildInfo";
     public static final String BEAN_ENRICHMENT_JSON_MAPPER = "jsonMapper";
     public static final String BEAN_CLIENT_DETAILS_SERVICE = "clientDetailsService";
-    // topic management API
     public static final String BEAN_ENRICHMENT_TOPIC_MODEL_DAO = "topicModelDao";
     public static final String BEAN_ENRICHMENT_TOPIC_ENTITY_DAO = "topicEntityDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_TOPIC_MODEL_SERVICE = "persistentTopicModelService";

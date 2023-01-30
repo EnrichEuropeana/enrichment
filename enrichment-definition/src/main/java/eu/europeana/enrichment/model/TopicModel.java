@@ -22,4 +22,7 @@ public interface TopicModel {
 	public String getAlgorithm();
 	public void setAlgorithm(String alg) throws UnsupportedEntityTypeException;
 	
+	public String getId();
+	public void setId(String id);
+	
 }

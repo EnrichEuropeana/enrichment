@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
@@ -87,6 +88,7 @@ public class TranslationController extends BaseRest {
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception {
 		
 		verifyReadAccess(request);
@@ -150,6 +152,7 @@ public class TranslationController extends BaseRest {
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
 			@RequestParam(value = "property", required = false, defaultValue = "description") String property,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception {
 
 		verifyReadAccess(request);
