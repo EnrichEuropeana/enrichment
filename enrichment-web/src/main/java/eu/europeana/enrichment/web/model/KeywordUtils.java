@@ -23,13 +23,14 @@ public class KeywordUtils {
         view.setStatus(keyword.getStatus());
                 
         if(keyword.getPreferredWikidataId()!= null && keyword.getPrefferedWikidataEntity() != null) {
-            view.setPrefWkdId(keyword.getPreferredWikidataId());
+            view.setPreferredWikidataId(keyword.getPreferredWikidataId());
             view.setPrefLabelEn(
                     getLabel(keyword.getPrefferedWikidataEntity().getPrefLabel(), LANG_EN));
             view.setWikidataTypes(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
             view.setType(getWikidataTypes(keyword.getPrefferedWikidataEntity()));
             view.setTpItemIds(top5(keyword.getTpItemIds()));
             view.setDbpediaWikidataIds(keyword.getDbpediaWikidataIds());
+            view.setWikidataLabelAltLabelMatchIds(keyword.getWikidataLabelAltLabelMatchIds());
 //            view.setDbpId(getDbpediaId(keyword));
 //            view.setDbpWkdId(getDbpWkdId(keyword));
 //            view.setPosition(getPosition(keyword));

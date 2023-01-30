@@ -63,7 +63,7 @@
 		<appender-ref ref="FileLoggerInfo"/>
 		<appender-ref ref="FileLoggerError"/>
 	</Logger>
-	<Logger name="org.springframework.data.mongodb.core.MongoTemplate" level="DEBUG" additivity="false">
+	<Logger name="org.springframework.data.mongodb.core.MongoTemplate" level="INFO" additivity="false">
     	<appender-ref ref="Console"/>
 		<appender-ref ref="FileLoggerInfo"/>
 		<appender-ref ref="FileLoggerError"/>
