@@ -3,7 +3,8 @@ package eu.europeana.enrichment.web.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,10 +21,8 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.Keyword;
 import eu.europeana.enrichment.model.impl.KeywordStatus;
 import eu.europeana.enrichment.mongo.dao.KeywordDaoImpl;
-import eu.europeana.enrichment.web.model.KeywordItemView;
 import eu.europeana.enrichment.web.model.KeywordUtils;
 import eu.europeana.enrichment.web.model.KeywordView;
-import eu.europeana.enrichment.web.repository.KeywordItemRepository;
 import eu.europeana.enrichment.web.repository.KeywordRepository;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_KEYWORD_SERVICE)
@@ -34,40 +33,20 @@ public class EnrichmentKeywordServiceImpl {
      */
 
     @Autowired()
-//	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_KEYWORD_DAO)
+    //Data access object
     KeywordDaoImpl keywordDao;
 
     @Autowired
+    //data tables repository
     KeywordRepository keywordRepository;
-
-    @Autowired
-    KeywordItemRepository keywordItemRepository;
 
     Logger logger = LogManager.getLogger(getClass());
 
     public DataTablesOutput<KeywordView> getKeywords(DataTablesInput input) {
 
-        DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();
+        DataTablesInput.SearchConfiguration searchConfiguration = new DataTablesInput.SearchConfiguration();      
         input.setSearchConfiguration(searchConfiguration);
-        // TODO: use constants and enable sort in the table
-//        input.addSorting(null);
-//        input.getColumn("Id").get().setName("propertyId");
-        input.AddSorting("propertyId", DataTablesInput.Order.Direction.asc);
         searchConfiguration.setSearchType("position", DataTablesInput.SearchType.Integer);
-//	        searchConfiguration.setExcludedColumns(List.of("country", "geoCoordinates"));
-
-//	        searchConfiguration.setSearchType("isEnabled", DataTablesInput.SearchType.Boolean);
-
-//	        searchConfiguration.getExcludedColumns().add("user");
-
-//	        List<String> productRefColumns = new ArrayList<>();
-//	        productRefColumns.add("label");
-//	        productRefColumns.add("isEnabled");
-//	        productRefColumns.add("createdAt");
-//	        searchConfiguration.addRefConfiguration("product", "product", productRefColumns, "label");
-
-//	        Criteria additionalCriteria = new Criteria();
-        input.setSearch(new DataTablesInput.Search(null, false));
         // TODO: use constants
         Criteria filter = new Criteria("status");
         filter.nin(List.of(KeywordStatus.UNREFERENCED, KeywordStatus.NOT_LINKED));
@@ -90,110 +69,47 @@ public class EnrichmentKeywordServiceImpl {
         res.setData(results);
         return res;
     }
-
-    public int updateNotLinkedStatus() {
-
-        List<Keyword> keywords = keywordDao.findAllKeywords();
-        int updated = 0;
-        int processed = 0;
-        for (Keyword keyword : keywords) {
-            boolean toUpdate = !KeywordStatus.UNREFERENCED.equals(keyword.getStatus())
-                    && !KeywordStatus.NOT_LINKED.equals(keyword.getStatus())
-                    && StringUtils.isBlank(keyword.getPreferredWikidataId());
-            // do d
-            if (toUpdate) {
-                keyword.setStatus(KeywordStatus.NOT_LINKED);
-                keyword.setModified(new Date());
-                keywordDao.saveKeyword(keyword);
-                // increment counter
-                updated++;
-            }
-            
-            processed++;
-            processingProgressLogging(updated, processed);
-        }
-
-        logProcessingProgress(updated, processed);
-        return updated;
-    }
-
-    private void processingProgressLogging(int updated, int processed) {
-        if (processed % 100 == 0) {
-            logProcessingProgress(updated, processed);
-        }
-    }
-
-    private void logProcessingProgress(int updated, int processed) {
-        logger.debug("Processed keyword records: " + processed);
-        logger.debug("Updated keyword records: " + updated);
-    }
-
-    public int updateUnreferencedStatus() {
-
-        List<Keyword> keywords = keywordDao.findAllKeywords();
-        int updated = 0;
-        int processed = 0;
-        long count;
-        for (Keyword keyword : keywords) {
-            // do d
-            count = keywordItemRepository.countByKeywordId(Long.valueOf(keyword.getPropertyId()));
-            boolean notReferenced = !(count > 0);
-            boolean toUpdate = notReferenced && !KeywordStatus.UNREFERENCED.equals(keyword.getStatus());
-            if (toUpdate) {
-                keyword.setStatus(KeywordStatus.UNREFERENCED);
-                keyword.setModified(new Date());
-                keywordDao.saveKeyword(keyword);
-                // increment counter
-                updated++;
-            }
-            processed++;
-            processingProgressLogging(updated, processed);
-        }
-
-        logProcessingProgress(updated, processed);
-        return updated;
-    }
-
-    public int updateItemIds() {
-
-        List<Keyword> keywords = keywordDao.findAllKeywords();
-        int updated = 0;
-        int processed = 0;
-        List<KeywordItemView> keywordItemViews;
-        List<Long> itemIds;
-        for (Keyword keyword : keywords) {
-            // do d
-            keywordItemViews = keywordItemRepository.retrieveByKeywordId(Long.valueOf(keyword.getPropertyId()));
-            if (keywordItemViews == null || keywordItemViews.isEmpty()) {
-                processed++;
-                continue;
-            }
-            itemIds = keywordItemViews.stream().map(entry -> entry.getItemId()).collect(Collectors.toList());
-
-            keyword.setTpItemIds(itemIds);
-//            keyword.setModified(new Date());
-            keywordDao.saveKeyword(keyword);
-            // increment counter
-            updated++;
-            processed++;
-            processingProgressLogging(updated, processed);
-
-        }
-        logProcessingProgress(updated, processed);
-        return updated;
-    }
-
+ 
     public KeywordView approve(String objectId) throws HttpException {
-        Keyword keyword =  keywordDao.findByObjectId(objectId);
-        if(keyword==null) {
-            throw new HttpException("No keyword found with objetId: " + objectId, "KEYOWRD_NOT_FOUND", HttpStatus.NOT_FOUND);
-        }
-        keyword.setApprovedWikidataId(keyword.getPreferredWikidataId());
-        keyword.setStatus(KeywordStatus.APPROVED);
-        keyword.setModified(new Date());
-        keyword = keywordDao.saveKeyword(keyword);
+        Keyword keyword = setApprovedAndSave(objectId, KeywordStatus.APPROVED, null);
         return KeywordUtils.createView(keyword);
     }
+
+    public KeywordView approveAlternative(String objectId, @NotNull String wkdId) throws HttpException {
+        Keyword keyword = setApprovedAndSave(objectId, KeywordStatus.APPROVED_ALTERNATIVE, wkdId);
+        return KeywordUtils.createView(keyword);
+    }
+    
+    public KeywordView approveBroadMatch(String objectId, @NotNull String wkdId) throws HttpException {
+        Keyword keyword = setApprovedAndSave(objectId, KeywordStatus.APPROVED_BROAD_MATCH, wkdId);
+        return KeywordUtils.createView(keyword);
+    }
+    
+    private Keyword setApprovedAndSave(String objectId, String status, String alternativeWkdId) throws HttpException {
+        Keyword keyword =  keywordDao.findByObjectId(objectId);
+        if(keyword==null) {
+            throw new HttpException("No keyword found with objectId: " + objectId, "KEYOWRD_NOT_FOUND", HttpStatus.NOT_FOUND);
+        }
+        markAsApproved(keyword, status, alternativeWkdId);
+        return keywordDao.saveKeyword(keyword);
+    }
+
+    private void markAsApproved(@NotNull Keyword keyword, @NotNull String status, String alternativeWkdId) throws HttpException {
+        if(alternativeWkdId == null) {
+            keyword.setApprovedWikidataId(keyword.getPreferredWikidataId());
+        } else {
+            try {
+                String wkdId = WikidataUtils.getWikidataEntityUri(alternativeWkdId);
+                keyword.setApprovedWikidataId(wkdId);
+            } catch (RuntimeException e) {
+                String message = "Invalid alternative wikidata id: " + alternativeWkdId;
+                throw new HttpException(message, message, HttpStatus.BAD_REQUEST);
+            }   
+        }
+        keyword.setStatus(status);
+        keyword.setModified(new Date());
+    }
+    
     
     public KeywordView reject(String objectId) throws HttpException {
         Keyword keyword =  keywordDao.findByObjectId(objectId);
@@ -206,4 +122,6 @@ public class EnrichmentKeywordServiceImpl {
         keyword = keywordDao.saveKeyword(keyword);
         return KeywordUtils.createView(keyword);
     }
+
+    
 }

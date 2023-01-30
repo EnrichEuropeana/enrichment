@@ -19,20 +19,34 @@ public class KeywordView {
 //    @Id
     private String objectId;
     private String propertyId;
-    private String keyword;
-    private String lang;
-    private String keywordEn;
+    //keyword -> value
+    private String value;
+    //keywordEn -> translatedValue
+    private String translatedValue;
+    //lang -> detectedOriginalLanguage
+    private String detectedOriginalLanguage;
+    //prefferedWikidataEntity.prefLabel.en
     private String prefLabelEn;
+    //typeFoundByNER: agent/place
     private String type;
+    //keywordPosition.offsetsTranslatedText
     private int position;
+    //prefferedWikidataEntity.wikidataType.*.value
     private String wikidataTypes;
     //private String dbpId;
     //private String dbpWkdId;
+    //dbpediaWikidataIds
     private List<String> dbpediaWikidataIds;
-    private String prefWkdId;
+    //preferedWikidataId
+    private String preferredWikidataId;
+    //??
     private String wkdIds;
-    private String wkdAltLabelIds;
+    private List<String> preferredWikidataIds;
+    //wikidataLabelAltLabelMatchIds
+    private List<String> wikidataLabelAltLabelMatchIds;
+    //top5(tpItemIds)
     private List<Long> tpItemIds;
+    //status
     private String status;
     
 
@@ -51,20 +65,20 @@ public class KeywordView {
         this.propertyId = propertyId;
     }
 
-    public String getKeyword() {
-        return keyword;
+    public String getValue() {
+        return value;
     }
 
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
+    public void setValue(String keyword) {
+        this.value = keyword;
     }
 
-    public String getKeywordEn() {
-        return keywordEn;
+    public String getTranslatedValue() {
+        return translatedValue;
     }
 
-    public void setKeywordEn(String keywordEn) {
-        this.keywordEn = keywordEn;
+    public void setTranslatedValue(String keywordEn) {
+        this.translatedValue = keywordEn;
     }
 
     public String getPrefLabelEn() {
@@ -115,12 +129,12 @@ public class KeywordView {
 //        this.dbpWkdId = dbpWkdId;
 //    }
 
-    public String getPrefWkdId() {
-        return prefWkdId;
+    public String getPreferredWikidataId() {
+        return preferredWikidataId;
     }
 
-    public void setPrefWkdId(String prefWkdId) {
-        this.prefWkdId = prefWkdId;
+    public void setPreferredWikidataId(String prefWkdId) {
+        this.preferredWikidataId = prefWkdId;
     }
 
     public String getWkdIds() {
@@ -131,20 +145,20 @@ public class KeywordView {
         this.wkdIds = wkdIds;
     }
 
-    public String getWkdAltLabelIds() {
-        return wkdAltLabelIds;
+    public List<String> getWikidataLabelAltLabelMatchIds() {
+        return wikidataLabelAltLabelMatchIds;
     }
 
-    public void setWkdAltLabelIds(String wkdAltLabelIds) {
-        this.wkdAltLabelIds = wkdAltLabelIds;
+    public void setWikidataLabelAltLabelMatchIds(List<String> wikidataLabelAltLabelMatchIds) {
+        this.wikidataLabelAltLabelMatchIds = wikidataLabelAltLabelMatchIds;
     }
 
-    public String getLang() {
-        return lang;
+    public String getDetectedOriginalLanguage() {
+        return detectedOriginalLanguage;
     }
 
-    public void setLang(String lang) {
-        this.lang = lang;
+    public void setDetectedOriginalLanguage(String lang) {
+        this.detectedOriginalLanguage = lang;
     }
 
     public List<Long> getTpItemIds() {
@@ -177,6 +191,14 @@ public class KeywordView {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<String> getPreferredWikidataIds() {
+        return preferredWikidataIds;
+    }
+
+    public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
+        this.preferredWikidataIds = preferredWikidataIds;
     }
 
 }
