@@ -21,7 +21,7 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.api.endpoint}")
     private String enrichApiEndpoint;
 
-    @Value("${enrich.mongodb.connectionUri}")
+	@Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
 
     @Value("${enrich.mongodb.truststore}")
@@ -140,6 +140,15 @@ public class EnrichmentConfiguration  {
 	
 	@Value("${europeana.apikey.serviceurl}")
 	private String apiKeyUrl;
+	
+	@Value("${spark.topic.detection.serviceurl}")
+	private String sparkTopicDetectionUrl;
+
+	@Value("${spark.language.detection.serviceurl}")
+	private String sparkLanguageDetectionUrl;
+	
+	@Value("${enrich.wikidata.save.json.to.local.cache: false}")
+	private boolean wikidataSaveJsonToLocalCache;
 
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
@@ -324,5 +333,16 @@ public class EnrichmentConfiguration  {
 	public String getApiKeyUrl() {
 	    return apiKeyUrl;
 	}
+
+	public String getSparkTopicDetectionUrl() {
+		return sparkTopicDetectionUrl;
+	}	
 	
+	public String getSparkLanguageDetectionUrl() {
+		return sparkLanguageDetectionUrl;
+	}	
+	
+	public boolean getWikidataSaveJsonToLocalCache() {
+		return wikidataSaveJsonToLocalCache;
+	}	
 }
