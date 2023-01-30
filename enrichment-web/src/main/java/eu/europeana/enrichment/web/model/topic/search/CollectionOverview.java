@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonLdConstants;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
-@JsonPropertyOrder({EnrichmentFields.ID, EnrichmentFields.TYPE, EnrichmentFields.TOTAL,
-	EnrichmentFields.FIRST, EnrichmentFields.LAST})
+@JsonPropertyOrder({EnrichmentConstants.ID, EnrichmentConstants.TYPE, EnrichmentConstants.TOTAL,
+	EnrichmentConstants.FIRST, EnrichmentConstants.LAST})
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class CollectionOverview {
     
@@ -22,7 +22,7 @@ public class CollectionOverview {
         return type;
     }
  
-    @JsonProperty(EnrichmentFields.ID)
+    @JsonProperty(EnrichmentConstants.ID)
     public String getId() {
         return id;
     }
@@ -31,7 +31,7 @@ public class CollectionOverview {
         this.id = id;
     }
 
-    @JsonProperty(EnrichmentFields.FIRST)
+    @JsonProperty(EnrichmentConstants.FIRST)
     public String getFirst() {
         return first;
     }
@@ -40,7 +40,7 @@ public class CollectionOverview {
         this.first = first;
     }
 
-    @JsonProperty(EnrichmentFields.LAST)
+    @JsonProperty(EnrichmentConstants.LAST)
     public String getLast() {
         return last;
     }
@@ -49,7 +49,7 @@ public class CollectionOverview {
         this.last = last;
     }
 
-    @JsonProperty(EnrichmentFields.TOTAL)
+    @JsonProperty(EnrichmentConstants.TOTAL)
     public Long getTotal() {
         return total;
     }

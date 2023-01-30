@@ -18,4 +18,8 @@ public interface PersistentTopicService {
 
 	public List<Topic> getAll();
 
+	Topic getById(long topicId);
+	
+	public long generateAutoIncrement(String entityType);
+
 }

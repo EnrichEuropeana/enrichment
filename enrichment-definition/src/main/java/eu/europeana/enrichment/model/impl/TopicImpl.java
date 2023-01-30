@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import dev.morphia.annotations.Entity;
@@ -18,11 +19,24 @@ import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.Transient;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.Term;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.TopicModel;
 import eu.europeana.enrichment.model.utils.TopicTermsDeserializer;
 
+@JsonPropertyOrder({
+	EnrichmentConstants.TOPIC_ID, 
+	EnrichmentConstants.TOPIC_IDENTIFIER, 
+	EnrichmentConstants.TOPIC_SCORE, 
+	EnrichmentConstants.TOPIC_LABELS, 
+	EnrichmentConstants.TOPIC_DESCRIPTIONS, 
+	EnrichmentConstants.TOPIC_TERMS, 
+	EnrichmentConstants.TOPIC_KEYWORDS, 
+	EnrichmentConstants.TOPIC_MODEL, 
+	EnrichmentConstants.TOPIC_CREATED, 
+	EnrichmentConstants.TOPIC_MODIFIED 
+})
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Entity(value="TopicEntity")
@@ -34,41 +48,48 @@ public class TopicImpl implements Topic {
 	public ObjectId _id;
 	
 	@JsonIgnore
+	@Transient
+	private String modelId;	
+	
+	@JsonProperty(EnrichmentConstants.TOPIC_MODEL)
 	private TopicModel model;
 	
 	// <{baseurl}/topic/1>
-	@JsonProperty("topicID")
-	private String topicID;
+	@JsonIgnore
+	private long id;
 	
+	@Transient
+	@JsonProperty(EnrichmentConstants.TOPIC_ID)
+	private String urlId;
+
 	// "LDA_EXP1-K15-IT200#TOPIC1"
-	@JsonProperty("identifier")
+	@JsonProperty(EnrichmentConstants.TOPIC_IDENTIFIER)
 	@Indexed(options = @IndexOptions(unique = true))
 	private String identifier;
 	
-	@JsonProperty("labels")
+	@JsonProperty(EnrichmentConstants.TOPIC_LABELS)
 	private List<String> labels;
 	
 	// language based description
-	@JsonProperty("descriptions")
+	@JsonProperty(EnrichmentConstants.TOPIC_DESCRIPTIONS)
 	private Map<String,String> descriptions;
 	
 	@JsonDeserialize(using=TopicTermsDeserializer.class)
-	@JsonProperty("terms")
+	@JsonProperty(EnrichmentConstants.TOPIC_TERMS)
 	private List<Term> terms;
 	
 	@JsonDeserialize(using=TopicTermsDeserializer.class)
-	@JsonProperty("keywords")
+	@JsonProperty(EnrichmentConstants.TOPIC_KEYWORDS)
 	private List<Term> keywords;
 	
-	@Transient
-	@JsonProperty("modelID")
-	private String modelId;	
-	
-	@JsonProperty("created")
+	@JsonProperty(EnrichmentConstants.TOPIC_CREATED)
 	private Date created;
 	
-	@JsonProperty("modified")
+	@JsonProperty(EnrichmentConstants.TOPIC_MODIFIED)
 	private Date modified;
+	
+	@JsonProperty(EnrichmentConstants.TOPIC_SCORE)
+	private Float score;
 		
 	public TopicImpl()
 	{
@@ -76,13 +97,13 @@ public class TopicImpl implements Topic {
 	}
 
 	@Override
-	public String getTopicID() {
-		return this.topicID;
+	public long getId() {
+		return this.id;
 	}
 
 	@Override
-	public void setTopicID(String id) {
-		this.topicID = id;
+	public void setId(long id) {
+		this.id = id;
 
 	}
 
@@ -166,10 +187,6 @@ public class TopicImpl implements Topic {
 	public void setModified(Date date) {
 		this.modified = date;
 	}
-	
-	public ObjectId getObjectId() {
-		return _id;
-	}
 
 	@Override
 	public String getModelId() {
@@ -200,5 +217,20 @@ public class TopicImpl implements Topic {
 		else
 			this.modelId = modelId;
 	}
+	
+	public Float getScore() {
+		return score;
+	}
 
+	public void setScore(Float score) {
+		this.score = score;
+	}
+
+	public String getUrlId() {
+		return urlId;
+	}
+
+	public void setUrlId(String urlId) {
+		this.urlId = urlId;
+	}	
 }

@@ -79,6 +79,7 @@ enrich.annotations.creator=
 
 enrich.wikidata.subclasses.geographic-location=/home/ait/enrich/wikidata-types/Q2221906-geographic-location-subclasses.json
 enrich.wikidata.subclasses.human=/home/ait/enrich/wikidata-types/Q5-human-subclasses.json
+enrich.wikidata.save.json.to.local.cache=false
 
 #string value representing the key used for JWT signature verification 
 europeana.apikey.jwttoken.signaturekey=
@@ -88,3 +89,6 @@ authorization.api.name=
 auth.read.enabled=
 auth.write.enabled=
 europeana.apikey.serviceurl=
+
+spark.topic.detection.serviceurl=
+spark.language.detection.serviceurl=

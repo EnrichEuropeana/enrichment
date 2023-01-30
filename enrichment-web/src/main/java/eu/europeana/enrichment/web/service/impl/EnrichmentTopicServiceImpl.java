@@ -1,21 +1,39 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.beans.DocumentObjectBinder;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
@@ -25,14 +43,12 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.mongo.service.PersistentTopicService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrTopicEntityImpl;
-import eu.europeana.enrichment.solr.model.vocabulary.TopicSolrFields;
 import eu.europeana.enrichment.solr.service.impl.SolrTopicServiceImpl;
-import eu.europeana.enrichment.web.common.config.I18nConstants;
-import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 import eu.europeana.enrichment.web.model.topic.search.CollectionOverview;
 import eu.europeana.enrichment.web.model.topic.search.TopicIdsResultPage;
@@ -66,11 +82,15 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				
 		if (topic.getCreated() == null)
 			topic.setCreated(new Date());
+		
+		// here we need to create topic ID
+		long id = persistentTopicService.generateAutoIncrement(EntityTypes.Topic.getEntityType());
+		topic.setId(id);		
 
 		persistentTopicService.save(topic);
 		
 		try {
-			solrTopicService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(topic), true);
+			solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(topic), true);
 		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 		}
@@ -78,8 +98,8 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public Topic updateTopic(Topic topic) {
-		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
+	public Topic updateTopic(long id, Topic topic) {
+		Topic dbtopicEntity = persistentTopicService.getById(id);
 		if (dbtopicEntity != null)
 		{
 			if (topic.getTerms() != null)
@@ -88,36 +108,99 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				dbtopicEntity.setKeywords(topic.getKeywords());
 			if (topic.getDescriptions() != null)
 				dbtopicEntity.setDescriptions(topic.getDescriptions());
-			if (topic.getTopicID() != null)
-				dbtopicEntity.setTopicID(topic.getTopicID());
 			if (topic.getLabels() != null)
 				dbtopicEntity.setLabels(topic.getLabels());
 			
 			dbtopicEntity.setModified(new Date());
 			persistentTopicService.save(dbtopicEntity);
 			try {
-				solrTopicService.store(TopicSolrFields.SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
+				solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
 			} catch (SolrServiceException e) {
 				logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 			}
 			return dbtopicEntity;
 		}
-		return null;
+		else {
+			return null;
+		}
+	}
+	
+	public List<Topic> detectTopics (String text, int topics) throws URISyntaxException, ClientProtocolException, IOException, HttpException {
+		
+	    CloseableHttpClient client = HttpClients.createDefault();
+	    
+	    //check if the language of the text is only English
+	    HttpPost httpPost = new HttpPost(config.getSparkLanguageDetectionUrl());
+		StringEntity httpEntity = new StringEntity(text);
+	    httpPost.setEntity(httpEntity);	    
+	    CloseableHttpResponse response = client.execute(httpPost);
+	    String responseString = EntityUtils.toString(response.getEntity());
+	    JSONObject responseJson = new JSONObject(responseString);
+	    boolean textOnlyEn = true;
+	    Iterator<String> responseLanguagesIter = responseJson.keys();
+	    while(responseLanguagesIter.hasNext()) {
+	    	if(!responseLanguagesIter.next().equals("en")) {
+	    		textOnlyEn=false;
+	    		break;
+	    	}
+	    }
+	    if(!textOnlyEn) {
+	    	throw new HttpException(null, "The text of the topic should be in English.", null, HttpStatus.BAD_REQUEST);
+	    }
+	    
+	    //topic detection request
+	    List<NameValuePair> postParameters = new ArrayList<>();
+	    postParameters.add(new BasicNameValuePair("num_topics", String.valueOf(topics)));
+	    //Build the server URI together with the parameters and the body
+	    URIBuilder uriBuilder = new URIBuilder(config.getSparkTopicDetectionUrl());
+	    uriBuilder.addParameters(postParameters);
+	    httpPost = new HttpPost(uriBuilder.build());
+		httpEntity = new StringEntity(text);
+	    httpPost.setEntity(httpEntity);	    
+	    response = client.execute(httpPost);
+
+	    responseString = EntityUtils.toString(response.getEntity());
+	    responseJson = new JSONObject(responseString);
+	    Iterator<String> responseTopicIdIter = responseJson.keys();
+	    Map<String,Float> unsortedResponseMap = new HashMap<>();
+	    while(responseTopicIdIter.hasNext()) {
+	    	String topicId = responseTopicIdIter.next();
+	    	unsortedResponseMap.put(topicId, responseJson.getFloat(topicId));
+	    }	    
+	    LinkedHashMap<String, Float> sortedResponseMap = new LinkedHashMap<>();
+	    unsortedResponseMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+	        .forEachOrdered(x -> sortedResponseMap.put(x.getKey(), x.getValue()));
+
+	    List<Topic> result = new ArrayList<>();
+	    Set<String> topicIdsKeys = sortedResponseMap.keySet();
+	    for(String topicId : topicIdsKeys) {
+			Topic dbtopicEntity = persistentTopicService.getById(Integer.valueOf(topicId)+1);
+			if (dbtopicEntity != null) {
+				updateTopicForSerialization(dbtopicEntity);
+				dbtopicEntity.setScore(sortedResponseMap.get(topicId));
+				result.add(dbtopicEntity);
+			}			 
+	    }
+
+	    client.close();
+	    return result;
+
 	}
 
 	@Override
-	public Topic deleteTopic(String topicIdentifier) {
-		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topicIdentifier);
+	public Topic deleteTopic(long topicId) {
+		Topic dbtopicEntity = persistentTopicService.getById(topicId);
 		if (dbtopicEntity == null)
 			return null;
-		
-		persistentTopicService.delete(dbtopicEntity);
-		
+				
 		try {
-			solrTopicService.deleteById(TopicSolrFields.SOLR_CORE, dbtopicEntity.getIdentifier());
+			solrTopicService.deleteById(EnrichmentConstants.TOPIC_SOLR_CORE, String.valueOf(dbtopicEntity.getId()));
 		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception is thrown during the deletion of the topic from Solr.", e);
 		}
+		
+		persistentTopicService.delete(dbtopicEntity);
+
 		return dbtopicEntity;
 	}
 
@@ -133,8 +216,9 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    long totalInCollection = solrResults.getNumFound();
 	    
 	    //validate the page number
-	    if(totalInCollection-pageSize*currentPageNum<0) {
-			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, CommonApiConstants.QUERY_PARAM_PAGE, String.valueOf(pageSize));
+	    if(totalInCollection-pageSize*currentPageNum<=0) {
+	    	throw new HttpException(null, "Invalid combination of the " + CommonApiConstants.QUERY_PARAM_PAGE + " and " +
+	    			CommonApiConstants.QUERY_PARAM_PAGE_SIZE + " parameters (out of range).", null, HttpStatus.BAD_REQUEST);
 	    }    
 	    
 	    //set the result page items based on profile
@@ -195,25 +279,27 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
+			    	solrTopicsIds.add(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getId());
 			    }
 	    	}
 		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
 	    }
 	    else if(LdProfile.STANDARD.equals(profile)) {
-	    	List<Topic> solrTopics = new ArrayList<>();
+	    	List<Topic> dbTopics = new ArrayList<>();
 	    	if(solrResults.size()>0) {
 				DocumentObjectBinder binder = new DocumentObjectBinder();
 			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-			    	solrTopic.setTopicID(config.getEnrichApiEndpoint() + "/topic/" + solrTopic.getTopicID());
-			    	solrTopic.setModelId(config.getEnrichApiEndpoint() + "/model/" + solrTopic.getModelId());
-			    	solrTopics.add(solrTopic);
+					Topic dbtopicEntity = persistentTopicService.getById(solrTopic.getId());
+					if (dbtopicEntity != null) {
+						updateTopicForSerialization(dbtopicEntity);
+				    	dbTopics.add(dbtopicEntity);
+					}			    	
 			    }		
 	    	}
-	    	((TopicResultPage)resPage).setItems(solrTopics);
+	    	((TopicResultPage)resPage).setItems(dbTopics);
 	    }
 	}
 	
@@ -237,6 +323,11 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	        		+ "&" + CommonApiConstants.QUERY_PARAM_PAGE_SIZE + "=" + pageSize;    	
 	    }
 	    resPage.setNextPageUri(nextPage);		
+	}
+	
+	public void updateTopicForSerialization (Topic topic) {
+		topic.setUrlId(config.getEnrichApiEndpoint() + "/topic/" + topic.getId());
+		topic.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + topic.getModel().getIdentifier());
 	}
 	
 }

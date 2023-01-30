@@ -1,8 +1,5 @@
 package eu.europeana.enrichment.model.impl;
 
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.CONTEXT_FIELD;
-import static eu.europeana.enrichment.model.vocabulary.EntitySerializationConstants.WIKIDATA_CONTEXT;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,16 +8,16 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.model.vocabulary.EnrichmentFields;
 
 @JsonPropertyOrder({ 
-	CONTEXT_FIELD, 
-	EnrichmentFields.ID, 
-	EnrichmentFields.TYPE, 
-	EnrichmentFields.TOTAL,
-	EnrichmentFields.PART_OF, 
-	EnrichmentFields.ITEMS
+	EnrichmentConstants.CONTEXT_FIELD, 
+	EnrichmentConstants.ID, 
+	EnrichmentConstants.TYPE, 
+	EnrichmentConstants.TOTAL,
+	EnrichmentConstants.PART_OF, 
+	EnrichmentConstants.ITEMS
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class NamedEntitySolrCollection {
@@ -42,7 +39,7 @@ public class NamedEntitySolrCollection {
 		total = String.valueOf(totalPage);			
 	}
 	
-	@JsonProperty(EnrichmentFields.ITEMS)
+	@JsonProperty(EnrichmentConstants.ITEMS)
 	public List<WikidataEntity> getItems() {
 		return items;
 	}
@@ -51,7 +48,7 @@ public class NamedEntitySolrCollection {
 		this.items = items;
 	}
 	
-	@JsonProperty(EnrichmentFields.PART_OF)
+	@JsonProperty(EnrichmentConstants.PART_OF)
 	public Map<String,String> getPartOf() {
 		return partOf;
 	}
@@ -61,7 +58,7 @@ public class NamedEntitySolrCollection {
 	}
 	
 	
-	@JsonProperty(EnrichmentFields.ID)
+	@JsonProperty(EnrichmentConstants.ID)
 	public String getId() {
 		return id;
 	}
@@ -70,7 +67,7 @@ public class NamedEntitySolrCollection {
 		this.id = url;
 	}
 	
-	@JsonProperty(EnrichmentFields.TYPE)
+	@JsonProperty(EnrichmentConstants.TYPE)
 	public String getType() {
 		return type;
 	}
@@ -79,7 +76,7 @@ public class NamedEntitySolrCollection {
 		this.type = type;
 	}
 
-	@JsonProperty(EnrichmentFields.TOTAL)
+	@JsonProperty(EnrichmentConstants.TOTAL)
 	public String getTotal() {
 		return total;
 	}
@@ -88,9 +85,9 @@ public class NamedEntitySolrCollection {
 		this.total = total;
 	}
 	
-	@JsonProperty(CONTEXT_FIELD)
+	@JsonProperty(EnrichmentConstants.CONTEXT_FIELD)
 	public String getContext() {
-		return WIKIDATA_CONTEXT;
+		return EnrichmentConstants.WIKIDATA_CONTEXT;
 	}
 	
 }

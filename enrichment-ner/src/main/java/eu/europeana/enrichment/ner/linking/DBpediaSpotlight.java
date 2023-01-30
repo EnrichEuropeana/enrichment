@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -56,8 +58,38 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 	 */
 	
 	public DBpediaResponse getDBpediaResponse(String dbpediaUrl) throws Exception {
-		String response = createRequest(dbpediaUrl);
-		if(response==null) return null;
+		
+		DBpediaResponse dbpediaResp = null;
+		boolean redirect = true; 
+		List<String> alreadyUsedDbpediaIds = new ArrayList<>();
+		alreadyUsedDbpediaIds.add(dbpediaUrl);
+		//keep fetching the redirect dbpedia links until there is not any one more or we find the wikidata id in the sameAs part 
+		while (redirect) {
+			String responseStr = createRequest(dbpediaUrl);
+			if(responseStr==null) return null;
+			
+		    InputStream stream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
+		    try {
+		    	dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+			} catch (JAXBException e) {
+				logger.error("Cannot unmarschall the dbpedia response. Probably no valid data within it.", e);
+				return null;
+			}
+		    if(dbpediaResp.getWikipageRedirect()==null || dbpediaResp.getWikidataUrls().size()>0) {
+		    	redirect=false;
+		    }
+		    else {
+		    	if(!alreadyUsedDbpediaIds.contains(dbpediaResp.getWikipageRedirect().getResourceUrl())) {
+		    		alreadyUsedDbpediaIds.add(dbpediaResp.getWikipageRedirect().getResourceUrl());
+		    		dbpediaUrl=dbpediaResp.getWikipageRedirect().getResourceUrl();
+		    	}	
+		    	else {
+		    		redirect=false;
+		    	}
+		    }
+		}
+		return dbpediaResp;
+
 //		JacksonXmlModule xmlModule = new JacksonXmlModule();
 //		xmlModule.setDefaultUseWrapper(false);
 //		XmlMapper xmlMapper = new XmlMapper(xmlModule);
@@ -65,13 +97,6 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 //		DBpediaResponseHeader value = xmlMapper.readValue(response, DBpediaResponseHeader.class);
 //		if(value==null) return null;
 //		return value.getResult();
-	    InputStream stream = new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8));
-	    try {
-			return ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
-		} catch (JAXBException e) {
-			logger.error("Cannot unmarschall the dbpedia response. Probably no valid data within it.", e);
-			return null;
-		}
 		
 	}
 	
