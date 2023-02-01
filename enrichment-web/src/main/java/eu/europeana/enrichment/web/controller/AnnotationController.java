@@ -1,7 +1,14 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
@@ -16,7 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
+import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
@@ -38,6 +48,8 @@ public class AnnotationController extends BaseRest {
 	
 	@Autowired 
 	JsonLdSerializer jsonLdSerializer;
+	
+	Logger logger = LogManager.getLogger(getClass());
 	
 	/**
 	 * This method represents the /enrichment/annotation end point, where the annotations for all NamedEntities 
@@ -92,12 +104,65 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyWriteAccess(Operations.CREATE, request);
-			NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, itemId, property);
-			String resultJson = jsonLdSerializer.serializeObject(result);
+			
+			String resultJson=null;
+			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
+			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
+				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			}
+			else {
+				List<String> linking = new ArrayList<>();
+				linking.add(EnrichmentConstants.defaultLinkingTool);
+				List<String> nerTools = new ArrayList<>();			
+				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
+				nerTools.add(EnrichmentConstants.stanfordNer);
+				
+				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, itemId, property);
+				resultJson = jsonLdSerializer.serializeObject(result);
+			}
+
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
-	
+
+	@ApiOperation(value = "Create annotations for all items", nickname = "createAnnotationsAllItems")
+	@RequestMapping(value = "/enrichment/annotation-all-items", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> createAnnotationsAllItems(
+			HttpServletRequest request) throws Exception, HttpException {
+
+			verifyWriteAccess(Operations.CREATE, request);
+			
+			String linking_local = "Wikidata";
+			String nerTools_local = "DBpedia_Spotlight,Stanford_NER";
+			List<String> linking = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+			List<String> nerTools = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools_local,",")));						
+
+			List<ItemEntity> items = persistentItemEntityService.getAllItemEntities();
+			boolean startFrom=false;
+			boolean check=true;
+			int itemCount=12692;
+			for(ItemEntity item : items) {	
+				//start from specified item, to continue the analysis in case in breaks
+				if(check && "1243601".equals(item.getItemId()) && "108619".equals(item.getStoryId()))
+				{
+					startFrom=true;
+					check=false;
+				}
+				if(startFrom && !StringUtils.isBlank(item.getTranscriptionText()))
+				{
+					logger.info("NER analysis and annotation generation for the item number:" + itemCount);
+					itemCount++;
+					logger.info("NER analysis and annotation generation for the item: storyId=" + item.getStoryId() + ", itemId=" + item.getItemId());
+					enrichmentNerService.createNamedEntitiesForItem(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, nerTools, false, linking, EnrichmentConstants.defaultTranslationTool, false, true);
+					enrichmentNerService.createAnnotations(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+				}
+			}
+
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"result\" : \"Annotations for all items are created.\"}", HttpStatus.OK);
+			return response;		
+	}
+
    /**
     * This method represents the /enrichment/annotation/{storyId}/{itemId}/{wikidataIdentifier} end point,
 	* where the annotations for some NamedEntity of the given item for the specified story are retrieved using the class NamedEntityAnnotationImpl.

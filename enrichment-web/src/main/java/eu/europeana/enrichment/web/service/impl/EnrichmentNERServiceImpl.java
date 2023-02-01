@@ -366,7 +366,7 @@ public class EnrichmentNERServiceImpl {
 			}
 			
 			results[0] = updatedItem.getTranscriptionText();
-			results[1] = ModelUtils.getMainTranslationLanguage(updatedItem);
+			results[1] = ModelUtils.getOnlyTranscriptionLanguage(updatedItem);
 			return results;
 		}
 

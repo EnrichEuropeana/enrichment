@@ -110,7 +110,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		}						
 
 		String textToTranslate = item.getTranscriptionText();
-		String sourceLanguage = ModelUtils.getMainTranslationLanguage(item);
+		String sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item);
 		if(StringUtils.isBlank(textToTranslate))
 		{
 			logger.debug("The text of the item to be translated is empty!");
