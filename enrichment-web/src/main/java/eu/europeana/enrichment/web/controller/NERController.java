@@ -25,7 +25,6 @@ import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
@@ -95,9 +94,16 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 		
-		enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, true, linkingList, translationTool, original, false);
-		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
-		
+		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
+		String resultJsonLd = null;
+		if(!result.isEmpty()) {
+			resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
+		}
+		else {	
+			enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, true, linkingList, translationTool, original, false);
+			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;
 	}
 	
@@ -170,9 +176,17 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 	
-		enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
-		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"The NER analysis has been successfully executed.\"}", HttpStatus.OK);
+		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
+		String resultJsonLd = null;
+		if(!result.isEmpty()) {
+			resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
+		}
+		else {	
+			enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
+			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+		}
 		
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;		
 	}
 	
@@ -213,26 +227,26 @@ public class NERController extends BaseRest {
 		
 	}	
 	
-	@ApiOperation(value = "Compute named entities for all stories descriptions")
-	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNEREntitiesAllStories(
-			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
-	
-		verifyWriteAccess(Operations.CREATE, request);
-
-		String linking=EnrichmentConstants.defaultLinkingTool;
-		String nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
-		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
-		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-
-		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
-		for(StoryEntity story : stories) {
-			logger.info("NER analysis for the storyId: " + story.getStoryId());
-			enrichmentNerService.createNamedEntitiesForStory(story.getStoryId(), EnrichmentConstants.STORY_ITEM_DESCRIPTION, nerToolsList, true, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
-		}
-
-		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
-		return response;
-	}
+//	@ApiOperation(value = "Compute named entities for all stories descriptions")
+//	@RequestMapping(value = "/enrichment/ner/allStories", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+//	public ResponseEntity<String> getNEREntitiesAllStories(
+//			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
+//	
+//		verifyWriteAccess(Operations.CREATE, request);
+//
+//		String linking=EnrichmentConstants.defaultLinkingTool;
+//		String nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+//		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
+//		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+//
+//		List<StoryEntity> stories = persistentStoryEntityService.getAllStoryEntities();	
+//		for(StoryEntity story : stories) {
+//			logger.info("NER analysis for the storyId: " + story.getStoryId());
+//			enrichmentNerService.createNamedEntitiesForStory(story.getStoryId(), EnrichmentConstants.STORY_ITEM_DESCRIPTION, nerToolsList, true, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
+//		}
+//
+//		ResponseEntity<String> response = new ResponseEntity<String>("{\"Result\":\"Done.\"}", HttpStatus.OK);
+//		return response;
+//	}
 
 }
