@@ -68,43 +68,39 @@ public class AnnotationController extends BaseRest {
 			+ "a story please do not specify any value). The \"property\" parameter refers to the part of the story/item being analyzed, i.e. description or transcription, etc.")
 	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getAnnotations(
-			@RequestParam(value="property", required=true) String property,
+			@RequestParam(value="property", required=false) String property,
 			@RequestParam(value="storyId", required=true) String storyId,			
 			@RequestParam(value="itemId", required=false) String itemId,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyReadAccess(request);
+			
+			if(property==null) {
+				property = itemId!=null ? EnrichmentConstants.STORY_ITEM_TRANSCRIPTION : EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+			}
+
 			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
 			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;
 	}
 	
-	/**
-	 * This method represents the /enrichment/annotation end point, where the annotations for all NamedEntities 
-     * of an item are saved to the db using the class NamedEntityAnnotationCollection.
-	 * All requests on this end point are processed here.
-	 * @param property
-	 * @param storyId
-	 * @param itemId
-	 * @return
-	 * @throws Exception
-	 * @throws HttpException
-	 */
-	@ApiOperation(value = "Create annotations", nickname = "createAnnotations", notes = "This method stores the annotations of "
-			+ "stories or items	to the database. The parameter \"storyId\" enables considering the annotations that are only realted to the given story."
-			+ " The parameter \"itemId\" further restricts saving of the annotations to the given story item (in case of all items of a story please do not specify any value)."
-			+ " The \"property\" parameter refers to the part of the story/item being analyzed, either description or transcription, etc.")
-	@RequestMapping(value = "/enrichment/annotation", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> createAnnotations(
-			@RequestParam(value="property", required=true) String property,
-			@RequestParam(value="storyId", required=true) String storyId,			
-			@RequestParam(value="itemId", required=false) String itemId,
+	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method stores the annotations of "
+			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription).")
+	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> createAnnotationsForItem(
+			@PathVariable("storyId") String storyId,
+			@PathVariable("itemId") String itemId,
+			@RequestParam(value="property", required = false) String property,
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyWriteAccess(Operations.CREATE, request);
-			
+
+			if(property==null) {
+				property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
+			}
+
 			String resultJson=null;
 			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
 			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
@@ -126,42 +122,78 @@ public class AnnotationController extends BaseRest {
 			return response;		
 	}
 
-	@ApiOperation(value = "Create annotations for all items", nickname = "createAnnotationsAllItems")
-	@RequestMapping(value = "/enrichment/annotation-all-items", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> createAnnotationsAllItems(
+	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
+			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription).")
+	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> createAnnotationsForStory(
+			@PathVariable("storyId") String storyId,
+			@RequestParam(value="property", required = false) String property,
 			HttpServletRequest request) throws Exception, HttpException {
 
 			verifyWriteAccess(Operations.CREATE, request);
-			
-			String linking_local = "Wikidata";
-			String nerTools_local = "DBpedia_Spotlight,Stanford_NER";
-			List<String> linking = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking_local,",")));
-			List<String> nerTools = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools_local,",")));						
 
-			List<ItemEntity> items = persistentItemEntityService.getAllItemEntities();
-			boolean startFrom=false;
-			boolean check=true;
-			int itemCount=12692;
-			for(ItemEntity item : items) {	
-				//start from specified item, to continue the analysis in case in breaks
-				if(check && "1243601".equals(item.getItemId()) && "108619".equals(item.getStoryId()))
-				{
-					startFrom=true;
-					check=false;
-				}
-				if(startFrom && !StringUtils.isBlank(item.getTranscriptionText()))
-				{
-					logger.info("NER analysis and annotation generation for the item number:" + itemCount);
-					itemCount++;
-					logger.info("NER analysis and annotation generation for the item: storyId=" + item.getStoryId() + ", itemId=" + item.getItemId());
-					enrichmentNerService.createNamedEntitiesForItem(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, nerTools, false, linking, EnrichmentConstants.defaultTranslationTool, false, true);
-					enrichmentNerService.createAnnotations(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-				}
+			if(property==null) {
+				property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 			}
 
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"result\" : \"Annotations for all items are created.\"}", HttpStatus.OK);
+			String resultJson=null;
+			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, null, property);
+			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
+				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			}
+			else {
+				List<String> linking = new ArrayList<>();
+				linking.add(EnrichmentConstants.defaultLinkingTool);
+				List<String> nerTools = new ArrayList<>();			
+				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
+				nerTools.add(EnrichmentConstants.stanfordNer);
+				
+				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, null, property);
+				resultJson = jsonLdSerializer.serializeObject(result);
+			}
+
+			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
+	
+	
+//	@ApiOperation(value = "Create annotations for all items", nickname = "createAnnotationsAllItems")
+//	@RequestMapping(value = "/enrichment/annotation-all-items", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
+//	public ResponseEntity<String> createAnnotationsAllItems(
+//			HttpServletRequest request) throws Exception, HttpException {
+//
+//			verifyWriteAccess(Operations.CREATE, request);
+//			
+//			String linking_local = "Wikidata";
+//			String nerTools_local = "DBpedia_Spotlight,Stanford_NER";
+//			List<String> linking = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking_local,",")));
+//			List<String> nerTools = new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools_local,",")));						
+//
+//			List<ItemEntity> items = persistentItemEntityService.getAllItemEntities();
+//			boolean startFrom=false;
+//			boolean check=true;
+//			int itemCount=12692;
+//			for(ItemEntity item : items) {	
+//				//start from specified item, to continue the analysis in case in breaks
+//				if(check && "1243601".equals(item.getItemId()) && "108619".equals(item.getStoryId()))
+//				{
+//					startFrom=true;
+//					check=false;
+//				}
+//				if(startFrom && !StringUtils.isBlank(item.getTranscriptionText()))
+//				{
+//					logger.info("NER analysis and annotation generation for the item number:" + itemCount);
+//					itemCount++;
+//					logger.info("NER analysis and annotation generation for the item: storyId=" + item.getStoryId() + ", itemId=" + item.getItemId());
+//					enrichmentNerService.createNamedEntitiesForItem(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, nerTools, false, linking, EnrichmentConstants.defaultTranslationTool, false, true);
+//					enrichmentNerService.createAnnotations(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+//				}
+//			}
+//
+//			ResponseEntity<String> response = new ResponseEntity<String>("{\"result\" : \"Annotations for all items are created.\"}", HttpStatus.OK);
+//			return response;		
+//	}
 
    /**
     * This method represents the /enrichment/annotation/{storyId}/{itemId}/{wikidataIdentifier} end point,

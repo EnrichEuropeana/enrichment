@@ -65,13 +65,13 @@ public class NERController extends BaseRest {
 	 * @throws HttpException
 	 * @throws SolrServiceException
 	 */
-	@ApiOperation(value = "Create named entities for a story", nickname = "createNEREntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
+	@ApiOperation(value = "Create named entities for a story", nickname = "createNamedEntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNEREntitiesStory(
+	public ResponseEntity<String> createNamedEntitiesStory(
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
 			@RequestParam(value = "property", required = false) String property,
@@ -107,11 +107,11 @@ public class NERController extends BaseRest {
 		return response;
 	}
 	
-	@ApiOperation(value = "Get named entities for a story", nickname = "getEntitiesStory", notes = "This method retrieves the Named Entity (NER) objects "
+	@ApiOperation(value = "Get named entities for a story", nickname = "getNamedEntitiesStory", notes = "This method retrieves the Named Entity (NER) objects "
 			+ "that are stored in the database by the given POST method: /enrichment/ner/{storyId}. For the description of parameters, please see the "
 			+ "corresponding POST method.")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getEntitiesStory(
+	public ResponseEntity<String> getNamedEntitiesStory(
 			@PathVariable("storyId") String storyId,
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "nerTools", required = false) String nerTools,
@@ -146,13 +146,13 @@ public class NERController extends BaseRest {
 	 * NER services for items
 	 */
 	
-	@ApiOperation(value = "Create named entities for an item", nickname = "createNEREntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
+	@ApiOperation(value = "Create named entities for an item", nickname = "createNamedEntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
 			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation).")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getNEREntitiesItem(
+	public ResponseEntity<String> createNamedEntitiesItem(
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "translationTool", required = false) String translationTool,
@@ -190,11 +190,11 @@ public class NERController extends BaseRest {
 		return response;		
 	}
 	
-	@ApiOperation(value = "Get named entities for an item", nickname = "getEntitiesItem", notes = "This method retrieves the Named Entity (NER) objects "
+	@ApiOperation(value = "Get named entities for an item", nickname = "getNamedEntitiesItem", notes = "This method retrieves the Named Entity (NER) objects "
 			+ "that are stored in the database by the given POST method: /enrichment/ner/{itemId}. For the description of parameters, please see the" 
 			+ " corresponding POST method." )
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getEntitiesItem(
+	public ResponseEntity<String> getNamedEntitiesItem(
 			@PathVariable("storyId") String storyId,
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value = "property", required = false) String property,
