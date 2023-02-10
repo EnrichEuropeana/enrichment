@@ -500,8 +500,7 @@ public class EnrichmentNERServiceImpl {
 	public NamedEntityAnnotation getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
 		String wikidataIdGenerated=null;
-		if(wikidataEntity.startsWith("Q")) wikidataIdGenerated = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + wikidataEntity;
-		else wikidataIdGenerated = wikidataEntity;		
+		wikidataIdGenerated = WikidataUtils.getWikidataEntityUri(wikidataEntity);
 		
 		return persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
 	}

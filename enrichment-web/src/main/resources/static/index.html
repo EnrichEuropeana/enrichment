@@ -17,10 +17,12 @@
             <tr>
             	<th>Id</th>
                 <th>K-Id</th>
+                <th>Lang</th>
                 <th>Keyword text</th>
                 <th>Keyword (EN)</th>
                 <th>Pref Label (EN)</th>
                 <th>Pref-WKD ID</th>
+                <th>Validation  </th>
                 <th>Status</th>
                 <th>TP Items</th>
                 <!-- 
@@ -31,6 +33,7 @@
                  -->
                 <th>Wikidata Types</th>
                 <th>Spotlight WKD Ids</th>
+                <th>Alternative WKD Ids</th>
                 <!-- 
                 <th>Dbpedia ID</th>
                 <th>Dbpedia-WKD ID</th>
@@ -44,10 +47,12 @@
             <tr>
             	<th>objectId</th>
                 <th>propertyId</th>
-                <th>Keyword_Orig</th>
-                <th>Keyword_EN</th>
-                <th>PrefLabel_EN</th>
-                <th>PrefWKD_ID</th>
+                <th>detectedOriginalLanguage</th>
+                <th>value</th>
+                <th>translatedValue</th>
+                <th>prefLabelEn</th>
+                <th>preferredWikidataId</th>
+                <th>validation</th>
                 <th>status</th>
                 <th>tpItemIds</th>
                 <!--  
@@ -58,6 +63,7 @@
                  -->
                 <th>WikidataTypes</th>
                 <th>dbpediaWikidataIds</th>
+                <th>wikidataLabelAltLabelMatchIds</th>
                 <!-- 
                 <th>Dbp_ID</th>
                 <th>DbpWKD_ID</th>
@@ -86,7 +92,7 @@
     
     	function approve(objectId, prefWkdId){
     		//alert('approve: ' + objectId);
-    		let confirmed = confirm("Approve wikidata entity for keyword", prefWkdId);
+    		let confirmed = confirm("Approve wikidata entity " + prefWkdId + " for keyword", prefWkdId);
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
@@ -98,6 +104,44 @@
     				  })
     				  .fail(function( data ) {
     				    alert("update operation failed: " + data);
+    				    console.log(data);
+    				  })
+    		}
+    	}
+    	
+    	function approveAlternative(objectId, prefWkdId){
+    		//alert('approve: ' + objectId);
+    		let confirmed = prompt("Assign alternative wikidata entity for keyword", "Enter an alternativive Wikidata id (e.g. Q1234)");
+    		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
+    		if(confirmed){
+    			$.ajax({
+    				  url: "/keyword/approve/alternative?objectId=" + objectId + "&wkdId=" + confirmed,
+    				})
+    				  .done(function( data ) {
+    					  alert("update operation succeded! ");
+    					  $('#keyword').DataTable().ajax.reload();
+    				  })
+    				  .fail(function( data ) {
+    				    alert("update operation failed: " + data);
+    				    console.log(data);
+    				  })
+    		}
+    	}
+    	
+    	function approveBroad(objectId, prefWkdId){
+    		//alert('approve: ' + objectId);
+    		let confirmed = prompt("Approve wikidata entity " + prefWkdId + " or provide alternative entity (e.g. Q1234) as broad match for keyword", prefWkdId);
+    		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
+    		if(confirmed){
+    			$.ajax({
+    				  url: "/keyword/approve/broad?objectId=" + objectId + "&wkdId=" + confirmed,
+    				})
+    				  .done(function( data ) {
+    					  alert("update operation succeded! ");
+    					  $('#keyword').DataTable().ajax.reload();
+    				  })
+    				  .fail(function( data ) {
+    				    alert("update operation failed: " + data.error);
     				    console.log(data);
     				  })
     		}
@@ -122,11 +166,12 @@
     	}
     	
     	function buildButtons(objectId, prefWkdId){
-    		var links = ' <a href="javascript:" onclick="approve(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/approve1.png" width="20" /> ' + '</a>';
-    		links = links + ' <a href="javascript:" onclick="reject(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/reject1.png" width="20" /> ' + '</a>';
+    		var links = '<a href="javascript:" onclick="approve(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/approve1.png" height="18" /></a>';
+    		links = links + ' <a href="javascript:" onclick="reject(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/reject1.png" height="18" /></a>';
+    		links = links + ' <a href="javascript:" onclick="approveAlternative(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/change1.png" height="18" /></a>';
+    		links = links + ' <a href="javascript:" onclick="approveBroad(\''+objectId+'\', \''+prefWkdId+'\')"><img src="./img/broader1.png" height="18" /></a>';
     		return links	 
     	}
-    	
     	
     	function getWkdLink(url){
     		if(url){
@@ -188,15 +233,23 @@
     	}
     	
         $(document).ready(function() {
-
             $('#keyword tfoot th').each( function () {
                 var title = $(this).text();
-                $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                if(title != "objectId" && title != "prefLabelEn" && title != "validation" && title != "tpItemIds" && title != "WikidataTypes"){
+                	$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+                }else{
+                	$(this).html( '&nbsp;' );
+                }
             } );
 
             var table = $('#keyword').DataTable( {
                 processing: false,
                 serverSide: true,
+                searching: true,
+                order: [[1, 'asc']],
+                columnDefs: [
+                    { "width": "5%", "targets": 1 }
+                  ],
                 ajax: {
                     url: "/keyword/datatable",
                     dataSrc: function (data) {
@@ -206,20 +259,25 @@
                             renderData.push({
                             	objectId: data.data[i].objectId,
                                 propertyId: data.data[i].propertyId,
-                                Keyword_Orig: data.data[i].keyword,
-                                Keyword_EN: data.data[i].keywordEn,
-                                PrefLabel_EN: getValue(data.data[i], 'prefLabelEn'),
-                                PrefWKD_ID: getWkdLink(data.data[i].prefWkdId) + buildButtons(data.data[i].objectId, data.data[i].prefWkdId),
+                                detectedOriginalLanguage: data.data[i].detectedOriginalLanguage, 
+                                value: data.data[i].value,
+                                translatedValue: data.data[i].translatedValue,
+                                prefLabelEn: getValue(data.data[i], 'prefLabelEn'),
+                                preferredWikidataId: getWkdLink(data.data[i].preferredWikidataId),
+                                validation: buildButtons(data.data[i].objectId, data.data[i].preferredWikidataId),
                                 status: '' + data.data[i].status,
                                 tpItemIds: buildTpLinks(data.data[i].tpItemIds),
                                 //Type: getValue(data.data[i], 'type'),
                                 //Position: data.data[i].position,
                                 WikidataTypes: '' + data.data[i].wikidataTypes,
                                 dbpediaWikidataIds: buildWkdLinks(data.data[i].dbpediaWikidataIds),
+                                wikidataLabelAltLabelMatchIds: buildWkdLinks(data.data[i].wikidataLabelAltLabelMatchIds),
+                                
                                 //Dbp_ID: getDbpLink(data.data[i].dbpId),
                                 //DbpWKD_ID: getWkdLink(data.data[i].dbpWkdId),
                                 //WKD_IDs: getWkdLinks(data.data[i].wkdIds),
                                 //WKD_AltLabel_IDs: getWkdLinks(data.data[i].wkdAltLabelIds) 
+                                //"prefferedWikidataEntity.prefLabel.en": data.data[i].value.prefLabelEn,
                             });
                         }
 
@@ -227,22 +285,26 @@
                     }
                 },
                 columns: [
-                	{ data: 'objectId' },
-                    { data: 'propertyId' },
-                    { data: 'Keyword_Orig' },
-                    { data: 'Keyword_EN' },
-                    { data: 'PrefLabel_EN' },
-                    { data: 'PrefWKD_ID' },
+                	{ data: 'objectId', width: '5%' },
+                    { data: 'propertyId' , width: '5%'},
+                    { data: 'detectedOriginalLanguage' },
+                    { data: 'value', name: 'value'},
+                    { data: 'translatedValue' },
+                    { data: 'prefLabelEn', searchable: true, orderable: false},
+                    { data: 'preferredWikidataId', searchable: true, orderable: false},
+                    { data: 'validation', searchable: false, orderable: false},
                     { data: 'status' },
                     //{ data: 'Type' },
                     //{ data: 'Position' },
-                    { data: 'tpItemIds' },
-                    { data: 'WikidataTypes' },
-                    { data: 'dbpediaWikidataIds' },
+                    { data: 'tpItemIds', searchable: true, orderable: false },
+                    { data: 'WikidataTypes', name: 'WikidataTypes', searchable: false, orderable: false},
+                    { data: 'dbpediaWikidataIds', searchable: true, orderable: false },
+                    { data: 'wikidataLabelAltLabelMatchIds', searchable: true, orderable: false },
                     //{ data: 'Dbp_ID' },
                     //{ data: 'DbpWKD_ID' },
                     //{ data: 'WKD_IDs' },
                     //{ data: 'WKD_AltLabel_IDs' },
+                    //{ data: 'prefferedWikidataEntity.prefLabel.en', searchable: false, orderable: true,  visible:false},
                 ]
             } );
 
