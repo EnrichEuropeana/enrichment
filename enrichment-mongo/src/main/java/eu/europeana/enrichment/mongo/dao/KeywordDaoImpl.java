@@ -34,5 +34,11 @@ public class KeywordDaoImpl {
 	    return enrichmentDatastore.find(Keyword.class).filter(
 	                eq(EnrichmentConstants.OBJECT_ID, new ObjectId(objectId)))
 	                .first();
-        }
+    }
+	
+	public Keyword findByPropertyId(String propertyId) {
+		return enrichmentDatastore.find(Keyword.class).filter(
+                eq(EnrichmentConstants.KEYWORD_PROPERTY_ID, propertyId))
+                .first();
+	}
 }
