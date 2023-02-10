@@ -50,8 +50,8 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 		}
 	}
 	
-	public void deletePositionEntitiesAndNamedEntity(String storyId,String itemId, String fieldUsedForNER) {
-		namedEntityDao.deletePositionEntitiesAndNamedEntity(storyId,itemId,fieldUsedForNER);
+	public void deletePositionEntitiesAndNamedEntities(String storyId,String itemId, String fieldUsedForNER) {
+		namedEntityDao.deletePositionEntitiesAndNamedEntities(storyId,itemId,fieldUsedForNER);
 	}
 	
 	public void deleteAllNamedEntities() {

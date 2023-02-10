@@ -62,7 +62,7 @@ public interface PersistentNamedEntityAnnotationService {
 	 */
 	public void deleteNamedEntityAnnotationById(String id);
 	
-	public void deleteNamedEntityAnnotation(String storyId,String itemId);
+	public void deleteNamedEntityAnnotation(String storyId,String itemId, String property);
 
 	
 }

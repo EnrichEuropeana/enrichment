@@ -62,6 +62,11 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
+	public void deleteAllItemsOfStory(String storyId) {
+		itemEntityDao.deleteAllItemsOfStory(storyId);
+	}
+	
+	@Override
 	public ItemEntity findItemEntityFromStory(String storyId, String itemId) {
 		
 		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
