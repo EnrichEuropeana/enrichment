@@ -147,6 +147,8 @@ public class EnrichmentConstants {
 	public static final String TOPIC_SOLR_DESCRIPTION_ALL = "description.*";
 	public static final String TOPIC_SOLR_DESCRIPTION = "description";
 
+	public static final String KEYWORD_PROPERTY_ID = "propertyId";
+
 	// results page
 	public static final String PART_OF = "partOf";
 	public static final String NEXT = "next";
