@@ -83,6 +83,7 @@
     
 
     <script type="text/javascript">
+
     	function getDbpLink(url){
     		if(url){
     			return '<a href="' + url + '" target="_blank">'+ url.replace('http://dbpedia.org/resource/', '') + '</a>';
@@ -96,7 +97,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve?objectId=" + objectId,
+    				  url: "keyword/approve?objectId=" + objectId,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -115,7 +116,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve/alternative?objectId=" + objectId + "&wkdId=" + confirmed,
+    				  url: "keyword/approve/alternative?objectId=" + objectId + "&wkdId=" + confirmed,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -134,7 +135,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve/broad?objectId=" + objectId + "&wkdId=" + confirmed,
+    				  url: "keyword/approve/broad?objectId=" + objectId + "&wkdId=" + confirmed,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -152,7 +153,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/reject?objectId=" + objectId,
+    				  url: "keyword/reject?objectId=" + objectId,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded!");
@@ -251,7 +252,7 @@
                     { "width": "5%", "targets": 1 }
                   ],
                 ajax: {
-                    url: "/keyword/datatable",
+                    url: "keyword/datatable",
                     dataSrc: function (data) {
                         let renderData = new Array();
 

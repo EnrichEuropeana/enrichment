@@ -150,7 +150,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 	
-		String result = enrichmentTranslationService.getTranslation(storyId, itemId, translationTool, wskey);
+		String result = enrichmentTranslationService.getTranslation(storyId, itemId, translationTool, property);
 		if(result==null) {
 			result="Translation does not exist!";
 		}		
