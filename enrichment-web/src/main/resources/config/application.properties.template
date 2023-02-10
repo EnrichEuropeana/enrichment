@@ -5,8 +5,8 @@ spring.profiles.active=${activeProfile}
 enrich.translation.google = false
 
 # mongo connectivity
-spring.data.mongodb.uri=mongodb://localhost:27017/keywords2
-spring.data.mongodb.database=keywords2
+spring.data.mongodb.uri=mongodb://localhost:27017/keywords
+spring.data.mongodb.database=keywords
 
 # mysql connectivity
 spring.jpa.hibernate.ddl-auto=update
