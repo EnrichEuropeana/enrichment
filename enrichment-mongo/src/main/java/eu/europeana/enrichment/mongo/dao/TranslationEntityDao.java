@@ -11,7 +11,7 @@ import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 public interface TranslationEntityDao {
 
 	public TranslationEntity findTranslationEntity(String key);
-	public List<TranslationEntity> findAllTranslationEntities();
+	public List<TranslationEntity> findAllTranslationEntities(boolean onlyItems, boolean onlyStories);
 	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId, String tool, String language, String type);
 	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type);
 	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key);

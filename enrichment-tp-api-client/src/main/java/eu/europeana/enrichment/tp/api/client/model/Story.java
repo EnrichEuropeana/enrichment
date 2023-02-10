@@ -3,8 +3,11 @@ package eu.europeana.enrichment.tp.api.client.model;
 import java.sql.Timestamp;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class Story {
 	public Integer StoryId;
 	public String dcTitle;

@@ -2,8 +2,8 @@ package eu.europeana.enrichment.model.impl;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
@@ -93,14 +93,18 @@ public class PositionEntityImpl {
         // typecast pe to PositionEntity so that we can compare data members  
         PositionEntityImpl pe_new = (PositionEntityImpl) pe; 
         
-        Collections.sort(offsetsTranslatedText);
-        Collections.sort(pe_new.getOffsetsTranslatedText());
+        if(offsetsTranslatedText!=null) {
+        	Collections.sort(offsetsTranslatedText);
+        }
+        if(pe_new.getOffsetsTranslatedText()!=null) {
+        	Collections.sort(pe_new.getOffsetsTranslatedText());
+        }
         
         // Compare the data members and return accordingly  
-        return pe_new.getStoryId().compareTo(storyId)==0
-                && StringUtils.compare(pe_new.getItemId(),itemId)==0
-                && pe_new.getOffsetsTranslatedText().equals(offsetsTranslatedText) //compare the 2 lists including the order of elements, that is why we first sorted them
-                && pe_new.getFieldUsedForNER().compareTo(fieldUsedForNER)==0;
+        return Objects.equals(pe_new.getStoryId(), storyId)
+                && Objects.equals(pe_new.getItemId(),itemId)
+                && Objects.equals(pe_new.getOffsetsTranslatedText(), offsetsTranslatedText) //compare the 2 lists including the order of elements, that is why we first sorted them
+                && Objects.equals(pe_new.getFieldUsedForNER(), fieldUsedForNER);
     }     
     
 	@Override

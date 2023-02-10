@@ -114,9 +114,9 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public long deleteItemEntityByStoryItemId(String key) {
+	public long deleteAllItemsOfStory(String storyId) {
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EnrichmentConstants.ITEM_ID,key))
+                eq(EnrichmentConstants.STORY_ID,storyId))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}

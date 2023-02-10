@@ -16,7 +16,7 @@ public interface NamedEntityDao {
 
 	//public List<NamedEntityImpl> getAllNamedEntities();
 	public void saveNamedEntity(NamedEntityImpl entity);
-	public void deletePositionEntitiesAndNamedEntity(String storyId,String itemId, String fieldUsedForNER);
+	public void deletePositionEntitiesAndNamedEntities(String storyId,String itemId, String fieldUsedForNER);
 	public List<NamedEntityImpl> findAllNamedEntities();
 	public long deleteAllNamedEntities();
 }

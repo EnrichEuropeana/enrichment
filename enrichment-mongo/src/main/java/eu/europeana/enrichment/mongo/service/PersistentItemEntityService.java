@@ -1,7 +1,5 @@
 package eu.europeana.enrichment.mongo.service;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import eu.europeana.enrichment.model.ItemEntity;
@@ -60,6 +58,8 @@ public interface PersistentItemEntityService {
 	 * @return
 	 */
 	public void deleteItemEntity(ItemEntity entity);
+	
+	public void deleteAllItemsOfStory(String storyId);
 
 	/**
 	 * This function updates the NER tools list that are already applied to the given story

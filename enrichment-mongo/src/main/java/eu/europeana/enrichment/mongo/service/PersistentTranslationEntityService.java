@@ -26,7 +26,7 @@ public interface PersistentTranslationEntityService {
 	 * 
 	 * @return							list of database translation entries
 	 */
-	public List<TranslationEntity> getAllTranslationEntities();
+	public List<TranslationEntity> getAllTranslationEntities(boolean onlyItems, boolean onlyStories);
 	/*
 	 * This method saves and updates translation entries into the Mongo database
 	 * 

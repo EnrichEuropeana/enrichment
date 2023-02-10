@@ -54,6 +54,6 @@ public interface ItemEntity {
 
 	void setTranscriptionLanguages(List<String> transcriptionLanguages);
 	
-	void copyFromItem(ItemEntity item) throws NoSuchAlgorithmException, UnsupportedEncodingException;
+	void copyFromItem(ItemEntity item);
 
 }

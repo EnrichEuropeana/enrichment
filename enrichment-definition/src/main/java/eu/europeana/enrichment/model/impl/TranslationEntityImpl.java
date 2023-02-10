@@ -6,7 +6,11 @@ import java.security.NoSuchAlgorithmException;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.ItemEntity;
@@ -14,6 +18,7 @@ import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.TranslationEntity;
 
 @Entity(value="TranslationEntityImpl")
+@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool") }, options = @IndexOptions(unique = true)))
 public class TranslationEntityImpl implements TranslationEntity{
 
 	protected String key;
@@ -24,6 +29,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private String storyId;
 	private String itemId;
 	private String originLangGoogle;
+	private String type;
 	
 	public TranslationEntityImpl (TranslationEntity copy)
 	{
@@ -35,6 +41,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 		this.storyId = copy.getStoryId();
 		this.itemId = copy.getItemId();
 		this.originLangGoogle = copy.getOriginLangGoogle();
+		this.type = copy.getType();
 	}
 	
 	public TranslationEntityImpl() {
@@ -92,8 +99,6 @@ public class TranslationEntityImpl implements TranslationEntity{
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
-
-	private String type;
 	
 	@Override
 	public String getETranslationId() {
