@@ -83,6 +83,7 @@
     
 
     <script type="text/javascript">
+
     	function getDbpLink(url){
     		if(url){
     			return '<a href="' + url + '" target="_blank">'+ url.replace('http://dbpedia.org/resource/', '') + '</a>';
@@ -96,7 +97,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve?objectId=" + objectId,
+    				  url: "keyword/approve?objectId=" + objectId,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -115,7 +116,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve/alternative?objectId=" + objectId + "&wkdId=" + confirmed,
+    				  url: "keyword/approve/alternative?objectId=" + objectId + "&wkdId=" + confirmed,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -134,7 +135,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/approve/broad?objectId=" + objectId + "&wkdId=" + confirmed,
+    				  url: "keyword/approve/broad?objectId=" + objectId + "&wkdId=" + confirmed,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded! ");
@@ -152,7 +153,7 @@
     		//alert('Confirmed ' + objectId  + ' - ' + confirmed);
     		if(confirmed){
     			$.ajax({
-    				  url: "/keyword/reject?objectId=" + objectId,
+    				  url: "keyword/reject?objectId=" + objectId,
     				})
     				  .done(function( data ) {
     					  alert("update operation succeded!");
@@ -232,7 +233,16 @@
     		return ''; 
     	}
     	
+    	function buildStatus(status, approvedWkdId){
+    		if('approved_alternative' == status || 'approved_broad_match' == status){
+    			return status + ' (' + getWkdLink(approvedWkdId) + ')'; 
+    		} else {
+    			return '' + status;
+    		} 
+    	}
+    	
         $(document).ready(function() {
+        	//display search boxes only on selected cplumns
             $('#keyword tfoot th').each( function () {
                 var title = $(this).text();
                 if(title != "objectId" && title != "prefLabelEn" && title != "validation" && title != "tpItemIds" && title != "WikidataTypes"){
@@ -242,6 +252,7 @@
                 }
             } );
 
+        	//fetch the data throug ajax call
             var table = $('#keyword').DataTable( {
                 processing: false,
                 serverSide: true,
@@ -251,10 +262,10 @@
                     { "width": "5%", "targets": 1 }
                   ],
                 ajax: {
-                    url: "/keyword/datatable",
+                    url: "keyword/datatable",
                     dataSrc: function (data) {
                         let renderData = new Array();
-
+						//render the data into the column, and apply transformations where needed	
                         for (let i = 0; i < data.data.length; i++) {
                             renderData.push({
                             	objectId: data.data[i].objectId,
@@ -264,26 +275,22 @@
                                 translatedValue: data.data[i].translatedValue,
                                 prefLabelEn: getValue(data.data[i], 'prefLabelEn'),
                                 preferredWikidataId: getWkdLink(data.data[i].preferredWikidataId),
+                                //add the action buttons
                                 validation: buildButtons(data.data[i].objectId, data.data[i].preferredWikidataId),
-                                status: '' + data.data[i].status,
+                                status: buildStatus (data.data[i].status, data.data[i].approvedWikidataId),
                                 tpItemIds: buildTpLinks(data.data[i].tpItemIds),
                                 //Type: getValue(data.data[i], 'type'),
                                 //Position: data.data[i].position,
                                 WikidataTypes: '' + data.data[i].wikidataTypes,
                                 dbpediaWikidataIds: buildWkdLinks(data.data[i].dbpediaWikidataIds),
                                 wikidataLabelAltLabelMatchIds: buildWkdLinks(data.data[i].wikidataLabelAltLabelMatchIds),
-                                
-                                //Dbp_ID: getDbpLink(data.data[i].dbpId),
-                                //DbpWKD_ID: getWkdLink(data.data[i].dbpWkdId),
-                                //WKD_IDs: getWkdLinks(data.data[i].wkdIds),
-                                //WKD_AltLabel_IDs: getWkdLinks(data.data[i].wkdAltLabelIds) 
-                                //"prefferedWikidataEntity.prefLabel.en": data.data[i].value.prefLabelEn,
                             });
                         }
 
                         return renderData;
                     }
                 },
+                //column display definitions && column controls
                 columns: [
                 	{ data: 'objectId', width: '5%' },
                     { data: 'propertyId' , width: '5%'},
@@ -294,21 +301,15 @@
                     { data: 'preferredWikidataId', searchable: true, orderable: false},
                     { data: 'validation', searchable: false, orderable: false},
                     { data: 'status' },
-                    //{ data: 'Type' },
-                    //{ data: 'Position' },
                     { data: 'tpItemIds', searchable: true, orderable: false },
                     { data: 'WikidataTypes', name: 'WikidataTypes', searchable: false, orderable: false},
                     { data: 'dbpediaWikidataIds', searchable: true, orderable: false },
                     { data: 'wikidataLabelAltLabelMatchIds', searchable: true, orderable: false },
-                    //{ data: 'Dbp_ID' },
-                    //{ data: 'DbpWKD_ID' },
-                    //{ data: 'WKD_IDs' },
-                    //{ data: 'WKD_AltLabel_IDs' },
-                    //{ data: 'prefferedWikidataEntity.prefLabel.en', searchable: false, orderable: true,  visible:false},
                 ]
             } );
 
-            table.columns().every( function () {
+            //trigger the search function automatically
+        	table.columns().every( function () {
                 var that = this;
 
                 $( 'input', this.footer() ).on( 'keyup change clear', function () {

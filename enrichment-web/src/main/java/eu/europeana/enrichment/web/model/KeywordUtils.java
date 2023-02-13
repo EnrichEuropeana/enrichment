@@ -31,11 +31,7 @@ public class KeywordUtils {
             view.setTpItemIds(top5(keyword.getTpItemIds()));
             view.setDbpediaWikidataIds(keyword.getDbpediaWikidataIds());
             view.setWikidataLabelAltLabelMatchIds(keyword.getWikidataLabelAltLabelMatchIds());
-//            view.setDbpId(getDbpediaId(keyword));
-//            view.setDbpWkdId(getDbpWkdId(keyword));
-//            view.setPosition(getPosition(keyword));
-//            view.setWkdIds(getWkdIds(keyword));
-//            view.setWkdAltLabelIds(getWkdAltLabelIds(keyword));            
+            view.setApprovedWikidataId(keyword.getApprovedWikidataId());
         }
         
         

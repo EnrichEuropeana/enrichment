@@ -9,45 +9,32 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonView;
 
-//@Entity(value = "KeywordNamedEntity")
 @Document
 @JsonInclude(Include.NON_NULL)
 @JsonView(value= {View.class})
 public class KeywordView {
 
-//    private KeywordNamedEntity kne;
-//    @Id
     private String objectId;
     private String propertyId;
-    //keyword -> value
     private String value;
-    //keywordEn -> translatedValue
     private String translatedValue;
-    //lang -> detectedOriginalLanguage
     private String detectedOriginalLanguage;
-    //prefferedWikidataEntity.prefLabel.en
     private String prefLabelEn;
     //typeFoundByNER: agent/place
     private String type;
-    //keywordPosition.offsetsTranslatedText
     private int position;
     //prefferedWikidataEntity.wikidataType.*.value
     private String wikidataTypes;
-    //private String dbpId;
-    //private String dbpWkdId;
-    //dbpediaWikidataIds
     private List<String> dbpediaWikidataIds;
-    //preferedWikidataId
     private String preferredWikidataId;
     //??
     private String wkdIds;
     private List<String> preferredWikidataIds;
-    //wikidataLabelAltLabelMatchIds
     private List<String> wikidataLabelAltLabelMatchIds;
     //top5(tpItemIds)
     private List<Long> tpItemIds;
-    //status
     private String status;
+    private String approvedWikidataId;
     
 
     public KeywordView() {
@@ -199,6 +186,14 @@ public class KeywordView {
 
     public void setPreferredWikidataIds(List<String> preferredWikidataIds) {
         this.preferredWikidataIds = preferredWikidataIds;
+    }
+
+    public String getApprovedWikidataId() {
+        return approvedWikidataId;
+    }
+
+    public void setApprovedWikidataId(String approvedWikidataId) {
+        this.approvedWikidataId = approvedWikidataId;
     }
 
 }
