@@ -46,12 +46,18 @@ public class PositionEntityDaoImpl {
 	
 	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
-	    filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    if(namedEntityId!=null) {
+	    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
+	    }
+	    if(storyId!=null) {
+	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    }
 	    if(itemId!=null) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
+	    if(fieldForNer!=null) {
+	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
+	    }
     	filters.add(eq(EnrichmentConstants.OFFSETS_TRANSLATED_TEXT, offsetTranslatedText));
 	    
 		return enrichmentDatastore

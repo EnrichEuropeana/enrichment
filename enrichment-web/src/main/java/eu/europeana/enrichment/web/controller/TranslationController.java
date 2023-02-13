@@ -17,11 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
-import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,9 +37,6 @@ public class TranslationController extends BaseRest {
 	
 	@Autowired
 	PersistentStoryEntityService persistentStoryEntityService;
-	
-	@Autowired
-	PersistentTranslationEntityService persistentTranslationEntityService;
 
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -69,15 +63,14 @@ public class TranslationController extends BaseRest {
 		
 		verifyWriteAccess(Operations.CREATE, request);
 		
-		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-		body.setStoryId(storyId);
-		body.setTranslationTool(translationTool);
-		body.setType(property);
+		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		enrichmentTranslationService.translate(body, true);
-		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
-		
-		return response;	
+		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool);
+		if(result==null) {
+			result="Either story or its property (e.g. description) does not exist!";
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);	
+		return response;
 	}
 	
 	@ApiOperation(value = "Get translated text (Google, eTranslation) for Stories", nickname = "getTranslationStory", notes = "This method retrieves the translated story elements. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
@@ -93,14 +86,13 @@ public class TranslationController extends BaseRest {
 		
 		verifyReadAccess(request);
 		
-		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-		body.setStoryId(storyId);
-		body.setTranslationTool(translationTool);
-		body.setType(property);
+		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		TranslationEntity translation = enrichmentTranslationService.translate(body, false);
-		ResponseEntity<String> response = new ResponseEntity<String>(translation.getTranslatedText(), HttpStatus.OK);
-		
+		String result = enrichmentTranslationService.getTranslation(storyId, null, translationTool, property);
+		if(result==null) {
+			result="Translation does not exist!";
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;		
 	} 
 	
@@ -132,14 +124,13 @@ public class TranslationController extends BaseRest {
 
 		verifyWriteAccess(Operations.CREATE, request);
 		
-		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-		body.setStoryId(storyId);
-		body.setItemId(itemId);
-		body.setTranslationTool(translationTool);
-		body.setType(property);
+		validateTranslationParams(storyId, itemId, translationTool, property, true);
 		
-		enrichmentTranslationService.translate(body, true);
-		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool);
+		if(result==null) {
+			result="Either item or its property (e.g. transcription) does not exist!";
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;
 	}
 	
@@ -156,18 +147,15 @@ public class TranslationController extends BaseRest {
 			HttpServletRequest request) throws Exception {
 
 		verifyReadAccess(request);
-		EnrichmentTranslationRequest body = new EnrichmentTranslationRequest();
-		body.setStoryId(storyId);
-		body.setItemId(itemId);
-		body.setTranslationTool(translationTool);
-		body.setType(property);
 		
-		TranslationEntity translation = enrichmentTranslationService.translate(body, false);
-		
-		ResponseEntity<String> response = new ResponseEntity<String>(translation.getTranslatedText(), HttpStatus.OK);
-		
+		validateTranslationParams(storyId, itemId, translationTool, property, true);
+	
+		String result = enrichmentTranslationService.getTranslation(storyId, itemId, translationTool, property);
+		if(result==null) {
+			result="Translation does not exist!";
+		}		
+		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;		
 	} 
-
 
 }

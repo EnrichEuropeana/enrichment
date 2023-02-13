@@ -20,14 +20,14 @@ import io.swagger.annotations.Api;
 
 @RestController
 @Api(tags = "Keyword Validation Service", description=" ")
-@RequestMapping("/keyword")
+//@RequestMapping("/keyword")
 public class KeywordController extends BaseRest {
 
     @Autowired
     private EnrichmentKeywordServiceImpl enrichmenKeywordService;
     
     
-    @GetMapping(value = "/datatable")
+    @GetMapping(value = "/keyword/datatable")
     @ResponseBody
     @JsonView(DataTablesOutput.View.class)
     public DataTablesOutput<KeywordView> getKeywords(@Valid DataTablesInput input) {
@@ -35,13 +35,13 @@ public class KeywordController extends BaseRest {
         return enrichmenKeywordService.getKeywords(input);
     }
 	
-    @GetMapping(value = "/approve")
+    @GetMapping(value = "/keyword/approve")
     @ResponseBody
     public KeywordView approve(@RequestParam(value = "objectId", required = true) String objectId) throws HttpException {
         return enrichmenKeywordService.approve(objectId);
     }
 
-    @GetMapping(value = "/approve/alternative")
+    @GetMapping(value = "/keyword/approve/alternative")
     @ResponseBody
     public KeywordView approveAlternative(
             @RequestParam(value = "objectId", required = true) String objectId,
@@ -51,7 +51,7 @@ public class KeywordController extends BaseRest {
         return enrichmenKeywordService.approveAlternative(objectId, wkdId);
     }
 
-    @GetMapping(value = "/approve/broad")
+    @GetMapping(value = "/keyword/approve/broad")
     @ResponseBody
     public KeywordView approveBroad(
             @RequestParam(value = "objectId", required = true) String objectId,
@@ -61,7 +61,7 @@ public class KeywordController extends BaseRest {
     }
 
     
-    @GetMapping(value = "/reject")
+    @GetMapping(value = "/keyword/reject")
     @ResponseBody
     public KeywordView reject(@RequestParam(value = "objectId", required = true) String objectId) throws HttpException {
         return enrichmenKeywordService.reject(objectId);

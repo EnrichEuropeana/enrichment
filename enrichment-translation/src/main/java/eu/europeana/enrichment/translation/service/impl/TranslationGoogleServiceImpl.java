@@ -104,7 +104,7 @@ public class TranslationGoogleServiceImpl {
 //				
 //	}
 	
-	public Translation translateText(String text, String sourceLanguage, String targetLanguage) {
+	public Translation translateText(String text, String targetLanguage) {
 		try {
 			Translation translation = translate.translate(text, TranslateOption.targetLanguage(targetLanguage));		
 			return translation;

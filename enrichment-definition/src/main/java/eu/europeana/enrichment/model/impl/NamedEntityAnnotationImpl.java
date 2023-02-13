@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.bson.types.ObjectId;
 
@@ -32,7 +33,7 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 	EnrichmentConstants.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId") }, options = @IndexOptions(unique = true)))
+@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
 public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 
 	@JsonIgnore
@@ -205,11 +206,10 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
         NamedEntityAnnotation nea_new = (NamedEntityAnnotation) nea; 
        
         // Compare the data members and return accordingly  
-        return this.hashCode()==nea_new.hashCode();
-//        		nea_new.getStoryId().compareTo(storyId)==0
-//                && nea_new.getItemId().compareTo(itemId)==0
-//                && nea_new.getWikidataId().compareTo(wikidataId)==0
-//                && nea_new.getProperty().compareTo(property)==0;
+        return Objects.equals(nea_new.getStoryId(),storyId)
+                && Objects.equals(nea_new.getItemId(), itemId)
+                && Objects.equals(nea_new.getWikidataId(), wikidataId)
+                && Objects.equals(nea_new.getProperty(),property);
     } 
     
     @Override

@@ -40,7 +40,6 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
 import eu.europeana.enrichment.model.Topic;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
@@ -66,10 +65,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	@Autowired
 	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_TOPIC_SERVICE)
 	SolrTopicServiceImpl solrTopicService;
-	
-	@Autowired
-	JsonLdSerializer jsonLdSerializer;
-	
+		
 	@Autowired
 	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 	EnrichmentConfiguration config;
