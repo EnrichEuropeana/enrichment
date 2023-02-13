@@ -23,9 +23,6 @@ import io.swagger.annotations.Api;
 @RequestMapping("/keyword")
 public class KeywordController extends BaseRest {
 
-//    @Autowired
-//    private KeywordRepository keywordRepository;
-    
     @Autowired
     private EnrichmentKeywordServiceImpl enrichmenKeywordService;
     
