@@ -102,6 +102,9 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.wikidata.directory}")
     private String enrichWikidataDirectory;
     
+    @Value("${transcribathon.base.url.stories}")
+    private String transcribathonBaseUrlStories;
+
     @Value("${transcribathon.base.url.stories.minimal}")
     private String transcribathonBaseUrlStoriesMinimal;
     
@@ -257,7 +260,15 @@ public class EnrichmentConfiguration  {
     public String getSolrWikidataBaseUrl() {
 		return solrWikidataBaseUrl;
 	}
-    
+
+    public String getTranscribathonBaseUrlStories() {
+		return transcribathonBaseUrlStories;
+	}
+
+	public void setTranscribathonBaseUrlStories(String transcribathonBaseUrlStories) {
+		this.transcribathonBaseUrlStories = transcribathonBaseUrlStories;
+	}
+
     public String getTranscribathonBaseUrlStoriesMinimal() {
 		return transcribathonBaseUrlStoriesMinimal;
 	}

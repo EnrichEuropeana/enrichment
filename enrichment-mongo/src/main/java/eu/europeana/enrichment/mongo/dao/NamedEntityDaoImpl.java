@@ -96,18 +96,25 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    if(storyId!=null) {
+	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    }
 	    if(itemId!=null) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, type));
+	    if(type!=null) {
+	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, type));
+	    }
 	    if(nerTools!=null) {
 	    	filters.add(all(EnrichmentConstants.NER_TOOLS, nerTools));
 	    	if(matchNerToolsExactly) {
 	    		filters.add(size(EnrichmentConstants.NER_TOOLS, nerTools.size()));
 	    	}
 	    }
-
+	    if(filters.size()==0) {
+	     return new ArrayList<>();	
+	    }
+	    
 		List<PositionEntityImpl> positions = enrichmentDatastore
 			.find(PositionEntityImpl.class)
 			.filter(filters.toArray(Filter[]::new))
@@ -141,13 +148,18 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 
 	@Override
-	public void deletePositionEntitiesAndNamedEntity(String storyId, String itemId, String fieldUsedForNER) {
+	public void deletePositionEntitiesAndNamedEntities(String storyId, String itemId, String fieldUsedForNER) {
 	    List<Filter> filters = new ArrayList<>();
-	    filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    if(storyId!=null) {
+	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    }
 	    if(itemId!=null) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUsedForNER));
+	    if(fieldUsedForNER!=null) {
+	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUsedForNER));
+	    }
+	    if(filters.size()==0) return;
 
 		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))

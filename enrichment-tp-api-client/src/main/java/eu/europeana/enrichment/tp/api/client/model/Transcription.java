@@ -2,6 +2,11 @@ package eu.europeana.enrichment.tp.api.client.model;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class Transcription {
 	public Integer TranscriptionId;
 	public String Text;

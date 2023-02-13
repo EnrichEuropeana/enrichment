@@ -10,7 +10,7 @@ public class ModelUtils {
 	
 	static Logger logger = LogManager.getLogger(ModelUtils.class);
 	
-	public static String getMainTranslationLanguage (ItemEntity item) {
+	public static String getOnlyTranscriptionLanguage (ItemEntity item) {
 		if(item.getTranscriptionLanguages()!=null && item.getTranscriptionLanguages().size()==1) {
 			return item.getTranscriptionLanguages().get(0);
 		}

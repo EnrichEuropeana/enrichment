@@ -17,7 +17,7 @@ public interface ItemEntityDao {
 	//public List<NamedEntity> getAllStoryItemEntities();
 	public void saveItemEntity(ItemEntity entity);
 	public void deleteItemEntity(ItemEntity entity);
-	public long deleteItemEntityByStoryItemId(String key);
+	public long deleteAllItemsOfStory(String storyId);
 	public void updateNerToolsForItem(String itemId, String nerTool);
 	public List<String> getNerToolsForItem(String itemId);
 //	public int getNumerAnalysedNamedEntities(String field);

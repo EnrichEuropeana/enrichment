@@ -23,4 +23,7 @@ public class PersistentKeywordServiceImpl {
 		return keywordDao.findAllKeywords();
 	}
 
+	public Keyword findByPropertyId(String propertyId) {
+		return keywordDao.findByPropertyId(propertyId);
+	}
 }

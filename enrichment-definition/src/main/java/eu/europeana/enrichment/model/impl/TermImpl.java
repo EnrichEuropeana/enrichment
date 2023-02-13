@@ -14,7 +14,7 @@ public class TermImpl implements Term {
 	// between 1 and 250
 	private Integer rank;
 	// between 0 and 100
-	private Integer score;
+	private Double score;
 	
 	
 	public TermImpl()
@@ -22,7 +22,7 @@ public class TermImpl implements Term {
 		
 	}
 	
-	public TermImpl(String term, Integer rank, Integer score) {
+	public TermImpl(String term, Integer rank, Double score) {
 //		if (!(1<=rank.intValue() && rank.intValue()<=250))
 //			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
 //		
@@ -64,12 +64,12 @@ public class TermImpl implements Term {
 	}
 
 	@Override
-	public Integer getScore() {
+	public Double getScore() {
 		return this.score;
 	}
 
 	@Override
-	public void setScore(Integer score) throws UnsupportedRangeTermEntityException {
+	public void setScore(Double score) throws UnsupportedRangeTermEntityException {
 //		if (!(0<=score.intValue() && score.intValue()<=100))
 //			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
 		this.score = score;

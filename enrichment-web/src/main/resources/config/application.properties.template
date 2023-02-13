@@ -2,11 +2,11 @@
 # we inject entitymanagment.properties in Jenkins builds, so this property needs to be specified here
 spring.profiles.active=${activeProfile}
 #server.port = 8181
-enrich.translation.google = true
+enrich.translation.google = false
 
 # mongo connectivity
-spring.data.mongodb.uri=mongodb://localhost:27017/keywords2
-spring.data.mongodb.database=keywords2
+spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
+spring.data.mongodb.database=enrichment
 
 # mysql connectivity
 spring.jpa.hibernate.ddl-auto=update
