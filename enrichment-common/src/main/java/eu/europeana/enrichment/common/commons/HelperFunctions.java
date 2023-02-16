@@ -192,10 +192,8 @@ public class HelperFunctions {
 			//String path = pathName.replace("/", "\\\\");
 			String contentJsonFile = null;
 
-			try {
-	            
+			try {	            
 				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-	            
 	        } catch (IOException e) {
 				throw e;
 	        }
