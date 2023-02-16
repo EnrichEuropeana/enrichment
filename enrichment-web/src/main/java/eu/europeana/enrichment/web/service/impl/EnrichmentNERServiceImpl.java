@@ -237,7 +237,7 @@ public class EnrichmentNERServiceImpl {
 	
 					NamedEntityImpl dbEntity = persistentNamedEntityService.findExistingNamedEntity(tmpNamedEntity);
 					nerLinkingService.addLinkingInformation(tmpNamedEntity, dbEntity, linking, languageForNer, nerTool, matchType);
-					saveNamedEntityAndPositionsToDbAndSolr(tmpNamedEntity, dbEntity);
+					saveNamedEntityAndPositionsToDb(tmpNamedEntity, dbEntity);
 				}	
 			}
 		}
@@ -251,7 +251,7 @@ public class EnrichmentNERServiceImpl {
 		else return false;
 	}
 	
-	private void saveNamedEntityAndPositionsToDbAndSolr (NamedEntityImpl newNamedEntity, NamedEntityImpl existingNamedEntity) throws SolrServiceException, IOException {
+	private void saveNamedEntityAndPositionsToDb (NamedEntityImpl newNamedEntity, NamedEntityImpl existingNamedEntity) throws SolrServiceException, IOException {
 		if(existingNamedEntity!=null) {
 			//save the position entity only
 			List<Integer> existingOffsets = new ArrayList<Integer>();
@@ -284,14 +284,8 @@ public class EnrichmentNERServiceImpl {
 		}
 		else {
 			persistentNamedEntityService.saveNamedEntity(newNamedEntity);
-			if(newNamedEntity.getPreferedWikidataId()!=null) {
-				if(!solrWikidataEntityService.existWikidataURL(newNamedEntity.getPreferedWikidataId())) {
-					solrWikidataEntityService.storeWikidataFromURL(newNamedEntity.getPreferedWikidataId(), newNamedEntity.getType());
-				}
-			}
 			newNamedEntity.getPositionEntity().setNamedEntityId(newNamedEntity.get_id());
 			persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
-
 		}
 		
 	}
