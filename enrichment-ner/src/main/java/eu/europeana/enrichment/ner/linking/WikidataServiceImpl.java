@@ -921,8 +921,8 @@ public class WikidataServiceImpl implements WikidataService {
 				if(matchPrefLabelInWikidata(wikidataJSON, namedEntity.getLabel())) {
 					if(wikidataJSONLocalCache==null) {
 						//save to local cache and solr
-						HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSONLocalCache);
-						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
+						HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSON);
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSON,namedEntity.getType()), namedEntity.getType());
 					}
 					else if(! solrWikidataEntityService.existWikidataURL(wikidataId)) {
 						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
@@ -946,8 +946,8 @@ public class WikidataServiceImpl implements WikidataService {
 			if(matchPrefLabelInWikidata(wikidataJSON, namedEntity.getLabel())) {
 				if(wikidataJSONLocalCache==null) {
 					//save to local cache and solr
-					HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSONLocalCache);
-					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
+					HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSON);
+					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSON,namedEntity.getType()), namedEntity.getType());
 				}
 				else if(! solrWikidataEntityService.existWikidataURL(wikidataId)) {
 					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
