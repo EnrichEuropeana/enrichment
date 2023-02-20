@@ -198,6 +198,9 @@ public class HelperFunctions {
 				throw e;
 	        }
 
+			if(StringUtils.isBlank(contentJsonFile)) {
+				return null;
+			}
 			return contentJsonFile;
 		}
 
