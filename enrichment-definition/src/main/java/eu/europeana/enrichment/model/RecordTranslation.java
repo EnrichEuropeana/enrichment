@@ -2,6 +2,8 @@ package eu.europeana.enrichment.model;
 
 import java.util.List;
 
+import eu.europeana.enrichment.model.impl.RecordTranslationDetectedLang;
+
 public interface RecordTranslation {
 
     public static final String TRANSLATION_STATUS_COMPLETE = "COMPLETE";
@@ -38,5 +40,9 @@ public interface RecordTranslation {
     void setIdentifier(String identifier);
 
     String getIdentifier();
+
+	List<RecordTranslationDetectedLang> getDescriptionDetectedLang();
+	
+	void setDescriptionDetectedLang(List<RecordTranslationDetectedLang> descriptionDetectedLang);
 
 }

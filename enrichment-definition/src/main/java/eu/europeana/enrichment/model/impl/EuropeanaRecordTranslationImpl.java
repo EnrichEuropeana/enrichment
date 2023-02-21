@@ -28,6 +28,7 @@ public class EuropeanaRecordTranslationImpl implements RecordTranslation {
     @Indexed(options = @IndexOptions(unique = true))
     private String identifier;
     private String translationStatus;
+    private List<RecordTranslationDetectedLang> descriptionDetectedLanguage;
 
 
     public EuropeanaRecordTranslationImpl() {
@@ -150,5 +151,14 @@ public class EuropeanaRecordTranslationImpl implements RecordTranslation {
         this.identifier = identifier;
     }
 
+    @Override
+	public List<RecordTranslationDetectedLang> getDescriptionDetectedLang() {
+		return descriptionDetectedLanguage;
+	}
+
+    @Override
+	public void setDescriptionDetectedLang(List<RecordTranslationDetectedLang> descriptionDetectedLang) {
+		this.descriptionDetectedLanguage = descriptionDetectedLang;
+	}
     
 }

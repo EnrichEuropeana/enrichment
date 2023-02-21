@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -134,10 +135,11 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "matchInstanceOf", required = false, defaultValue = "true") boolean matchInstanceOf,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-		verifyReadAccess(request);
+		verifyWriteAccess(Operations.CREATE, request);
 		if(pageSize==null || pageSize.isEmpty())
 		{	
 			pageSize="5";
@@ -180,7 +182,7 @@ public class WikidataController extends BaseRest {
 			if(i>=startIndex && i<endIndex)
 			{
 				//getting WikidataEntity, either from local cache or from the wikidata
-				WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
+				WikidataEntity wikidataEntity = wikidataService.getWikidataEntityAndSaveToLocalCache(wikidataIDs.get(i), type, matchInstanceOf);
 				
 				if (wikidataEntity!=null) { 
 					items.add(wikidataEntity);						

@@ -45,8 +45,9 @@ import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
-import eu.europeana.enrichment.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
 //import net.arnx.jsonic.JSONException;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_WIKIDATA_SERVICE)
@@ -55,6 +56,9 @@ public class WikidataServiceImpl implements WikidataService {
 	@Autowired
 	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 	EnrichmentConfiguration configuration;
+	
+	@Autowired
+	SolrWikidataEntityService solrWikidataEntityService;
 	
 	Logger logger = LogManager.getLogger(getClass());
 
@@ -163,7 +167,7 @@ public class WikidataServiceImpl implements WikidataService {
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(wikidataIDs!=null) {
 			for(String wikidataIdEach : wikidataIDs) {
-				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataIdEach);
+				String wikidataJSONResponse = getWikidataJSONFromRemote(wikidataIdEach);
 				if(validWikidataPage(wikidataJSONResponse)) {
 					return wikidataIDs;					
 				}
@@ -178,7 +182,7 @@ public class WikidataServiceImpl implements WikidataService {
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(wikidataIDs!=null) {
 			for(String wikidataIdEach : wikidataIDs) {
-				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataIdEach);
+				String wikidataJSONResponse = getWikidataJSONFromRemote(wikidataIdEach);
 				if(validWikidataPage(wikidataJSONResponse)) {
 					return wikidataIDs;					
 				}
@@ -420,11 +424,8 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public String getWikidataJSONFromWikidataID(String WikidataID) {
-		
-		String WikidataJSONResponse = createRequest(WikidataID, null);
-		return WikidataJSONResponse;
-		
+	public String getWikidataJSONFromRemote(String WikidataID) {
+		return createRequest(WikidataID, null);
 	}
 
 	@Override
@@ -549,42 +550,40 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public WikidataEntity getWikidataEntityUsingLocalCache(String wikidataURL, String type) throws IOException {
+	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws IOException {
 		
 		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
-		String WikidataJSON = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
-		if(WikidataJSON==null) 	
+		String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
+		String wikidataJSON=wikidataJSONLocalCache;
+		if(wikidataJSON==null) 	
 		{
-			if(!configuration.getWikidataSaveJsonToLocalCache()) { 
+			logger.debug("Wikidata entity does not exist in a local file cache!");
+			wikidataJSON = getWikidataJSONFromRemote(wikidataURL);
+		}
+		if(wikidataJSON==null || wikidataJSON.isEmpty()) {
+			logger.debug("Wikidata entity does not exist in the remote repository!");
+			return null;
+		}
+
+		if(matchType) {
+			if(matchInstanceOfProperty(wikidataJSON, type)) {
+				if(wikidataJSONLocalCache==null) {
+					HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, wikidataJSON);
+					logger.debug("Wikidata entity is successfully saved to a local file cache!");
+				}
+				return getWikidataEntity(wikidataURL,wikidataJSON,type);
+			}
+			else {
 				return null;
 			}
-			logger.debug("Wikidata entity does not exist in a local file cache!");
-			WikidataJSON = getWikidataJSONFromWikidataID(wikidataURL);
-			if(WikidataJSON==null || WikidataJSON.isEmpty()) return null;
-			HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, WikidataJSON);
-			logger.debug("Wikidata entity is successfully saved to a local file cache!");			
 		}
-		
-		WikidataEntity wikiEntity = null;
-		/**
-		 * TODO: introduce the EntityObjectFactory class that would do the automatic object creation
-		 */
-		if(EntityTypes.Agent.getEntityType().equalsIgnoreCase(type)) {
-			wikiEntity = new WikidataAgentImpl();
-			if(WikidataJSON.contains(EnrichmentConstants.AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER)) {
-				return getWikidataEntity(wikidataURL,WikidataJSON,type);
-			}	
-
+		else {
+			if(wikidataJSONLocalCache==null) {
+				HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataURL, wikidataJSON);
+				logger.debug("Wikidata entity is successfully saved to a local file cache!");
+			}
+			return getWikidataEntity(wikidataURL,wikidataJSON,type);
 		}
-		else if(EntityTypes.Place.getEntityType().equalsIgnoreCase(type)) {
-			wikiEntity = new WikidataPlaceImpl();
-			if(WikidataJSON.contains(EnrichmentConstants.PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER)) {
-				return getWikidataEntity(wikidataURL,WikidataJSON,type);
-			}				
-		}
-		
-		return null;
-		
 	}
 	
 	@Override
@@ -894,7 +893,7 @@ public class WikidataServiceImpl implements WikidataService {
 		return false;
 	}
 	
-	private boolean matchTypeInWikidata(String wikidataJSONResponse, String type) {
+	private boolean matchInstanceOfProperty(String wikidataJSONResponse, String type) {
 		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.INSTANCE_OF_JSONPROP);
 		if(jsonElement!=null)	
 		{
@@ -913,66 +912,142 @@ public class WikidataServiceImpl implements WikidataService {
 			}				
 		}
 		return false;
-
 	}
 	
-	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) { 
-		List<String> savedWikidataIds=new ArrayList<String>();
-		List<String> savedWikidataJsons=new ArrayList<String>();
+	private String matchPrefLabelForPreferredWikidataId(NamedEntityImpl namedEntity, String wikidataId, String wikidataJSONLocalCache, String wikidataJSON,
+			boolean matchType, List<String> savedWikidataIds, List<String> savedWikidataJsons, List<Boolean> isWikidataFromLocalCache) throws IOException, SolrServiceException {
+		if(matchType) {
+			if(matchInstanceOfProperty(wikidataJSON, namedEntity.getType())) {
+				if(matchPrefLabelInWikidata(wikidataJSON, namedEntity.getLabel())) {
+					if(wikidataJSONLocalCache==null) {
+						//save to local cache and solr
+						HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSON);
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSON,namedEntity.getType()), namedEntity.getType());
+					}
+					else if(! solrWikidataEntityService.existWikidataURL(wikidataId)) {
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
+					}
+					return wikidataId;
+				}
+				//save to do the rest of the checks below
+				else {
+					savedWikidataIds.add(wikidataId);
+					savedWikidataJsons.add(wikidataJSON);
+					if(wikidataJSONLocalCache==null) {
+						isWikidataFromLocalCache.add(false);
+					}
+					else {
+						isWikidataFromLocalCache.add(true);
+					}
+				}
+			}
+		}
+		else {
+			if(matchPrefLabelInWikidata(wikidataJSON, namedEntity.getLabel())) {
+				if(wikidataJSONLocalCache==null) {
+					//save to local cache and solr
+					HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, wikidataId, wikidataJSON);
+					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSON,namedEntity.getType()), namedEntity.getType());
+				}
+				else if(! solrWikidataEntityService.existWikidataURL(wikidataId)) {
+					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(wikidataId,wikidataJSONLocalCache,namedEntity.getType()), namedEntity.getType());
+				}
+				return wikidataId;
+			}
+			//save to do the rest of the checks below
+			else {
+				savedWikidataIds.add(wikidataId);
+				savedWikidataJsons.add(wikidataJSON);
+				if(wikidataJSONLocalCache==null) {
+					isWikidataFromLocalCache.add(false);
+				}
+				else {
+					isWikidataFromLocalCache.add(true);
+				}
+			}
+		}
+		return null;
+	}
+	
+	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException { 
+		List<String> savedWikidataIds=new ArrayList<>();
+		List<String> savedWikidataJsons=new ArrayList<>();
+		List<Boolean> isWikidataFromLocalCache=new ArrayList<>();
 		if(namedEntity.getDbpediaWikidataIds()!=null) {
 			//first check if any of the ids match the prefLabel
 			for(String wikidataId : namedEntity.getDbpediaWikidataIds()) {
-				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
-				if(validWikidataPage(wikidataJSONResponse)) {
-					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
-						savedWikidataIds.add(wikidataId);
-						savedWikidataJsons.add(wikidataJSONResponse);
-						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-							return wikidataId;
-						}
-					}
-					else {
-						savedWikidataIds.add(wikidataId);
-						savedWikidataJsons.add(wikidataJSONResponse);
-						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-							return wikidataId;
-						}
-						
+				String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId);
+				String wikidataJSON=null;
+				if(wikidataJSONLocalCache!=null) {
+					wikidataJSON=wikidataJSONLocalCache;
+				}
+				else {
+					wikidataJSON=getWikidataJSONFromRemote(wikidataId);
+				}
+
+				if(validWikidataPage(wikidataJSON)) {		
+					String foundPreferredId = matchPrefLabelForPreferredWikidataId(namedEntity, wikidataId, wikidataJSONLocalCache, wikidataJSON, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+					if(foundPreferredId!=null) {
+						return foundPreferredId;
 					}
 				}
 			}
 			//then check if any of the ids match the altLabel
 			for(int i=0;i<savedWikidataJsons.size();i++) {
 				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					if(! isWikidataFromLocalCache.get(i)) {
+						//save to local cache and solr
+						HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, savedWikidataIds.get(i), savedWikidataJsons.get(i));
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(i),savedWikidataJsons.get(i),namedEntity.getType()), namedEntity.getType());
+					}					
+					else if(! solrWikidataEntityService.existWikidataURL(savedWikidataIds.get(i))) {
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(i),savedWikidataJsons.get(i),namedEntity.getType()), namedEntity.getType());
+					}
 					return savedWikidataIds.get(i);
 				}
 			}
-			return getTheLowestWikidataId(namedEntity.getDbpediaWikidataIds());
+			//get the lowest dbpedia wikidata id if no other matches found
+			int lowestWikidataIdIndex = getIndexOfTheLowestWikidataId(savedWikidataIds);
+			if(lowestWikidataIdIndex!=-1) {
+				if(! isWikidataFromLocalCache.get(lowestWikidataIdIndex)) {
+					HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, savedWikidataIds.get(lowestWikidataIdIndex), savedWikidataJsons.get(lowestWikidataIdIndex));
+					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(lowestWikidataIdIndex),savedWikidataJsons.get(lowestWikidataIdIndex),namedEntity.getType()), namedEntity.getType());
+				}
+				else if(! solrWikidataEntityService.existWikidataURL(savedWikidataIds.get(lowestWikidataIdIndex))) {
+					solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(lowestWikidataIdIndex),savedWikidataJsons.get(lowestWikidataIdIndex),namedEntity.getType()), namedEntity.getType());
+				}
+				return savedWikidataIds.get(lowestWikidataIdIndex);
+			}						
 		}		
 		else if(namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()!=null) {
 			//first check if any of the ids match the prefLabel
 			for(String wikidataId : namedEntity.getWikidataLabelAltLabelAndTypeMatchIds()) {
-				String wikidataJSONResponse = getWikidataJSONFromWikidataID(wikidataId);
-				if(validWikidataPage(wikidataJSONResponse)) {
-					if(matchType && matchTypeInWikidata(wikidataJSONResponse, namedEntity.getType())) {
-						savedWikidataIds.add(wikidataId);
-						savedWikidataJsons.add(wikidataJSONResponse);
-						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-							return wikidataId;
-						}
-					}
-					else {
-						savedWikidataIds.add(wikidataId);
-						savedWikidataJsons.add(wikidataJSONResponse);
-						if(matchPrefLabelInWikidata(wikidataJSONResponse, namedEntity.getLabel())) {
-							return wikidataId;
-						}
+				String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId);
+				String wikidataJSON=null;
+				if(wikidataJSONLocalCache!=null) {
+					wikidataJSON=wikidataJSONLocalCache;
+				}
+				else {
+					wikidataJSON=getWikidataJSONFromRemote(wikidataId);
+				}
+
+				if(validWikidataPage(wikidataJSON)) {
+					String foundPreferredId = matchPrefLabelForPreferredWikidataId(namedEntity, wikidataId, wikidataJSONLocalCache, wikidataJSON, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+					if(foundPreferredId!=null) {
+						return foundPreferredId;
 					}
 				}
 			}
 			//then check if any of the ids match the altLabel
 			for(int i=0;i<savedWikidataJsons.size();i++) {
 				if(matchAltLabelInWikidata(savedWikidataJsons.get(i), namedEntity.getLabel())) {
+					if(! isWikidataFromLocalCache.get(i)) {
+						HelperFunctions.saveWikidataJsonToLocalFileCache(wikidataDirectory, savedWikidataIds.get(i), savedWikidataJsons.get(i));
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(i),savedWikidataJsons.get(i),namedEntity.getType()), namedEntity.getType());
+					}					
+					else if(! solrWikidataEntityService.existWikidataURL(savedWikidataIds.get(i))) {
+						solrWikidataEntityService.storeWikidataEntity(getWikidataEntity(savedWikidataIds.get(i),savedWikidataJsons.get(i),namedEntity.getType()), namedEntity.getType());
+					}
 					return savedWikidataIds.get(i);
 				}
 			}
@@ -981,18 +1056,20 @@ public class WikidataServiceImpl implements WikidataService {
 		return null;
 	}
 
-	private String getTheLowestWikidataId(List<String> wikidataIds) {
-		if(wikidataIds.size()==0) {
-			return null;
+	private int getIndexOfTheLowestWikidataId(List<String> wikidataIds) {
+		if(wikidataIds.isEmpty()) {
+			return -1;
 		}
 		int lowestQId=Integer.valueOf(wikidataIds.get(0).substring(wikidataIds.get(0).lastIndexOf("/") + 2).trim());
-		for(String id : wikidataIds) {
-			int wikidataIdInt = Integer.valueOf(id.substring(id.lastIndexOf("/") + 2).trim());
+		int lowestIndex=0;
+		for(int i=0;i<wikidataIds.size();i++) {
+			int wikidataIdInt = Integer.valueOf(wikidataIds.get(i).substring(wikidataIds.get(i).lastIndexOf("/") + 2).trim());
 			if(wikidataIdInt<lowestQId) {
 				lowestQId=wikidataIdInt;
+				lowestIndex=i;
 			}
 		}
-		return EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + "Q" + lowestQId;
+		return lowestIndex;
 	}
 	
 	private Set<String> readWikidataSubclasses(String path) throws IOException {
