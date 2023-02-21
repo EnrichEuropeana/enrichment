@@ -65,13 +65,14 @@ public class TopicDaoImpl implements TopicDao{
 
 	@Override
 	public List<Topic> getByModelIdentifier(String modelIdentifier) {
-		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class).filter(eq(EnrichmentConstants.TOPIC_MODELID,modelIdentifier)).iterator();
+		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class)
+				.filter(eq(EnrichmentConstants.TOPIC_MODEL + "." + EnrichmentConstants.TOPIC_MODEL_IDENTIFIER, modelIdentifier))
+				.iterator();
 		List<Topic> list = new ArrayList<Topic>();
 		while (iter.hasNext())
 		{
 			list.add(iter.next());
-		}
-		
+		}		
 		return list ;
 	}
 

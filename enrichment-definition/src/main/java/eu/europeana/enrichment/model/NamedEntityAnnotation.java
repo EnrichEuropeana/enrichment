@@ -68,7 +68,7 @@ public interface NamedEntityAnnotation {
 	String getStoryId ();
 	
 	String getItemId ();
-	
+	void setItemId(String itemId);
 	
 	int hashCode();
 	public boolean equals(Object nea);

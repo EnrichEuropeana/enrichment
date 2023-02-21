@@ -89,6 +89,10 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		return itemId;
 	}
 	
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+	
 	public NamedEntityAnnotationImpl () {
 	}
 	
