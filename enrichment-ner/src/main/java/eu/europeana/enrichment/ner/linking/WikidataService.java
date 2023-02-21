@@ -5,6 +5,7 @@ import java.util.List;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 public interface WikidataService {
 
@@ -15,7 +16,7 @@ public interface WikidataService {
 	 * @param WikidataID			(e.g. http://www.wikidata.org/entity/Q762)
 	 * @return
 	 */
-	public String getWikidataJSONFromWikidataID(String WikidataID);
+	public String getWikidataJSONFromRemote(String WikidataID);
 	
 	/**
 	 * This method returns a value of the specific JSON field 
@@ -111,16 +112,8 @@ public interface WikidataService {
 	public List<String> getWikidataAgentIdWithLabel(String label, String language);
 	
 	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language);
-	
-	/**
-	 * This method creates and returns WikidataEntity based on the given wikidataURL
-	 * 
-	 * @param wikidataURL			a URL used to fetch the wikidata
-	 * @param type					(agent, place, etc.)
-	 * @return
-	 */
-	
-	public WikidataEntity getWikidataEntityUsingLocalCache (String wikidataURL, String type) throws IOException;
+		
+	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws IOException;
 
 	public WikidataEntity getWikidataEntity(String wikidataURL, String WikidataJSON, String type);
 	
@@ -130,5 +123,5 @@ public interface WikidataService {
 
 	List<String> getWikidataIdWithWikidataSearch(String label);
 	
-	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType);
+	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException;
 }

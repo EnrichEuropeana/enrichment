@@ -27,6 +27,13 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	Logger logger = LogManager.getLogger(getClass());
 
 	@Override
+	public List<NamedEntityAnnotationImpl> getAllNamedEntityAnnotations() {
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class)
+			.iterator()
+			.toList();
+	}
+
+	@Override
 	public NamedEntityAnnotation findNamedEntityAnnotation(String id) {
 		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
                 eq(EnrichmentConstants.ID, id))
