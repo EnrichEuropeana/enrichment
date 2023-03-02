@@ -6,10 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -143,8 +143,8 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				}
 				Translation googleResponse = googleTranslationService.translateText(textToTranslate, EnrichmentConstants.defaultTargetTranslationLanguage);
 				if(googleResponse!=null) {
-					String googleResponseText = Jsoup.parse(googleResponse.getTranslatedText()).text();
-					tmpTranslationEntity.setTranslatedText(googleResponseText);
+					String unescapedHtml = StringEscapeUtils.unescapeHtml4(googleResponse.getTranslatedText());
+					tmpTranslationEntity.setTranslatedText(unescapedHtml);
 					tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
 				}
 				break;
