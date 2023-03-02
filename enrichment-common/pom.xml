@@ -73,12 +73,6 @@
 <!-- 	    	<version>${version.jackson-jsonld}</version> -->
 <!-- 		</dependency> -->
 			
-		<!-- parsing html markup in Java -->
-		<dependency>
-	    	<groupId>org.jsoup</groupId>
-	    	<artifactId>jsoup</artifactId>
-	    	<version>${version.jsoup}</version>
-		</dependency>			
 	</dependencies>
 		
 	<build>

@@ -84,6 +84,9 @@ public class EnrichmentConstants {
 	public static final String PLACE_OF_BIRTH_JSONPROP = "claims.P19.mainsnak.datavalue.value.id";
 	public static final String PLACE_OF_DEATH_JSONPROP = "claims.P20.mainsnak.datavalue.value.id";
 	public static final String PROFESSIONOROCCUPATION_JSONPROP = "claims.P106.mainsnak.datavalue.value.id";
+	public static final String FAMILY_NAME_JSONPROP = "claims.P734.mainsnak.datavalue.value.id";
+	public static final String GIVEN_NAME_JSONPROP = "claims.P735.mainsnak.datavalue.value.id";
+
 	//this property is the latitude property
 	public static final String PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER = "P625";
 	public static final String PLACE_IDENTIFICATION_JSONPROP = "claims."+ PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER+".mainsnak.datavalue.value.latitude";

@@ -101,8 +101,11 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.wikidata.directory}")
     private String enrichWikidataDirectory;
-    
-    @Value("${transcribathon.base.url.stories}")
+
+    @Value("${enrich.wikidata.json.base.url}")
+    private String enrichWikidataJsonBaseUrl;
+
+	@Value("${transcribathon.base.url.stories}")
     private String transcribathonBaseUrlStories;
 
     @Value("${transcribathon.base.url.stories.minimal}")
@@ -356,4 +359,9 @@ public class EnrichmentConfiguration  {
 	public boolean getWikidataSaveJsonToLocalCache() {
 		return wikidataSaveJsonToLocalCache;
 	}	
+	
+    public String getEnrichWikidataJsonBaseUrl() {
+		return enrichWikidataJsonBaseUrl;
+	}
+	
 }

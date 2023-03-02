@@ -2,6 +2,7 @@ package eu.europeana.enrichment.ner.linking;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
@@ -124,4 +125,6 @@ public interface WikidataService {
 	List<String> getWikidataIdWithWikidataSearch(String label);
 	
 	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException;
+	
+	CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws IOException;
 }
