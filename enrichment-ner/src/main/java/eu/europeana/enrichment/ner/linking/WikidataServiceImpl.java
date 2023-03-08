@@ -148,8 +148,8 @@ public class WikidataServiceImpl implements WikidataService {
 	{
 		wikidataDirectory = enrichmentConfiguration.getEnrichWikidataDirectory();
 		//reading the files for the wikidata subclasses
-		wikidataSubclassesForPlace = new HashSet<String>(readWikidataSubclasses(enrichmentConfiguration.getWikidataSubclassesGeographicLocation()));
-		wikidataSubclassesForAgent = new HashSet<String>(readWikidataSubclasses(enrichmentConfiguration.getWikidataSubclassesHuman()));
+		wikidataSubclassesForPlace = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesGeographicLocation()));
+		wikidataSubclassesForAgent = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesHuman()));
 	}
 	
 	
@@ -396,7 +396,8 @@ public class WikidataServiceImpl implements WikidataService {
 	 * 
 	 * @return response body or null
 	 */
-	private String createRequest(String wikidataId, Map<String, String> params) {
+	private String createRequest(String wikidataId, Map<String, String> params, int... retry) {
+		int retryArgs[] = retry;
 		try {
 			String Q_identifier = wikidataId.substring(wikidataId.lastIndexOf("/") + 1);			
 			URIBuilder builder = new URIBuilder(configuration.getEnrichWikidataJsonBaseUrl() + Q_identifier + ".json");
@@ -420,8 +421,26 @@ public class WikidataServiceImpl implements WikidataService {
 
 		} catch (URISyntaxException | IOException e) {
 			// TODO Auto-generated catch block
-			logger.log(Level.ERROR, "Exception during the wikidata service call.", e);
-			return null;
+			logger.log(Level.ERROR, "Exception during the wikidata service call for wikidata id: " + wikidataId, e);
+			//retry
+			if(retryArgs.length==0) {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e1) {
+				}
+				return createRequest(wikidataId, params, 1);
+			}
+			else if(retryArgs.length==1 && retryArgs[0]<3) {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e1) {
+				}
+				return createRequest(wikidataId, params, retryArgs[0]+1);				
+			}
+			else {
+				logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId, e);
+				return null;
+			}
 		}
 
 	}
@@ -894,7 +913,8 @@ public class WikidataServiceImpl implements WikidataService {
 		return false;
 	}
 	
-	private boolean matchInstanceOfProperty(String wikidataJSONResponse, String type) {
+	@Override
+	public boolean matchInstanceOfProperty(String wikidataJSONResponse, String type) {
 		List<List<String>> jsonElement = getJSONFieldFromWikidataJSON(wikidataJSONResponse,EnrichmentConstants.INSTANCE_OF_JSONPROP);
 		if(!jsonElement.isEmpty())	
 		{
@@ -1073,7 +1093,7 @@ public class WikidataServiceImpl implements WikidataService {
 		return lowestIndex;
 	}
 	
-	private Set<String> readWikidataSubclasses(String path) throws IOException {
+	public Set<String> readWikidataIdsFromQueryServiceOutput(String path) throws IOException {
 		Set<String> wikidataIdentifiers = new HashSet<String>();
 		Path subclassesPlacePath = Path.of(path);
 		String subclassesPlaceString = Files.readString(subclassesPlacePath);

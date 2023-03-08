@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
-public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
+public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEntityAnnotation {
 
 	@JsonIgnore
 	private static String idBaseUrl;
@@ -145,6 +146,7 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		processing.setScore(score);
 		processing.setFoundByNerTools(new ArrayList<String>(nerTools));
 		this.processing=processing;
+		this.created = new Date();
 	}
 
 	@JsonProperty(EnrichmentConstants.TARGET)
