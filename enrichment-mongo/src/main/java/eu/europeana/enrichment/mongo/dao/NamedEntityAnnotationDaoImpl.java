@@ -106,7 +106,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 	
 	@Override
-	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property) {
+	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
@@ -116,6 +116,9 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	    }
 	    if(property!=null) {
 	    	filters.add(eq(EnrichmentConstants.PROPERTY, property));
+	    }
+	    if(wikidataId!=null) {
+	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
 	    }
 	    if(filters.size()==0) return 0;
 	    
@@ -132,7 +135,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, List<String> nerTools) {
+	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> nerTools) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
@@ -142,6 +145,9 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	    }
 	    if(property!=null) {
 	    	filters.add(eq(EnrichmentConstants.PROPERTY, property));
+	    }
+	    if(wikidataId!=null) {
+	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
 	    }
 	    if(nerTools!=null) {
 	    	filters.add(all(EnrichmentConstants.PROCESSING + "." + EnrichmentConstants.FOUND_BY_NER_TOOLS, nerTools));

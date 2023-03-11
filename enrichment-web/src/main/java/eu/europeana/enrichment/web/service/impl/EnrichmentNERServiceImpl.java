@@ -432,12 +432,12 @@ public class EnrichmentNERServiceImpl {
 	}
 
 	public NamedEntityAnnotationCollection getAnnotations(String storyId, String itemId, String property) throws Exception {
-		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
+		List<NamedEntityAnnotation> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null, null);
 		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId);
 	}
 	
 	public NamedEntityAnnotationCollection createAnnotations(String storyId, String itemId, String property) throws SolrServiceException, IOException {
-		List<NamedEntityAnnotation> namedEntityAnnos = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null);
+		List<NamedEntityAnnotation> namedEntityAnnos = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null, null);
 		if(namedEntityAnnos.isEmpty()) {
 			namedEntityAnnos = new ArrayList<NamedEntityAnnotation> ();
 			List<String> nerTools = new ArrayList<String>();
@@ -467,21 +467,8 @@ public class EnrichmentNERServiceImpl {
 		for(NamedEntityImpl ne : namedEntities) {
 			if(ne.getPreferedWikidataId()!=null) {
 				boolean alreadyExist = annos.stream().filter(el -> el.getWikidataId().equals(ne.getPreferedWikidataId())).findFirst().isPresent();
-				if(!alreadyExist) {
-					//getting Solr WikidataEntity prefLabel
-					WikidataEntity wikiEntity = solrWikidataEntityService.getWikidataEntity(ne.getPreferedWikidataId(), ne.getType());
-					String entityPrefLabel = ne.getLabel();
-					if(wikiEntity!=null)
-					{
-						Map<String, List<String>> prefLabelMap = wikiEntity.getPrefLabel();
-						if(prefLabelMap!=null && prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en")!=null 
-								&& prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").size()>0)
-							entityPrefLabel = prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").get(0);
-					}
-					//computing score
-					double score=computeScoreForAnnotations(nerTools,ne);
-											
-					NamedEntityAnnotationImpl tmpNamedEntityAnnotation = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),storyId,itemId, ne.getPreferedWikidataId(), ne.getLabel(), entityPrefLabel, property, ne.getType(), score, nerTools); 
+				if(!alreadyExist) {				
+					NamedEntityAnnotation tmpNamedEntityAnnotation = createAnno(ne, nerTools, storyId, itemId, property); 
 					annos.add(tmpNamedEntityAnnotation);					
 					//saving the entity to the db
 					persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(tmpNamedEntityAnnotation);
@@ -491,6 +478,24 @@ public class EnrichmentNERServiceImpl {
 
 	}
 
+	public NamedEntityAnnotation createAnno(NamedEntityImpl ne, List<String> nerTools, String storyId, String itemId, String property) throws SolrServiceException {
+		//getting Solr WikidataEntity prefLabel
+		WikidataEntity wikiEntity = solrWikidataEntityService.getWikidataEntity(ne.getPreferedWikidataId(), ne.getType());
+		String entityPrefLabel = ne.getLabel();
+		if(wikiEntity!=null)
+		{
+			Map<String, List<String>> prefLabelMap = wikiEntity.getPrefLabel();
+			if(prefLabelMap!=null && prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en")!=null 
+					&& prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").size()>0)
+				entityPrefLabel = prefLabelMap.get(EntitySolrFields.PREF_LABEL+".en").get(0);
+		}
+		//computing score
+		double score=computeScoreForAnnotations(nerTools,ne);
+								
+		return new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),storyId,itemId, ne.getPreferedWikidataId(), ne.getLabel(), entityPrefLabel, property, ne.getType(), score, nerTools); 
+		
+	}
+	
 	public NamedEntityAnnotation getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		
 		String wikidataIdGenerated=null;

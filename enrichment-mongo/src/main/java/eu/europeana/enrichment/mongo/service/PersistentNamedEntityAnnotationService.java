@@ -33,10 +33,11 @@ public interface PersistentNamedEntityAnnotationService {
 	 * @param storyId
 	 * @param itemId
 	 * @param property
+	 * @param wikidataId
 	 * @param nerTools
 	 * @return
 	 */
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, List<String> nerTools);
+	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> nerTools);
 
 	/**
 	 * This method retrieves an entity from the Mongo 
@@ -62,7 +63,7 @@ public interface PersistentNamedEntityAnnotationService {
 	 */
 	public void deleteNamedEntityAnnotationById(String id);
 	
-	public void deleteNamedEntityAnnotation(String storyId,String itemId, String property);
+	public void deleteNamedEntityAnnotation(String storyId,String itemId, String property, String wikidataId);
 
 	
 }

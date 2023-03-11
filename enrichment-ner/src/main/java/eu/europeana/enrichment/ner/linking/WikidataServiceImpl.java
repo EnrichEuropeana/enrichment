@@ -158,13 +158,13 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getWikidataId(String geonameId) {
+	public List<String> getWikidataId(String geonameId) throws Exception {
 		String query = String.format(geonamesIdQueryString, geonameId);
 		return processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 	}
 	
 	@Override
-	public List<String> getWikidataIdWithLabel(String label, String language) {
+	public List<String> getWikidataIdWithLabel(String label, String language) throws Exception {
 		String query = String.format(labelQueryString, label, language);
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(wikidataIDs!=null) {
@@ -179,7 +179,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getWikidataIdWithLabelAltLabel(String label, String language) {
+	public List<String> getWikidataIdWithLabelAltLabel(String label, String language) throws Exception {
 		String query = String.format(labelAltLabelQueryString, label, language);
 		List<String> wikidataIDs = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(wikidataIDs!=null) {
@@ -194,7 +194,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public List<String> getWikidataIdWithWikidataSearch(String label) {
+	public List<String> getWikidataIdWithWikidataSearch(String label) throws Exception {
 		/*
 		 * the params for the direct request to the wikidata search results page, in which case
 		 * the html as output would be received. An example: https://www.wikidata.org/w/index.php?search=Festung+Semendria&title=Special:Search&profile=advanced&fulltext=1&ns0=1
@@ -212,7 +212,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 
 	@Override
-	public List<String> getWikidataPlaceIdWithLabel(String label, String language) {
+	public List<String> getWikidataPlaceIdWithLabel(String label, String language) throws Exception {
 		String query = String.format(placeLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
@@ -222,7 +222,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) {
+	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) throws Exception {
 		String query = String.format(placeLabelAltLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
@@ -232,7 +232,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public List<String> getWikidataAgentIdWithLabel(String label, String language){
+	public List<String> getWikidataAgentIdWithLabel(String label, String language) throws Exception{
 		String query = String.format(agentlabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
@@ -242,7 +242,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language){
+	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language) throws Exception{
 		String query = String.format(agentlabelAltLabelQueryString, label, language);
 		List<String> result = processWikidataSparqlResponse(createRequest(baseUrlSparql, Collections.singletonMap("query", query)));
 		if(result!=null)
@@ -396,7 +396,7 @@ public class WikidataServiceImpl implements WikidataService {
 	 * 
 	 * @return response body or null
 	 */
-	private String createRequest(String wikidataId, Map<String, String> params, int... retry) {
+	private String createRequest(String wikidataId, Map<String, String> params, int... retry) throws Exception {
 		int retryArgs[] = retry;
 		try {
 			String Q_identifier = wikidataId.substring(wikidataId.lastIndexOf("/") + 1);			
@@ -439,14 +439,14 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			else {
 				logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId, e);
-				return null;
+				throw e;
 			}
 		}
 
 	}
 
 	@Override
-	public String getWikidataJSONFromRemote(String WikidataID) {
+	public String getWikidataJSONFromRemote(String WikidataID) throws Exception {
 		return createRequest(WikidataID, null);
 	}
 
@@ -570,7 +570,7 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	@Override
-	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws IOException {
+	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws Exception {
 		
 		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
 		String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
@@ -990,7 +990,7 @@ public class WikidataServiceImpl implements WikidataService {
 		return null;
 	}
 	
-	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException { 
+	public String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws Exception { 
 		List<String> savedWikidataIds=new ArrayList<>();
 		List<String> savedWikidataJsons=new ArrayList<>();
 		List<Boolean> isWikidataFromLocalCache=new ArrayList<>();
@@ -1118,7 +1118,7 @@ public class WikidataServiceImpl implements WikidataService {
 	
 	@Override
 	@Async
-	public CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws IOException {
+	public CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws Exception {
 		String response = createRequest(wikidataId, null);
 		if(response==null || !response.contains("entities")) {
 			return CompletableFuture.completedFuture(wikidataId);
