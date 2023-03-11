@@ -79,6 +79,10 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 	public String getWikidataId() {
 		return wikidataId;
 	}
+	
+	public void setWikidataId(String wikiId) {
+		this.wikidataId=wikiId;
+	}
 
 	@JsonIgnore
 	public String getStoryId() {

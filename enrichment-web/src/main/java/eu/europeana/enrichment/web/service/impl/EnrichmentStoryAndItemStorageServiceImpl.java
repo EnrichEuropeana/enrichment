@@ -59,7 +59,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				persistentItemEntityService.deleteAllItemsOfStory(dbStory.getStoryId());
 				persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, null);
 				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, null);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, null);
+				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, null, null);
 				dbStory=null;
 			}
 			else {
@@ -67,19 +67,19 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, null);
 				}
 				if(! StringUtils.equals(dbStory.getSummary(), tpStory.getSummary()))
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY, null);
 				}
 				if(! StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText()))
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, null);
 				}
 				
 				dbStory.copyFromStory(tpStory);				
@@ -99,7 +99,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				persistentItemEntityService.deleteItemEntity(dbItem);
 				persistentTranslationEntityService.deleteTranslationEntity(null, dbItem.getItemId(), null);
 				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(null, dbItem.getItemId(), null);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), null);
+				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), null, null);
 				dbItem=null;
 			}
 			else {
@@ -107,7 +107,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(null, dbItem.getItemId(),EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(null, dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, null);
 				}	
 				dbItem.copyFromItem(tpItem);
 				persistentItemEntityService.saveItemEntity(dbItem);
@@ -134,19 +134,19 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, null);
 					}
 					else if(! StringUtils.equals(dbStoryEntity.getSummary(), story.getSummary()))
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY, null);
 					}
 					else if(! StringUtils.equals(dbStoryEntity.getTranscriptionText(), story.getTranscriptionText()))
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, null);
 					}					
 					dbStoryEntity.copyFromStory(story);
 					persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
@@ -179,7 +179,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, null);
 					}	
 					dbItemEntity.copyFromItem(item);
 					persistentItemEntityService.saveItemEntity(dbItemEntity);

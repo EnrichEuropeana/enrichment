@@ -11,10 +11,10 @@ public interface NamedEntityAnnotationDao {
 	public NamedEntityAnnotation findNamedEntityAnnotation(String id);
 	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId);
 	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId);
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, List<String> nerTools);
+	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> nerTools);
 	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity);
 	public long deleteNamedEntityAnnotationById(String id);
-	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property);
+	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId);
 	public void deleteAllNamedEntityAnnotation();
 
 }

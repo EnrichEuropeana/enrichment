@@ -63,7 +63,8 @@ public interface NamedEntityAnnotation {
 	Map<String,Object> getBody ();
 	void setBody (Map<String,Object> bodyParam);
 
-	String getWikidataId ();
+	String getWikidataId();
+	void setWikidataId(String wikiId);
 
 	String getStoryId ();
 	
