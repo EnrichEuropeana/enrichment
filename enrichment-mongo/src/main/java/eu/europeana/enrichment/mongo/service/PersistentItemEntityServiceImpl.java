@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
@@ -18,11 +17,11 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	ItemEntityDao itemEntityDao;
 	
 	@Override
-	public ItemEntity findItemEntity(String storyId, String itemId) {
+	public ItemEntityImpl findItemEntity(String storyId, String itemId) {
 		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}
 	
-	public ItemEntity findItemEntity(String itemId) {
+	public ItemEntityImpl findItemEntity(String itemId) {
 		return itemEntityDao.findItemEntity(itemId);
 	}
 	
@@ -32,32 +31,32 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId) {
+	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId) {
 		// TODO Auto-generated method stub
 		return itemEntityDao.findStoryItemEntitiesFromStory(storyId);
 	}
 
 	@Override
-	public List<ItemEntity> getAllItemEntities() {
+	public List<ItemEntityImpl> getAllItemEntities() {
 
 		return itemEntityDao.findAllItemEntities();
 
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) {
+	public void saveItemEntity(ItemEntityImpl entity) {
 		itemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
-	public void saveStoryItemEntities(List<ItemEntity> entities) {
-		for(ItemEntity entity : entities) {
+	public void saveStoryItemEntities(List<ItemEntityImpl> entities) {
+		for(ItemEntityImpl entity : entities) {
 			saveItemEntity(entity);
 		}
 	}
 
 	@Override
-	public void deleteItemEntity(ItemEntity entity) {
+	public void deleteItemEntity(ItemEntityImpl entity) {
 		itemEntityDao.deleteItemEntity(entity);
 	}
 
@@ -67,7 +66,7 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 	
 	@Override
-	public ItemEntity findItemEntityFromStory(String storyId, String itemId) {
+	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId) {
 		
 		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
 	}

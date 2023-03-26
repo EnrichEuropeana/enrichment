@@ -12,18 +12,16 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 @Embedded
 public class Processing {
 
+	//this field is a concatenated string of ner tools, first being dbpedia, e.g. DBpedia_Spotlight,Stanford_NER or only Stanford_NER
 	@Property(EnrichmentConstants.FOUND_BY_NER_TOOLS)
 	private List<String> foundByNerTools;
+	//this field has the same format as foundByNerTools
+	@Property(EnrichmentConstants.LINKED_BY_NER_TOOLS)
+	private List<String> linkedByNerTools;
 	
 	private String matching;
 	private double score;
 
-	public List<String> getFoundByNerTools() {
-		return foundByNerTools;
-	}
-	public void setFoundByNerTools(List<String> foundByNerTools) {
-		this.foundByNerTools = foundByNerTools;
-	}
 	public String getMatching() {
 		return matching;
 	}
@@ -36,5 +34,16 @@ public class Processing {
 	public void setScore(double score) {
 		this.score = score;
 	}	
-	
+	public List<String> getFoundByNerTools() {
+		return foundByNerTools;
+	}
+	public void setFoundByNerTools(List<String> foundByNerTools) {
+		this.foundByNerTools = foundByNerTools;
+	}
+	public List<String> getLinkedByNerTools() {
+		return linkedByNerTools;
+	}
+	public void setLinkedByNerTools(List<String> linkedByNerTools) {
+		this.linkedByNerTools = linkedByNerTools;
+	}	
 }

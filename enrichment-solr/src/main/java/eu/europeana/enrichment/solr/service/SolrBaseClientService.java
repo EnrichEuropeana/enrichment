@@ -5,9 +5,6 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 public interface SolrBaseClientService {

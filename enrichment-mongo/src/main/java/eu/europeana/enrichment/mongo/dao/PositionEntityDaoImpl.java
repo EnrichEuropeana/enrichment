@@ -30,56 +30,39 @@ public class PositionEntityDaoImpl {
 				.iterator()
 				.toList();
 	}
-	
-	public PositionEntityImpl findPositionEntitiesForNerTool(String storyId, String itemId, String fieldForNer, String nerTool) {
-		return enrichmentDatastore.find(PositionEntityImpl.class).filter(
-				eq(EnrichmentConstants.STORY_ID, storyId),
-				eq(EnrichmentConstants.ITEM_ID, itemId),
-				eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer),
-                eq(EnrichmentConstants.NER_TOOLS, nerTool))
-				.first();
-	}
-	
+		
 	public void savePositionEntity(PositionEntityImpl position) {
 		this.enrichmentDatastore.save(position);
 	}
 	
-	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
+	public PositionEntityImpl findPositionEntity(ObjectId namedEntityId, String storyId, String itemId, String fieldForNer) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(namedEntityId!=null) {
-	    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
-	    }
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(fieldForNer!=null) {
-	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
-	    }
-    	filters.add(eq(EnrichmentConstants.OFFSETS_TRANSLATED_TEXT, offsetTranslatedText));
+    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
+    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
+    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
 	    
 		return enrichmentDatastore
 				.find(PositionEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))
 				.first();
 	}
-	
+
+	public List<PositionEntityImpl> findPositionEntities(String storyId, String itemId, String fieldForNer) {
+	    List<Filter> filters = new ArrayList<>();
+    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
+    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
+	    
+		return enrichmentDatastore
+				.find(PositionEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
+				.iterator()
+				.toList();
+	}
+
 	public List<PositionEntityImpl> getAllPositionEntities() {
-		List<PositionEntityImpl> queryResult = enrichmentDatastore.find(PositionEntityImpl.class).iterator().toList();
-		if(queryResult.size()>0)
-		{
-			List<PositionEntityImpl> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				PositionEntityImpl dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-		else {
-			return queryResult;
-		}
+		return enrichmentDatastore.find(PositionEntityImpl.class).iterator().toList();
 	}
 
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_STORY_ENTITY_DAO)
@@ -24,7 +23,7 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	private static Map<String, List<String>> nerToolsForStory = new HashMap<String, List<String>>();	
 	
 	@Override
-	public StoryEntity findStoryEntity(String key) {
+	public StoryEntityImpl findStoryEntity(String key) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
                 eq(EnrichmentConstants.STORY_ID, key))
                 .first();
@@ -38,13 +37,13 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	}
 
 	@Override
-	public void saveStoryEntity(StoryEntity entity) {
+	public void saveStoryEntity(StoryEntityImpl entity) {
 		if(entity==null) return;
 		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override
-	public void deleteStoryEntity(StoryEntity entity) {
+	public void deleteStoryEntity(StoryEntityImpl entity) {
 		enrichmentDatastore.find(StoryEntityImpl.class).filter(
             eq(EnrichmentConstants.OBJECT_ID,entity.getId()))
 			.delete();
@@ -59,19 +58,8 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	}
 
 	@Override
-	public List<StoryEntity> findAllStoryEntities() {
-		List<StoryEntityImpl> queryResult = enrichmentDatastore.find(StoryEntityImpl.class).iterator().toList();
-		if(queryResult.isEmpty())
-			return null;
-		else
-		{
-			List<StoryEntity> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				StoryEntity dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
+	public List<StoryEntityImpl> findAllStoryEntities() {
+		return enrichmentDatastore.find(StoryEntityImpl.class).iterator().toList();
 	}
 
 	@Override

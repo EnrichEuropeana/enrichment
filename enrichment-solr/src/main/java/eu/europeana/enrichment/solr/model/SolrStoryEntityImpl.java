@@ -9,16 +9,15 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 
-public class SolrStoryEntityImpl extends StoryEntityImpl implements StoryEntity {
+public class SolrStoryEntityImpl extends StoryEntityImpl {
 	
 	private String descriptionEnNonorm;
 
-	public SolrStoryEntityImpl (StoryEntity copy) {
+	public SolrStoryEntityImpl (StoryEntityImpl copy) {
 		this.setStoryId(copy.getStoryId());
 		this.setTranscriptionText(copy.getTranscriptionText());
 		this.setDescription(copy.getDescription());

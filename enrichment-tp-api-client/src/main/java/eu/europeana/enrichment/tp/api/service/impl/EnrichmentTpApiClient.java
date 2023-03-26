@@ -17,8 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.tp.api.client.model.CompletionStatus;
@@ -35,7 +33,7 @@ public class EnrichmentTpApiClient {
 	@Autowired
 	EnrichmentConfiguration configuration;
 		
-	public StoryEntity getStoryFromTranscribathonMinimalStory(String storyId) {
+	public StoryEntityImpl getStoryFromTranscribathonMinimalStory(String storyId) {
 		Story storyMinimal = getTranscribathonMinimalStory(storyId);
 		if(storyMinimal!=null) {
 			return convertTranscribathonStoryToLocalStory(storyMinimal);
@@ -45,7 +43,7 @@ public class EnrichmentTpApiClient {
 		}
 	}
 
-	public ItemEntity getItemFromTranscribathon(String itemId) {
+	public ItemEntityImpl getItemFromTranscribathon(String itemId) {
 		Item tpItem = getTranscribathonItem(itemId);
 		if(tpItem!=null) {
 			return convertTranscribathonItemToLocalItem(tpItem);
@@ -117,8 +115,8 @@ public class EnrichmentTpApiClient {
 		}
 	}
 
-	private StoryEntity convertTranscribathonStoryToLocalStory(Story storyMinimal) {	
-		StoryEntity newStory = new StoryEntityImpl();
+	private StoryEntityImpl convertTranscribathonStoryToLocalStory(Story storyMinimal) {	
+		StoryEntityImpl newStory = new StoryEntityImpl();
 		newStory.setStoryId(storyMinimal.StoryId.toString());
 		newStory.setDescription(storyMinimal.dcDescription);
 		newStory.setSummary(storyMinimal.Summary);
@@ -140,9 +138,9 @@ public class EnrichmentTpApiClient {
 		return newStory;
 	}
 
-	private ItemEntity convertTranscribathonItemToLocalItem (Item item) {
+	private ItemEntityImpl convertTranscribathonItemToLocalItem (Item item) {
 		if(item.Transcriptions==null) return null;
-		ItemEntity newItem = new ItemEntityImpl();
+		ItemEntityImpl newItem = new ItemEntityImpl();
 		boolean foundTranscription = false;
 		for (Transcription trElem : item.Transcriptions) {
 			if(trElem.TextNoTags!=null && !trElem.TextNoTags.isBlank())

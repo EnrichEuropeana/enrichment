@@ -127,6 +127,7 @@ public class EnrichmentConstants {
 	public static final String NER_TOOLS = "nerTools";
 	public static final String PROCESSING = "processing";
 	public static final String FOUND_BY_NER_TOOLS = "foundByNerTools";
+	public static final String LINKED_BY_NER_TOOLS = "linkedByNerTools";
 	public static final String POSITION_NAMED_ENTITY = "namedEntityId";
 	public static final String TOTAL = "total";
 	public static final String ITEMS = "items";
@@ -181,11 +182,15 @@ public class EnrichmentConstants {
 	public static final String ModelsURL = "";
 
 	//ner analysis
-	public static final String stanfordNer = "Stanford_NER";
-	public static final String dbpediaSpotlightName = "DBpedia_Spotlight";
-	public static final String defaultLinkingTool = "Wikidata";
-	public static final String europeanaLinkingTool = "Europeana";
+	public static final String WIKIDATA_LINKING = "Wikidata";
+	public static final String EUROPEANA_LINKING = "Europeana";
 	public static final String LINKING = "linking";
+	public static final String PREF_WIKI_ID_STATUS_CROSSVALID_PREF_LABEL="crossvalidated_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_CROSSVALID_ALT_LABEL="crossvalidated_alt_label";
+	public static final String PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL="validated_dbp_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL="validated_dbp_alt_label";
+	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL="validated_stanford_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL="validated_stanford_alt_label";
 	
 	//solr denormalization fields
     public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";

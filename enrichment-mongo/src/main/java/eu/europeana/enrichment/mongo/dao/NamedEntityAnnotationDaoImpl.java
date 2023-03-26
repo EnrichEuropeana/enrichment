@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
@@ -34,14 +33,14 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public NamedEntityAnnotation findNamedEntityAnnotation(String id) {
+	public NamedEntityAnnotationImpl findNamedEntityAnnotation(String id) {
 		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
                 eq(EnrichmentConstants.ID, id))
                 .first();
 	}
 
 	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId) {
+	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
@@ -53,25 +52,14 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	    	return new ArrayList<>();
 	    }
 
-		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore.find(NamedEntityAnnotationImpl.class)
+		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class)
 				.filter(filters.toArray(Filter[]::new))			
 				.iterator()
 				.toList();
-		if(queryResult.isEmpty())
-			return new ArrayList<>();
-		else
-		{
-			List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntityAnnotation dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
 	}
 
 	@Override
-	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) 
+	public NamedEntityAnnotationImpl findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) 
 	{
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
@@ -93,7 +81,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 	
 	@Override
-	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity) {
+	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
 		this.enrichmentDatastore.save(entity);
 	}
 
@@ -135,7 +123,7 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> nerTools) {
+	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
@@ -149,24 +137,18 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	    if(wikidataId!=null) {
 	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
 	    }
-	    if(nerTools!=null) {
-	    	filters.add(all(EnrichmentConstants.PROCESSING + "." + EnrichmentConstants.FOUND_BY_NER_TOOLS, nerTools));
+	    if(linkedByNerTools!=null) {
+	    	filters.add(all(EnrichmentConstants.PROCESSING + "." + EnrichmentConstants.LINKED_BY_NER_TOOLS, linkedByNerTools));
 	    }
 	    if(filters.size()==0) {
 	    	return new ArrayList<>();
 	    }
 
-		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore
+		return enrichmentDatastore
 				.find(NamedEntityAnnotationImpl.class)
 				.filter(filters.toArray(Filter[]::new))			
 				.iterator()
 				.toList();
 
-		List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-		for(int index = 0; index < queryResult.size(); index++) {
-			NamedEntityAnnotation dbEntity = queryResult.get(index);
-			tmpResult.add(dbEntity);
-		}
-		return tmpResult;
 	}
 }

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.tp.api.service.impl.EnrichmentTpApiClient;
 
@@ -27,7 +27,7 @@ public class TranscribathonConcurrentCallServiceImpl {
      */
 	@Async
 	public CompletableFuture<String> callStoryMinimalService(String storyId) throws Exception {
-		StoryEntity fetchedStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
+		StoryEntityImpl fetchedStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
 		persistentStoryEntityService.saveStoryEntity(fetchedStory);
 		if(fetchedStory!=null)
 			return CompletableFuture.completedFuture(null);

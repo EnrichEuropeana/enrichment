@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
@@ -26,29 +24,17 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	@Autowired
 	private Datastore enrichmentDatastore; 
 	
-	private void addItemEntity(TranslationEntityImpl dbEntity) {
-		StoryEntity dbItemEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
-		dbEntity.setStoryEntity(dbItemEntity);
-	}
-	
 	@Override
-	public TranslationEntity findTranslationEntity(String key) {
-		TranslationEntityImpl dbEntity = enrichmentDatastore.find(TranslationEntityImpl.class).filter(
+	public TranslationEntityImpl findTranslationEntity(String key) {
+		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
                 eq(EnrichmentConstants.KEY, key))
                 .first();
-		if(dbEntity==null)
-			return null;
-		else {
-			addItemEntity(dbEntity);
-			return dbEntity;
-		}
 	}
 	
 	@Override
-	public List<TranslationEntity> findAllTranslationEntities(boolean onlyItems, boolean onlyStories) {
-		List<TranslationEntityImpl> queryResult = null; 
+	public List<TranslationEntityImpl> findAllTranslationEntities(boolean onlyItems, boolean onlyStories) {
 		if(!onlyItems && !onlyStories) {
-			queryResult = enrichmentDatastore.find(TranslationEntityImpl.class).iterator().toList();
+			return enrichmentDatastore.find(TranslationEntityImpl.class).iterator().toList();
 		}
 		else {
 			List<Filter> filters = new ArrayList<>();
@@ -58,26 +44,14 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			else {
 				filters.add(eq(EnrichmentConstants.ITEM_ID, null));
 			}
-	    	queryResult = enrichmentDatastore.find(TranslationEntityImpl.class)
-					.filter(filters.toArray(Filter[]::new))
-	                .iterator().toList();
-		}	
-		
-		if(queryResult==null)
-			return new ArrayList<>();
-		else
-		{
-			List<TranslationEntity> tmpResult = new ArrayList<>();
-			for(int index = 0; index < queryResult.size(); index++) {
-				TranslationEntity dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}		
+	    	return enrichmentDatastore.find(TranslationEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))
+                .iterator().toList();
+		}			
 	}
 
 	@Override
-	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
+	public TranslationEntityImpl findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
@@ -107,7 +81,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 	
 	@Override
-	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId,
+	public TranslationEntityImpl findTranslationEntityWithAditionalInformation(String storyId, String itemId,
 			String tool, String language, String type) {
 	    List<Filter> filters = new ArrayList<>();
 	    if(storyId!=null) {
@@ -162,12 +136,12 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) {
+	public void saveTranslationEntity(TranslationEntityImpl entity) {
 		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override
-	public void deleteTranslationEntity(TranslationEntity entity) {
+	public void deleteTranslationEntity(TranslationEntityImpl entity) {
 		enrichmentDatastore.find(TranslationEntityImpl.class).filter(
 			eq(EnrichmentConstants.OBJECT_ID,entity.getId()))
 			.delete();			

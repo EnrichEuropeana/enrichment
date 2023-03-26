@@ -1,20 +1,15 @@
 package eu.europeana.enrichment.solr.service;
 
-import java.io.IOException;
-
 import javax.annotation.Resource;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.params.CommonParams;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrStoryEntityImpl;
@@ -36,7 +31,7 @@ public class SolrEntityPositionsServiceTest {
 	public void test() throws SolrServiceException {
 		
 		//StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("bookDumitruTest2");
-		StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity("1495");
+		StoryEntityImpl dbStoryEntity = persistentStoryEntityService.findStoryEntity("1495");
 			
 		//delete all documents first
 		//solrEntityService.deleteByQuery("*");

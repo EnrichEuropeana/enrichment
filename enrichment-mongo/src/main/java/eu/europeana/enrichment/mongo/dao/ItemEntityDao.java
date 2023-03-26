@@ -2,7 +2,6 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 
 /*
@@ -10,17 +9,17 @@ import eu.europeana.enrichment.model.impl.ItemEntityImpl;
  */
 public interface ItemEntityDao {
 
-	public ItemEntity findItemEntityFromStory (String storyId, String itemId);
+	public ItemEntityImpl findItemEntityFromStory (String storyId, String itemId);
 	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId);
-	public List<ItemEntity> findAllItemEntities ();
-	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
+	public List<ItemEntityImpl> findAllItemEntities ();
+	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
-	public void saveItemEntity(ItemEntity entity);
-	public void deleteItemEntity(ItemEntity entity);
+	public void saveItemEntity(ItemEntityImpl entity);
+	public void deleteItemEntity(ItemEntityImpl entity);
 	public long deleteAllItemsOfStory(String storyId);
 	public void updateNerToolsForItem(String itemId, String nerTool);
 	public List<String> getNerToolsForItem(String itemId);
 //	public int getNumerAnalysedNamedEntities(String field);
 //	public void setNumerAnalysedNamedEntities(String field, int num);
-	public ItemEntity findItemEntity(String itemId);
+	public ItemEntityImpl findItemEntity(String itemId);
 }

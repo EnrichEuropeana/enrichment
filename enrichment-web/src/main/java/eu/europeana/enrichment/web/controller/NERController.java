@@ -26,6 +26,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
@@ -78,15 +79,17 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = false) String nerTools,
 			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
+			@RequestParam(value = "force", required = false,defaultValue = "false") Boolean force,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 	
 		verifyWriteAccess(Operations.CREATE, request);
 		
 		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
-		if(linking==null) linking=EnrichmentConstants.defaultLinkingTool;
-		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
+		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 		if(original==null) original=false;
+		if(force==null) force=false;
 		
 		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
@@ -94,14 +97,20 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 		
-		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
 		String resultJsonLd = null;
-		if(!result.isEmpty()) {
-			resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
-		}
-		else {	
-			enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, true, linkingList, translationTool, original, false);
+		if(force) {
+			enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false, true);
 			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+		}
+		else {
+			List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);			
+			if(!result.isEmpty()) {
+				resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
+			}
+			else {	
+				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false, true);
+				resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+			}
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;
@@ -121,7 +130,7 @@ public class NERController extends BaseRest {
 		verifyReadAccess(request);
 		
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
-		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 	
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateBaseParamsForNEROrTranslation(storyId, null, property, false);
@@ -159,16 +168,18 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = false) String nerTools,
-			@RequestParam(value = "original", required = false,defaultValue = "false") Boolean original,
+			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
+			@RequestParam(value = "force", required = false, defaultValue = "false") Boolean force,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 
 		verifyWriteAccess(Operations.CREATE, request);
 		
 		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
-		if(linking==null) linking=EnrichmentConstants.defaultLinkingTool;
-		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
+		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 		if(original==null) original=false;
+		if(force==null) force=false;
 		
 		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
@@ -176,14 +187,20 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 	
-		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
 		String resultJsonLd = null;
-		if(!result.isEmpty()) {
-			resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
+		if(force) {
+			enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false, true);
+			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";			
 		}
-		else {	
-			enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, true, linkingList, translationTool, original, false);
-			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+		else {
+			List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
+			if(!result.isEmpty()) {
+				resultJsonLd="{\"Result\" : \"NamedEntity-s have been already created! Please use get method to get them!\"}";
+			}
+			else {	
+				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false, true);
+				resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+			}
 		}
 		
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
@@ -205,7 +222,7 @@ public class NERController extends BaseRest {
 		verifyReadAccess(request);
 
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
-		if(nerTools==null) nerTools=EnrichmentConstants.dbpediaSpotlightName + "," + EnrichmentConstants.stanfordNer;
+		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 	
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateBaseParamsForNEROrTranslation(storyId, itemId, property, true);

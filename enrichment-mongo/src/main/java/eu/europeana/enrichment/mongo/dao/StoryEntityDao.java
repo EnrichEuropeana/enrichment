@@ -2,7 +2,6 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 
 /*
@@ -10,11 +9,11 @@ import eu.europeana.enrichment.model.impl.StoryEntityImpl;
  */
 public interface StoryEntityDao {
 
-	public StoryEntity findStoryEntity(String key);
+	public StoryEntityImpl findStoryEntity(String key);
 	public List<StoryEntityImpl> findStoryEntities(String key);
-	public List<StoryEntity> findAllStoryEntities();
-	public void saveStoryEntity(StoryEntity entity);
-	public void deleteStoryEntity(StoryEntity entity);
+	public List<StoryEntityImpl> findAllStoryEntities();
+	public void saveStoryEntity(StoryEntityImpl entity);
+	public void deleteStoryEntity(StoryEntityImpl entity);
 	public long deleteStoryEntityByStoryId(String key);
 	public void updateNerToolsForStory(String storyId, String nerTool);
 	public List<String> getNerToolsForStory(String storyId);

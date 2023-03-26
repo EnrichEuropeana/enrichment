@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.dao.StoryEntityDao;
 
@@ -17,7 +16,7 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	StoryEntityDao storyEntityDao;
 	
 	@Override
-	public StoryEntity findStoryEntity(String storyId) {
+	public StoryEntityImpl findStoryEntity(String storyId) {
 		return storyEntityDao.findStoryEntity(storyId);
 	}
 	
@@ -27,24 +26,24 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	}
 
 	@Override
-	public List<StoryEntity> getAllStoryEntities() {
+	public List<StoryEntityImpl> getAllStoryEntities() {
 		return storyEntityDao.findAllStoryEntities();
 	}
 
 	@Override
-	public void saveStoryEntity(StoryEntity entity) {
+	public void saveStoryEntity(StoryEntityImpl entity) {
 		storyEntityDao.saveStoryEntity(entity);
 	}
 
 	@Override
-	public void saveStoryEntities(List<StoryEntity> entities) {
-		for(StoryEntity entity : entities) {
+	public void saveStoryEntities(List<StoryEntityImpl> entities) {
+		for(StoryEntityImpl entity : entities) {
 			saveStoryEntity(entity);
 		}
 	}
 
 	@Override
-	public void deleteStoryEntity(StoryEntity entity) {
+	public void deleteStoryEntity(StoryEntityImpl entity) {
 		storyEntityDao.deleteStoryEntity(entity);
 	}
 	

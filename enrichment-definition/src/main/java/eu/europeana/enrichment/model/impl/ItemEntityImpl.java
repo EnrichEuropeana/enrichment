@@ -16,18 +16,16 @@ import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.Transient;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
 
 @Entity(value = "ItemEntityImpl")
-public class ItemEntityImpl implements ItemEntity {
+public class ItemEntityImpl {
 
 	// id will be used for storing MongoDB _id
 	@Id
 	private ObjectId _id;
 
 	@Transient
-	private StoryEntity storyEntity;
+	private StoryEntityImpl storyEntity;
 
 	@Indexed(options = @IndexOptions(unique = true))
 	private String itemId;
@@ -41,7 +39,7 @@ public class ItemEntityImpl implements ItemEntity {
 	private String source;
 	private List<String> keywords;
 
-	public ItemEntityImpl(ItemEntity item) {
+	public ItemEntityImpl(ItemEntityImpl item) {
 		this.itemId = item.getItemId();
 		this.type = item.getType();
 		this.transcriptionText = item.getTranscriptionText();
@@ -57,52 +55,42 @@ public class ItemEntityImpl implements ItemEntity {
 
 	}
 
-	@Override
 	public String getStoryId() {
 		return storyId;
 	}
 
-	@Override
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}
 
-	@Override
 	public String getItemId() {
 		return itemId;
 	}
 
-	@Override
 	public void setItemId(String storyItemId) {
 		this.itemId = storyItemId;
 	}
 
-	@Override
 	public String getType() {
 		return this.type;
 	}
 
-	@Override
 	public void setType(String textType) {
 		this.type = textType;
 	}
 
-	@Override
 	public String getTranscriptionText() {
 		return transcriptionText;
 	}
 
-	@Override
 	public void setTranscriptionText(String transcriptionText) {
 		this.transcriptionText = transcriptionText;
 	}
 
-	@Override
 	public String getKey() {
 		return hashKey;
 	}
 
-	@Override
 	public void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		MessageDigest digest = MessageDigest.getInstance("SHA-256");
 		String textWithoutWithespace = text.replaceAll("\\s+", "");
@@ -110,45 +98,26 @@ public class ItemEntityImpl implements ItemEntity {
 		hashKey = new String(hash, "UTF-8");
 	}
 
-	@Override
 	public String getTitle() {
 		return title;
 	}
 
-	@Override
 	public void setTitle(String itemTitle) {
 		this.title = itemTitle;
 	}
 
-	@Override
 	public String getSource() {
 
 		return source;
 	}
 
-	@Override
 	public void setSource(String sourceParam) {
 		this.source = sourceParam;
 
 	}
 
-	@Override
 	public ObjectId getId() {
 		return _id;
-	}
-
-	@Override
-	public StoryEntity getStoryEntity() {
-		return storyEntity;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity storyEntity) {
-		this.storyEntity = storyEntity;
-		if (storyEntity != null)
-			setStoryId(storyEntity.getStoryId());
-		else
-			setStoryId(null);
 	}
 
 	public List<String> getKeywords() {
@@ -167,8 +136,7 @@ public class ItemEntityImpl implements ItemEntity {
 		this.transcriptionLanguages = transcriptionLanguages;
 	}
 
-	@Override
-	public void copyFromItem(ItemEntity item) {
+	public void copyFromItem(ItemEntityImpl item) {
 		this.setItemId(item.getItemId());
 		if(item.getKeywords()!=null) this.setKeywords(new ArrayList<>(item.getKeywords()));
 		this.setSource(item.getSource());
