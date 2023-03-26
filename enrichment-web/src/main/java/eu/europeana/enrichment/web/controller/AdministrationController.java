@@ -26,8 +26,8 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -68,7 +68,7 @@ public class AdministrationController extends BaseRest {
 	@RequestMapping(value = "/administration/updateStories", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateStories(
-			@RequestBody StoryEntity [] body,
+			@RequestBody StoryEntityImpl [] body,
 			HttpServletRequest request) throws HttpException {
 		
 		verifyWriteAccess(Operations.CREATE, request);
@@ -76,7 +76,7 @@ public class AdministrationController extends BaseRest {
 		if(body==null) {
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
 		}
-		for(StoryEntity story: body) {
+		for(StoryEntityImpl story: body) {
 			validateStory(story);
 		}
 		
@@ -148,7 +148,7 @@ public class AdministrationController extends BaseRest {
 	@RequestMapping(value = "/administration/updateItems", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateItems(
-			@RequestBody ItemEntity [] body,
+			@RequestBody ItemEntityImpl [] body,
 			HttpServletRequest request) throws HttpException, Exception {
 		
 		verifyWriteAccess(Operations.CREATE, request);
@@ -156,7 +156,7 @@ public class AdministrationController extends BaseRest {
 		if(body==null) {
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
 		}
-		for(ItemEntity item: body) {
+		for(ItemEntityImpl item: body) {
 			validateItem(item);
 		}
 		

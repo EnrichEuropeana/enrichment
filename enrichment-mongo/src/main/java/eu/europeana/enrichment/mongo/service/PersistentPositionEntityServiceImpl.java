@@ -19,19 +19,19 @@ public class PersistentPositionEntityServiceImpl {
 	public List<PositionEntityImpl> findPositionEntities(ObjectId namedEntityId) {
 		return positionEntityDao.findPositionEntities(namedEntityId);
 	}
-
-	public PositionEntityImpl findPositionEntitiesForNerTool(String storyId, String itemId, String fieldForNer, String nerTool) {
-		return positionEntityDao.findPositionEntitiesForNerTool(storyId, itemId, fieldForNer, nerTool);
-	}
 	
 	public void savePositionEntity(PositionEntityImpl position) {
 		positionEntityDao.savePositionEntity(position);
 	}
 	
-	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
-		return positionEntityDao.findPositionEntities(namedEntityId, storyId, itemId, offsetTranslatedText, fieldForNer);
+	public PositionEntityImpl findPositionEntity(ObjectId namedEntityId, String storyId, String itemId, String fieldForNer) {
+		return positionEntityDao.findPositionEntity(namedEntityId, storyId, itemId, fieldForNer);
 	}
-	
+
+	public List<PositionEntityImpl> findPositionEntities(String storyId, String itemId, String fieldForNer) {
+		return positionEntityDao.findPositionEntities(storyId, itemId, fieldForNer);
+	}
+
 	public List<PositionEntityImpl> getAllPositionEntities() {
 		return positionEntityDao.getAllPositionEntities();
 	}

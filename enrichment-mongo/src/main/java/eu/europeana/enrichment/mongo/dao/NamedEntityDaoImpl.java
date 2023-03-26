@@ -1,12 +1,12 @@
 package eu.europeana.enrichment.mongo.dao;
 
-import static dev.morphia.query.experimental.filters.Filters.all;
 import static dev.morphia.query.experimental.filters.Filters.eq;
 import static dev.morphia.query.experimental.filters.Filters.in;
-import static dev.morphia.query.experimental.filters.Filters.size;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,8 +19,10 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
@@ -39,6 +41,13 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	Logger logger = LogManager.getLogger(getClass());
 		
 	@Override
+	public NamedEntityImpl findNamedEntity(ObjectId objId) {
+		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+                eq(EnrichmentConstants.OBJECT_ID, objId))
+                .first();
+	}
+	
+	@Override
 	public NamedEntityImpl findNamedEntityByLabel(String label) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
                 eq(EnrichmentConstants.LABEL, label))
@@ -46,27 +55,50 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 	
 	/*
-	 * This function check if there is an existing named entity that is equal to the named entity provided.
-	 * First the dbpedia id is checked. If it does not exist (e.g. in case of the staford analyzer),
-	 * the matching position is checked. In case of stanford, simply checking the named entity label and type
-	 * would not be enough, since the type is very broad (e.g. place or agent) and there can be many different 
-	 * entities with the same label, e.g. for Berlin, it can be Berlin in Germany, Berlin in New Hampshire, etc. 
+	 * This function check if there is an existing named entity that matches the named entity provided by the ner tools.
+	 * In case of dbpedia, there can be many different entities (different dbpediaId) with the same label and type, 
+	 * e.g. for Berlin, it can be Berlin in Germany, Berlin in New Hampshire, etc. So, in case of the dbpedia id exists in 
+	 * a new named entity, the check need to include all fields: label, type, and dbpedia id. In case nothing is found,
+	 * additional check is done for only label and type fields, since it may be that the stanford tool found some entity before,
+	 * and the dbpedia find the one with the same label and type now, in which case the entities are the same. In case of stanford, 
+	 * we can only match by label and type. The list is returned since it may be the case, as said, that for the same label and type,
+	 * different dbpedia ids are found, which are actually different entities.
 	 */
 	@Override
-	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne) {
+	public NamedEntityImpl findNamedEntityByNerTool(NamedEntityImpl ne) {
 		//for the dbpedia ner, every entity will have a dbpedia id
 		if(ne.getDBpediaId()!=null) {
+			NamedEntityImpl result = enrichmentDatastore.find(NamedEntityImpl.class).filter(
+				eq(EnrichmentConstants.LABEL, ne.getLabel()),
+				eq(EnrichmentConstants.TYPE, ne.getType()),
+                eq(EnrichmentConstants.DBPEDIA_ID, ne.getDBpediaId()))
+				.first();
+			if(result!=null) {
+				return result;
+			}
+			
 			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-	                eq(EnrichmentConstants.DBPEDIA_ID, ne.getDBpediaId()))
-	                .first();
+				eq(EnrichmentConstants.LABEL, ne.getLabel()),
+				eq(EnrichmentConstants.TYPE, ne.getType()),
+	            eq(EnrichmentConstants.DBPEDIA_ID, null))
+				.first();
 		}
-		else {
+		else {			
 			return enrichmentDatastore.find(NamedEntityImpl.class).filter(
 				eq(EnrichmentConstants.LABEL, ne.getLabel()),
 				eq(EnrichmentConstants.TYPE, ne.getType()))
 				.first();
 		}
 	}
+	
+	@Override
+	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId) {
+		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
+			eq(EnrichmentConstants.LABEL, label),
+			eq(EnrichmentConstants.TYPE, type),
+            eq(EnrichmentConstants.DBPEDIA_ID, dbpediaId))
+			.first();
+	}	
 	
 	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
@@ -78,53 +110,49 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	
 	@Override
 	public List<NamedEntityImpl> findAllNamedEntities() {
-		List<NamedEntityImpl> queryResult = enrichmentDatastore.find(NamedEntityImpl.class).iterator().toList();
-		if(queryResult.size()>0)
-		{
-			List<NamedEntityImpl> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntityImpl dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-		else {
-			return queryResult;
-		}
+		return enrichmentDatastore
+				.find(NamedEntityImpl.class)
+				.iterator()
+				.toList();
 	}	
 
 	@Override
-	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
-	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(type!=null) {
-	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, type));
-	    }
-	    if(nerTools!=null) {
-	    	filters.add(all(EnrichmentConstants.NER_TOOLS, nerTools));
-	    	if(matchNerToolsExactly) {
-	    		filters.add(size(EnrichmentConstants.NER_TOOLS, nerTools.size()));
-	    	}
-	    }
-	    if(filters.size()==0) {
-	     return new ArrayList<>();	
-	    }
-	    
-		List<PositionEntityImpl> positions = enrichmentDatastore
-			.find(PositionEntityImpl.class)
-			.filter(filters.toArray(Filter[]::new))
-            .iterator()
-			.toList();
+	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String fieldUserForNER, List<String> nerTools, boolean matchNerToolsExactly) {
+		List<PositionEntityImpl> peInitial = enrichmentDatastore
+				.find(PositionEntityImpl.class)
+				.filter(eq(EnrichmentConstants.STORY_ID, storyId),
+						eq(EnrichmentConstants.ITEM_ID, itemId),
+						eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUserForNER))
+	            .iterator()
+				.toList();
 		
-		Set<ObjectId> namedEntityIds = positions.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
-
+		List<PositionEntityImpl> peAdjusted = new ArrayList<>();
+		for(PositionEntityImpl pe : peInitial) {
+			if(matchNerToolsExactly) {
+				//check if positions contain all ner tools specified, meaning they are found by all asked ner tools
+				Optional<Integer> nerToolsBoth = pe.getOffsetsTranslatedText().entrySet().stream()
+					.filter(e -> HelperFunctions.containsAllListElems(e.getValue(), nerTools))
+					.map(Map.Entry::getKey)
+					.findFirst();
+				if(nerToolsBoth.isPresent()) {
+					peAdjusted.add(pe);
+				}
+			}
+			else {
+				//check if positions contain any ner tools specified, meaning they are found by any asked ner tool
+				Optional<Integer> nerToolsAny = pe.getOffsetsTranslatedText().entrySet().stream()
+					.filter(e -> HelperFunctions.containsAnyListElem(e.getValue(), nerTools))
+					.map(Map.Entry::getKey)
+					.findFirst();
+				if(nerToolsAny.isPresent()) {
+					peAdjusted.add(pe);
+				}
+			}
+		}
+		
+		Set<ObjectId> neIds = peAdjusted.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
 		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-			in(EnrichmentConstants.OBJECT_ID, namedEntityIds)
+			in(EnrichmentConstants.OBJECT_ID, neIds)
 			)
 			.iterator()
 			.toList();
@@ -161,20 +189,77 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	    }
 	    if(filters.size()==0) return;
 
-		List<PositionEntityImpl> positions = enrichmentDatastore.find(PositionEntityImpl.class)
+		List<PositionEntityImpl> peList = enrichmentDatastore.find(PositionEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))
 				.iterator()
 				.toList();
-		Set<ObjectId> namedEntityIdsSet = positions.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
+		if (peList.isEmpty()) {
+			return;
+		}
+		Set<ObjectId> peIdsSet = peList.stream().map(el -> el.get_id()).collect(Collectors.toSet());
+		Set<ObjectId> neIdsSet = peList.stream().map(el -> el.getNamedEntityId()).collect(Collectors.toSet());
 
+		//delete position entities for the given story and/or item 
 		enrichmentDatastore.find(PositionEntityImpl.class)
-			.filter(filters.toArray(Filter[]::new))
+			.filter(in(EnrichmentConstants.OBJECT_ID, peIdsSet))
             .delete(MorphiaUtils.MULTI_DELETE_OPTS);
-		
-		enrichmentDatastore.find(NamedEntityImpl.class).filter(
-			in(EnrichmentConstants.OBJECT_ID, namedEntityIdsSet)
-            )
-            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
+
+		//adjust the named entities of the deleted position entities accordingly
+		for(ObjectId neId : neIdsSet) {
+			//fetch the remaining positions of the named entities
+			List<PositionEntityImpl> peRemained = enrichmentDatastore.find(PositionEntityImpl.class)
+					.filter(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, neId))
+		            .iterator().toList();
+			
+			if(peRemained.isEmpty()) {
+				enrichmentDatastore.find(NamedEntityImpl.class)
+				.filter(eq(EnrichmentConstants.OBJECT_ID, neId))
+	            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
+			}
+			else {
+				boolean stanfordExists=false;
+				boolean dbpediaExissts=false;
+				for(PositionEntityImpl pe : peRemained) {
+					Optional<Integer> stanfordCheck = pe.getOffsetsTranslatedText().entrySet().stream()
+						.filter(e -> e.getValue().contains(NerTools.Stanford.getStringValue()))
+						.map(Map.Entry::getKey)
+						.findFirst();
+					Optional<Integer> dbpediaCheck = pe.getOffsetsTranslatedText().entrySet().stream()
+						.filter(e -> e.getValue().contains(NerTools.Stanford.getStringValue()))
+						.map(Map.Entry::getKey)
+						.findFirst();
+					if(stanfordCheck.isPresent()) {
+						stanfordExists=true;
+					}
+					if(dbpediaCheck.isPresent()) {
+						dbpediaExissts=true;
+					}
+					
+					if(stanfordExists && dbpediaExissts) {
+						break;
+					}
+				}
+				if(!stanfordExists || !dbpediaExissts) {
+					NamedEntityImpl ne = findNamedEntity(neId);
+					if(!stanfordExists) {
+						ne.setWikidataSearchIds(null);
+						ne.setPrefWikiIdBothStanfordAndDbpedia(null);
+						ne.setPrefWikiIdBothStanfordAndDbpedia_status(null);
+						ne.setPrefWikiIdOnlyStanford(null);
+						ne.setPrefWikiIdOnlyStanford_status(null);
+					}
+					if(!dbpediaExissts) {
+						ne.setDBpediaId(null);
+						ne.setDbpediaWikidataIds(null);
+						ne.setPrefWikiIdBothStanfordAndDbpedia(null);
+						ne.setPrefWikiIdBothStanfordAndDbpedia_status(null);
+						ne.setPrefWikiIdOnlyDbpedia(null);
+						ne.setPrefWikiIdOnlyDbpedia_status(null);
+					}
+					saveNamedEntity(ne);
+				}
+			}
+		}
 	}
 
 }

@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -394,6 +395,34 @@ public class HelperFunctions {
 		String[] itemArr = new String[itemList.size()];
 		itemArr = itemList.toArray(itemArr);
 		return itemArr;
+	}
+
+	public static List<String> sortWikiIds(List<String> wikiIds) {
+		if(wikiIds.isEmpty()) {
+			return wikiIds;
+		}
+		String base = wikiIds.get(0).substring(0, wikiIds.get(0).lastIndexOf('Q') + 1);
+		List<Integer> wikiIntegerIds = wikiIds.stream().map(el -> Integer.valueOf(el.substring(el.lastIndexOf('Q')+1))).collect(Collectors.toList());
+		Collections.sort(wikiIntegerIds);
+		return wikiIntegerIds.stream().map(el -> base + el).collect(Collectors.toList());
+	}
+	
+	public static boolean containsAllListElems(String str, List<String> list) {
+		for(String elem : list) {
+			if(! str.contains(elem)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean containsAnyListElem(String str, List<String> list) {
+		for(String elem : list) {
+			if(str.contains(elem)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -14,8 +14,9 @@ import eu.europeana.api.commons.web.controller.BaseRestController;
 import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
@@ -88,7 +89,7 @@ public abstract class BaseRest  extends BaseRestController{
 
 	protected void validateNERTools(List<String> tools) throws ParamValidationException {
 		for(String nerTool : tools) {
-			if(! (nerTool.equals(EnrichmentConstants.dbpediaSpotlightName) || nerTool.equals(EnrichmentConstants.stanfordNer))) {
+			if(! (nerTool.equals(NerTools.Dbpedia.getStringValue()) || nerTool.equals(NerTools.Stanford.getStringValue()))) {
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentConstants.NER_TOOLS, nerTool);
 			}
 		}
@@ -96,14 +97,14 @@ public abstract class BaseRest  extends BaseRestController{
 	
 	protected void validateNERLinking(List<String> linking) throws ParamValidationException {
 		for(String linkingTool : linking) {
-			if(! (linkingTool.equals(EnrichmentConstants.defaultLinkingTool) || linkingTool.equals(EnrichmentConstants.europeanaLinkingTool))) {
+			if(! (linkingTool.equals(EnrichmentConstants.WIKIDATA_LINKING) || linkingTool.equals(EnrichmentConstants.EUROPEANA_LINKING))) {
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentConstants.LINKING, linkingTool);
 			}
 		}
 
 	}
 	
-	protected void validateStory(StoryEntity story) throws ParamValidationException {
+	protected void validateStory(StoryEntityImpl story) throws ParamValidationException {
 		if(story.getStoryId() == null)
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ID, null);
 		if(story.getDescription() == null)
@@ -120,7 +121,7 @@ public abstract class BaseRest  extends BaseRestController{
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TITLE, null);		
 	}
 	
-	protected void validateItem(ItemEntity item) throws ParamValidationException {
+	protected void validateItem(ItemEntityImpl item) throws ParamValidationException {
 		if(item.getStoryId() == null)
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ID, null);
 		if(item.getTranscriptionLanguages() == null)

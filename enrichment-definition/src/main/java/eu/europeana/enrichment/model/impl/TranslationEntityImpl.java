@@ -11,15 +11,11 @@ import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Index;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
-import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
 
 @Entity(value="TranslationEntityImpl")
 @Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool") }, options = @IndexOptions(unique = true)))
-public class TranslationEntityImpl implements TranslationEntity{
+public class TranslationEntityImpl {
 
 	protected String key;
 	private String language;
@@ -31,7 +27,7 @@ public class TranslationEntityImpl implements TranslationEntity{
 	private String originLangGoogle;
 	private String type;
 	
-	public TranslationEntityImpl (TranslationEntity copy)
+	public TranslationEntityImpl (TranslationEntityImpl copy)
 	{
 		this.key = copy.getKey();
 		this.language = copy.getLanguage();
@@ -51,71 +47,37 @@ public class TranslationEntityImpl implements TranslationEntity{
 	@Id
     private ObjectId _id;
 	
-	@Transient
-	private StoryEntity storyEntity;
 	
-	@Transient
-	private ItemEntity itemEntity;
-	
-	@Override
 	public ObjectId getId() {
 		return _id;
 	}
 
-	@Override
-	public StoryEntity getStoryEntity() {
-		return this.storyEntity;
-	}
-
-	@Override
-	public void setStoryEntity(StoryEntity storyEntity) {
-		this.storyEntity = storyEntity;
-		if(storyEntity != null)
-			setStoryId(storyEntity.getStoryId());
-		else
-			setStoryId(null);
-	}
 	
-	@Override
-	public ItemEntity getItemEntity() {
-		return this.itemEntity;
-	}
-
-	@Override
-	public void setItemEntity(ItemEntity itemEntity) {
-		this.itemEntity = itemEntity;
-		if(itemEntity != null)
-			setItemId(itemEntity.getItemId());
-		else
-			setItemId(null);
-	}
-	
-	@Override
 	public String getItemId() {
 		return itemId;
 	}
 
-	@Override
+	
 	public void setItemId(String itemId) {
 		this.itemId = itemId;
 	}
 	
-	@Override
+	
 	public String getETranslationId() {
 		return eTranslationId;
 	}
 	
-	@Override
+	
 	public void setETranslationId(String eTranslationId) {
 		this.eTranslationId = eTranslationId;
 	}
 
-	@Override
+	
 	public String getKey() {
 		return key;
 	}
 
-	@Override
+	
 	public void setKey(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		key = HelperFunctions.generateHashFromText(text);
@@ -134,52 +96,52 @@ public class TranslationEntityImpl implements TranslationEntity{
 		//key = new String(hash, "UTF-8");
 	}
 
-	@Override
+	
 	public String getLanguage() {
 		return language;
 	}
 	
-	@Override
+	
 	public void setLanguage(String language) {
 		this.language = language;
 	}
 	
-	@Override
+	
 	public String getTranslatedText() {
 		return translatedText;
 	}
 
-	@Override
+	
 	public void setTranslatedText(String translatedText) {
 		this.translatedText = translatedText;
 	}
 
-	@Override
+	
 	public String getTool() {
 		return tool;
 	}
 
-	@Override
+	
 	public void setTool(String tool) {
 		this.tool = tool;
 	}
 	
-	@Override
+	
 	public String getType() {
 		return type;
 	}
 	
-	@Override
+	
 	public void setType(String type) {
 		this.type = type;
 	}
 	
-	@Override
+	
 	public String getStoryId() {
 		return storyId;
 	}
 
-	@Override
+	
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}

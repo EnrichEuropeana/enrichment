@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
 public interface WikidataService {
 
@@ -125,7 +125,7 @@ public interface WikidataService {
 
 	List<String> getWikidataIdWithWikidataSearch(String label) throws Exception;
 	
-	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException, Exception;
+	public boolean computePreferredWikidataIds(NamedEntityImpl namedEntity, List<PositionEntityImpl> positions, boolean matchType) throws Exception;
 	
 	CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws IOException, Exception;
 	

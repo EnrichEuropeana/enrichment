@@ -1,12 +1,10 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +22,10 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -108,13 +105,13 @@ public class AnnotationController extends BaseRest {
 			}
 			else {
 				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.defaultLinkingTool);
+				linking.add(EnrichmentConstants.WIKIDATA_LINKING);
 				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
-				nerTools.add(EnrichmentConstants.stanfordNer);
+				nerTools.add(NerTools.Dbpedia.getStringValue());
+				nerTools.add(NerTools.Stanford.getStringValue());
 				
-				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, itemId, property);
+				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerTools, linking, EnrichmentConstants.defaultTranslationTool, false, true, true);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 
@@ -143,13 +140,13 @@ public class AnnotationController extends BaseRest {
 			}
 			else {
 				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.defaultLinkingTool);
+				linking.add(EnrichmentConstants.WIKIDATA_LINKING);
 				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
-				nerTools.add(EnrichmentConstants.stanfordNer);
+				nerTools.add(NerTools.Dbpedia.getStringValue());
+				nerTools.add(NerTools.Stanford.getStringValue());
 				
-				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, null, property);
+				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerTools, linking, EnrichmentConstants.defaultTranslationTool, false, true, true);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 

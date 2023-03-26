@@ -12,8 +12,6 @@ import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
@@ -28,48 +26,26 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	
 	private static Map<String, List<String>> nerToolsForItem = new HashMap<String, List<String>>();
 	
-	private void addAdditionalInformation(ItemEntity dbEntity) {
-		StoryEntity dbStoryEntity = storyEntityDao.findStoryEntity(dbEntity.getStoryId());
-		dbEntity.setStoryEntity(dbStoryEntity);
+	@Override
+	public List<ItemEntityImpl> findAllItemEntities() {
+		return enrichmentDatastore.find(ItemEntityImpl.class).iterator().toList();
 	}
 	
 	@Override
-	public List<ItemEntity> findAllItemEntities() {
-		List<ItemEntityImpl> queryResult = enrichmentDatastore.find(ItemEntityImpl.class).iterator().toList();
-		if(queryResult == null)
-			return null;
-		else
-		{
-			List<ItemEntity> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				ItemEntity dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-	}
-	
-	@Override
-	public ItemEntity findItemEntityFromStory(String storyId, String itemId)
+	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId)
 	{
-		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EnrichmentConstants.STORY_ID, storyId),
-                eq(EnrichmentConstants.ITEM_ID, itemId)
-                )
-                .first();		
-		if (dbEntity!=null) 
-			addAdditionalInformation(dbEntity);		
-		return dbEntity;
+		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
+            eq(EnrichmentConstants.STORY_ID, storyId),
+            eq(EnrichmentConstants.ITEM_ID, itemId))
+			.first();		
 	}
 	
 	@Override
-	public ItemEntity findItemEntity(String itemId)
+	public ItemEntityImpl findItemEntity(String itemId)
 	{
-		ItemEntityImpl dbEntity = enrichmentDatastore.find(ItemEntityImpl.class).filter(
-                eq(EnrichmentConstants.ITEM_ID, itemId)
-                )
-                .first();		
-		return dbEntity;
+		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
+            eq(EnrichmentConstants.ITEM_ID, itemId))
+            .first();		
 	}
 	
 	@Override
@@ -82,32 +58,20 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 	
 	@Override
-	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId){
-		List<ItemEntityImpl> queryResult = enrichmentDatastore.find(ItemEntityImpl.class).filter(
+	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId){
+		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
                 eq(EnrichmentConstants.STORY_ID, storyId))
                 .iterator()
                 .toList();
-		if(queryResult.isEmpty())
-			return null;
-		else
-		{
-			List<ItemEntity> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				ItemEntityImpl dbEntity = queryResult.get(index);
-				addAdditionalInformation(dbEntity);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) {
+	public void saveItemEntity(ItemEntityImpl entity) {
 		this.enrichmentDatastore.save(entity);
 	}
 
 	@Override
-	public void deleteItemEntity(ItemEntity entity) {
+	public void deleteItemEntity(ItemEntityImpl entity) {
 		enrichmentDatastore.find(ItemEntityImpl.class).filter(
             eq(EnrichmentConstants.OBJECT_ID,entity.getId()))
 			.delete();

@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 
 public interface PersistentNamedEntityAnnotationService {
 
@@ -14,7 +14,7 @@ public interface PersistentNamedEntityAnnotationService {
 	 * @param id
 	 * @return
 	 */
-	public NamedEntityAnnotation findNamedEntityAnnotation(String id);
+	public NamedEntityAnnotationImpl findNamedEntityAnnotation(String id);
 	
 	/**
 	 * This method retrieves an entity from the Mongo 
@@ -24,7 +24,7 @@ public interface PersistentNamedEntityAnnotationService {
 	 * @param itemId
 	 * @return
 	 */
-	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId);
+	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId);
 
 	/**
 	 * This method retrieves an entity from the Mongo 
@@ -37,8 +37,7 @@ public interface PersistentNamedEntityAnnotationService {
 	 * @param nerTools
 	 * @return
 	 */
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> nerTools);
-
+	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools);
 	/**
 	 * This method retrieves an entity from the Mongo 
 	 * database based on their storyId and wikidataId
@@ -49,14 +48,14 @@ public interface PersistentNamedEntityAnnotationService {
 	 * @return
 	 */
 	
-	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId);
+	public NamedEntityAnnotationImpl findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId);
 
     /**
      * This method saves and updates entities into the Mongo database
      * @param entity
      */
 	
-	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity);
+	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity);
 	
 	/**
 	 * This method deletes an entity from the Mongo database base on its id

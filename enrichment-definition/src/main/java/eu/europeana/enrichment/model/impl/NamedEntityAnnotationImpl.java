@@ -102,7 +102,7 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 	}
 	
 	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
-			double score, List<String> nerTools) {
+			double score, List<String> foundByNerTools, List<String> linkedByNerTools) {
 
 		idBaseUrl=idBaseUrlPar;
 		targetItemsBaseUrl=targetItemsBaseUrlPar;
@@ -148,7 +148,8 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 		
 		Processing processing = new Processing();
 		processing.setScore(score);
-		processing.setFoundByNerTools(new ArrayList<String>(nerTools));
+		processing.setFoundByNerTools(new ArrayList<>(foundByNerTools));
+		processing.setLinkedByNerTools(new ArrayList<>(linkedByNerTools));
 		this.processing=processing;
 		this.created = new Date();
 	}

@@ -2,6 +2,8 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 
 /*
@@ -10,7 +12,8 @@ import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 public interface NamedEntityDao {
 	
 	public NamedEntityImpl findNamedEntityByLabel(String label);
-	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne);
+	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId);
+	public NamedEntityImpl findNamedEntityByNerTool(NamedEntityImpl ne);
 	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type);
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId,String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly);
 
@@ -19,4 +22,5 @@ public interface NamedEntityDao {
 	public void deletePositionEntitiesAndNamedEntities(String storyId,String itemId, String fieldUsedForNER);
 	public List<NamedEntityImpl> findAllNamedEntities();
 	public long deleteAllNamedEntities();
+	NamedEntityImpl findNamedEntity(ObjectId objId);
 }

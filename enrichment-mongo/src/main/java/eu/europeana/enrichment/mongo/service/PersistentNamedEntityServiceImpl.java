@@ -2,6 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +25,16 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 		return namedEntityDao.findNamedEntityByLabel(label);
 	}
 	
-	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne) {
-		return namedEntityDao.findExistingNamedEntity(ne);
+	public NamedEntityImpl findNamedEntity(ObjectId objId) {
+		return namedEntityDao.findNamedEntity(objId);
+	}
+	
+	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId) {
+		return namedEntityDao.findNamedEntity(label, type, dbpediaId);
+	}
+	
+	public NamedEntityImpl findNamedEntitiesByNerTool(NamedEntityImpl ne) {
+		return namedEntityDao.findNamedEntityByNerTool(ne);
 	}
 	
 	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {

@@ -5,13 +5,12 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.ItemEntitySolrFields;
 
-public class SolrItemEntityImpl extends ItemEntityImpl implements ItemEntity {
+public class SolrItemEntityImpl extends ItemEntityImpl {
 	
-	public SolrItemEntityImpl (ItemEntity copy) {
+	public SolrItemEntityImpl (ItemEntityImpl copy) {
 		this.setStoryId(copy.getStoryId());
 		this.setItemId(copy.getItemId());
 		this.setTranscriptionText(copy.getTranscriptionText());
