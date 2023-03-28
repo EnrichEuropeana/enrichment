@@ -2,6 +2,7 @@ package eu.europeana.enrichment.common.commons;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -152,14 +153,18 @@ public class HelperFunctions {
 	public static void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+		String fileFullPathName = directory;
+		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
 		
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathName))))
-	    {			
-	    	
-			bw.write(content);
-			
-		    logger.debug("Wikidata JSON File is written successfully!");
+		saveToFile(fileFullPathName, wikidataURL);
+	}
+
+	public static void saveToFile (String fileFullPathNameWithExtension, String content) throws IOException
+	{
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileFullPathNameWithExtension))))
+	    {    	
+			bw.write(content);	
+		    logger.debug("File: " + fileFullPathNameWithExtension + ", is written successfully to the location!");
 			    
 		} catch (IOException ioe) 
 	    {
@@ -171,36 +176,35 @@ public class HelperFunctions {
 	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = null;
-
-    	//Specify the file name and path here
-    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
-    	File file = new File(pathName);
+		String fileFullPathName = directory;
+		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
+		return readFileFromDisk(fileFullPathName);
+	}
+	
+	public static String readFileFromDisk (String fileFullPathWithExtension) throws IOException 
+	{
+    	File file = new File(fileFullPathWithExtension);
 
     	/* This logic will make sure that the file 
 		 * gets created if it is not present at the
 		 * specified location
 	    */
 		if (!file.exists()) {
-			return null;
+			throw new FileNotFoundException();
 		}
 		else
 		{
 			//String path = pathName.replace("/", "\\\\");
-			String contentJsonFile = null;
+			String content = null;
 
 			try {	            
-				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+				content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 	        } catch (IOException e) {
 				throw e;
 	        }
 
-			if(StringUtils.isBlank(contentJsonFile)) {
-				return null;
-			}
-			return contentJsonFile;
+			return content;
 		}
-
 	    
 	}
 	

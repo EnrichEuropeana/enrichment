@@ -60,6 +60,7 @@ public class EnrichmentConstants {
     
     //wikidata
     public static final String WIKIDATA_ENTITY_BASE_URL = "http://www.wikidata.org/entity/";
+    public static final String WIKIDATA_DIR="wikidata";
     
     // properties fields in the wikidata json
 	/*
@@ -210,5 +211,9 @@ public class EnrichmentConstants {
 	public static final String defaultTranslationTool = "Google";
 	public static final String eTranslationTool = "eTranslation";
 
+	//translation evaluation
+	public static final String TRANSLATION_EVALUATION_DIR = "translation-eval";
+	public static final String DRI_COLLECTION_DIR = "dri-collection";
+	public static final String UWR_COLLECTION_DIR = "uwr-collection";
 }
 

@@ -99,8 +99,8 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.items.import}")
     private String itemsImport;
 
-    @Value("${enrich.wikidata.directory}")
-    private String enrichWikidataDirectory;
+    @Value("${enrich.directory}")
+    private String enrichDirectory;
 
     @Value("${enrich.wikidata.json.base.url}")
     private String enrichWikidataJsonBaseUrl;
@@ -155,7 +155,10 @@ public class EnrichmentConfiguration  {
 	
 	@Value("${enrich.wikidata.save.json.to.local.cache: true}")
 	private boolean wikidataSaveJsonToLocalCache;
-
+	
+	@Value("${search.api.base.url}")
+	private String searchApiBaseUrl;
+	
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -252,9 +255,38 @@ public class EnrichmentConfiguration  {
 		return itemsImport;
 	}
 
-	public String getEnrichWikidataDirectory() {
-		return enrichWikidataDirectory;
+	public String getEnrichDirectory() {
+		return enrichDirectory;
 	} 
+
+	public String getEnrichWikidataDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.WIKIDATA_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.WIKIDATA_DIR;
+		}
+		
+	} 
+	
+	public String getEnrichDRICollectionDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
+		}
+	} 
+	
+	public String getEnrichUWRCollectionDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
+		}
+	} 
+
 	
     public String getNerStanfordModel() {
 		return nerStanfordModel;
@@ -364,4 +396,8 @@ public class EnrichmentConfiguration  {
 		return enrichWikidataJsonBaseUrl;
 	}
 	
+	public String getSearchApiBaseUrl() {
+		return searchApiBaseUrl;
+	}
+
 }
