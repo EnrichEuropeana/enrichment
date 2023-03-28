@@ -13,6 +13,39 @@
   <name>enrichment-translation-evaluation</name>
 
   <dependencies>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-common</artifactId>
+			<version>${version.enrichmentAPI}</version>			
+		</dependency>  
+        <dependency>
+           <groupId>org.apache.httpcomponents</groupId>
+           <artifactId>httpclient</artifactId>
+        </dependency>
+   		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+  		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${version.json}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>${version.apache-commons-csv}</version>
+		</dependency>
+		
+  
   </dependencies>
 
 	<build>

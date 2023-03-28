@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
@@ -617,7 +618,7 @@ public class WikidataServiceImpl implements WikidataService {
 		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
 		String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
 		String wikidataJSON=wikidataJSONLocalCache;
-		if(wikidataJSON==null) 	
+		if(StringUtils.isBlank(wikidataJSON)) 	
 		{
 			logger.debug("Wikidata entity does not exist in a local file cache!");
 			wikidataJSON = getWikidataJSONFromRemote(wikidataURL);
@@ -1038,7 +1039,7 @@ public class WikidataServiceImpl implements WikidataService {
 		for(String wikidataId : wikiIds) {
 			String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId);
 			String wikidataJSON=null;
-			if(wikidataJSONLocalCache!=null) {
+			if(! StringUtils.isBlank(wikidataJSONLocalCache)) {
 				wikidataJSON=wikidataJSONLocalCache;
 			}
 			else {
