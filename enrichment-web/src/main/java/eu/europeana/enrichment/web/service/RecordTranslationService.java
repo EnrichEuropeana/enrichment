@@ -5,5 +5,5 @@ import eu.europeana.enrichment.model.RecordTranslation;
 public interface RecordTranslationService {
 
 
-    public RecordTranslation translate(RecordTranslation record) throws Exception;
+    public <T extends RecordTranslation> RecordTranslation translate(RecordTranslation record, Class<T> objClass) throws Exception;
 }

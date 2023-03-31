@@ -127,7 +127,10 @@ public class EnrichmentConfiguration  {
     private String annotationsCreator;	
 	
 	@Value("${enrich.wikidata.subclasses.geographic-location}")
-    private String wikidataSubclassesGeographicLocation;	
+    private String wikidataSubclassesGeographicLocation;
+	
+	@Value("${enrich.wikidata.subclasses.geographic-location.remove}")
+    private String wikidataSubclassesGeographicLocationRemove;
 
 	@Value("${enrich.wikidata.subclasses.human}")
     private String wikidataSubclassesHuman;	
@@ -355,7 +358,11 @@ public class EnrichmentConfiguration  {
 	public String getWikidataSubclassesGeographicLocation() {
 		return wikidataSubclassesGeographicLocation;
 	}
-	
+
+	public String getWikidataSubclassesGeographicLocationRemove() {
+		return wikidataSubclassesGeographicLocationRemove;
+	}
+
 	public String getWikidataSubclassesHuman() {
 		return wikidataSubclassesHuman;
 	}

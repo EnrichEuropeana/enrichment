@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.RecordTranslation;
-import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
-import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_RECORD_TRANSLATION_DAO)
@@ -22,12 +20,10 @@ public class RecordTranslationDaoImpl implements RecordTranslationDao {
 	private Datastore enrichmentDatastore; 
 	
 	@Override
-	public RecordTranslation findByRecordId(String recordId) {
-	    RecordTranslation dbEntity = enrichmentDatastore.find(EuropeanaRecordTranslationImpl.class).filter(
+	public <T extends RecordTranslation> RecordTranslation findByRecordId(String recordId, Class<T> objClass) {
+	    return enrichmentDatastore.find(objClass).filter(
                 eq(RecordTranslationFields.RECORD_ID, recordId))
                 .first();
-		
-		return dbEntity;
 	}
 	
 	
@@ -40,23 +36,16 @@ public class RecordTranslationDaoImpl implements RecordTranslationDao {
 	}
 
 	@Override
-	public void deleteTranslationEntity(RecordTranslation recordTranslation) {
-		enrichmentDatastore.find(EuropeanaRecordTranslationImpl.class).filter(
-			eq(RecordTranslationFields.OBJECT_ID, ((EuropeanaRecordTranslationImpl) recordTranslation).getObjectId()))
-			.delete();			
-	}
-
-	@Override
-	public long deleteByRecordId(String recordId) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(RecordTranslationFields.OBJECT_ID, recordId))
+	public <T extends RecordTranslation> long deleteByRecordId(String recordId, Class<T> objClass) {
+		return enrichmentDatastore.find(objClass).filter(
+                eq(RecordTranslationFields.RECORD_ID, recordId))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}
 
 	@Override
-	public List<EuropeanaRecordTranslationImpl> getAllTranslationRecords() {
-	    return enrichmentDatastore.find(EuropeanaRecordTranslationImpl.class).iterator().toList();
+	public <T extends RecordTranslation> List<T> getAllTranslationRecords(Class<T> objClass) {
+	    return enrichmentDatastore.find(objClass).iterator().toList();
 	}	
 	
 }

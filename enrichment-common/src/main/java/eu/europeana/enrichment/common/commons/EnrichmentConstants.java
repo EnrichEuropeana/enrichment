@@ -210,6 +210,7 @@ public class EnrichmentConstants {
 	public static final String defaultTargetTranslationLanguage = "en";
 	public static final String defaultTranslationTool = "Google";
 	public static final String eTranslationTool = "eTranslation";
+	public static final String eTranslationFailedSign = "-";
 
 	//translation evaluation
 	public static final String TRANSLATION_EVALUATION_DIR = "translation-eval";

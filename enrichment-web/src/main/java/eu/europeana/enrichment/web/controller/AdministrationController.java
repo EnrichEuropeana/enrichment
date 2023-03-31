@@ -28,6 +28,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -207,11 +208,11 @@ public class AdministrationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
+	@ApiOperation(value = "Receive translated text from eTranslation", nickname = "getFromETranslation", notes = "This method represents an endpoint"
 			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
-	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/receiveETranslation", method = {RequestMethod.POST},
 			produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> getETranslation(
+	public ResponseEntity<String> getFromETranslation(
 			@RequestParam(value = "target-language", required = false) String targetLanguage,
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
@@ -222,6 +223,26 @@ public class AdministrationController extends BaseRest {
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,body);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
 		return response;
+	}
+
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
+			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
+	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.GET},
+			produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> getETranslation(
+			@RequestParam(value = "text") String text,
+			@RequestParam(value = "sourceLang") String sourceLang,
+			@RequestParam(value = "targetLang") String targetLang) throws TranslationException, UnsupportedEncodingException, InterruptedException 
+	{
+		String resp = eTranslationService.translateText(text, sourceLang, targetLang);
+		if(resp==null) {
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			return response;
+		}
+		else {
+			ResponseEntity<String> response = new ResponseEntity<String>("{\"translation\" : " + "\"" + resp + "\"}", HttpStatus.OK);
+			return response;
+		}
 	}
 
 //	@ApiOperation(value = "Run NER analysis for all items", nickname = "runNERAllItems", notes = "This method performs the Named Entity Recognition (NER) analysis "
