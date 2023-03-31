@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
+import eu.europeana.enrichment.common.exceptions.FunctionalRuntimeException;
 import eu.europeana.enrichment.model.WikidataAgent;
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.WikidataPlace;
@@ -52,7 +53,6 @@ import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
-import eu.europeana.enrichment.ner.exception.InvalidWikidataIdJsonException;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
@@ -137,7 +137,6 @@ public class WikidataServiceImpl implements WikidataService {
 	private final String wikidataResultKey = "results";
 	private final String wikidataBindingsKey = "bindings";
 	private final String wikidataItemKey = "item";
-	private final String wikidataDescriptionKey = "description";
 	private final String wikidataValueKey = "value";
 		
 	private String wikidataDirectory;
@@ -153,7 +152,10 @@ public class WikidataServiceImpl implements WikidataService {
 	{
 		wikidataDirectory = enrichmentConfiguration.getEnrichWikidataDirectory();
 		//reading the files for the wikidata subclasses
-		wikidataSubclassesForPlace = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesGeographicLocation()));
+		Set<String> wikidataSubclassesForPlaceAll = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesGeographicLocation()));
+		Set<String> wikidataSubclassesForPlaceRemove = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesGeographicLocationRemove()));
+		wikidataSubclassesForPlace = new HashSet<>(wikidataSubclassesForPlaceAll);
+		wikidataSubclassesForPlace.removeAll(wikidataSubclassesForPlaceRemove);
 		wikidataSubclassesForAgent = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesHuman()));
 	}
 	
@@ -408,11 +410,11 @@ public class WikidataServiceImpl implements WikidataService {
 					return responeString;
 				}
 				else {
-					throw new InvalidWikidataIdJsonException("Wikidata response json is invalid (does not contain \"entities\").");
+					throw new FunctionalRuntimeException("Wikidata response json is invalid (does not contain \"entities\").");
 				}
 			}
 			else {
-				throw new InvalidWikidataIdJsonException("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
+				throw new FunctionalRuntimeException("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
 			}
 			
 		} catch (URISyntaxException | IOException e) {

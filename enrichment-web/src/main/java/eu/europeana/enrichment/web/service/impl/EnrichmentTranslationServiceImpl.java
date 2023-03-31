@@ -6,14 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.cloud.translate.Translation;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
@@ -140,11 +137,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					logger.debug("The google translation service is currently disabled.");
 					return null;
 				}
-				Translation googleResponse = googleTranslationService.translateText(textToTranslate, EnrichmentConstants.defaultTargetTranslationLanguage);
-				if(googleResponse!=null) {
-					String unescapedHtml = StringEscapeUtils.unescapeHtml4(googleResponse.getTranslatedText());
-					tmpTranslationEntity.setTranslatedText(unescapedHtml);
-					tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
+				List<String> googleTransTextResp = new ArrayList<>();
+				List<String> googleTransDetectedLangResp = new ArrayList<>();
+				googleTranslationService.translateText(textToTranslate, null, EnrichmentConstants.defaultTargetTranslationLanguage, googleTransTextResp, googleTransDetectedLangResp);
+				if(googleTransTextResp.size()>0) {
+					tmpTranslationEntity.setTranslatedText(googleTransTextResp.get(0));
+					tmpTranslationEntity.setOriginLangGoogle(googleTransDetectedLangResp.get(0));
 				}
 				break;
 			case eTranslationToolName:
@@ -153,8 +151,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					return null;					
 				}
 				String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, EnrichmentConstants.defaultTargetTranslationLanguage);
-				if(eTranslationResponse!=null)
+				if(! eTranslationResponse.equals(EnrichmentConstants.eTranslationFailedSign)) {
 					tmpTranslationEntity.setTranslatedText(eTranslationResponse);
+				}
 				break;
 			default:
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);

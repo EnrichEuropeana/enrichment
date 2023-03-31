@@ -174,7 +174,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		}
 		else {
 			//update the offset(position) of the entity
-			alreadyExistNamedEntityImpl.getPositionEntity().getOffsetsTranslatedText().put(entityOffset, NerTools.Dbpedia.getStringValue());
+			if(! alreadyExistNamedEntityImpl.getPositionEntity().getOffsetsTranslatedText().containsKey(entityOffset)) {
+				alreadyExistNamedEntityImpl.getPositionEntity().getOffsetsTranslatedText().put(entityOffset, NerTools.Dbpedia.getStringValue());
+			}
 		}
 	}
 	

@@ -5,6 +5,11 @@ import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -27,15 +32,28 @@ import org.springframework.stereotype.Service;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
+import eu.europeana.enrichment.model.impl.RecordTranslationEval;
+import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
+import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 
 @Service
 public class EnrichmentTranslationEval 
 {
+	private static final String dcDescriptionLangAwareField = "dcDescriptionLangAware";
+	private static final String statusInvalid = "INVALID";
+	private static final String statusInvalidMultilingual = "INVALID_MULTILINGUAL";
+	
 	Logger logger = LogManager.getLogger(getClass());
 	
 	@Autowired
 	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 	EnrichmentConfiguration configuration;
+	
+	@Autowired
+    RecordTranslationDao recordTranslationDao;
+	
+	@Autowired(required=false)
+	TranslationGoogleServiceImpl googleTranslationService;
 
     public void saveDRICollectionItemsToJsonFiles() throws Exception {
 		try {
@@ -113,5 +131,77 @@ public class EnrichmentTranslationEval
 				}
             }
 		}	
+    }
+    
+    public void translateAndSaveRecord(String record) {
+    	RecordTranslationEval recordTranslationEval = new RecordTranslationEval();
+    	JSONObject recordJson = new JSONObject(record); 
+    	boolean saveRecord = false;
+    	if(recordJson.has("id")) {
+    		saveRecord = true;
+    		String recordId = recordJson.getString("id");
+	    	recordTranslationEval.setRecordId(recordId);
+	    	recordTranslationEval.setIdentifier(recordId);
+    	}
+    	if(recordJson.has(dcDescriptionLangAwareField)) {
+    		Map<String, List<String>> dcDescLangAware = new HashMap<>();
+    		List<String> language = new ArrayList<>();
+    		//get the dcDescriptionLangAware field
+    		JSONObject dcDescLangAwareJson = recordJson.getJSONObject(dcDescriptionLangAwareField);
+    		Iterator<String> keys = dcDescLangAwareJson.keys(); 		
+    		//setting the description and translation fields
+     		while(keys.hasNext()) { 
+    			String key = keys.next();
+    			if(key.equalsIgnoreCase("en")) {
+    				JSONArray enDescription = dcDescLangAwareJson.getJSONArray(key);
+    				List<String> translation = new ArrayList<>();
+    				for(int i=0; i<enDescription.length(); i++) {
+    					translation.add(enDescription.getString(i));
+    				}
+    				if(! translation.isEmpty()) {
+    					recordTranslationEval.setTranslation(translation);
+    					dcDescLangAware.put("en", new ArrayList<>(translation));
+    				}
+    			}
+    			else {
+    				JSONArray nonEnDescription = dcDescLangAwareJson.getJSONArray(key);
+    				List<String> description = new ArrayList<>();
+    				for(int i=0; i<nonEnDescription.length(); i++) {
+    					language.add(key);
+    					description.add(nonEnDescription.getString(i));
+    				}
+    				if(! description.isEmpty()) {
+    					recordTranslationEval.setDescription(description);
+    					recordTranslationEval.setLanguage(language);
+    					dcDescLangAware.put(key, new ArrayList<>(description));
+    				}
+    			}
+    		}
+
+     		if(! dcDescLangAware.isEmpty()) {
+     			recordTranslationEval.setDcDescriptionLangAware(dcDescLangAware);
+     		}
+     		//validation
+    		if(dcDescLangAware.size()!=2 || !dcDescLangAware.containsKey("en")) {
+    			recordTranslationEval.setTranslationStatus(statusInvalidMultilingual);
+    		}
+     		if(! (recordTranslationEval.getTranslation()!=null && recordTranslationEval.getDescription()!=null
+     				&& recordTranslationEval.getTranslation().size()==recordTranslationEval.getDescription().size())) {
+     			recordTranslationEval.setTranslationStatus(statusInvalid);
+     		}
+     		
+     		//translate record
+     		if(recordTranslationEval.getDescription()!=null) {
+     			List<String> googleTransTextResp = new ArrayList<>();
+     			List<String> googleTransDetectedLangResp = new ArrayList<>();
+     			googleTranslationService.translateList(recordTranslationEval.getDescription(), recordTranslationEval.getLanguage().get(0), "en", googleTransTextResp, googleTransDetectedLangResp);
+     			recordTranslationEval.setGoogleTranslation(googleTransTextResp);
+     			recordTranslationEval.setGoogleDetectedLang(googleTransDetectedLangResp.get(0));
+     		}     		
+    	}
+    	
+    	if(saveRecord) {
+    		recordTranslationDao.saveTranslationEntity(recordTranslationEval);
+    	}
     }
 }

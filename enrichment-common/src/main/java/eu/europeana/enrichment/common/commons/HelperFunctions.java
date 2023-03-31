@@ -13,7 +13,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -427,6 +429,13 @@ public class HelperFunctions {
 			}
 		}
 		return false;
+	}
+	
+	public static Set<String> listFilesFromDirUsingJavaIO(String dir) {
+	    return Stream.of(new File(dir).listFiles())
+	      .filter(file -> !file.isDirectory())
+	      .map(File::getName)
+	      .collect(Collectors.toSet());
 	}
 
 }
