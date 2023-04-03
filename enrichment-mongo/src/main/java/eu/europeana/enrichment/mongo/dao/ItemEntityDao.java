@@ -11,7 +11,7 @@ public interface ItemEntityDao {
 
 	public ItemEntityImpl findItemEntityFromStory (String storyId, String itemId);
 	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId);
-	public List<ItemEntityImpl> findAllItemEntities ();
+	public List<ItemEntityImpl> find_N_ItemEntities(int limit, int skip);
 	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId);
 	//public List<NamedEntity> getAllStoryItemEntities();
 	public void saveItemEntity(ItemEntityImpl entity);

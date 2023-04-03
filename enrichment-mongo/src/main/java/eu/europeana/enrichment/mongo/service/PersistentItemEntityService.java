@@ -28,12 +28,8 @@ public interface PersistentItemEntityService {
 	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId);
 	
 	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId);
-	/*
-	 * This method retrieves all item entities from the Mongo database
-	 * 
-	 * @return							list of database item entities
-	 */
-	public List<ItemEntityImpl> getAllItemEntities();
+	
+	public List<ItemEntityImpl> get_N_ItemEntities(int limit, int skip);
 	/*
 	 * This method saves and updates story item entities into the Mongo database
 	 * 

@@ -20,7 +20,7 @@ public interface NamedEntityDao {
 	//public List<NamedEntityImpl> getAllNamedEntities();
 	public void saveNamedEntity(NamedEntityImpl entity);
 	public void deletePositionEntitiesAndNamedEntities(String storyId,String itemId, String fieldUsedForNER);
-	public List<NamedEntityImpl> findAllNamedEntities();
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip);
 	public long deleteAllNamedEntities();
 	NamedEntityImpl findNamedEntity(ObjectId objId);
 }

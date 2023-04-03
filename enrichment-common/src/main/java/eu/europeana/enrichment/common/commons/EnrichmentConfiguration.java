@@ -66,7 +66,10 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.translation.eTranslation.requesterCallback}")
     private String translationETranslationRequesterCallback;
 
-    @Value("${enrich.translation.eTranslation.errorCallback}")
+    @Value("${enrich.translation.eTranslation.baseUrl.local}")
+    private String translationETranslationBaseUrlLocal;
+
+	@Value("${enrich.translation.eTranslation.errorCallback}")
     private String translationETranslationErrorCallback;
 
     @Value("${enrich.translation.eTranslation.emailDestination}")
@@ -225,6 +228,10 @@ public class EnrichmentConfiguration  {
 	public String getTranslationETranslationRequesterCallback() {
 		return translationETranslationRequesterCallback;
 	}
+	
+    public String getTranslationETranslationBaseUrlLocal() {
+		return translationETranslationBaseUrlLocal;
+	}	
 
 	public String getTranslationETranslationErrorCallback() {
 		return translationETranslationErrorCallback;

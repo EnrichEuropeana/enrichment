@@ -70,7 +70,7 @@ public class ETranslationEuropaServiceImpl {
 	public ETranslationEuropaServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws Exception {
 		readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
 		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
-		//this.requesterCallback = requesterCallback;
+		this.requesterCallback = enrichmentConfiguration.getTranslationETranslationRequesterCallback();
 		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
 		this.emailDestination = enrichmentConfiguration.getTranslationETranslationEmailDestination();
 	}
@@ -117,7 +117,7 @@ public class ETranslationEuropaServiceImpl {
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);
 		
-		long maxWaitingTime = 1 * 60 * 1000;// in millisec. (1. number is for minutes, 2. for seconds, so: 1*1*1000 is 1 second)
+		long maxWaitingTime = 2 * 60 * 1000;// in millisec. (1. number is for minutes, 2. for seconds, so: 1*1*1000 is 1 second)
 		long waitingTime = 0;
 		long sleepingTime = 500; //in millisec.
 		while(createdRequests.get(externalReference) == null && waitingTime < maxWaitingTime)

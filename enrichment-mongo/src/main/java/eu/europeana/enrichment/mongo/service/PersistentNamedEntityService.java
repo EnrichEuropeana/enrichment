@@ -31,7 +31,7 @@ public interface PersistentNamedEntityService {
 	 * 
 	 * @return							list of database named entities
 	 */
-	public List<NamedEntityImpl> getAllNamedEntities();
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip);
 	/*
 	 * This method saves and updates named entities into the Mongo database
 	 * 
