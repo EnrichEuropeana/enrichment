@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
+import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
@@ -227,20 +229,23 @@ public class AdministrationController extends BaseRest {
 
 	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
 			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
-	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.GET},
+	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
 			produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getETranslation(
-			@RequestParam(value = "text") String text,
+			@RequestBody String text,
 			@RequestParam(value = "sourceLang") String sourceLang,
-			@RequestParam(value = "targetLang") String targetLang) throws TranslationException, UnsupportedEncodingException, InterruptedException 
+			@RequestParam(value = "targetLang") String targetLang,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
+			HttpServletRequest request) throws TranslationException, UnsupportedEncodingException, InterruptedException, ApplicationAuthenticationException 
 	{
+		verifyReadAccess(request);
 		String resp = eTranslationService.translateText(text, sourceLang, targetLang);
 		if(resp==null) {
 			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 			return response;
 		}
 		else {
-			ResponseEntity<String> response = new ResponseEntity<String>("{\"translation\" : " + "\"" + resp + "\"}", HttpStatus.OK);
+			ResponseEntity<String> response = new ResponseEntity<String>(resp, HttpStatus.OK);
 			return response;
 		}
 	}

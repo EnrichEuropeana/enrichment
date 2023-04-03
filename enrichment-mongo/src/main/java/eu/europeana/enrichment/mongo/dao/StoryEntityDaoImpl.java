@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
@@ -56,10 +57,14 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}
-
+	
 	@Override
-	public List<StoryEntityImpl> findAllStoryEntities() {
-		return enrichmentDatastore.find(StoryEntityImpl.class).iterator().toList();
+	public List<StoryEntityImpl> find_N_StoryEntities(int limit, int skip) {
+		return enrichmentDatastore.find(StoryEntityImpl.class)
+				.iterator(new FindOptions()
+					    .skip(skip)
+					    .limit(limit))
+				.toList();
 	}
 
 	@Override

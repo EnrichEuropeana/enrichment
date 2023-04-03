@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -102,7 +103,7 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 	}
 	
 	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
-			double score, List<String> foundByNerTools, List<String> linkedByNerTools) {
+			double score, List<String> foundByNerTools, List<String> linkedByNerTools, String body_description, String body_givenName, String body_familyName, List<String> body_professionOrOccupation, Float body_lat, Float body_long) {
 
 		idBaseUrl=idBaseUrlPar;
 		targetItemsBaseUrl=targetItemsBaseUrlPar;
@@ -141,7 +142,26 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 		Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
 		bodyHiddenLabel.put("en", entityHiddenLabel);
 		this.body.put("hiddenLabel", bodyHiddenLabel);
-		
+
+		if(! StringUtils.isBlank(body_description)) {
+			this.body.put("description", body_description);
+		}
+		if(! StringUtils.isBlank(body_givenName)) {
+			this.body.put("givenName", body_givenName);
+		}
+		if(! StringUtils.isBlank(body_familyName)) {
+			this.body.put("familyName", body_familyName);
+		}
+		if(body_professionOrOccupation.size()>0) {
+			this.body.put("professionOrOccupation", body_professionOrOccupation);
+		}
+		if(body_lat!=null) {
+			this.body.put("lat", body_lat);
+		}
+		if(body_long!=null) {
+			this.body.put("long", body_long);
+		}
+
 		this.wikidataId = wikidataId;
 		this.storyId = storyId;		
 		this.property = prop;

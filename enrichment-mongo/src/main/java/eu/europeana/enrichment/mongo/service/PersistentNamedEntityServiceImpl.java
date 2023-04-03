@@ -45,8 +45,8 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, nerTools, matchNerToolsExactly);
 	}
 	
-	public List<NamedEntityImpl> getAllNamedEntities() {
-		return namedEntityDao.findAllNamedEntities();
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip) {
+		return namedEntityDao.get_N_NamedEntities(limit, skip);
 	}
 	
 	public void saveNamedEntity(NamedEntityImpl entity) {

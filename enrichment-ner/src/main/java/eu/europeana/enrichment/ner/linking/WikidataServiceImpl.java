@@ -1038,6 +1038,9 @@ public class WikidataServiceImpl implements WikidataService {
 	}
 	
 	private String checkPreferredWikiIdPrefLabelMatch(List<String> wikiIds, NamedEntityImpl namedEntity, boolean matchType, List<String> savedWikidataIds, List<String> savedWikidataJsons, List<Boolean> isWikidataFromLocalCache) throws Exception {
+		if(wikiIds==null) {
+			return null;
+		}
 		for(String wikidataId : wikiIds) {
 			String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId);
 			String wikidataJSON=null;
@@ -1114,103 +1117,139 @@ public class WikidataServiceImpl implements WikidataService {
 			List<Boolean> isWikidataFromLocalCache=new ArrayList<>();
 			String preferredWikiId=null;
 			//compute the crossvalidated pref wiki id
-			if(optNerToolsBoth.isPresent() && !prefWikiIdAll_computed) {
-				prefWikiIdAll_computed=true;
-				
-				List<String> crossValidatedIds = namedEntity.getDbpediaWikidataIds().stream().filter(namedEntity.getWikidataSearchIds()::contains).collect(Collectors.toList());
-				if(! crossValidatedIds.isEmpty()) {
-					//check pref label match
-					preferredWikiId=checkPreferredWikiIdPrefLabelMatch(crossValidatedIds, namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
-					if(preferredWikiId!=null) {
-						updated=true;
-						namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
-						namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_CROSSVALID_PREF_LABEL);
+			if(optNerToolsBoth.isPresent()) {
+				if(! prefWikiIdAll_computed) {
+					prefWikiIdAll_computed=true;
+					List<String> crossValidatedIds = new ArrayList<>();
+					if(namedEntity.getDbpediaWikidataIds()!=null && namedEntity.getWikidataSearchIds()!=null) {
+						crossValidatedIds.addAll(namedEntity.getDbpediaWikidataIds().stream().filter(namedEntity.getWikidataSearchIds()::contains).collect(Collectors.toList()));
 					}
-					else {
-						//then check alt label match
-						preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+					if(! crossValidatedIds.isEmpty()) {
+						//check pref label match
+						preferredWikiId=checkPreferredWikiIdPrefLabelMatch(crossValidatedIds, namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
 						if(preferredWikiId!=null) {
 							updated=true;
 							namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
-							namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_CROSSVALID_ALT_LABEL);
+							namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_CROSSVALID_PREF_LABEL);
 						}
-					}
-				}		
-				
-				if(preferredWikiId==null) {
-					prefWikiIdStanford_computed=true;
-					//check matches in the wikidata search ids
-					savedWikidataIds.clear();
-					savedWikidataJsons.clear();
-					isWikidataFromLocalCache.clear();
-					preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getWikidataSearchIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
-					if(preferredWikiId!=null) {
-						updated=true;
-						namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
-						namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
-
-						//set also the prefWikiIdStanford
-						namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
-						namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
-						
-					}
-					else {
-						//then check alt label match
-						preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+						else {
+							//then check alt label match
+							preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+							if(preferredWikiId!=null) {
+								updated=true;
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_CROSSVALID_ALT_LABEL);
+							}
+						}
+					}		
+					
+					if(preferredWikiId==null) {
+						prefWikiIdStanford_computed=true;
+						//check matches in the wikidata search ids
+						savedWikidataIds.clear();
+						savedWikidataJsons.clear();
+						isWikidataFromLocalCache.clear();
+						preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getWikidataSearchIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
 						if(preferredWikiId!=null) {
 							updated=true;
 							namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
-							namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
-
+							namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
+	
 							//set also the prefWikiIdStanford
 							namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
-							namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
+							namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
+							
+						}
+						else {
+							//then check alt label match
+							preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+							if(preferredWikiId!=null) {
+								updated=true;
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
+	
+								//set also the prefWikiIdStanford
+								namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
+								namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
+							}
+						}
+					}
+					
+					//in case no preferred id is found either by cross-validation or only in with the wiki search (this is probably the case which will never happen in praxis)
+					if(preferredWikiId==null) {
+						prefWikiIdDbpedia_computed=true;
+						
+						//check matches in the dbpedia wiki ids
+						preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getDbpediaWikidataIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+						if(preferredWikiId!=null) {
+							updated=true;
+							namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
+							namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL);
+	
+							//set also the prefWikiIdOnlyDbpedia
+							namedEntity.setPrefWikiIdOnlyDbpedia(preferredWikiId);
+							namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL);
+						}
+						else {
+							//then check alt label match
+							preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+							if(preferredWikiId!=null) {
+								updated=true;
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia(preferredWikiId);
+								namedEntity.setPrefWikiIdBothStanfordAndDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL);
+	
+								//set also the prefWikiIdOnlyDbpedia
+								namedEntity.setPrefWikiIdOnlyDbpedia(preferredWikiId);
+								namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL);
+							}	
 						}
 					}
 				}
 			}	
-			
 			//compute the pref wiki id for dbpedia
-			if(preferredWikiId==null && optNerToolsDbpedia.isPresent() && !prefWikiIdDbpedia_computed) {
-				prefWikiIdDbpedia_computed=true;
-				
-				//check matches in the dbpedia wiki ids
-				preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getDbpediaWikidataIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
-				if(preferredWikiId!=null) {
-					updated=true;
-					namedEntity.setPrefWikiIdOnlyDbpedia(preferredWikiId);
-					namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL);
-				}
-				else {
-					//then check alt label match
-					preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+			else if(optNerToolsDbpedia.isPresent()) {
+				if(! prefWikiIdDbpedia_computed) {
+					prefWikiIdDbpedia_computed=true;
+					
+					//check matches in the dbpedia wiki ids
+					preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getDbpediaWikidataIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
 					if(preferredWikiId!=null) {
 						updated=true;
 						namedEntity.setPrefWikiIdOnlyDbpedia(preferredWikiId);
-						namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL);
-					}	
+						namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL);
+					}
+					else {
+						//then check alt label match
+						preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+						if(preferredWikiId!=null) {
+							updated=true;
+							namedEntity.setPrefWikiIdOnlyDbpedia(preferredWikiId);
+							namedEntity.setPrefWikiIdOnlyDbpedia_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL);
+						}	
+					}
 				}
 			}
-			
 			//compute the pref wiki id for stanford
-			if(preferredWikiId==null && optNerToolsStanford.isPresent() && !prefWikiIdStanford_computed) {
-				prefWikiIdStanford_computed=true;
-				
-				//check matches in the wiki search ids
-				preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getWikidataSearchIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
-				if(preferredWikiId!=null) {
-					updated=true;
-					namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
-					namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
-				}
-				else {
-					//then check alt label match
-					preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+			else if(optNerToolsStanford.isPresent()) {	
+				if(! prefWikiIdStanford_computed) {
+					prefWikiIdStanford_computed=true;
+					
+					//check matches in the wiki search ids
+					preferredWikiId=checkPreferredWikiIdPrefLabelMatch(namedEntity.getWikidataSearchIds(), namedEntity, matchType, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
 					if(preferredWikiId!=null) {
 						updated=true;
 						namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
-						namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
-					}	
+						namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL);
+					}
+					else {
+						//then check alt label match
+						preferredWikiId=checkPreferredWikiIdAltLabelMatch(namedEntity, savedWikidataIds, savedWikidataJsons, isWikidataFromLocalCache);
+						if(preferredWikiId!=null) {
+							updated=true;
+							namedEntity.setPrefWikiIdOnlyStanford(preferredWikiId);
+							namedEntity.setPrefWikiIdOnlyStanford_status(EnrichmentConstants.PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL);
+						}	
+					}
 				}
 			}
 			

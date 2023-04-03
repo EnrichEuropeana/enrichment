@@ -24,11 +24,14 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 	
 	Logger logger = LogManager.getLogger(getClass());
 
+	/*
+	 * For saving the wikidata jsons the config that does not make heavy load is: corePoolSize=20, maxPoolSize=50.
+	 */
 	@Override
 	public Executor getAsyncExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(20);
-		executor.setMaxPoolSize(50);
+		executor.setCorePoolSize(10);
+		executor.setMaxPoolSize(20);
 		//executor.setQueueCapacity(100);
 		executor.initialize();
 		return executor;

@@ -3,6 +3,7 @@ package eu.europeana.enrichment.translation.evaluation;
 import java.io.IOException;
 import java.io.Reader;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,8 +16,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -27,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
@@ -34,6 +40,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.RecordTranslationEval;
 import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
+import eu.europeana.enrichment.translation.service.impl.DeeplTranslationServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 
 @Service
@@ -54,6 +61,9 @@ public class EnrichmentTranslationEval
 	
 	@Autowired(required=false)
 	TranslationGoogleServiceImpl googleTranslationService;
+	
+	@Autowired
+	DeeplTranslationServiceImpl deeplTranslationService;
 
     public void saveDRICollectionItemsToJsonFiles() throws Exception {
 		try {
@@ -133,7 +143,7 @@ public class EnrichmentTranslationEval
 		}	
     }
     
-    public void translateAndSaveRecord(String record) {
+    public void saveRecordFromJson(String record) {
     	RecordTranslationEval recordTranslationEval = new RecordTranslationEval();
     	JSONObject recordJson = new JSONObject(record); 
     	boolean saveRecord = false;
@@ -188,20 +198,65 @@ public class EnrichmentTranslationEval
      		if(! (recordTranslationEval.getTranslation()!=null && recordTranslationEval.getDescription()!=null
      				&& recordTranslationEval.getTranslation().size()==recordTranslationEval.getDescription().size())) {
      			recordTranslationEval.setTranslationStatus(statusInvalid);
-     		}
-     		
-     		//translate record
-     		if(recordTranslationEval.getDescription()!=null) {
-     			List<String> googleTransTextResp = new ArrayList<>();
-     			List<String> googleTransDetectedLangResp = new ArrayList<>();
-     			googleTranslationService.translateList(recordTranslationEval.getDescription(), recordTranslationEval.getLanguage().get(0), "en", googleTransTextResp, googleTransDetectedLangResp);
-     			recordTranslationEval.setGoogleTranslation(googleTransTextResp);
-     			recordTranslationEval.setGoogleDetectedLang(googleTransDetectedLangResp.get(0));
      		}     		
     	}
     	
     	if(saveRecord) {
     		recordTranslationDao.saveTranslationEntity(recordTranslationEval);
+    	}
+    }
+    
+    public void addGoogleTranslation(RecordTranslationEval record) throws URISyntaxException, ClientProtocolException, IOException {
+    	if(record.getDescription()!=null && record.getGoogleTranslation()==null) {
+ 			List<String> googleTransTextResp = new ArrayList<>();
+ 			List<String> googleTransDetectedLangResp = new ArrayList<>();
+ 			googleTranslationService.translateList(record.getDescription(), record.getLanguage().get(0), "en", googleTransTextResp, googleTransDetectedLangResp);
+ 			record.setGoogleTranslation(googleTransTextResp);
+ 			record.setGoogleDetectedLang(googleTransDetectedLangResp.get(0));
+ 			recordTranslationDao.saveTranslationEntity(record);
+    	}
+	}
+    
+    public void addEtTranslation(RecordTranslationEval record) throws URISyntaxException, ClientProtocolException, IOException {
+    	if(record.getDescription()!=null && record.getEtTranslation()==null) {
+			URIBuilder builder = new URIBuilder(configuration.getTranslationETranslationBaseUrlLocal());
+			builder.setParameter("wskey", "apidemo");
+			builder.setParameter("sourceLang", record.getLanguage().get(0));
+			builder.setParameter("targetLang", "en");
+			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			HttpPost request = new HttpPost(builder.build());
+			request.addHeader("Accept", "text/plain");
+			List<String> etTranslation = new ArrayList<>();
+			for(String desc : record.getDescription()) {
+				StringEntity body = new StringEntity(desc, StandardCharsets.UTF_8.name());
+				request.setEntity(body);
+				CloseableHttpResponse result = httpClient.execute(request);
+				if(result.getStatusLine().getStatusCode() == HttpStatus.OK.value()) {
+					String responeString = EntityUtils.toString(result.getEntity(), StandardCharsets.UTF_8.name());
+					etTranslation.add(responeString);
+				}
+		    }
+			if(! etTranslation.isEmpty()) {
+				record.setEtTranslation(etTranslation);
+				recordTranslationDao.saveTranslationEntity(record);
+			}				
+    	}		    
+    }
+    
+    public void addDeeplTranslation (RecordTranslationEval record) throws ClientProtocolException, IOException {
+    	//"ga" (Irish) is still not supported language by Deepl, only "pl" (Polish)
+    	if(record.getDescription()!=null && record.getDeeplTranslation()==null && record.getLanguage().contains("pl")) {
+			List<String> deeplTranslations = new ArrayList<>();
+			for(String desc : record.getDescription()) {
+				String resp =  deeplTranslationService.translateText(desc, "en");
+				if(resp!=null) {
+					deeplTranslations.add(resp);
+				}
+		    }
+			if(! deeplTranslations.isEmpty()) {
+				record.setDeeplTranslation(deeplTranslations);
+				recordTranslationDao.saveTranslationEntity(record);
+			}				
     	}
     }
 }

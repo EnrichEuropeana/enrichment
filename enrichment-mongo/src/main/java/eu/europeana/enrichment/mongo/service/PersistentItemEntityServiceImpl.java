@@ -37,9 +37,9 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public List<ItemEntityImpl> getAllItemEntities() {
+	public List<ItemEntityImpl> get_N_ItemEntities(int limit, int skip) {
 
-		return itemEntityDao.findAllItemEntities();
+		return itemEntityDao.find_N_ItemEntities(limit, skip);
 
 	}
 

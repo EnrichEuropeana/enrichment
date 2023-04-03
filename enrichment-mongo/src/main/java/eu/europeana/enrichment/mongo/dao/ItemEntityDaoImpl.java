@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
@@ -27,8 +28,12 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	private static Map<String, List<String>> nerToolsForItem = new HashMap<String, List<String>>();
 	
 	@Override
-	public List<ItemEntityImpl> findAllItemEntities() {
-		return enrichmentDatastore.find(ItemEntityImpl.class).iterator().toList();
+	public List<ItemEntityImpl> find_N_ItemEntities(int limit, int skip) {
+		return enrichmentDatastore.find(ItemEntityImpl.class)
+				.iterator(new FindOptions()
+					    .skip(skip)
+					    .limit(limit))
+				.toList();
 	}
 	
 	@Override

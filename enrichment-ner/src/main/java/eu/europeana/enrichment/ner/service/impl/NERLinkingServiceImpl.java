@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.NerTools;
@@ -81,7 +80,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			}
 			
 			if(dbpediaWikidataIds.size()>0) {
-				ne.setDbpediaWikidataIds(HelperFunctions.sortWikiIds(dbpediaWikidataIds));
+				ne.setDbpediaWikidataIds(dbpediaWikidataIds);
 				updated=true;
 			}			
 		}
@@ -90,7 +89,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 			//fetch the wikidata search ids
 			List<String> wikidataSearchIds = wikidataService.getWikidataIdWithWikidataSearch(ne.getLabel());
 			if(wikidataSearchIds.size()>0) {
-				ne.setWikidataSearchIds(HelperFunctions.sortWikiIds(wikidataSearchIds));
+				ne.setWikidataSearchIds(wikidataSearchIds);
 				updated=true;
 			}
 		}

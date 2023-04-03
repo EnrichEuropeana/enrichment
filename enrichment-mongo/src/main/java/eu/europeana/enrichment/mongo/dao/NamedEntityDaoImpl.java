@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
@@ -109,10 +110,12 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 	
 	@Override
-	public List<NamedEntityImpl> findAllNamedEntities() {
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip) {
 		return enrichmentDatastore
 				.find(NamedEntityImpl.class)
-				.iterator()
+				.iterator(new FindOptions()
+					    .skip(skip)
+					    .limit(limit))
 				.toList();
 	}	
 

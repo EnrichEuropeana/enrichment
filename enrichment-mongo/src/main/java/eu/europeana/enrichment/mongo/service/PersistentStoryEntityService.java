@@ -20,7 +20,7 @@ public interface PersistentStoryEntityService {
 	 * 
 	 * @return							list of database story entities
 	 */
-	public List<StoryEntityImpl> getAllStoryEntities();
+	public List<StoryEntityImpl> get_N_StoryEntities(int limit, int skip);
 	/*
 	 * This method saves and updates story entities into the Mongo database
 	 * 

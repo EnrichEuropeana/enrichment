@@ -26,8 +26,8 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	}
 
 	@Override
-	public List<StoryEntityImpl> getAllStoryEntities() {
-		return storyEntityDao.findAllStoryEntities();
+	public List<StoryEntityImpl> get_N_StoryEntities(int limit, int skip) {
+		return storyEntityDao.find_N_StoryEntities(limit, skip);
 	}
 
 	@Override

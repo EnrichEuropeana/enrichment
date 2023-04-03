@@ -11,7 +11,6 @@ public interface StoryEntityDao {
 
 	public StoryEntityImpl findStoryEntity(String key);
 	public List<StoryEntityImpl> findStoryEntities(String key);
-	public List<StoryEntityImpl> findAllStoryEntities();
 	public void saveStoryEntity(StoryEntityImpl entity);
 	public void deleteStoryEntity(StoryEntityImpl entity);
 	public long deleteStoryEntityByStoryId(String key);
@@ -19,4 +18,5 @@ public interface StoryEntityDao {
 	public List<String> getNerToolsForStory(String storyId);
 //	public int getNumerAnalysedNamedEntities(String field);
 //	public void setNumerAnalysedNamedEntities(String field, int num);
+	public List<StoryEntityImpl> find_N_StoryEntities(int limit, int skip);
 }
