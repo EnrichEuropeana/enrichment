@@ -99,17 +99,17 @@ public class NERController extends BaseRest {
 		
 		String resultJsonLd = null;
 		if(force) {
-			enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false, true);
-			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false);
+			resultJsonLd=jsonLdSerializer.serializeObject(result);
 		}
 		else {
 			List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);			
 			if(!result.isEmpty()) {
-				resultJsonLd="{\"Result\" : \"NamedEntity-s have been already crrated! Please use get method to get them!\"}";
+				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 			else {	
-				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false, true);
-				resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+				result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false);
+				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
@@ -189,17 +189,17 @@ public class NERController extends BaseRest {
 	
 		String resultJsonLd = null;
 		if(force) {
-			enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false, true);
-			resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";			
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false);
+			resultJsonLd=jsonLdSerializer.serializeObject(result);			
 		}
 		else {
 			List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
 			if(!result.isEmpty()) {
-				resultJsonLd="{\"Result\" : \"NamedEntity-s have been already created! Please use get method to get them!\"}";
+				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 			else {	
-				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false, true);
-				resultJsonLd="{\"Result\":\"The NER analysis has been successfully executed.\"}";
+				result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false);
+				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 		}
 		

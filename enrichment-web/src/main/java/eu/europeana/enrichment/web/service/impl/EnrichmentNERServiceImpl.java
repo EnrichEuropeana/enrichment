@@ -149,15 +149,17 @@ public class EnrichmentNERServiceImpl {
 	 * @param removeExistingEntities
 	 * @throws Exception
 	 */
-	public void createNamedEntitiesForStory(String storyId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateStory, boolean removeExistingEntities) throws Exception {
+	public List<NamedEntityImpl> createNamedEntitiesForStory(String storyId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateStory) throws Exception {
+		List<NamedEntityImpl> result = new ArrayList<>();
 		StoryEntityImpl story = persistentStoryEntityService.findStoryEntity(storyId);
-		if(removeExistingEntities) {
-			//delete existing position and named entities
-			persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, property);
-		}
+		
+		//delete existing position, named entities and annotations
+		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, property);
+		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, null);
+
 		String [] textAndLanguage = getStoryTextForNER(story, translationTool, property, original, updateStory);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
-			return;
+			return result;
 		}
 		String textForNer = textAndLanguage[0];
 		String languageForNer = textAndLanguage[1];
@@ -167,6 +169,7 @@ public class EnrichmentNERServiceImpl {
 		//add linking to the named entities
 		for(ObjectId neId : namedEntitiesToUpdateLinking) {
 			NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(neId);
+			result.add(ne);
 			List<PositionEntityImpl> positions = persistentPositionEntityService.findPositionEntities(neId);
 			boolean neUpdatedLinking = nerLinkingService.addLinkingInformation(ne, positions, linking);
 			boolean neUpdatedPrefWikiId=wikidataService.computePreferredWikidataIds(ne, positions, true);
@@ -174,6 +177,8 @@ public class EnrichmentNERServiceImpl {
 				persistentNamedEntityService.saveNamedEntity(ne);
 			}
 		}
+		
+		return result;
 	}
 
 	/**
@@ -190,15 +195,17 @@ public class EnrichmentNERServiceImpl {
 	 * @param removeExistingEntities
 	 * @throws Exception
 	 */
-	public void createNamedEntitiesForItem(String storyId, String itemId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateItem, boolean removeExistingEntities) throws Exception {
+	public List<NamedEntityImpl> createNamedEntitiesForItem(String storyId, String itemId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateItem) throws Exception {
+		List<NamedEntityImpl> result = new ArrayList<>();
 		ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
-		if(removeExistingEntities) {
-			//delete existing position and named entities for the given item
-			persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), property);
-		}
+
+		//delete existing position and named entities for the given item
+		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), property);
+		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, null);
+		
 		String [] textAndLanguage = getItemTextForNER(item, translationTool, property, original, updateItem);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
-			return;
+			return result;
 		}
 		String textForNer = textAndLanguage[0];
 		String languageForNer = textAndLanguage[1];
@@ -208,6 +215,7 @@ public class EnrichmentNERServiceImpl {
 		//add linking to the named entities
 		for(ObjectId neId : namedEntitiesToUpdateLinking) {
 			NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(neId);
+			result.add(ne);
 			List<PositionEntityImpl> positions = persistentPositionEntityService.findPositionEntities(neId);
 			boolean neUpdatedLinking = nerLinkingService.addLinkingInformation(ne, positions, linking);
 			boolean neUpdatedPrefWikiId=wikidataService.computePreferredWikidataIds(ne, positions, true);
@@ -215,6 +223,7 @@ public class EnrichmentNERServiceImpl {
 				persistentNamedEntityService.saveNamedEntity(ne);
 			}
 		}
+		return result;
 
 	}
 	
@@ -328,7 +337,7 @@ public class EnrichmentNERServiceImpl {
 					persistentNamedEntityService.saveNamedEntity(existingNamedEntity);
 				}	
 			}	
-			//if no  existing position is found, and the position entity as new to the existing named entity 
+			//if no  existing position is found, add the position entity as new to the existing named entity 
 			if(! foundMatchingPosition) {
 				newNamedEntity.getPositionEntity().setNamedEntityId(existingNamedEntity.get_id());
 				persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
@@ -497,7 +506,7 @@ public class EnrichmentNERServiceImpl {
 		List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(storyId, itemId, property);
 		List<NamedEntityAnnotationImpl> namedEntityAnnos = new ArrayList<>();
 		for(PositionEntityImpl pe : positionEntities) {
-			NamedEntityAnnotationImpl ne = createAnnotationsForPosition(pe);
+			NamedEntityAnnotationImpl ne = createAndSaveAnnotationsForPosition(pe);
 			if(ne!=null) {
 				namedEntityAnnos.add(ne);
 			}
@@ -506,7 +515,7 @@ public class EnrichmentNERServiceImpl {
 		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl(), configuration.getAnnotationsCreator(), namedEntityAnnos, storyId, itemId);
 	}
 	
-	public NamedEntityAnnotationImpl createAnnotationsForPosition(PositionEntityImpl pe) throws Exception {		
+	public NamedEntityAnnotationImpl createAndSaveAnnotationsForPosition(PositionEntityImpl pe) throws Exception {		
 		List<String> foundByNer=new ArrayList<>();
 		List<String> linkedByNer=new ArrayList<>();
 		NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(pe.getNamedEntityId());
@@ -628,10 +637,143 @@ public class EnrichmentNERServiceImpl {
 			//computing score
 			double score=computeScoreForAnnotations(foundByNer, linkedByNer);
 									
-			return new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
-					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long); 		
+			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
+					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
+			persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
+			return newAnno;
 		}
 		return null;
+	}
+
+	@Async
+	public CompletableFuture<Boolean> createAndSaveAnnotationsForPosition_parallel(PositionEntityImpl pe) throws Exception {		
+		List<String> foundByNer=new ArrayList<>();
+		List<String> linkedByNer=new ArrayList<>();
+		NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(pe.getNamedEntityId());
+		String preferredWikiId=choosePreferredWikiId(pe, ne, foundByNer, linkedByNer);
+		
+		//create annotation
+		if(preferredWikiId!=null) {
+			//compute the annotation fields
+			String wikidataJSONLocal = HelperFunctions.getWikidataJsonFromLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId);
+			String wikidataJSON=wikidataJSONLocal;
+			if(StringUtils.isBlank(wikidataJSON)) 	
+			{
+				logger.info("Wikidata entity does not exist in a local file cache!");
+				wikidataJSON = wikidataService.getWikidataJSONFromRemote(preferredWikiId);
+				HelperFunctions.saveWikidataJsonToLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId, wikidataJSON);					
+			}
+			
+			//compute the pref label
+			String entityPrefLabel = ne.getLabel();
+			Map<String,List<String>> prefLabelMap = null;
+			List<List<String>> jsonElement = null;
+			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{ 
+				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+				if(prefLabelMap!=null && prefLabelMap.get("en")!=null && prefLabelMap.get("en").size()>0)
+					entityPrefLabel = prefLabelMap.get("en").get(0);
+			}
+
+			//compute other body fields
+			String body_description = null;
+			String body_givenName = "";
+			String body_familyName = "";
+			List<String> body_professionOrOccupation = new ArrayList<>();
+			Float body_lat = null;
+			Float body_long = null;
+			
+			//body description
+			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.DESCRIPTION_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				for(int i=0;i<jsonElement.size();i++) {
+					if("en".equalsIgnoreCase(jsonElement.get(i).get(0))) {
+						body_description=jsonElement.get(i).get(1);
+						break;
+					}
+				}
+			}
+			
+			//getting the given name and family name for agents
+			if(ne.getType().equalsIgnoreCase(NERClassification.AGENT.toString())) {
+				//getting the given name
+				jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.GIVEN_NAME_JSONPROP);
+				if(!jsonElement.isEmpty()) 
+				{
+					//for each collected name in the form of wikidata Q-identifier, fetch the english label for that wikidata id
+					for(int i=0;i<jsonElement.size();i++)
+					{
+						String givenNameWikiId=EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(i).get(0);
+						String givenNameWikiJson=wikidataService.getWikidataJSONFromRemote(givenNameWikiId);
+						List<List<String>> givenNameJsonElement = wikidataService.getJSONFieldFromWikidataJSON(givenNameWikiJson,"labels.en.value");
+						if(!givenNameJsonElement.isEmpty()) {
+							body_givenName=body_givenName + givenNameJsonElement.get(0).get(0) + " ";
+						}
+					}					
+					if(! StringUtils.isBlank(body_givenName)) {
+						body_givenName = StringUtils.substring(body_givenName, 0, body_givenName.length()-1);
+					}
+				}
+				
+				//getting the family name
+				jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.FAMILY_NAME_JSONPROP);
+				if(!jsonElement.isEmpty()) 
+				{
+					//for each collected family name in the form of wikidata Q-identifier, fetch the english label for that wikidata id
+					for(int i=0;i<jsonElement.size();i++)
+					{
+						String familyNameWikiId=EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(i).get(0);
+						String familyNameWikiJson=wikidataService.getWikidataJSONFromRemote(familyNameWikiId);
+						List<List<String>> familyNameJsonElement = wikidataService.getJSONFieldFromWikidataJSON(familyNameWikiJson,"labels.en.value");
+						if(!familyNameJsonElement.isEmpty()) {
+							body_familyName=body_familyName + familyNameJsonElement.get(0).get(0) + " ";
+						}
+					}
+					if(! StringUtils.isBlank(body_familyName)) {
+						body_familyName = StringUtils.substring(body_familyName, 0, body_familyName.length()-1);
+					}					
+				}
+				
+				//getting the profession or occupation
+				jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.PROFESSIONOROCCUPATION_JSONPROP);
+				if(!jsonElement.isEmpty()) 
+				{
+					for(int i=0;i<jsonElement.size();i++)
+					{
+						String occupationWikiId=EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(i).get(0);
+						String occupationWikiJson=wikidataService.getWikidataJSONFromRemote(occupationWikiId);
+						List<List<String>> occupationJsonElement = wikidataService.getJSONFieldFromWikidataJSON(occupationWikiJson,"labels.en.value");
+						if(!occupationJsonElement.isEmpty()) {
+							body_professionOrOccupation.add(occupationJsonElement.get(0).get(0));
+						}
+					}
+				}				
+			}
+			else if(ne.getType().equalsIgnoreCase(NERClassification.PLACE.toString())) {
+				jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.LATITUDE_JSONPROP);
+				if(!jsonElement.isEmpty()) 
+				{
+					body_lat = Float.valueOf(jsonElement.get(0).get(0));
+				}
+				
+				jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.LONGITUDE_JSONPROP);
+				if(!jsonElement.isEmpty()) 
+				{
+					body_long = Float.valueOf(jsonElement.get(0).get(0));
+				}
+			}
+			
+			//computing score
+			double score=computeScoreForAnnotations(foundByNer, linkedByNer);
+									
+			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
+					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
+			persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
+			return CompletableFuture.completedFuture(true);
+		}
+		return CompletableFuture.completedFuture(false);
 	}
 	
 	public String choosePreferredWikiId(PositionEntityImpl pe, NamedEntityImpl ne, List<String> foundByNer, List<String> linkedByNer) {

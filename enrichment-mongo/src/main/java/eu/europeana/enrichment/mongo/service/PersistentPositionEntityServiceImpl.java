@@ -32,8 +32,8 @@ public class PersistentPositionEntityServiceImpl {
 		return positionEntityDao.findPositionEntities(storyId, itemId, fieldForNer);
 	}
 
-	public List<PositionEntityImpl> getAllPositionEntities() {
-		return positionEntityDao.getAllPositionEntities();
+	public List<PositionEntityImpl> get_N_PositionEntities(int limit, int skip) {
+		return positionEntityDao.get_N_PositionEntities(limit, skip);
 	}
 
 }

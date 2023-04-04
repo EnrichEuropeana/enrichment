@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
@@ -61,8 +62,12 @@ public class PositionEntityDaoImpl {
 				.toList();
 	}
 
-	public List<PositionEntityImpl> getAllPositionEntities() {
-		return enrichmentDatastore.find(PositionEntityImpl.class).iterator().toList();
+	public List<PositionEntityImpl> get_N_PositionEntities(int limit, int skip) {
+		return enrichmentDatastore.find(PositionEntityImpl.class)
+				.iterator(new FindOptions()
+					    .skip(skip)
+					    .limit(limit))
+				.toList();
 	}
 
 }
