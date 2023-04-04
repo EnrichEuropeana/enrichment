@@ -207,7 +207,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 			.filter(in(EnrichmentConstants.OBJECT_ID, peIdsSet))
             .delete(MorphiaUtils.MULTI_DELETE_OPTS);
 
-		//adjust the named entities of the deleted position entities accordingly
+		//delete named entities of the deleted position entities if they do not have any position entity left
 		for(ObjectId neId : neIdsSet) {
 			//fetch the remaining positions of the named entities
 			List<PositionEntityImpl> peRemained = enrichmentDatastore.find(PositionEntityImpl.class)
@@ -218,49 +218,6 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 				enrichmentDatastore.find(NamedEntityImpl.class)
 				.filter(eq(EnrichmentConstants.OBJECT_ID, neId))
 	            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
-			}
-			else {
-				boolean stanfordExists=false;
-				boolean dbpediaExissts=false;
-				for(PositionEntityImpl pe : peRemained) {
-					Optional<Integer> stanfordCheck = pe.getOffsetsTranslatedText().entrySet().stream()
-						.filter(e -> e.getValue().contains(NerTools.Stanford.getStringValue()))
-						.map(Map.Entry::getKey)
-						.findFirst();
-					Optional<Integer> dbpediaCheck = pe.getOffsetsTranslatedText().entrySet().stream()
-						.filter(e -> e.getValue().contains(NerTools.Stanford.getStringValue()))
-						.map(Map.Entry::getKey)
-						.findFirst();
-					if(stanfordCheck.isPresent()) {
-						stanfordExists=true;
-					}
-					if(dbpediaCheck.isPresent()) {
-						dbpediaExissts=true;
-					}
-					
-					if(stanfordExists && dbpediaExissts) {
-						break;
-					}
-				}
-				if(!stanfordExists || !dbpediaExissts) {
-					NamedEntityImpl ne = findNamedEntity(neId);
-					if(!stanfordExists) {
-						ne.setWikidataSearchIds(null);
-						ne.setPrefWikiIdBothStanfordAndDbpedia(null);
-						ne.setPrefWikiIdBothStanfordAndDbpedia_status(null);
-						ne.setPrefWikiIdOnlyStanford(null);
-						ne.setPrefWikiIdOnlyStanford_status(null);
-					}
-					if(!dbpediaExissts) {
-						ne.setDBpediaId(null);
-						ne.setDbpediaWikidataIds(null);
-						ne.setPrefWikiIdBothStanfordAndDbpedia(null);
-						ne.setPrefWikiIdBothStanfordAndDbpedia_status(null);
-						ne.setPrefWikiIdOnlyDbpedia(null);
-						ne.setPrefWikiIdOnlyDbpedia_status(null);
-					}
-					saveNamedEntity(ne);
-				}
 			}
 		}
 	}

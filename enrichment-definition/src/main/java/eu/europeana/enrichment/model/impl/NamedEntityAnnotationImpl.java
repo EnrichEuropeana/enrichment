@@ -35,7 +35,7 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 	EnrichmentConstants.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
+//@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
 public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEntityAnnotation {
 
 	@JsonIgnore

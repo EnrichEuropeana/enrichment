@@ -1,8 +1,5 @@
 package eu.europeana.enrichment.web.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +22,6 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -83,8 +79,9 @@ public class AnnotationController extends BaseRest {
 			return response;
 	}
 	
-	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method stores the annotations of "
-			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription).")
+	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method creates and stores the annotations of "
+			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription). Please note that the Named Entity "
+			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForItem(
 			@PathVariable("storyId") String storyId,
@@ -104,13 +101,6 @@ public class AnnotationController extends BaseRest {
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
-				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.WIKIDATA_LINKING);
-				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(NerTools.Dbpedia.getStringValue());
-				nerTools.add(NerTools.Stanford.getStringValue());
-				
-				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerTools, linking, EnrichmentConstants.defaultTranslationTool, false, true, true);
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
@@ -120,7 +110,8 @@ public class AnnotationController extends BaseRest {
 	}
 
 	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
-			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription).")
+			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). Please note that the Named Entity "
+			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForStory(
 			@PathVariable("storyId") String storyId,
@@ -139,13 +130,6 @@ public class AnnotationController extends BaseRest {
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
-				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.WIKIDATA_LINKING);
-				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(NerTools.Dbpedia.getStringValue());
-				nerTools.add(NerTools.Stanford.getStringValue());
-				
-				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerTools, linking, EnrichmentConstants.defaultTranslationTool, false, true, true);
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
