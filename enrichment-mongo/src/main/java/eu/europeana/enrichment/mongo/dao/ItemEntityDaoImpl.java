@@ -37,33 +37,16 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 	
 	@Override
-	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId)
+	public ItemEntityImpl findItemEntity(String storyId, String itemId)
 	{
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-            eq(EnrichmentConstants.STORY_ID, storyId),
-            eq(EnrichmentConstants.ITEM_ID, itemId))
-			.first();		
+	            eq(EnrichmentConstants.STORY_ID, storyId),
+	            eq(EnrichmentConstants.ITEM_ID, itemId))
+				.first();		
 	}
 	
 	@Override
-	public ItemEntityImpl findItemEntity(String itemId)
-	{
-		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-            eq(EnrichmentConstants.ITEM_ID, itemId))
-            .first();		
-	}
-	
-	@Override
-	public List<ItemEntityImpl> findItemEntitiesFromStory(String storyId, String itemId)
-	{
-		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
-            eq(EnrichmentConstants.STORY_ID, storyId),
-            eq(EnrichmentConstants.ITEM_ID, itemId))
-            .iterator().toList();
-	}
-	
-	@Override
-	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId){
+	public List<ItemEntityImpl> findAllItemsOfStory(String storyId){
 		return enrichmentDatastore.find(ItemEntityImpl.class).filter(
                 eq(EnrichmentConstants.STORY_ID, storyId))
                 .iterator()

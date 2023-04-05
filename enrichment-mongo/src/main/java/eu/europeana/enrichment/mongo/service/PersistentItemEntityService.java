@@ -5,31 +5,10 @@ import java.util.List;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 
 public interface PersistentItemEntityService {
-
-	/*
-	 * This method retrieves a story item entity from the Mongo 
-	 * database based on their key
-	 * 
-	 * @param itemId				story item id of the story item entity
-	 * @return							a database story item entity 
-	 */
-	public ItemEntityImpl findItemEntity(String storyId, String itemId);
-	
-	public ItemEntityImpl findItemEntity(String itemId);
-	
-	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId);
-	
-	/**
-	 * This method retrieves ItemEntity from the db for the given story
-	 * @param storyId
-	 * @param itemId
-	 * @return
-	 */
-	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId);
-	
-	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId);
 	
 	public List<ItemEntityImpl> get_N_ItemEntities(int limit, int skip);
+	public ItemEntityImpl findItemEntity(String storyId, String itemId);
+	public List<ItemEntityImpl> findAllItemsOfStory(String storyId);
 	/*
 	 * This method saves and updates story item entities into the Mongo database
 	 * 
@@ -70,9 +49,5 @@ public interface PersistentItemEntityService {
 	 * @param itemId
 	 * @return
 	 */
-	
-//	int getNumerAnalysedNamedEntities(String field);
-//	
-//	List<String> getNerToolsForItem(String itemId);
 
 }

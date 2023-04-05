@@ -1,5 +1,10 @@
 package eu.europeana.enrichment.common.commons;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.bson.types.ObjectId;
+
 public class EnrichmentConstants {
 
 	//config bean constants
@@ -216,5 +221,10 @@ public class EnrichmentConstants {
 	public static final String TRANSLATION_EVALUATION_DIR = "translation-eval";
 	public static final String DRI_COLLECTION_DIR = "dri-collection";
 	public static final String UWR_COLLECTION_DIR = "uwr-collection";
+	
+	//check if the field during the mongo search should be skipped (because the null field values are valid values for the search, in which case the mongo field does not exist)
+	public static final String MONGO_SKIP_FIELD="mongo_skip_field";
+	public static final List<String> MONGO_SKIP_LIST_FIELD=Collections.singletonList(MONGO_SKIP_FIELD);
+	public static final ObjectId MONGO_SKIP_OBJECT_ID_FIELD=new ObjectId();
 }
 

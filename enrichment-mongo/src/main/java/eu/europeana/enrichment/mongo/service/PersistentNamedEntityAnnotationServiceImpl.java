@@ -14,39 +14,15 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 	//@Resource(name = "namedEntityAnnotationDao")
 	@Autowired
 	NamedEntityAnnotationDao namedEntityAnnotationDao;
-	
-	@Override
-	public NamedEntityAnnotationImpl findNamedEntityAnnotation(String id) {
-		
-		return namedEntityAnnotationDao.findNamedEntityAnnotation(id);
-	}
 
 	@Override
-	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId) {
-		
-		return namedEntityAnnotationDao.findNamedEntityAnnotationWithStoryAndItemId(storyId, itemId);
-	}
-	
-	@Override
-	public List<NamedEntityAnnotationImpl> findNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools) {
-		return namedEntityAnnotationDao.findNamedEntityAnnotation(storyId, itemId, property, wikidataId, linkedByNerTools);
-	}
-
-	@Override
-	public NamedEntityAnnotationImpl findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) {
-		
-		return namedEntityAnnotationDao.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataId);
+	public List<NamedEntityAnnotationImpl> findAnnotations(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools) {
+		return namedEntityAnnotationDao.findAnnotations(storyId, itemId, property, wikidataId, linkedByNerTools);
 	}
 
 	@Override
 	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
 		namedEntityAnnotationDao.saveNamedEntityAnnotation(entity);		
-	}
-
-	@Override
-	public void deleteNamedEntityAnnotationById(String id) {
-		
-		namedEntityAnnotationDao.deleteNamedEntityAnnotationById(id);		
 	}
 	
 	@Override

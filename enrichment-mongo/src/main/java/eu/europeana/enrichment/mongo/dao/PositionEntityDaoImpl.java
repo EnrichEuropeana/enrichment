@@ -36,24 +36,20 @@ public class PositionEntityDaoImpl {
 		this.enrichmentDatastore.save(position);
 	}
 	
-	public PositionEntityImpl findPositionEntity(ObjectId namedEntityId, String storyId, String itemId, String fieldForNer) {
+	public List<PositionEntityImpl> findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, String fieldForNer) {
 	    List<Filter> filters = new ArrayList<>();
-    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
-    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
-	    
-		return enrichmentDatastore
-				.find(PositionEntityImpl.class)
-				.filter(filters.toArray(Filter[]::new))
-				.first();
-	}
-
-	public List<PositionEntityImpl> findPositionEntities(String storyId, String itemId, String fieldForNer) {
-	    List<Filter> filters = new ArrayList<>();
-    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
+	    if(! EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD.equals(namedEntityId)) {
+	    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
+	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
+	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(fieldForNer)) {
+	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
+	    }
 	    
 		return enrichmentDatastore
 				.find(PositionEntityImpl.class)

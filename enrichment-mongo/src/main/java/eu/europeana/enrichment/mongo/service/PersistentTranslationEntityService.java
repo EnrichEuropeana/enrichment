@@ -5,21 +5,8 @@ import java.util.List;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 
 public interface PersistentTranslationEntityService {
-
-	/*
-	 * This method retrieves a translation entry from the Mongo database 
-	 * based on their SHA256 key
-	 * 
-	 * @param key						SHA256 key without spaces
-	 * @return							a database translation entry 
-	 */
-	public TranslationEntityImpl findTranslationEntity(String key);
-	
-	public TranslationEntityImpl findTranslationEntityWithAditionalInformation(String storyId, String itemId, String tool, String language, String type);
 	
 	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type);
-	
-	public TranslationEntityImpl findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key);
 	/*
 	 * This method retrieves all translation entries from the Mongo database
 	 * 

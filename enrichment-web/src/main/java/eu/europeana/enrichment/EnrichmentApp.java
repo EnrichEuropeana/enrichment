@@ -13,13 +13,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.ImportResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.datatables.DataTablesRepositoryFactoryBean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.data.repository.config.BootstrapMode;
 
 
 /**
@@ -38,6 +38,7 @@ import org.springframework.data.repository.config.BootstrapMode;
 @EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class, 
     basePackageClasses = {eu.europeana.enrichment.web.repository.KeywordRepository.class})
 @EnableJpaRepositories(basePackages = "eu.europeana.enrichment.web.repository")
+@ImportResource("classpath:enrichment-web-context.xml") //used only for the error messages bean config
 public class EnrichmentApp extends SpringBootServletInitializer {
 
 	static Properties props = new Properties();

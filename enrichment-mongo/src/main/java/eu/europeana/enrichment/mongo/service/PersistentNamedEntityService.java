@@ -9,20 +9,10 @@ import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 public interface PersistentNamedEntityService {
 	
 	public NamedEntityImpl findNamedEntity(ObjectId objId);
-	/*
-	 * This method retrieves a named entity from the Mongo 
-	 * database based on their key
-	 * 
-	 * @param label						label of the named entity
-	 * @return							a database named entity 
-	 */
-	public NamedEntityImpl findNamedEntityByLabel(String label);
 	
-	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId);
+	public List<NamedEntityImpl> findNamedEntities(String label, String type, String dbpediaId);
 	
-	public NamedEntityImpl findNamedEntitiesByNerTool(NamedEntityImpl ne);
-	
-	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type);
+	public NamedEntityImpl findEqualNamedEntity(NamedEntityImpl ne);
 	
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly);
 

@@ -25,7 +25,6 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
@@ -155,7 +154,7 @@ public class EnrichmentNERServiceImpl {
 		
 		//delete existing position, named entities and annotations
 		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, property);
-		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, null);
+		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 
 		String [] textAndLanguage = getStoryTextForNER(story, translationTool, property, original, updateStory);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
@@ -201,7 +200,7 @@ public class EnrichmentNERServiceImpl {
 
 		//delete existing position and named entities for the given item
 		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), property);
-		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, null);
+		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 		
 		String [] textAndLanguage = getItemTextForNER(item, translationTool, property, original, updateItem);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
@@ -278,7 +277,7 @@ public class EnrichmentNERServiceImpl {
 						continue;
 					}
 	
-					NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findNamedEntitiesByNerTool(tmpNamedEntity);
+					NamedEntityImpl dbNamedEntity = persistentNamedEntityService.findEqualNamedEntity(tmpNamedEntity);
 					saveNamedEntityAndPositions(tmpNamedEntity, dbNamedEntity, nerTool, linking, namedEntityObjectsToRecomputeLinking);					
 				}	
 			}
@@ -298,35 +297,35 @@ public class EnrichmentNERServiceImpl {
 		if(existingNamedEntity != null) {
 			boolean foundMatchingPosition=false;
 			//update existing position entity if it exists
-			PositionEntityImpl existingPosition = 
-					persistentPositionEntityService.findPositionEntity(
+			List<PositionEntityImpl> existingPosition = 
+					persistentPositionEntityService.findPositionEntities(
 							existingNamedEntity.get_id(),
 							newNamedEntity.getPositionEntity().getStoryId(),
 							newNamedEntity.getPositionEntity().getItemId(),
 							newNamedEntity.getPositionEntity().getFieldUsedForNER()
 							);
 			
-			if(existingPosition!=null) {
+			if(! existingPosition.isEmpty()) {
 				boolean positionEntityHasChanged=false;
 				//update positions and ner tools
 				for(Map.Entry<Integer, String> newOffset : newNamedEntity.getPositionEntity().getOffsetsTranslatedText().entrySet()) {
 					Integer newOffsetKey = newOffset.getKey();
 					String newOffsetValue = newOffset.getValue();
-					if(existingPosition.getOffsetsTranslatedText().containsKey(newOffsetKey)) {
-						String existingOffsetNerTools = existingPosition.getOffsetsTranslatedText().get(newOffsetKey);
+					if(existingPosition.get(0).getOffsetsTranslatedText().containsKey(newOffsetKey)) {
+						String existingOffsetNerTools = existingPosition.get(0).getOffsetsTranslatedText().get(newOffsetKey);
 						if(! existingOffsetNerTools.contains(newOffsetValue)) {
-							existingPosition.getOffsetsTranslatedText().put(newOffsetKey, existingOffsetNerTools + "," + newOffsetValue);
+							existingPosition.get(0).getOffsetsTranslatedText().put(newOffsetKey, existingOffsetNerTools + "," + newOffsetValue);
 							positionEntityHasChanged=true;
 						}
 					}
 					else {
-						existingPosition.getOffsetsTranslatedText().put(newOffsetKey, newOffsetValue);
+						existingPosition.get(0).getOffsetsTranslatedText().put(newOffsetKey, newOffsetValue);
 						positionEntityHasChanged=true;
 					}
 				}
 				
 				if(positionEntityHasChanged) {
-					persistentPositionEntityService.savePositionEntity(existingPosition);
+					persistentPositionEntityService.savePositionEntity(existingPosition.get(0));
 					namedEntityObjectsToRecomputeLinking.add(existingNamedEntity.get_id());
 				}
 				
@@ -352,7 +351,7 @@ public class EnrichmentNERServiceImpl {
 			persistentNamedEntityService.saveNamedEntity(newNamedEntity);
 			newNamedEntity.getPositionEntity().setNamedEntityId(newNamedEntity.get_id());
 			persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
-			namedEntityObjectsToRecomputeLinking.add(persistentNamedEntityService.findNamedEntity(newNamedEntity.getLabel(), newNamedEntity.getType(), newNamedEntity.getDBpediaId()).get_id());
+			namedEntityObjectsToRecomputeLinking.add(persistentNamedEntityService.findNamedEntities(newNamedEntity.getLabel(), newNamedEntity.getType(), newNamedEntity.getDBpediaId()).get(0).get_id());
 		}
 	}
 
@@ -498,12 +497,12 @@ public class EnrichmentNERServiceImpl {
 	}
 
 	public NamedEntityAnnotationCollection getAnnotations(String storyId, String itemId, String property) throws Exception {
-		List<NamedEntityAnnotationImpl> entities = persistentNamedEntityAnnotationService.findNamedEntityAnnotation(storyId, itemId, property, null, null);
+		List<NamedEntityAnnotationImpl> entities = persistentNamedEntityAnnotationService.findAnnotations(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_LIST_FIELD);
 		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId);
 	}
 	
 	public NamedEntityAnnotationCollection createAnnotationsForStoryOrItem(String storyId, String itemId, String property) throws Exception {
-		List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(storyId, itemId, property);
+		List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, itemId, property);
 		List<NamedEntityAnnotationImpl> namedEntityAnnos = new ArrayList<>();
 		for(PositionEntityImpl pe : positionEntities) {
 			NamedEntityAnnotationImpl ne = createAndSaveAnnotationsForPosition(pe);
@@ -841,12 +840,10 @@ public class EnrichmentNERServiceImpl {
 	}
 
 	
-	public NamedEntityAnnotation getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
-		
+	public List<NamedEntityAnnotationImpl> getStoryOrItemAnnotation(String storyId, String itemId, String wikidataEntity) throws HttpException, IOException {
 		String wikidataIdGenerated=null;
 		wikidataIdGenerated = WikidataUtils.getWikidataEntityUri(wikidataEntity);
-		
-		return persistentNamedEntityAnnotationService.findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(storyId, itemId, wikidataIdGenerated);
+		return persistentNamedEntityAnnotationService.findAnnotations(storyId, itemId, EnrichmentConstants.MONGO_SKIP_FIELD, wikidataIdGenerated, EnrichmentConstants.MONGO_SKIP_LIST_FIELD);
 	}
 	
 	private double computeScoreForAnnotations(List<String> foundByNer, List<String> linkedByNer) {

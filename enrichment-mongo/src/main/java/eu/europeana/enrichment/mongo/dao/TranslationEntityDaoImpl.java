@@ -25,13 +25,6 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	private Datastore enrichmentDatastore; 
 	
 	@Override
-	public TranslationEntityImpl findTranslationEntity(String key) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EnrichmentConstants.KEY, key))
-                .first();
-	}
-	
-	@Override
 	public List<TranslationEntityImpl> findAllTranslationEntities(boolean onlyItems, boolean onlyStories) {
 		if(!onlyItems && !onlyStories) {
 			return enrichmentDatastore.find(TranslationEntityImpl.class).iterator().toList();
@@ -42,6 +35,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 				filters.add(exists(EnrichmentConstants.ITEM_ID));
 			}
 			else {
+				filters.add(exists(EnrichmentConstants.STORY_ID));
 				filters.add(eq(EnrichmentConstants.ITEM_ID, null));
 			}
 	    	return enrichmentDatastore.find(TranslationEntityImpl.class)
@@ -49,81 +43,24 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
                 .iterator().toList();
 		}			
 	}
-
-	@Override
-	public TranslationEntityImpl findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
-	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(tool!=null) {
-	    	filters.add(eq(EnrichmentConstants.TOOL, tool));
-	    }
-	    if(language!=null) {
-	    	filters.add(eq(EnrichmentConstants.LANGUAGE, language));
-	    }
-	    if(type!=null) {
-	    	filters.add(eq(EnrichmentConstants.TYPE, type));
-	    }
-	    if(key!=null) {
-	    	filters.add(eq(EnrichmentConstants.KEY, key));
-	    }
-	    if(filters.size()==0) {
-	    	return null;
-	    }
-
-		return enrichmentDatastore.find(TranslationEntityImpl.class)
-				.filter(filters.toArray(Filter[]::new))
-                .first();
-	}
 	
 	@Override
-	public TranslationEntityImpl findTranslationEntityWithAditionalInformation(String storyId, String itemId,
+	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId,
 			String tool, String language, String type) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(tool!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(tool)) {
 	    	filters.add(eq(EnrichmentConstants.TOOL, tool));
 	    }
-	    if(language!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(language)) {
 	    	filters.add(eq(EnrichmentConstants.LANGUAGE, language));
 	    }
-	    if(type!=null) {
-	    	filters.add(eq(EnrichmentConstants.TYPE, type));
-	    }
-	    if(filters.size()==0) {
-	    	return null;
-	    }
-
-		return enrichmentDatastore.find(TranslationEntityImpl.class)
-				.filter(filters.toArray(Filter[]::new))
-                .first();
-	}
-	
-	@Override
-	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
-	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(tool!=null) {
-	    	filters.add(eq(EnrichmentConstants.TOOL, tool));
-	    }
-	    if(language!=null) {
-	    	filters.add(eq(EnrichmentConstants.LANGUAGE, language));
-	    }
-	    if(type!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(type)) {
 	    	filters.add(eq(EnrichmentConstants.TYPE, type));
 	    }
 	    if(filters.size()==0) {
@@ -132,9 +69,10 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 
 		return enrichmentDatastore.find(TranslationEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))
-                .iterator().toList();
+                .iterator()
+                .toList();
 	}
-
+	
 	@Override
 	public void saveTranslationEntity(TranslationEntityImpl entity) {
 		this.enrichmentDatastore.save(entity);
@@ -146,25 +84,17 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 			eq(EnrichmentConstants.OBJECT_ID,entity.getId()))
 			.delete();			
 	}
-
-	@Override
-	public long deleteTranslationEntityByKey(String key) {
-		return enrichmentDatastore.find(TranslationEntityImpl.class).filter(
-                eq(EnrichmentConstants.KEY,key))
-                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
-                .getDeletedCount();
-	}
 	
 	@Override
 	public long deleteTranslationEntity(String storyId, String itemId, String type) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(type!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(type)) {
 	    	filters.add(eq(EnrichmentConstants.TYPE, type));
 	    }
 
@@ -178,8 +108,5 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	    	return 0;
 	    }
 	}
-
-
-	
 
 }

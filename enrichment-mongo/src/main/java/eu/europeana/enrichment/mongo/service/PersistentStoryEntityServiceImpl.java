@@ -21,11 +21,6 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	}
 	
 	@Override
-	public List<StoryEntityImpl> findStoryEntities(String storyId) {
-		return storyEntityDao.findStoryEntities(storyId);
-	}
-
-	@Override
 	public List<StoryEntityImpl> get_N_StoryEntities(int limit, int skip) {
 		return storyEntityDao.find_N_StoryEntities(limit, skip);
 	}
