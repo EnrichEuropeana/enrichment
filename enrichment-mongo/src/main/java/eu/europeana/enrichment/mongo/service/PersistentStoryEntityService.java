@@ -14,7 +14,6 @@ public interface PersistentStoryEntityService {
 	 */
 	public StoryEntityImpl findStoryEntity(String storyId);
 	
-	public List<StoryEntityImpl> findStoryEntities(String storyId);
 	/*
 	 * This method retrieves all story entities from the Mongo database
 	 * 

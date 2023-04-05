@@ -23,7 +23,6 @@ import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_DAO)
@@ -48,13 +47,6 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
                 .first();
 	}
 	
-	@Override
-	public NamedEntityImpl findNamedEntityByLabel(String label) {
-		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-                eq(EnrichmentConstants.LABEL, label))
-                .first();
-	}
-	
 	/*
 	 * This function check if there is an existing named entity that matches the named entity provided by the ner tools.
 	 * In case of dbpedia, there can be many different entities (different dbpediaId) with the same label and type, 
@@ -66,7 +58,7 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	 * different dbpedia ids are found, which are actually different entities.
 	 */
 	@Override
-	public NamedEntityImpl findNamedEntityByNerTool(NamedEntityImpl ne) {
+	public NamedEntityImpl findEqualNamedEntity(NamedEntityImpl ne) {
 		//for the dbpedia ner, every entity will have a dbpedia id
 		if(ne.getDBpediaId()!=null) {
 			NamedEntityImpl result = enrichmentDatastore.find(NamedEntityImpl.class).filter(
@@ -93,22 +85,28 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 	
 	@Override
-	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId) {
-		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-			eq(EnrichmentConstants.LABEL, label),
-			eq(EnrichmentConstants.TYPE, type),
-            eq(EnrichmentConstants.DBPEDIA_ID, dbpediaId))
-			.first();
-	}	
-	
-	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
-		return enrichmentDatastore.find(NamedEntityImpl.class).filter(
-                eq(EnrichmentConstants.LABEL, label),
-                eq(EnrichmentConstants.TYPE, type))
+	public List<NamedEntityImpl> findNamedEntities(String label, String type, String dbpediaId) {
+	    List<Filter> filters = new ArrayList<>();
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(label)) {
+	    	filters.add(eq(EnrichmentConstants.LABEL, label));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(type)) {
+	    	filters.add(eq(EnrichmentConstants.TYPE, type));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(dbpediaId)) {
+	    	filters.add(eq(EnrichmentConstants.DBPEDIA_ID, dbpediaId));
+	    }
+	    if(filters.size()==0) {
+	    	return null;
+	    }
+
+		return enrichmentDatastore
+				.find(NamedEntityImpl.class)
+				.filter(filters.toArray(Filter[]::new))			
 				.iterator()
 				.toList();
-	}
-	
+	}	
+		
 	@Override
 	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip) {
 		return enrichmentDatastore
@@ -121,11 +119,23 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 
 	@Override
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String fieldUserForNER, List<String> nerTools, boolean matchNerToolsExactly) {
+	    List<Filter> filters = new ArrayList<>();
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
+	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
+	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(fieldUserForNER)) {
+	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUserForNER));
+	    }
+	    if(filters.size()==0) {
+	    	return null;
+	    }
+
 		List<PositionEntityImpl> peInitial = enrichmentDatastore
 				.find(PositionEntityImpl.class)
-				.filter(eq(EnrichmentConstants.STORY_ID, storyId),
-						eq(EnrichmentConstants.ITEM_ID, itemId),
-						eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUserForNER))
+				.filter(filters.toArray(Filter[]::new))
 	            .iterator()
 				.toList();
 		
@@ -181,13 +191,13 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	@Override
 	public void deletePositionEntitiesAndNamedEntities(String storyId, String itemId, String fieldUsedForNER) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(fieldUsedForNER!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(fieldUsedForNER)) {
 	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldUsedForNER));
 	    }
 	    if(filters.size()==0) return;

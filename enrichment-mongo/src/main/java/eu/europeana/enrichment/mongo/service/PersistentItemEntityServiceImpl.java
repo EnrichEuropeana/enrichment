@@ -18,22 +18,13 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	
 	@Override
 	public ItemEntityImpl findItemEntity(String storyId, String itemId) {
-		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
-	}
-	
-	public ItemEntityImpl findItemEntity(String itemId) {
-		return itemEntityDao.findItemEntity(itemId);
-	}
-	
-	@Override
-	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId) {
-		return itemEntityDao.findItemEntitiesFromStory(storyId, itemId);
+		return itemEntityDao.findItemEntity(storyId, itemId);
 	}
 
 	@Override
-	public List<ItemEntityImpl> findStoryItemEntitiesFromStory(String storyId) {
+	public List<ItemEntityImpl> findAllItemsOfStory(String storyId) {
 		// TODO Auto-generated method stub
-		return itemEntityDao.findStoryItemEntitiesFromStory(storyId);
+		return itemEntityDao.findAllItemsOfStory(storyId);
 	}
 
 	@Override
@@ -64,13 +55,7 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	public void deleteAllItemsOfStory(String storyId) {
 		itemEntityDao.deleteAllItemsOfStory(storyId);
 	}
-	
-	@Override
-	public ItemEntityImpl findItemEntityFromStory(String storyId, String itemId) {
 		
-		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
-	}
-	
 	@Override
 	public void updateNerToolsForItem(String itemId, String nerTool) {
 		itemEntityDao.updateNerToolsForItem(itemId, nerTool);

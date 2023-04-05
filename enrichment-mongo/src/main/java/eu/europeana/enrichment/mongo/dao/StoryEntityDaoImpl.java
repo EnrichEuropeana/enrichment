@@ -24,19 +24,12 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	private static Map<String, List<String>> nerToolsForStory = new HashMap<String, List<String>>();	
 	
 	@Override
-	public StoryEntityImpl findStoryEntity(String key) {
+	public StoryEntityImpl findStoryEntity(String storyId) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EnrichmentConstants.STORY_ID, key))
+                eq(EnrichmentConstants.STORY_ID, storyId))
                 .first();
 	}
 	
-	@Override
-	public List<StoryEntityImpl> findStoryEntities(String key) {
-		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EnrichmentConstants.STORY_ID, key))
-				.iterator().toList();
-	}
-
 	@Override
 	public void saveStoryEntity(StoryEntityImpl entity) {
 		if(entity==null) return;
@@ -51,9 +44,9 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	}
 
 	@Override
-	public long deleteStoryEntityByStoryId(String key) {
+	public long deleteStoryEntityByStoryId(String storyId) {
 		return enrichmentDatastore.find(StoryEntityImpl.class).filter(
-                eq(EnrichmentConstants.STORY_ID,key))
+                eq(EnrichmentConstants.STORY_ID, storyId))
                 .delete(MorphiaUtils.MULTI_DELETE_OPTS)
                 .getDeletedCount();
 	}

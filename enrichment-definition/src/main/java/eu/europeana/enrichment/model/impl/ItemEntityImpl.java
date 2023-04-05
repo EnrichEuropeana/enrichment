@@ -12,12 +12,15 @@ import java.util.Objects;
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
 import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexed;
+import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Transient;
 
 @Entity(value = "ItemEntityImpl")
+@Indexes(@Index(fields = { @Field("itemId"), @Field("storyId")}, options = @IndexOptions(unique = true)))
 public class ItemEntityImpl {
 
 	// id will be used for storing MongoDB _id
@@ -26,10 +29,7 @@ public class ItemEntityImpl {
 
 	@Transient
 	private StoryEntityImpl storyEntity;
-
-	@Indexed(options = @IndexOptions(unique = true))
 	private String itemId;
-	
 	private List<String> transcriptionLanguages;
 	private String type;
 	private String transcriptionText;

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -139,7 +138,8 @@ public class WikidataController extends BaseRest {
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-		verifyWriteAccess(Operations.CREATE, request);
+		verifyReadAccess(request);
+		
 		if(pageSize==null || pageSize.isEmpty())
 		{	
 			pageSize="5";

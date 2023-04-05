@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +22,8 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -197,17 +199,8 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 		
 		verifyReadAccess(request);
-		NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
-		String resultJson=null;
-		if(result!=null)
-		{
-			resultJson = jsonLdSerializer.serializeObject(result);
-		}
-		else
-		{
-			resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
-		}
-
+		List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
+		String resultJson=jsonLdSerializer.serializeObject(result);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 		return response;
 	} 
@@ -233,17 +226,8 @@ public class AnnotationController extends BaseRest {
 				HttpServletRequest request) throws Exception, HttpException {
 			
 			verifyReadAccess(request);
-			NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
-			String resultJson=null;
-			if(result!=null)
-			{
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-			else
-			{
-				resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
-			}
-
+			List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
+			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 			return response;
 		}

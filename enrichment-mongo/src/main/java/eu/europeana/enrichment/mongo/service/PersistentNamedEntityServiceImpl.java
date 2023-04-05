@@ -20,25 +20,17 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	
 	@Autowired
 	PositionEntityDaoImpl positionEntityDao;
-	
-	public NamedEntityImpl findNamedEntityByLabel(String label) {
-		return namedEntityDao.findNamedEntityByLabel(label);
-	}
-	
+		
 	public NamedEntityImpl findNamedEntity(ObjectId objId) {
 		return namedEntityDao.findNamedEntity(objId);
 	}
 	
-	public NamedEntityImpl findNamedEntity(String label, String type, String dbpediaId) {
-		return namedEntityDao.findNamedEntity(label, type, dbpediaId);
+	public List<NamedEntityImpl> findNamedEntities(String label, String type, String dbpediaId) {
+		return namedEntityDao.findNamedEntities(label, type, dbpediaId);
 	}
 	
-	public NamedEntityImpl findNamedEntitiesByNerTool(NamedEntityImpl ne) {
-		return namedEntityDao.findNamedEntityByNerTool(ne);
-	}
-	
-	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
-		return namedEntityDao.findAllNamedEntitiesByLabelAndType(label, type);
+	public NamedEntityImpl findEqualNamedEntity(NamedEntityImpl ne) {
+		return namedEntityDao.findEqualNamedEntity(ne);
 	}
 	
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {

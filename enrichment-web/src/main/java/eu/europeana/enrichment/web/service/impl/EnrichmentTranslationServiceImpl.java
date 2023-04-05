@@ -58,16 +58,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
 	@Override
 	public String getTranslation(String storyId, String itemId, String translationTool, String type) {
-		TranslationEntityImpl dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-		if(dbTranslationEntity==null) return null;
-		return dbTranslationEntity.getTranslatedText();
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(dbTranslationEntity.isEmpty()) {
+			return null;
+		}
+		return dbTranslationEntity.get(0).getTranslatedText();
 	}
 	
 	@Override
 	public String translateStory(StoryEntityImpl story, String type, String translationTool) throws Exception {
-		TranslationEntityImpl dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-		if(dbTranslationEntity != null) {
-			return dbTranslationEntity.getTranslatedText();
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(story.getStoryId(), null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(! dbTranslationEntity.isEmpty()) {
+			return dbTranslationEntity.get(0).getTranslatedText();
 		}						
 
 		String textToTranslate = null;
@@ -100,9 +102,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
 	@Override
 	public String translateItem(ItemEntityImpl item, String property, String translationTool) throws Exception {
-		TranslationEntityImpl dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, property);
-		if(dbTranslationEntity != null) {
-			return dbTranslationEntity.getTranslatedText();
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, property);
+		if(! dbTranslationEntity.isEmpty()) {
+			return dbTranslationEntity.get(0).getTranslatedText();
 		}						
 
 		String textToTranslate = item.getTranscriptionText();
@@ -219,20 +221,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_ORIGINAL_TEXT, null);
 		}
 		
-		TranslationEntityImpl dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, language, type);
-		if(dbTranslationEntity == null) {
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(storyId, itemId, translationTool, language, type);
+		if(dbTranslationEntity.isEmpty()) {
 			//TODO: proper exception handling
 			return "Item " + i + " failed to be uploaded!";
-		}
-		
+		}		
 		try {
 			
-			dbTranslationEntity.setKey(originalText);
+			dbTranslationEntity.get(0).setKey(originalText);
 
-			dbTranslationEntity.setTranslatedText(translatedText);
+			dbTranslationEntity.get(0).setTranslatedText(translatedText);
 			
-			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity.get(0));
 
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling

@@ -137,14 +137,7 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		
 		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, null, property, nerToolsList);
-		String resultJsonLd = null;
-		if(result.isEmpty()) {
-			resultJsonLd="{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
-		}
-		else
-		{
-			resultJsonLd=jsonLdSerializer.serializeObject(result);
-		}
+		String resultJsonLd = jsonLdSerializer.serializeObject(result);
 		
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;
@@ -229,14 +222,7 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		
 		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
-		String resultJsonLd = null;
-		if(result.isEmpty()) {
-			resultJsonLd="{\"info\" : \"No found NamedEntity-s for the given input parameters!\"}";
-		}
-		else
-		{
-			resultJsonLd=jsonLdSerializer.serializeObject(result);
-		}
+		String resultJsonLd =jsonLdSerializer.serializeObject(result);
 
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		
