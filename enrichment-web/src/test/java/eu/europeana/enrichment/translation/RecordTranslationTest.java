@@ -49,7 +49,7 @@ public class RecordTranslationTest {
         String testRecordId = "/test/recordId";
         recordTranslation.setRecordId(testRecordId);
         recordTranslation.setDescription(List.of("Das ist ein Text auf Deutsch!"));
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
         assertEquals(RecordTranslation.TRANSLATION_STATUS_COMPLETE, translation.getTranslationStatus());
         assertNotNull(translation.getTranslation());
         assertFalse(translation.getTranslation().isEmpty());
@@ -67,7 +67,7 @@ public class RecordTranslationTest {
         assertEquals(2, description.getDescriptions().size());
 
         RecordTranslation recordTranslation = buildRecordTranslation(description);
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
 
         assertNotNull(translation);
         assertEquals(2, translation.getTranslation().size());
@@ -131,7 +131,7 @@ public class RecordTranslationTest {
     private EuropeanaRecordTranslationImpl translateAndSerialize(String filename, Description1418 description)
             throws IOException, Exception, JsonProcessingException, JsonParseException, JsonMappingException {
         RecordTranslation recordTranslation = buildRecordTranslation(description);
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(translation);
         File translatedFile = getTranslationFile(filename);

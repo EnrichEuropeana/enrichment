@@ -14,7 +14,6 @@ import org.springframework.stereotype.Repository;
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
@@ -34,88 +33,24 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public NamedEntityAnnotation findNamedEntityAnnotation(String id) {
-		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
-                eq(EnrichmentConstants.ID, id))
-                .first();
-	}
-
-	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotationWithStoryAndItemId(String storyId, String itemId) {
-	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(filters.size()==0) {
-	    	return new ArrayList<>();
-	    }
-
-		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore.find(NamedEntityAnnotationImpl.class)
-				.filter(filters.toArray(Filter[]::new))			
-				.iterator()
-				.toList();
-		if(queryResult.isEmpty())
-			return new ArrayList<>();
-		else
-		{
-			List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				NamedEntityAnnotation dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-	}
-
-	@Override
-	public NamedEntityAnnotation findNamedEntityAnnotationWithStoryIdItemIdAndWikidataId(String storyId, String itemId, String wikidataId) 
-	{
-	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(itemId!=null) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(wikidataId!=null) {
-	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
-	    }
-	    if(filters.size()==0) {
-	    	return null;
-	    }
-
-		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class)
-			.filter(filters.toArray(Filter[]::new))
-			.first();
-	}
-	
-	@Override
-	public void saveNamedEntityAnnotation(NamedEntityAnnotation entity) {
+	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
 		this.enrichmentDatastore.save(entity);
 	}
-
-	@Override
-	public long deleteNamedEntityAnnotationById(String id) {
-		return enrichmentDatastore.find(NamedEntityAnnotationImpl.class).filter(
-                eq(EnrichmentConstants.ID, id))
-                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
-                .getDeletedCount();	
-	}
 	
 	@Override
-	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property) {
+	public long deleteNamedEntityAnnotation(String storyId, String itemId, String property, String wikidataId) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(property!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(property)) {
 	    	filters.add(eq(EnrichmentConstants.PROPERTY, property));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(wikidataId)) {
+	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
 	    }
 	    if(filters.size()==0) return 0;
 	    
@@ -126,41 +61,32 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public void deleteAllNamedEntityAnnotation() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public List<NamedEntityAnnotation> findNamedEntityAnnotation(String storyId, String itemId, String property, List<String> nerTools) {
+	public List<NamedEntityAnnotationImpl> findAnnotations(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(property!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(property)) {
 	    	filters.add(eq(EnrichmentConstants.PROPERTY, property));
 	    }
-	    if(nerTools!=null) {
-	    	filters.add(all(EnrichmentConstants.PROCESSING + "." + EnrichmentConstants.FOUND_BY_NER_TOOLS, nerTools));
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(wikidataId)) {
+	    	filters.add(eq(EnrichmentConstants.WIKIDATA_ID, wikidataId));
+	    }
+	    if(! EnrichmentConstants.MONGO_SKIP_LIST_FIELD.equals(linkedByNerTools)) {
+	    	filters.add(all(EnrichmentConstants.PROCESSING + "." + EnrichmentConstants.LINKED_BY_NER_TOOLS, linkedByNerTools));
 	    }
 	    if(filters.size()==0) {
 	    	return new ArrayList<>();
 	    }
 
-		List<NamedEntityAnnotationImpl> queryResult = enrichmentDatastore
+		return enrichmentDatastore
 				.find(NamedEntityAnnotationImpl.class)
 				.filter(filters.toArray(Filter[]::new))			
 				.iterator()
 				.toList();
 
-		List<NamedEntityAnnotation> tmpResult = new ArrayList<>();
-		for(int index = 0; index < queryResult.size(); index++) {
-			NamedEntityAnnotation dbEntity = queryResult.get(index);
-			tmpResult.add(dbEntity);
-		}
-		return tmpResult;
 	}
 }

@@ -2,7 +2,9 @@ package eu.europeana.enrichment.ner.service.impl;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +27,7 @@ import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.service.NERService;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
@@ -171,7 +174,9 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		}
 		else {
 			//update the offset(position) of the entity
-			alreadyExistNamedEntityImpl.getPositionEntity().addOfssetsTranslatedText(entityOffset);
+			if(! alreadyExistNamedEntityImpl.getPositionEntity().getOffsetsTranslatedText().containsKey(entityOffset)) {
+				alreadyExistNamedEntityImpl.getPositionEntity().getOffsetsTranslatedText().put(entityOffset, NerTools.Dbpedia.getStringValue());
+			}
 		}
 	}
 	
@@ -193,16 +198,12 @@ public class NERDBpediaSpotlightServiceImpl implements NERService{
 		
 		namedEntity.setType(type);
 
-		List<Integer> offsetTranslatedText = new ArrayList<Integer>();
-		offsetTranslatedText.add(Integer.valueOf(offset));
+		Map<Integer, String> offsetTranslatedText = new HashMap<>();
+		offsetTranslatedText.put(offset, NerTools.Dbpedia.getStringValue());
 		PositionEntityImpl positionEntity = new PositionEntityImpl();
 		// default: Offset position will be added to the translated
 		positionEntity.setOffsetsTranslatedText(offsetTranslatedText);
-		List<String> nerTools = new ArrayList<String>();
-		nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
-		positionEntity.setNerTools(nerTools);
 		namedEntity.setPositionEntity(positionEntity);
-
 		namedEntity.setDBpediaId(dbpediaUrl);
 
 		return namedEntity;

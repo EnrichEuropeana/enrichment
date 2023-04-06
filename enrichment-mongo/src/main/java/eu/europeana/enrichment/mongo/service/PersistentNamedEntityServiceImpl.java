@@ -2,6 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,25 +20,25 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 	
 	@Autowired
 	PositionEntityDaoImpl positionEntityDao;
-	
-	public NamedEntityImpl findNamedEntityByLabel(String label) {
-		return namedEntityDao.findNamedEntityByLabel(label);
+		
+	public NamedEntityImpl findNamedEntity(ObjectId objId) {
+		return namedEntityDao.findNamedEntity(objId);
 	}
 	
-	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne) {
-		return namedEntityDao.findExistingNamedEntity(ne);
+	public List<NamedEntityImpl> findNamedEntities(String label, String type, String dbpediaId) {
+		return namedEntityDao.findNamedEntities(label, type, dbpediaId);
 	}
 	
-	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type) {
-		return namedEntityDao.findAllNamedEntitiesByLabelAndType(label, type);
+	public NamedEntityImpl findEqualNamedEntity(NamedEntityImpl ne) {
+		return namedEntityDao.findEqualNamedEntity(ne);
 	}
 	
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly) {
 		return namedEntityDao.findNamedEntitiesWithAdditionalInformation(storyId, itemId, type, nerTools, matchNerToolsExactly);
 	}
 	
-	public List<NamedEntityImpl> getAllNamedEntities() {
-		return namedEntityDao.findAllNamedEntities();
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip) {
+		return namedEntityDao.get_N_NamedEntities(limit, skip);
 	}
 	
 	public void saveNamedEntity(NamedEntityImpl entity) {

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
+import dev.morphia.query.FindOptions;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
@@ -30,56 +31,39 @@ public class PositionEntityDaoImpl {
 				.iterator()
 				.toList();
 	}
-	
-	public PositionEntityImpl findPositionEntitiesForNerTool(String storyId, String itemId, String fieldForNer, String nerTool) {
-		return enrichmentDatastore.find(PositionEntityImpl.class).filter(
-				eq(EnrichmentConstants.STORY_ID, storyId),
-				eq(EnrichmentConstants.ITEM_ID, itemId),
-				eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer),
-                eq(EnrichmentConstants.NER_TOOLS, nerTool))
-				.first();
-	}
-	
+		
 	public void savePositionEntity(PositionEntityImpl position) {
 		this.enrichmentDatastore.save(position);
 	}
 	
-	public PositionEntityImpl findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, int offsetTranslatedText, String fieldForNer) {
+	public List<PositionEntityImpl> findPositionEntities(ObjectId namedEntityId, String storyId, String itemId, String fieldForNer) {
 	    List<Filter> filters = new ArrayList<>();
-	    if(namedEntityId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD.equals(namedEntityId)) {
 	    	filters.add(eq(EnrichmentConstants.POSITION_NAMED_ENTITY, namedEntityId));
 	    }
-	    if(storyId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
 	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
 	    }
-	    if(itemId!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
 	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
 	    }
-	    if(fieldForNer!=null) {
+	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(fieldForNer)) {
 	    	filters.add(eq(EnrichmentConstants.FIELD_USED_FOR_NER, fieldForNer));
 	    }
-    	filters.add(eq(EnrichmentConstants.OFFSETS_TRANSLATED_TEXT, offsetTranslatedText));
 	    
 		return enrichmentDatastore
 				.find(PositionEntityImpl.class)
 				.filter(filters.toArray(Filter[]::new))
-				.first();
+				.iterator()
+				.toList();
 	}
-	
-	public List<PositionEntityImpl> getAllPositionEntities() {
-		List<PositionEntityImpl> queryResult = enrichmentDatastore.find(PositionEntityImpl.class).iterator().toList();
-		if(queryResult.size()>0)
-		{
-			List<PositionEntityImpl> tmpResult = new ArrayList<>();
-			for(int index = queryResult.size()-1; index >= 0; index--) {
-				PositionEntityImpl dbEntity = queryResult.get(index);
-				tmpResult.add(dbEntity);
-			}
-			return tmpResult;
-		}
-		else {
-			return queryResult;
-		}
+
+	public List<PositionEntityImpl> get_N_PositionEntities(int limit, int skip) {
+		return enrichmentDatastore.find(PositionEntityImpl.class)
+				.iterator(new FindOptions()
+					    .skip(skip)
+					    .limit(limit))
+				.toList();
 	}
 
 }

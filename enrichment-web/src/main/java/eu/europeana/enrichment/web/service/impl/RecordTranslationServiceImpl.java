@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,14 +9,12 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.cloud.translate.Translation;
-
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.exceptions.FunctionalRuntimeException;
 import eu.europeana.enrichment.model.RecordTranslation;
 import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
 import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
-import eu.europeana.enrichment.web.exception.FunctionalRuntimeException;
 import eu.europeana.enrichment.web.service.RecordTranslationService;
 
 @Service(EnrichmentConstants.BEAN_RECORD_TRANSLATION_SERVICE)
@@ -45,9 +44,9 @@ public class RecordTranslationServiceImpl implements RecordTranslationService {
 	}
 	
 	@Override
-	public RecordTranslation translate(RecordTranslation record) throws Exception{
+	public <T extends RecordTranslation> RecordTranslation translate(RecordTranslation record, Class<T> objClass) throws Exception{
 		
-	    RecordTranslation storedTranslation = recordTranslationDao.findByRecordId(record.getRecordId());
+	    RecordTranslation storedTranslation = recordTranslationDao.findByRecordId(record.getRecordId(), objClass);
 	    if(storedTranslation != null && storedTranslation.isTranslationComplete()) {
 	        return storedTranslation;
 	    } else {
@@ -73,27 +72,26 @@ public class RecordTranslationServiceImpl implements RecordTranslationService {
             throw new FunctionalRuntimeException("Missing descriptions for record:"  + recordTranslation.getRecordId());
         } 
         
-        List<Translation> translations = googleTranslationService.translateList(recordTranslation.getDescription(), null, targetLanguage);
-        if(hasFailedTranslation(translations, recordTranslation.getDescription().size())) {
+		List<String> googleTransTextResp = new ArrayList<>();
+		List<String> googleTransDetectedLangResp = new ArrayList<>();
+        googleTranslationService.translateList(recordTranslation.getDescription(), null, targetLanguage, googleTransTextResp, googleTransDetectedLangResp);
+        if(hasFailedTranslation(googleTransTextResp, recordTranslation.getDescription().size())) {
             throw new FunctionalRuntimeException("Translation failed for record, see error logs:"  + recordTranslation.getRecordId());
         }
         
-        for (Translation translation : translations) {
-            if(isFailedTranslation(translation)) {
+        for (int i=0;i<googleTransTextResp.size();i++) {
+        	String transText = googleTransTextResp.get(i);
+        	String transDetectLang = googleTransDetectedLangResp.get(i);
+            if(StringUtils.isEmpty(transText) || StringUtils.isEmpty(transDetectLang)) {
                 throw new FunctionalRuntimeException("Translation failed for record, see error logs:"  + recordTranslation.getRecordId());
             }
-            recordTranslation.addTranslation(translation.getSourceLanguage(), translation.getTranslatedText());
+            recordTranslation.addTranslation(transDetectLang, transText);
         }
         recordTranslation.setTranslationStatus(RecordTranslation.TRANSLATION_STATUS_COMPLETE);
     }
 
-
-    private boolean isFailedTranslation(Translation translation) {
-        return translation == null || StringUtils.isEmpty(translation.getSourceLanguage()) || StringUtils.isEmpty(translation.getTranslatedText());
-    }
-
-    private boolean hasFailedTranslation(List<Translation> translations, int expectedTranslations) {
-        return translations == null || (translations.size() != expectedTranslations);
+    private boolean hasFailedTranslation(List<String> translations, int expectedTranslations) {
+        return translations.size()==0 || (translations.size() != expectedTranslations);
     }
 
 

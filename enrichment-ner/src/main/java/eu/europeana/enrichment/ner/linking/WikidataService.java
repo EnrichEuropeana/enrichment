@@ -2,11 +2,12 @@ package eu.europeana.enrichment.ner.linking;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import eu.europeana.enrichment.model.WikidataEntity;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
 public interface WikidataService {
 
@@ -17,7 +18,7 @@ public interface WikidataService {
 	 * @param WikidataID			(e.g. http://www.wikidata.org/entity/Q762)
 	 * @return
 	 */
-	public String getWikidataJSONFromRemote(String WikidataID);
+	public String getWikidataJSONFromRemote(String WikidataID) throws Exception;
 	
 	/**
 	 * This method returns a value of the specific JSON field 
@@ -55,7 +56,7 @@ public interface WikidataService {
 	 * @param geonamesId			(e.g. 2761333 should be Vienna)
 	 * @return						a list of Wikidata entity urls
 	 */
-	public List<String> getWikidataId(String geonameId);
+	public List<String> getWikidataId(String geonameId) throws Exception;
 	
 	/*
 	 * This method sends a Wikidata label sparql search query including
@@ -66,7 +67,7 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata entity urls
 	 */
-	public List<String> getWikidataIdWithLabel(String label, String language);
+	public List<String> getWikidataIdWithLabel(String label, String language) throws Exception;
 	
 	/*
 	 * This method sends a Wikidata sparql search query for label or altLabel including
@@ -77,7 +78,7 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata entity urls
 	 */
-	public List<String> getWikidataIdWithLabelAltLabel(String label, String language);
+	public List<String> getWikidataIdWithLabelAltLabel(String label, String language) throws Exception;
 	
 	/*
 	 * This method sends a Wikidata place label sparql search query including
@@ -88,7 +89,7 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata places entity urls
 	 */
-	public List<String> getWikidataPlaceIdWithLabel(String label, String language);
+	public List<String> getWikidataPlaceIdWithLabel(String label, String language) throws Exception;
 	
 	/*
 	 * This method sends a Wikidata place label and altlabel sparql search query including
@@ -99,7 +100,7 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata places entity urls
 	 */
-	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language);
+	public List<String> getWikidataPlaceIdWithLabelAltLabel(String label, String language) throws Exception;
 	
 	/*
 	 * This method sends a Wikidata agent label sparql search query including
@@ -110,11 +111,11 @@ public interface WikidataService {
 	 * 								labels for comparison
 	 * @return						a list of Wikidata agents entity urls
 	 */
-	public List<String> getWikidataAgentIdWithLabel(String label, String language);
+	public List<String> getWikidataAgentIdWithLabel(String label, String language) throws Exception;
 	
-	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language);
+	public List<String> getWikidataAgentIdWithLabelAltLabel(String label, String language) throws Exception;
 		
-	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws IOException;
+	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws IOException, Exception;
 
 	public WikidataEntity getWikidataEntity(String wikidataURL, String WikidataJSON, String type);
 	
@@ -122,9 +123,17 @@ public interface WikidataService {
 
 	boolean validWikidataPage(String wikidataJSONResponse);
 
-	List<String> getWikidataIdWithWikidataSearch(String label);
+	List<String> getWikidataIdWithWikidataSearch(String label) throws Exception;
 	
-	String computePreferedWikidataId(NamedEntityImpl namedEntity, boolean matchType) throws IOException, SolrServiceException;
+	public boolean computePreferredWikidataIds(NamedEntityImpl namedEntity, List<PositionEntityImpl> positions, boolean matchType) throws Exception;
 	
-	CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws IOException;
+	CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws IOException, Exception;
+	
+	public boolean matchInstanceOfProperty(String wikidataJSONResponse, String type);
+	
+	public Set<String> readWikidataIdsFromQueryServiceOutput(String path) throws IOException;
+	
+	public Set<String> getWikidataSubclassesForPlace();
+	
+	public Set<String> getWikidataSubclassesForAgent();
 }

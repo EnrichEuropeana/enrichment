@@ -27,13 +27,13 @@ public class NamedEntityAnnotationCollection {
 
 	private static String creator;
 
-	List<NamedEntityAnnotation> items;
+	List<NamedEntityAnnotationImpl> items;
 //	private String context = "http://www.w3.org/ns/anno.jsonld";
 	private String id;
 	private String type = "AnnotationCollection";
 	private String total; 
 
-	public NamedEntityAnnotationCollection(String idBaseUrlPar, String storyBaseUrl, String itemBaseUrl, String creatorPar, List<NamedEntityAnnotation> itemsParam, String storyId, String itemId) {
+	public NamedEntityAnnotationCollection(String idBaseUrlPar, String storyBaseUrl, String itemBaseUrl, String creatorPar, List<NamedEntityAnnotationImpl> itemsParam, String storyId, String itemId) {
 		
 		creator=creatorPar;
 		
@@ -63,11 +63,11 @@ public class NamedEntityAnnotationCollection {
 	}
 	
 	@JsonProperty(EnrichmentConstants.ITEMS)
-	public List<NamedEntityAnnotation> getItems() {
+	public List<NamedEntityAnnotationImpl> getItems() {
 		return items;
 	}
 	
-	public void setItems(List<NamedEntityAnnotation> items) {
+	public void setItems(List<NamedEntityAnnotationImpl> items) {
 		this.items = items;
 	}
 	

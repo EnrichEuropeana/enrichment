@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
@@ -48,8 +48,8 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		updateStoryFromTranscribathon(persistentStoryEntityService.findStoryEntity(storyId));
 	}
 
-	public StoryEntity updateStoryFromTranscribathon (StoryEntity dbStory) {
-		StoryEntity tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(dbStory.getStoryId());
+	public StoryEntityImpl updateStoryFromTranscribathon (StoryEntityImpl dbStory) {
+		StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(dbStory.getStoryId());
 		if(Objects.equals(dbStory, tpStory)) {
 			return dbStory;
 		}
@@ -57,9 +57,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 			if(tpStory==null) {
 				persistentStoryEntityService.deleteStoryEntity(dbStory);
 				persistentItemEntityService.deleteAllItemsOfStory(dbStory.getStoryId());
-				persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, null);
-				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, null);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, null);
+				persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD);
+				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD);
+				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
 				dbStory=null;
 			}
 			else {
@@ -67,19 +67,19 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
 				if(! StringUtils.equals(dbStory.getSummary(), tpStory.getSummary()))
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
 				if(! StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText()))
 				{
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
 				
 				dbStory.copyFromStory(tpStory);				
@@ -89,25 +89,25 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}		
 	}
 	
-	public ItemEntity updateItemFromTranscribathon (ItemEntity dbItem) {
-		ItemEntity tpItem = enrichmentTpApiClient.getItemFromTranscribathon(dbItem.getItemId());
+	public ItemEntityImpl updateItemFromTranscribathon (ItemEntityImpl dbItem) {
+		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(dbItem.getItemId());
 		if(Objects.equals(dbItem, tpItem)) {
 			return dbItem;
 		}
 		else {
 			if(tpItem==null) {
 				persistentItemEntityService.deleteItemEntity(dbItem);
-				persistentTranslationEntityService.deleteTranslationEntity(null, dbItem.getItemId(), null);
-				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(null, dbItem.getItemId(), null);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), null);
+				persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD);
+				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD);
+				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
 				dbItem=null;
 			}
 			else {
 				if(! StringUtils.equals(dbItem.getTranscriptionText(), tpItem.getTranscriptionText()))
 				{
-					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(null, dbItem.getItemId(),EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentTranslationEntityService.deleteTranslationEntity(null, dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(null, dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(),EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}	
 				dbItem.copyFromItem(tpItem);
 				persistentItemEntityService.saveItemEntity(dbItem);
@@ -116,17 +116,17 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}		
 	}
 	
-	public String updateStoriesFromInput(StoryEntity[] stories) {
+	public String updateStoriesFromInput(StoryEntityImpl[] stories) {
 		
 		logger.debug("Uploading new stories to the Mongo DB.");
 		
-		for (StoryEntity story : stories) {
+		for (StoryEntityImpl story : stories) {
 			//some stories have html markup in the description 
 //			String storyDescriptionText = HelperFunctions.parseHTMLWithJsoup(story.getDescription());
 //			story.setDescription(storyDescriptionText);
 			
 			//comparing the new and the already existing story and deleting old NamedEntities, TranslationEntities and NamedEntityAnnotations if there are changes
-			StoryEntity dbStoryEntity = persistentStoryEntityService.findStoryEntity(story.getStoryId());
+			StoryEntityImpl dbStoryEntity = persistentStoryEntityService.findStoryEntity(story.getStoryId());
 			if (dbStoryEntity!=null)
 			{
 				if(! Objects.equals(dbStoryEntity, story)) {
@@ -134,19 +134,19 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 					}
 					else if(! StringUtils.equals(dbStoryEntity.getSummary(), story.getSummary()))
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY, EnrichmentConstants.MONGO_SKIP_FIELD);
 					}
 					else if(! StringUtils.equals(dbStoryEntity.getTranscriptionText(), story.getTranscriptionText()))
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 					}					
 					dbStoryEntity.copyFromStory(story);
 					persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
@@ -160,18 +160,18 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		return "{\"info\": \"Done successfully!\"}";
 	}
 	
-	public String updateItemsFromInput(ItemEntity[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public String updateItemsFromInput(ItemEntityImpl[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		logger.debug("Uploading new items to the Mongo DB.");
 		
-		for (ItemEntity item : items) {
+		for (ItemEntityImpl item : items) {
 			
 			//remove html markup from the transcription and decription texts
 //			String itemTranscriptionText = HelperFunctions.parseHTMLWithJsoup(item.getTranscriptionText());
 //			item.setTranscriptionText(itemTranscriptionText);
 			
 			//comparing the new and the already existing item and deleting old NamedEntities if there are changes
-			ItemEntity dbItemEntity = persistentItemEntityService.findItemEntity(item.getStoryId(), item.getItemId());			
+			ItemEntityImpl dbItemEntity = persistentItemEntityService.findItemEntity(item.getStoryId(), item.getItemId());			
 			if (dbItemEntity!=null)
 			{
 				if(! Objects.equals(dbItemEntity, item)) {
@@ -179,7 +179,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 					{
 						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 						persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 					}	
 					dbItemEntity.copyFromItem(item);
 					persistentItemEntityService.saveItemEntity(dbItemEntity);

@@ -90,14 +90,7 @@ public class DeeplTranslationServiceImpl {
 	}
 
 	public String processDeeplResponse(String reponse) {
-		JSONObject responseJson = null;
-		try {
-			responseJson = new JSONObject(reponse);
-		}
-		catch (JSONException e) {
-			logger.debug("Exception during parsing the Deepl translation responce json.");
-			return null;
-		}
+		JSONObject responseJson = new JSONObject(reponse);
 		
 		if(!responseJson.has("translations"))
 		{

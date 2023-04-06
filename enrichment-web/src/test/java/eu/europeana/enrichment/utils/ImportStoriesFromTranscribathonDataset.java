@@ -14,7 +14,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
@@ -90,7 +89,7 @@ public class ImportStoriesFromTranscribathonDataset {
 				}
 			}
 			
-			StoryEntity [] newStories = new StoryEntity [1];
+			StoryEntityImpl [] newStories = new StoryEntityImpl [1];
 			newStories[0] = new StoryEntityImpl();
 			
 			if(!storyTranscription.equalsIgnoreCase("")) newStories[0].setTranscriptionText(storyTranscription);
