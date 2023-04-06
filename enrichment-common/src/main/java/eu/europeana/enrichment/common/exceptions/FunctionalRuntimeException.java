@@ -1,7 +1,6 @@
-package eu.europeana.enrichment.web.exception;
+package eu.europeana.enrichment.common.exceptions;
 
 public class FunctionalRuntimeException extends RuntimeException{
-
 	/**
 	 * 
 	 */

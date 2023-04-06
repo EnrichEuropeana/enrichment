@@ -2,7 +2,6 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.StoryEntity;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 
 public interface PersistentStoryEntityService {
@@ -13,15 +12,14 @@ public interface PersistentStoryEntityService {
 	 * @param storyId					story id of the story entity
 	 * @return							a database story entity 
 	 */
-	public StoryEntity findStoryEntity(String storyId);
+	public StoryEntityImpl findStoryEntity(String storyId);
 	
-	public List<StoryEntityImpl> findStoryEntities(String storyId);
 	/*
 	 * This method retrieves all story entities from the Mongo database
 	 * 
 	 * @return							list of database story entities
 	 */
-	public List<StoryEntity> getAllStoryEntities();
+	public List<StoryEntityImpl> get_N_StoryEntities(int limit, int skip);
 	/*
 	 * This method saves and updates story entities into the Mongo database
 	 * 
@@ -29,7 +27,7 @@ public interface PersistentStoryEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveStoryEntity(StoryEntity entity);
+	public void saveStoryEntity(StoryEntityImpl entity);
 	/*
 	 * This method saves and updates a list of story entities into the Mongo database
 	 * 
@@ -37,14 +35,14 @@ public interface PersistentStoryEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveStoryEntities(List<StoryEntity> entities);
+	public void saveStoryEntities(List<StoryEntityImpl> entities);
 	/*
 	 * This method deletes story entities from the Mongo database
 	 * 
 	 * @param entity					story entity which should be deleted
 	 * @return
 	 */
-	public void deleteStoryEntity(StoryEntity entity);
+	public void deleteStoryEntity(StoryEntityImpl entity);
 	
 	/**
 	 * This function updates the NER tools list that are already applied to the given story

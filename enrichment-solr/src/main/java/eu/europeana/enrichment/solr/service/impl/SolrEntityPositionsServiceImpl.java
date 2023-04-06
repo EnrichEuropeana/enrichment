@@ -34,7 +34,7 @@ import org.tartarus.snowball.ext.romanianStemmer;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.solr.commons.GoogleTranslator;
 import eu.europeana.enrichment.solr.commons.JavaGsonJSONParser;
@@ -860,7 +860,7 @@ public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl im
 
 	}
 	@Override
-	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
+	public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntityImpl dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws Exception
 	{		
 		/*
 		 * if the original language is the same as the target language, add positions in the original text

@@ -13,10 +13,9 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
-import eu.europeana.enrichment.model.StoryEntity;
 
 @Entity(value="StoryEntityImpl")
-public class StoryEntityImpl implements StoryEntity {
+public class StoryEntityImpl {
 
 	@Indexed(options = @IndexOptions(unique = true))
 	private String storyId;
@@ -38,12 +37,12 @@ public class StoryEntityImpl implements StoryEntity {
 	@Id
     private ObjectId _id;
 	
-	@Override
+	
 	public ObjectId getId() {
 		return _id;
 	}
 	
-	public StoryEntityImpl (StoryEntity copy)
+	public StoryEntityImpl (StoryEntityImpl copy)
 	{
 		this.storyId = copy.getStoryId();
 		this.title = copy.getTitle();
@@ -65,103 +64,103 @@ public class StoryEntityImpl implements StoryEntity {
 		
 	}
 
-	@Override
+	
 	public String getStoryId() {
 		return storyId;
 	}
 
-	@Override
+	
 	public void setStoryId(String storyId) {
 		this.storyId = storyId;
 	}
 
-	@Override
+	
 	public String getTitle() {
 		return title;
 	}
 
-	@Override
+	
 	public void setTitle(String storyTitle) {
 		this.title=storyTitle;
 		
 	}
 
-	@Override
+	
 	public String getSource() {
 		return source;
 	}
 
-	@Override
+	
 	public void setSource(String storySource) {
 		this.source=storySource;		
 	}
 
-	@Override
+	
 	public String getDescription() {
 		return description;
 	}
 
-	@Override
+	
 	public void setDescription(String description) {
 		this.description=description;
 	}
 	
-	@Override
+	
 	public String getDescriptionEn() {
 		return descriptionEn;
 	}
 
-	@Override
+	
 	public void setDescriptionEn(String descriptionEn) {
 		this.descriptionEn=descriptionEn;
 	}
 
-	@Override
+	
 	public String getSummary() {
 		return summary;
 	}
 
-	@Override
+	
 	public void setSummary(String storySummary) {
 		this.summary=storySummary;	
 	}
 	
-	@Override
+	
 	public String getSummaryEn() {
 		return summaryEn;
 	}
 
-	@Override
+	
 	public void setSummaryEn(String summaryEn) {
 		this.summaryEn=summaryEn;	
 	}
 
-	@Override
+	
 	public String getTranscriptionText() {
 		return transcriptionText;
 	}
 
-	@Override
+	
 	public void setTranscriptionText(String storyTranscription) {
 		this.transcriptionText=storyTranscription;
 	}
 
-	@Override
+	
 	public String getLanguageDescription() {
 		return languageDescription;
 	}
 
-	@Override
+	
 	public void setLanguageDescription(String storyLanguageDescription) {
 		this.languageDescription=storyLanguageDescription;
 	}
 
-	@Override
+	
 	public String getLanguageSummary() {
 		return languageSummary;
 	}
 
-	@Override
+	
 	public void setLanguageSummary(String storyLanguageSummary) {
 		this.languageSummary=storyLanguageSummary;
 	}
@@ -198,8 +197,8 @@ public class StoryEntityImpl implements StoryEntity {
 		this.transcriptionLanguages = transcriptionLanguages;
 	}
 
-	@Override
-	public void copyFromStory(StoryEntity story) {
+	
+	public void copyFromStory(StoryEntityImpl story) {
 		this.storyId = story.getStoryId();
 		this.title = story.getTitle();
 		this.source = story.getSource();

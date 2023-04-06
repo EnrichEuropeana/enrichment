@@ -6,21 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.google.cloud.translate.Translation;
-
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.exception.InternalServerException;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
-import eu.europeana.enrichment.model.TranslationEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
@@ -62,16 +58,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	
 	@Override
 	public String getTranslation(String storyId, String itemId, String translationTool, String type) {
-		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-		if(dbTranslationEntity==null) return null;
-		return dbTranslationEntity.getTranslatedText();
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(storyId, itemId, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(dbTranslationEntity.isEmpty()) {
+			return null;
+		}
+		return dbTranslationEntity.get(0).getTranslatedText();
 	}
 	
 	@Override
-	public String translateStory(StoryEntity story, String type, String translationTool) throws Exception {
-		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(story.getStoryId(), null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-		if(dbTranslationEntity != null) {
-			return dbTranslationEntity.getTranslatedText();
+	public String translateStory(StoryEntityImpl story, String type, String translationTool) throws Exception {
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(story.getStoryId(), null, translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
+		if(! dbTranslationEntity.isEmpty()) {
+			return dbTranslationEntity.get(0).getTranslatedText();
 		}						
 
 		String textToTranslate = null;
@@ -97,16 +95,16 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return textToTranslate;
 		}		
 		
-		TranslationEntity newTranslation = translateAndSave(story.getStoryId(), null, type, translationTool, sourceLanguage, textToTranslate);
+		TranslationEntityImpl newTranslation = translateAndSave(story.getStoryId(), null, type, translationTool, sourceLanguage, textToTranslate);
 		if(newTranslation==null) return null;
 		return newTranslation.getTranslatedText();
 	}
 
 	@Override
-	public String translateItem(ItemEntity item, String type, String translationTool) throws Exception {
-		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.findTranslationEntityWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, type);
-		if(dbTranslationEntity != null) {
-			return dbTranslationEntity.getTranslatedText();
+	public String translateItem(ItemEntityImpl item, String property, String translationTool) throws Exception {
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool, EnrichmentConstants.defaultTargetTranslationLanguage, property);
+		if(! dbTranslationEntity.isEmpty()) {
+			return dbTranslationEntity.get(0).getTranslatedText();
 		}						
 
 		String textToTranslate = item.getTranscriptionText();
@@ -120,19 +118,19 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return textToTranslate;
 		}
 		
-		TranslationEntity newTranslation = translateAndSave(item.getStoryId(), item.getItemId(), type, translationTool, sourceLanguage, textToTranslate);
+		TranslationEntityImpl newTranslation = translateAndSave(item.getStoryId(), item.getItemId(), property, translationTool, sourceLanguage, textToTranslate);
 		if(newTranslation==null) return null;
 		return newTranslation.getTranslatedText();
 	}
 
-	private TranslationEntity translateAndSave(String storyId, String itemId, String type, String translationTool, String sourceLanguage, String textToTranslate) throws Exception{
+	private TranslationEntityImpl translateAndSave(String storyId, String itemId, String property, String translationTool, String sourceLanguage, String textToTranslate) throws Exception{
 		try {
-			TranslationEntity tmpTranslationEntity = new TranslationEntityImpl();
+			TranslationEntityImpl tmpTranslationEntity = new TranslationEntityImpl();
 			tmpTranslationEntity.setLanguage(EnrichmentConstants.defaultTargetTranslationLanguage);
 			tmpTranslationEntity.setTool(translationTool);
 			tmpTranslationEntity.setStoryId(storyId);
 			tmpTranslationEntity.setItemId(itemId);
-			tmpTranslationEntity.setType(type);
+			tmpTranslationEntity.setType(property);
 			tmpTranslationEntity.setKey(textToTranslate);
 
 			switch (translationTool) {
@@ -141,11 +139,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					logger.debug("The google translation service is currently disabled.");
 					return null;
 				}
-				Translation googleResponse = googleTranslationService.translateText(textToTranslate, EnrichmentConstants.defaultTargetTranslationLanguage);
-				if(googleResponse!=null) {
-					String unescapedHtml = StringEscapeUtils.unescapeHtml4(googleResponse.getTranslatedText());
-					tmpTranslationEntity.setTranslatedText(unescapedHtml);
-					tmpTranslationEntity.setOriginLangGoogle(googleResponse.getSourceLanguage());
+				List<String> googleTransTextResp = new ArrayList<>();
+				List<String> googleTransDetectedLangResp = new ArrayList<>();
+				googleTranslationService.translateText(textToTranslate, null, EnrichmentConstants.defaultTargetTranslationLanguage, googleTransTextResp, googleTransDetectedLangResp);
+				if(googleTransTextResp.size()>0) {
+					tmpTranslationEntity.setTranslatedText(googleTransTextResp.get(0));
+					tmpTranslationEntity.setOriginLangGoogle(googleTransDetectedLangResp.get(0));
 				}
 				break;
 			case eTranslationToolName:
@@ -154,8 +153,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					return null;					
 				}
 				String eTranslationResponse = eTranslationService.translateText(textToTranslate, sourceLanguage, EnrichmentConstants.defaultTargetTranslationLanguage);
-				if(eTranslationResponse!=null)
+				if(! eTranslationResponse.equals(EnrichmentConstants.eTranslationFailedSign)) {
 					tmpTranslationEntity.setTranslatedText(eTranslationResponse);
+				}
 				break;
 			default:
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
@@ -221,20 +221,18 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_ORIGINAL_TEXT, null);
 		}
 		
-		TranslationEntity dbTranslationEntity = persistentTranslationEntityService.
-				findTranslationEntityWithAditionalInformation(storyId, itemId, translationTool, language, type);
-		if(dbTranslationEntity == null) {
+		List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService.findTranslationEntitiesWithAditionalInformation(storyId, itemId, translationTool, language, type);
+		if(dbTranslationEntity.isEmpty()) {
 			//TODO: proper exception handling
 			return "Item " + i + " failed to be uploaded!";
-		}
-		
+		}		
 		try {
 			
-			dbTranslationEntity.setKey(originalText);
+			dbTranslationEntity.get(0).setKey(originalText);
 
-			dbTranslationEntity.setTranslatedText(translatedText);
+			dbTranslationEntity.get(0).setTranslatedText(translatedText);
 			
-			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity.get(0));
 
 		} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
 			// TODO proper exception handling

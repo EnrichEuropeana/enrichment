@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.dao.ItemEntityDao;
 
@@ -18,46 +17,37 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	ItemEntityDao itemEntityDao;
 	
 	@Override
-	public ItemEntity findItemEntity(String storyId, String itemId) {
-		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
-	}
-	
-	public ItemEntity findItemEntity(String itemId) {
-		return itemEntityDao.findItemEntity(itemId);
-	}
-	
-	@Override
-	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId) {
-		return itemEntityDao.findItemEntitiesFromStory(storyId, itemId);
+	public ItemEntityImpl findItemEntity(String storyId, String itemId) {
+		return itemEntityDao.findItemEntity(storyId, itemId);
 	}
 
 	@Override
-	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId) {
+	public List<ItemEntityImpl> findAllItemsOfStory(String storyId) {
 		// TODO Auto-generated method stub
-		return itemEntityDao.findStoryItemEntitiesFromStory(storyId);
+		return itemEntityDao.findAllItemsOfStory(storyId);
 	}
 
 	@Override
-	public List<ItemEntity> getAllItemEntities() {
+	public List<ItemEntityImpl> get_N_ItemEntities(int limit, int skip) {
 
-		return itemEntityDao.findAllItemEntities();
+		return itemEntityDao.find_N_ItemEntities(limit, skip);
 
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntity entity) {
+	public void saveItemEntity(ItemEntityImpl entity) {
 		itemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
-	public void saveStoryItemEntities(List<ItemEntity> entities) {
-		for(ItemEntity entity : entities) {
+	public void saveStoryItemEntities(List<ItemEntityImpl> entities) {
+		for(ItemEntityImpl entity : entities) {
 			saveItemEntity(entity);
 		}
 	}
 
 	@Override
-	public void deleteItemEntity(ItemEntity entity) {
+	public void deleteItemEntity(ItemEntityImpl entity) {
 		itemEntityDao.deleteItemEntity(entity);
 	}
 
@@ -65,13 +55,7 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	public void deleteAllItemsOfStory(String storyId) {
 		itemEntityDao.deleteAllItemsOfStory(storyId);
 	}
-	
-	@Override
-	public ItemEntity findItemEntityFromStory(String storyId, String itemId) {
 		
-		return itemEntityDao.findItemEntityFromStory(storyId, itemId);
-	}
-	
 	@Override
 	public void updateNerToolsForItem(String itemId, String nerTool) {
 		itemEntityDao.updateNerToolsForItem(itemId, nerTool);

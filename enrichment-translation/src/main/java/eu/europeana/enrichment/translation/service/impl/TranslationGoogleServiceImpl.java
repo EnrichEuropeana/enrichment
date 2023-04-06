@@ -4,7 +4,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.logging.log4j.Level;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,23 +104,41 @@ public class TranslationGoogleServiceImpl {
 //				
 //	}
 	
-	public Translation translateText(String text, String targetLanguage) {
-		try {
-			Translation translation = translate.translate(text, TranslateOption.targetLanguage(targetLanguage));		
-			return translation;
+	public void translateText(String text, String sourceLanguage, String targetLanguage, List<String> responseText, List<String> responseDetectedLang) {
+		Translation translation=null;
+		if(sourceLanguage!=null) {
+			translation = translate.translate(text, TranslateOption.sourceLanguage(sourceLanguage), TranslateOption.targetLanguage(targetLanguage));
 		}
-		catch(Exception ex) {
-			logger.log(Level.ERROR, "Exception during the translation of the text using Google!", ex);
-			return null;
+		else {
+			translation = translate.translate(text, TranslateOption.targetLanguage(targetLanguage));		
+		}
+
+		//unescape html special chars
+		if(translation!=null) {
+			String unescapedHtmlTranslation = StringEscapeUtils.unescapeHtml4(translation.getTranslatedText());
+			responseText.add(unescapedHtmlTranslation);
+			responseDetectedLang.add(translation.getSourceLanguage());
 		}
 	}
 	
-        public List<Translation> translateList(List<String> texts, String sourceLanguage, String targetLanguage) {
-            try {
-                return translate.translate(texts, TranslateOption.targetLanguage(targetLanguage));
-            } catch (Exception ex) {
-                logger.log(Level.ERROR, "Exception during the translation of the text using Google!", ex);
-                return null;
-            }
-        }
+    public void translateList(List<String> texts, String sourceLanguage, String targetLanguage, List<String> responseText, List<String> responseDetectedLang) {
+    	List<Translation> translations=null;
+    	if(sourceLanguage!=null) {
+    		translations = translate.translate(texts, TranslateOption.sourceLanguage(sourceLanguage), TranslateOption.targetLanguage(targetLanguage));
+    	}
+    	else {
+    		translations = translate.translate(texts, TranslateOption.targetLanguage(targetLanguage));
+    	}
+    	
+		//unescape html special chars
+		if(translations!=null) {
+			for(Translation transEl : translations) {
+    			String unescapedHtmlTranslation = StringEscapeUtils.unescapeHtml4(transEl.getTranslatedText());
+    			responseText.add(unescapedHtmlTranslation);
+    			responseDetectedLang.add(transEl.getSourceLanguage());
+			}
+		}
+
     }
+    
+}

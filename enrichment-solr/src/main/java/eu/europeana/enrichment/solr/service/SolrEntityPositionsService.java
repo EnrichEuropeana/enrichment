@@ -1,11 +1,9 @@
 package eu.europeana.enrichment.solr.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.TreeMap;
 
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 
@@ -37,7 +35,7 @@ public interface SolrEntityPositionsService {
 		 * @throws SolrServiceException
 		 * @throws Exception
 		 */
-		 public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntity dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws SolrServiceException, Exception;
+		 public void findEntitiyOffsetsInOriginalText(boolean fuzzyLogic, StoryEntityImpl dbStoryEntity, String targetLanguage, String translatedText, TreeMap<String, List<List<String>>> identifiedNER) throws SolrServiceException, Exception;
 
 
 }

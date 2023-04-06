@@ -1,5 +1,10 @@
 package eu.europeana.enrichment.common.commons;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.bson.types.ObjectId;
+
 public class EnrichmentConstants {
 
 	//config bean constants
@@ -60,6 +65,7 @@ public class EnrichmentConstants {
     
     //wikidata
     public static final String WIKIDATA_ENTITY_BASE_URL = "http://www.wikidata.org/entity/";
+    public static final String WIKIDATA_DIR="wikidata";
     
     // properties fields in the wikidata json
 	/*
@@ -127,6 +133,7 @@ public class EnrichmentConstants {
 	public static final String NER_TOOLS = "nerTools";
 	public static final String PROCESSING = "processing";
 	public static final String FOUND_BY_NER_TOOLS = "foundByNerTools";
+	public static final String LINKED_BY_NER_TOOLS = "linkedByNerTools";
 	public static final String POSITION_NAMED_ENTITY = "namedEntityId";
 	public static final String TOTAL = "total";
 	public static final String ITEMS = "items";
@@ -181,11 +188,15 @@ public class EnrichmentConstants {
 	public static final String ModelsURL = "";
 
 	//ner analysis
-	public static final String stanfordNer = "Stanford_NER";
-	public static final String dbpediaSpotlightName = "DBpedia_Spotlight";
-	public static final String defaultLinkingTool = "Wikidata";
-	public static final String europeanaLinkingTool = "Europeana";
+	public static final String WIKIDATA_LINKING = "Wikidata";
+	public static final String EUROPEANA_LINKING = "Europeana";
 	public static final String LINKING = "linking";
+	public static final String PREF_WIKI_ID_STATUS_CROSSVALID_PREF_LABEL="crossvalidated_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_CROSSVALID_ALT_LABEL="crossvalidated_alt_label";
+	public static final String PREF_WIKI_ID_STATUS_DBP_VALID_PREF_LABEL="validated_dbp_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL="validated_dbp_alt_label";
+	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL="validated_stanford_pref_label";
+	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL="validated_stanford_alt_label";
 	
 	//solr denormalization fields
     public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";
@@ -204,6 +215,16 @@ public class EnrichmentConstants {
 	public static final String defaultTargetTranslationLanguage = "en";
 	public static final String defaultTranslationTool = "Google";
 	public static final String eTranslationTool = "eTranslation";
+	public static final String eTranslationFailedSign = "-";
 
+	//translation evaluation
+	public static final String TRANSLATION_EVALUATION_DIR = "translation-eval";
+	public static final String DRI_COLLECTION_DIR = "dri-collection";
+	public static final String UWR_COLLECTION_DIR = "uwr-collection";
+	
+	//check if the field during the mongo search should be skipped (because the null field values are valid values for the search, in which case the mongo field does not exist)
+	public static final String MONGO_SKIP_FIELD="mongo_skip_field";
+	public static final List<String> MONGO_SKIP_LIST_FIELD=Collections.singletonList(MONGO_SKIP_FIELD);
+	public static final ObjectId MONGO_SKIP_OBJECT_ID_FIELD=new ObjectId();
 }
 

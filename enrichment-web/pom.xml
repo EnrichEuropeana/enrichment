@@ -394,11 +394,6 @@
 			 <scope>system</scope>
 			<systemPath>${basedir}/lib/tp-api.jar</systemPath>  
 		</dependency>
-		<dependency>
-    		<groupId>org.apache.commons</groupId>
-    		<artifactId>commons-text</artifactId>
-    		<version>1.9</version>  		
-		</dependency>
 		
 	</dependencies>
 	
@@ -438,8 +433,32 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-		</pluginManagement>
+<!-- banned dependencies which will cause project build to fail -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>        
+                  <!-- deps with excludes will be banned -->      
+                    <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>			
+	</plugins>
+	</pluginManagement>
 	</build>
 
 </project>
