@@ -67,7 +67,8 @@ public class AdministrationController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	@ApiOperation(value = "Update StoryEntities from input in the database.", nickname = "updateStories", notes = "This method enables updating a set of stories from input in the database."
-			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body.")
+			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. In case the input stories do not exist"
+			+ "in the db, they will be stored as new.")
 	@RequestMapping(value = "/administration/updateStories", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateStories(
@@ -83,8 +84,8 @@ public class AdministrationController extends BaseRest {
 			validateStory(story);
 		}
 		
-		String uploadStoriesStatus = enrichmentStoryAndItemStorageService.updateStoriesFromInput(body);
-		ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
+		enrichmentStoryAndItemStorageService.updateStoriesFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 		return response;	
 	}
 	
@@ -163,8 +164,8 @@ public class AdministrationController extends BaseRest {
 			validateItem(item);
 		}
 		
-		String uploadItemsStatus = enrichmentStoryAndItemStorageService.updateItemsFromInput(body);
-		ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
+		enrichmentStoryAndItemStorageService.updateItemsFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 		return response;
 	}
 	

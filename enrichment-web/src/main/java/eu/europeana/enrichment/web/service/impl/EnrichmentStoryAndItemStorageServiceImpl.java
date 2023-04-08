@@ -116,7 +116,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}		
 	}
 	
-	public String updateStoriesFromInput(StoryEntityImpl[] stories) {
+	public void updateStoriesFromInput(StoryEntityImpl[] stories) {
 		
 		logger.debug("Uploading new stories to the Mongo DB.");
 		
@@ -157,10 +157,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 			}
 			
 		}
-		return "{\"info\": \"Done successfully!\"}";
 	}
 	
-	public String updateItemsFromInput(ItemEntityImpl[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+	public void updateItemsFromInput(ItemEntityImpl[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 		
 		logger.debug("Uploading new items to the Mongo DB.");
 		
@@ -189,7 +188,6 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				persistentItemEntityService.saveItemEntity(item);
 			}
 		}
-		return "{\"info\": \"Done successfully!\"}";
 	}
 	
 }

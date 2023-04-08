@@ -493,7 +493,9 @@ public class EnrichmentNERServiceImpl {
 	private void adaptNERServiceEndpointBasedOnLanguage (NERService service, String languageForNER)
 	{
 		String endpoint = service.getEnpoint();
-		service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
+		if(EnrichmentConstants.SUPPORTED_NER_LANGUAGES.contains(languageForNER)) {
+			service.setEndpoint(endpoint.replaceAll("/en/", "/"+languageForNER+"/"));
+		}
 	}
 
 	public NamedEntityAnnotationCollection getAnnotations(String storyId, String itemId, String property) throws Exception {
