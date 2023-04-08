@@ -227,8 +227,10 @@ public class AdministrationController extends BaseRest {
 		return response;
 	}
 
-	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
-			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method is aimed to be used "
+			+ "when translating with eTranslation locally. Namely, the eTranslation services returns response using a callback function, which should be "
+			+ "accessible from the Internet. When the app is deployed to the test server, it will be accessible from the internet, so this method can be "
+			+ "used to get the eTranslation responses.")
 	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
 			produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> getETranslation(

@@ -3,8 +3,6 @@ package eu.europeana.enrichment.ner.linking;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -1262,8 +1260,7 @@ public class WikidataServiceImpl implements WikidataService {
 
 	public Set<String> readWikidataIdsFromQueryServiceOutput(String path) throws IOException {
 		Set<String> wikidataIdentifiers = new HashSet<String>();
-		Path subclassesPlacePath = Path.of(path);
-		String subclassesPlaceString = Files.readString(subclassesPlacePath);
+		String subclassesPlaceString = HelperFunctions.readFileFromResources(path);
 		JSONArray subclassesPlaceJson = new JSONArray(subclassesPlaceString);
 		for(int index = 0; subclassesPlaceJson.length() > index; index++) {
 			JSONObject item = subclassesPlaceJson.getJSONObject(index);

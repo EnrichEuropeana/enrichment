@@ -1,0 +1,50 @@
+SELECT DISTINCT ?s ?desc WHERE {
+
+  { ?s wdt:P279* wd:Q62849941 }
+  UNION{ ?s wdt:P279* wd:Q6692396 }
+  UNION{ ?s wdt:P279* wd:Q2182989 }
+  UNION{ ?s wdt:P279* wd:Q4309578 }
+  UNION{ ?s wdt:P279* wd:Q10328323 }
+  UNION{ ?s wdt:P279* wd:Q164099 }
+  UNION{ ?s wdt:P279* wd:Q17189807 }
+  UNION{ ?s wdt:P279* wd:Q17005689 }
+  UNION{ ?s wdt:P279* wd:Q7458240 }
+  UNION{ ?s wdt:P279* wd:Q107464884 }
+  UNION{ ?s wdt:P279* wd:Q18981006 }
+  UNION{ ?s wdt:P279* wd:Q26220 }
+  UNION{ ?s wdt:P279* wd:Q211584 }
+  UNION{ ?s wdt:P279* wd:Q213283 }
+  UNION{ ?s wdt:P279* wd:Q17272482 }
+  UNION{ ?s wdt:P279* wd:Q651481 }
+  UNION{ ?s wdt:P279* wd:Q116908836 }
+  UNION{ ?s wdt:P279* wd:Q83180 }
+  UNION{ ?s wdt:P279* wd:Q106608890 }
+  UNION{ ?s wdt:P279* wd:Q170477 }
+  UNION{ ?s wdt:P279* wd:Q64040784 }
+  UNION{ ?s wdt:P279* wd:Q444789 }
+  UNION{ ?s wdt:P279* wd:Q1410110 }
+  UNION{ ?s wdt:P279* wd:Q148571 }
+  UNION{ ?s wdt:P279* wd:Q12511 }
+  UNION{ ?s wdt:P279* wd:Q350783 }
+  UNION{ ?s wdt:P279* wd:Q693004 }
+  UNION{ ?s wdt:P279* wd:Q3679502 }
+  UNION{ ?s wdt:P279* wd:Q1709184 }
+  UNION{ ?s wdt:P279* wd:Q7339568 }
+  UNION{ ?s wdt:P279* wd:Q8010 }
+  UNION{ ?s wdt:P279* wd:Q15104915 }
+  UNION{ ?s wdt:P279* wd:Q1326624 }
+  UNION{ ?s wdt:P279* wd:Q1439156 }
+  UNION{ ?s wdt:P279* wd:Q15924535 }
+  UNION{ ?s wdt:P279* wd:Q13397636 }
+  UNION{ ?s wdt:P279* wd:Q1565905 }
+  UNION{ ?s wdt:P279* wd:Q628858 }
+  UNION{ ?s wdt:P279* wd:Q41176 }
+  UNION{ ?s wdt:P279* wd:Q1664720 }
+  UNION{ ?s wdt:P279* wd:Q1497364 }
+  UNION{ ?s wdt:P279* wd:Q376799 }
+  UNION{ ?s wdt:P279* wd:Q811430 }
+
+  ?s rdfs:label ?desc filter (lang(?desc) = "en").
+}
+
+
