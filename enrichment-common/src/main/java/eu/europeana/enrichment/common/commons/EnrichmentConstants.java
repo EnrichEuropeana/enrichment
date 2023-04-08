@@ -197,6 +197,7 @@ public class EnrichmentConstants {
 	public static final String PREF_WIKI_ID_STATUS_DBP_VALID_ALT_LABEL="validated_dbp_alt_label";
 	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_PREF_LABEL="validated_stanford_pref_label";
 	public static final String PREF_WIKI_ID_STATUS_STANFORD_VALID_ALT_LABEL="validated_stanford_alt_label";
+	public static final String SUPPORTED_NER_LANGUAGES="en,de";
 	
 	//solr denormalization fields
     public static final String PREF_LABEL_DENORMALIZED = "skos_prefLabel";

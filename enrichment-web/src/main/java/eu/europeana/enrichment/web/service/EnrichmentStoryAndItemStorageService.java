@@ -14,8 +14,8 @@ public interface EnrichmentStoryAndItemStorageService {
 	
 	public ItemEntityImpl updateItemFromTranscribathon (ItemEntityImpl updatedItem);
 	
-	public String updateStoriesFromInput(StoryEntityImpl[] stories);
+	public void updateStoriesFromInput(StoryEntityImpl[] stories);
 	
-	public String updateItemsFromInput(ItemEntityImpl[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException;
+	public void updateItemsFromInput(ItemEntityImpl[] items) throws NoSuchAlgorithmException, UnsupportedEncodingException;
 	
 }
