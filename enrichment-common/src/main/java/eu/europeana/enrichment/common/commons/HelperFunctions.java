@@ -2,14 +2,13 @@ package eu.europeana.enrichment.common.commons;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -186,7 +186,6 @@ public class HelperFunctions {
 	public static String readFileFromDisk (String fileFullPathWithExtension) throws IOException 
 	{
     	File file = new File(fileFullPathWithExtension);
-
     	/* This logic will make sure that the file 
 		 * gets created if it is not present at the
 		 * specified location
@@ -207,8 +206,24 @@ public class HelperFunctions {
 
 			return content;
 		}
-	    
+		/*
+		 * The file can also be read in this way
+		 */
+//		Path filePath = Path.of(fileFullPathWithExtension);
+//		String fileString = Files.readString(filePath);
+
 	}
+	
+	public static String readFileFromResources(String resourcePath) throws IOException {
+	    try (InputStream resourceAsStream = HelperFunctions.class.getResourceAsStream(resourcePath)) {
+	      List<String> lines = IOUtils.readLines(resourceAsStream, StandardCharsets.UTF_8);
+	      StringBuilder out = new StringBuilder();
+	      for (String line : lines) {
+	        out.append(line);
+	      }
+	      return out.toString();
+	    }
+	}	
 	
 	public static boolean checkWikidataJSONFileExistance (String directory, String wikidataURL) throws IOException
 	{

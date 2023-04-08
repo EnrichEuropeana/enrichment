@@ -1,0 +1,49 @@
+SELECT DISTINCT ?s ?desc WHERE {
+  ?s wdt:P279* wd:Q2221906.
+  MINUS{ ?s wdt:P279* wd:Q62849941 }
+  MINUS{ ?s wdt:P279* wd:Q6692396 }
+  MINUS{ ?s wdt:P279* wd:Q2182989 }
+  MINUS{ ?s wdt:P279* wd:Q4309578 }
+  MINUS{ ?s wdt:P279* wd:Q10328323 }
+  MINUS{ ?s wdt:P279* wd:Q164099 }
+  MINUS{ ?s wdt:P279* wd:Q17189807 }
+  MINUS{ ?s wdt:P279* wd:Q17005689 }
+  MINUS{ ?s wdt:P279* wd:Q7458240 }
+  MINUS{ ?s wdt:P279* wd:Q107464884 }
+  MINUS{ ?s wdt:P279* wd:Q18981006 }
+  MINUS{ ?s wdt:P279* wd:Q26220 }
+  MINUS{ ?s wdt:P279* wd:Q211584 }
+  MINUS{ ?s wdt:P279* wd:Q213283 }
+  MINUS{ ?s wdt:P279* wd:Q17272482 }
+  MINUS{ ?s wdt:P279* wd:Q651481 }
+  MINUS{ ?s wdt:P279* wd:Q116908836 }
+  MINUS{ ?s wdt:P279* wd:Q83180 }
+  MINUS{ ?s wdt:P279* wd:Q106608890 }
+  MINUS{ ?s wdt:P279* wd:Q170477 }
+  MINUS{ ?s wdt:P279* wd:Q64040784 }
+  MINUS{ ?s wdt:P279* wd:Q444789 }
+  MINUS{ ?s wdt:P279* wd:Q1410110 }
+  MINUS{ ?s wdt:P279* wd:Q148571 }
+  MINUS{ ?s wdt:P279* wd:Q12511 }
+  MINUS{ ?s wdt:P279* wd:Q350783 }
+  MINUS{ ?s wdt:P279* wd:Q693004 }
+  MINUS{ ?s wdt:P279* wd:Q3679502 }
+  MINUS{ ?s wdt:P279* wd:Q1709184 }
+  MINUS{ ?s wdt:P279* wd:Q7339568 }
+  MINUS{ ?s wdt:P279* wd:Q8010 }
+  MINUS{ ?s wdt:P279* wd:Q15104915 }
+  MINUS{ ?s wdt:P279* wd:Q1326624 }
+  MINUS{ ?s wdt:P279* wd:Q1439156 }
+  MINUS{ ?s wdt:P279* wd:Q15924535 }
+  MINUS{ ?s wdt:P279* wd:Q13397636 }
+  MINUS{ ?s wdt:P279* wd:Q1565905 }
+  MINUS{ ?s wdt:P279* wd:Q628858 }
+  MINUS{ ?s wdt:P279* wd:Q41176 }
+  MINUS{ ?s wdt:P279* wd:Q1664720 }
+  MINUS{ ?s wdt:P279* wd:Q1497364 }
+  MINUS{ ?s wdt:P279* wd:Q376799 }
+  MINUS{ ?s wdt:P279* wd:Q811430 }
+
+#  OPTIONAL { ?s rdfs:label ?desc filter (lang(?desc) = "en"). }
+  ?s rdfs:label ?desc filter (lang(?desc) = "en").
+}
