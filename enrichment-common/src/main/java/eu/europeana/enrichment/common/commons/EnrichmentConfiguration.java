@@ -66,7 +66,10 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.translation.eTranslation.requesterCallback}")
     private String translationETranslationRequesterCallback;
 
-    @Value("${enrich.translation.eTranslation.errorCallback}")
+    @Value("${enrich.translation.eTranslation.baseUrl.local}")
+    private String translationETranslationBaseUrlLocal;
+
+	@Value("${enrich.translation.eTranslation.errorCallback}")
     private String translationETranslationErrorCallback;
 
     @Value("${enrich.translation.eTranslation.emailDestination}")
@@ -99,10 +102,13 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.items.import}")
     private String itemsImport;
 
-    @Value("${enrich.wikidata.directory}")
-    private String enrichWikidataDirectory;
+    @Value("${enrich.directory}")
+    private String enrichDirectory;
     
-    @Value("${transcribathon.base.url.stories}")
+    @Value("${enrich.wikidata.json.base.url}")
+    private String enrichWikidataJsonBaseUrl;
+
+	@Value("${transcribathon.base.url.stories}")
     private String transcribathonBaseUrlStories;
 
     @Value("${transcribathon.base.url.stories.minimal}")
@@ -124,7 +130,10 @@ public class EnrichmentConfiguration  {
     private String annotationsCreator;	
 	
 	@Value("${enrich.wikidata.subclasses.geographic-location}")
-    private String wikidataSubclassesGeographicLocation;	
+    private String wikidataSubclassesGeographicLocation;
+	
+	@Value("${enrich.wikidata.subclasses.geographic-location.remove}")
+    private String wikidataSubclassesGeographicLocationRemove;
 
 	@Value("${enrich.wikidata.subclasses.human}")
     private String wikidataSubclassesHuman;	
@@ -150,9 +159,12 @@ public class EnrichmentConfiguration  {
 	@Value("${spark.language.detection.serviceurl}")
 	private String sparkLanguageDetectionUrl;
 	
-	@Value("${enrich.wikidata.save.json.to.local.cache: false}")
+	@Value("${enrich.wikidata.save.json.to.local.cache: true}")
 	private boolean wikidataSaveJsonToLocalCache;
-
+	
+	@Value("${search.api.base.url}")
+	private String searchApiBaseUrl;
+	
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -216,6 +228,10 @@ public class EnrichmentConfiguration  {
 	public String getTranslationETranslationRequesterCallback() {
 		return translationETranslationRequesterCallback;
 	}
+	
+    public String getTranslationETranslationBaseUrlLocal() {
+		return translationETranslationBaseUrlLocal;
+	}	
 
 	public String getTranslationETranslationErrorCallback() {
 		return translationETranslationErrorCallback;
@@ -249,9 +265,38 @@ public class EnrichmentConfiguration  {
 		return itemsImport;
 	}
 
-	public String getEnrichWikidataDirectory() {
-		return enrichWikidataDirectory;
+	public String getEnrichDirectory() {
+		return enrichDirectory;
 	} 
+
+	public String getEnrichWikidataDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.WIKIDATA_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.WIKIDATA_DIR;
+		}
+		
+	} 
+	
+	public String getEnrichDRICollectionDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
+		}
+	} 
+	
+	public String getEnrichUWRCollectionDirectory() {
+		if(enrichDirectory.endsWith("/")) {
+			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
+		}
+		else {
+			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
+		}
+	} 
+
 	
     public String getNerStanfordModel() {
 		return nerStanfordModel;
@@ -320,7 +365,11 @@ public class EnrichmentConfiguration  {
 	public String getWikidataSubclassesGeographicLocation() {
 		return wikidataSubclassesGeographicLocation;
 	}
-	
+
+	public String getWikidataSubclassesGeographicLocationRemove() {
+		return wikidataSubclassesGeographicLocationRemove;
+	}
+
 	public String getWikidataSubclassesHuman() {
 		return wikidataSubclassesHuman;
 	}
@@ -356,4 +405,13 @@ public class EnrichmentConfiguration  {
 	public boolean getWikidataSaveJsonToLocalCache() {
 		return wikidataSaveJsonToLocalCache;
 	}	
+	
+    public String getEnrichWikidataJsonBaseUrl() {
+		return enrichWikidataJsonBaseUrl;
+	}
+	
+	public String getSearchApiBaseUrl() {
+		return searchApiBaseUrl;
+	}
+
 }
