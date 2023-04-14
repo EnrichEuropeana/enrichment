@@ -28,7 +28,6 @@ import eu.europeana.enrichment.model.WikidataPlace;
 import eu.europeana.enrichment.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.model.vocabulary.EntityTypes;
-import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
@@ -40,11 +39,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	
 	@Autowired
 	JsonLdSerializer jsonLdSerializer; 	
-	
-	//@Resource(name = "wikidataService")
-	@Autowired
-	WikidataService wikidataService;	
-	
+
 	@Autowired
 	EnrichmentConfiguration enrichmentConfiguration;
 
@@ -53,10 +48,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	private final Logger logger = LogManager.getLogger(getClass());
 	
 	@Override
-	public int storeWikidataFromURL(String wikidataURL, String type) throws SolrServiceException, IOException {
-		
-		WikidataEntity entity = wikidataService.getWikidataEntityUsingLocalCache(wikidataURL, type);
-
+	public int storeWikidataEntity(WikidataEntity entity, String type) throws SolrServiceException, IOException {
 		if(entity!=null)
 		{
 			if(EntityTypes.Agent.getEntityType().equalsIgnoreCase(type)) {
@@ -68,8 +60,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 				return 1;
 			}
 			return 0;			
-		}
-		
+		}		
 		return 0;
 	}
 	
@@ -279,41 +270,21 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		SolrDocumentList docList;
 		DocumentObjectBinder binder;
 		
-		//try to fetch the wikidata entity if there is not one in solr
-		while(true)
-		{
-		    QueryResponse rsp = null;
-			try {
-				rsp = query(solrCore, query);
-			} catch (SolrServiceException e) {
-				// TODO Auto-generated catch block
-				logger.log(Level.ERROR, "Exception during the Solr search with the wikidata url.", e);
-				throw e;
-			}
-	
-			//ResultSet<T> resultSet = new ResultSet<>();		
-			binder = new DocumentObjectBinder();
-			docList = rsp.getResults();
-			
-			if(docList.size()==0)
-			{
-				if(storeWikidataFromURL(wikidataURL,type)==0) break;
-			}
-			else
-			{
-				break;
-			}
+	    QueryResponse rsp = null;
+		try {
+			rsp = query(solrCore, query);
+		} catch (SolrServiceException e) {
+			// TODO Auto-generated catch block
+			logger.log(Level.ERROR, "Exception during the Solr search with the wikidata url.", e);
+			throw e;
 		}
 
-		
-		if(docList.size() > 1)
+		//ResultSet<T> resultSet = new ResultSet<>();		
+		binder = new DocumentObjectBinder();
+		docList = rsp.getResults();		
+		if(docList.size() == 0)
 		{
-			logger.error("There are !=1 Solr documents with the same wikidata URL! The number of documents is: " + String.valueOf(docList.size()));
-			return null;
-		}
-		else if(docList.size() == 0)
-		{
-			logger.error("There are neither Solr nor Wikidata documents that can be fetched from the web with this wikidata URL! ");
+			logger.error("There are no Solr documents for this wikidata URL: " + wikidataURL);
 			return null;
 		}
 		

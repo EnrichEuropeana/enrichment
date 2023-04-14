@@ -3,18 +3,15 @@ package eu.europeana.enrichment.mongo.dao;
 import java.util.List;
 
 import eu.europeana.enrichment.model.RecordTranslation;
-import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
 
 public interface RecordTranslationDao {
 
-    long deleteByRecordId(String recordId);
-
-    void deleteTranslationEntity(RecordTranslation recordTranslation);
+    <T extends RecordTranslation> long deleteByRecordId(String recordId, Class<T> objClass);
 
     RecordTranslation saveTranslationEntity(RecordTranslation recordTranslation);
 
-    RecordTranslation findByRecordId(String recordId);
+    <T extends RecordTranslation> RecordTranslation findByRecordId(String recordId, Class<T> objClass);
     
-    List<EuropeanaRecordTranslationImpl> getAllTranslationRecords();
+    <T extends RecordTranslation> List<T> getAllTranslationRecords(Class<T> objClass);
 
 }

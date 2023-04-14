@@ -1,15 +1,14 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.List;
-import java.util.Set;
 
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Transient;
 
@@ -20,10 +19,17 @@ public class NamedEntityImpl {
 	protected String type;
 	protected String label;
 	protected List<String> europeanaIds;
-	protected List<String> wikidataLabelAltLabelAndTypeMatchIds;
+	protected List<String> wikidataSearchIds;
+	protected List<String> prefLabelMatchWikiSearchIds;
+	protected List<String> altLabelMatchWikiSearchIds;
 	protected String dbpediaId;
 	protected List<String> dbpediaWikidataIds;
-	String preferedWikidataId;
+	String prefWikiIdBothStanfordAndDbpedia;
+	String prefWikiIdOnlyStanford;
+	String prefWikiIdOnlyDbpedia;
+	String prefWikiIdBothStanfordAndDbpedia_status;
+	String prefWikiIdOnlyStanford_status;
+	String prefWikiIdOnlyDbpedia_status;
 
 	@Transient
 	protected PositionEntityImpl positionEntity;
@@ -99,20 +105,77 @@ public class NamedEntityImpl {
 	public void setDBpediaId(String id) {
 		dbpediaId = id;
 	}
-
-	public String getPreferedWikidataId() {
-		return preferedWikidataId;
+	
+	public List<String> getWikidataSearchIds() {
+		return wikidataSearchIds;
 	}
 
-	public void setPreferedWikidataId(String preferedWikidataId) {
-		this.preferedWikidataId = preferedWikidataId;
+	public void setWikidataSearchIds(List<String> wikidataSearchIds) {
+		this.wikidataSearchIds = wikidataSearchIds;
 	}
 	
-	public List<String> getWikidataLabelAltLabelAndTypeMatchIds() {
-		return wikidataLabelAltLabelAndTypeMatchIds;
+	public List<String> getPrefLabelMatchWikiSearchIds() {
+		return prefLabelMatchWikiSearchIds;
 	}
 
-	public void setWikidataLabelAltLabelAndTypeMatchIds(List<String> wikidataLabelAltLabelAndTypeMatchIds) {
-		this.wikidataLabelAltLabelAndTypeMatchIds = wikidataLabelAltLabelAndTypeMatchIds;
+	public void setPrefLabelMatchWikiSearchIds(List<String> prefLabelMatchWikiSearchIds) {
+		this.prefLabelMatchWikiSearchIds = prefLabelMatchWikiSearchIds;
 	}
+
+	public List<String> getAltLabelMatchWikiSearchIds() {
+		return altLabelMatchWikiSearchIds;
+	}
+
+	public void setAltLabelMatchWikiSearchIds(List<String> altLabelMatchWikiSearchIds) {
+		this.altLabelMatchWikiSearchIds = altLabelMatchWikiSearchIds;
+	}
+	
+	public String getPrefWikiIdBothStanfordAndDbpedia() {
+		return prefWikiIdBothStanfordAndDbpedia;
+	}
+
+	public void setPrefWikiIdBothStanfordAndDbpedia(String prefWikiIdAll) {
+		this.prefWikiIdBothStanfordAndDbpedia = prefWikiIdAll;
+	}
+
+	public String getPrefWikiIdOnlyStanford() {
+		return prefWikiIdOnlyStanford;
+	}
+
+	public void setPrefWikiIdOnlyStanford(String prefWikiIdStanford) {
+		this.prefWikiIdOnlyStanford = prefWikiIdStanford;
+	}
+
+	public String getPrefWikiIdOnlyDbpedia() {
+		return prefWikiIdOnlyDbpedia;
+	}
+
+	public void setPrefWikiIdOnlyDbpedia(String prefWikiIdDbpedia) {
+		this.prefWikiIdOnlyDbpedia = prefWikiIdDbpedia;
+	}
+
+	public String getPrefWikiIdBothStanfordAndDbpedia_status() {
+		return prefWikiIdBothStanfordAndDbpedia_status;
+	}
+
+	public void setPrefWikiIdBothStanfordAndDbpedia_status(String prefWikiIdAll_status) {
+		this.prefWikiIdBothStanfordAndDbpedia_status = prefWikiIdAll_status;
+	}
+
+	public String getPrefWikiIdOnlyStanford_status() {
+		return prefWikiIdOnlyStanford_status;
+	}
+
+	public void setPrefWikiIdOnlyStanford_status(String prefWikiIdStanford_status) {
+		this.prefWikiIdOnlyStanford_status = prefWikiIdStanford_status;
+	}
+
+	public String getPrefWikiIdOnlyDbpedia_status() {
+		return prefWikiIdOnlyDbpedia_status;
+	}
+
+	public void setPrefWikiIdOnlyDbpedia_status(String prefWikiIdDbpedia_status) {
+		this.prefWikiIdOnlyDbpedia_status = prefWikiIdDbpedia_status;
+	}
+
 }

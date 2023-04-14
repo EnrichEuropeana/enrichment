@@ -1,7 +1,9 @@
 package eu.europeana.enrichment.ner.web;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.json.JSONObject;
@@ -9,9 +11,9 @@ import org.json.JSONObject;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 
@@ -149,20 +151,15 @@ public class NERStanfordServiceImpl{
 			namedEntity.setType(category);
 
 			PositionEntityImpl positionEntity = new PositionEntityImpl();
-			List<Integer> offsetList = new ArrayList<Integer>();
-			offsetList.add(offset);
-			// default: Offset position will be added to the translated 
-			positionEntity.setOffsetsTranslatedText(offsetList);
-			List<String> nerTools = new ArrayList<String>();
-			nerTools.add(EnrichmentConstants.stanfordNer);
-			positionEntity.setNerTools(nerTools);
+			Map<Integer, String> offsetMap = new HashMap<>();
+			offsetMap.put(offset, NerTools.Stanford.getStringValue());
+			positionEntity.setOffsetsTranslatedText(offsetMap);
 			namedEntity.setPositionEntity(positionEntity);
-
 			tmp.add(namedEntity);
 		}
 		else {
-			if(!alreadyExistNamedEntity.getPositionEntity().getOffsetsTranslatedText().contains(offset)) {
-				alreadyExistNamedEntity.getPositionEntity().addOfssetsTranslatedText(offset);
+			if(!alreadyExistNamedEntity.getPositionEntity().getOffsetsTranslatedText().containsKey(offset)) {
+				alreadyExistNamedEntity.getPositionEntity().getOffsetsTranslatedText().put(offset, NerTools.Stanford.getStringValue());
 			}
 		}
 	}

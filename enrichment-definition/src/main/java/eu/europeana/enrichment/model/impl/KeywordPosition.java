@@ -1,23 +1,24 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.List;
+import java.util.Map;
 
 import dev.morphia.annotations.Embedded;
 
 @Embedded
 public class KeywordPosition {
-	private List<Integer> offsetsTranslatedText;
-	private List<String> nerTools;	
-	public List<Integer> getOffsetsTranslatedText() {
+	private Map<Integer,String> offsetsTranslatedText;
+	private List<String> linkedByNerTools;	
+	public Map<Integer,String> getOffsetsTranslatedText() {
 		return offsetsTranslatedText;
 	}
-	public void setOffsetsTranslatedText(List<Integer> offsetsTranslatedText) {
+	public void setOffsetsTranslatedText(Map<Integer,String> offsetsTranslatedText) {
 		this.offsetsTranslatedText = offsetsTranslatedText;
 	}
-	public List<String> getNerTools() {
-		return nerTools;
+	public List<String> getLinkedNerTools() {
+		return linkedByNerTools;
 	}
-	public void setNerTools(List<String> nerTools) {
-		this.nerTools = nerTools;
+	public void setLinkedNerTools(List<String> linkedByNerTools) {
+		this.linkedByNerTools=linkedByNerTools;
 	}
 }

@@ -22,12 +22,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
+import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.StoryEntity;
+import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
@@ -64,11 +67,12 @@ public class AdministrationController extends BaseRest {
 	 * @return							"Done" if everything ok
 	 */
 	@ApiOperation(value = "Update StoryEntities from input in the database.", nickname = "updateStories", notes = "This method enables updating a set of stories from input in the database."
-			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body.")
+			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. In case the input stories do not exist"
+			+ "in the db, they will be stored as new.")
 	@RequestMapping(value = "/administration/updateStories", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateStories(
-			@RequestBody StoryEntity [] body,
+			@RequestBody StoryEntityImpl [] body,
 			HttpServletRequest request) throws HttpException {
 		
 		verifyWriteAccess(Operations.CREATE, request);
@@ -76,12 +80,12 @@ public class AdministrationController extends BaseRest {
 		if(body==null) {
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
 		}
-		for(StoryEntity story: body) {
+		for(StoryEntityImpl story: body) {
 			validateStory(story);
 		}
 		
-		String uploadStoriesStatus = enrichmentStoryAndItemStorageService.updateStoriesFromInput(body);
-		ResponseEntity<String> response = new ResponseEntity<String>(uploadStoriesStatus, HttpStatus.OK);
+		enrichmentStoryAndItemStorageService.updateStoriesFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 		return response;	
 	}
 	
@@ -148,7 +152,7 @@ public class AdministrationController extends BaseRest {
 	@RequestMapping(value = "/administration/updateItems", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateItems(
-			@RequestBody ItemEntity [] body,
+			@RequestBody ItemEntityImpl [] body,
 			HttpServletRequest request) throws HttpException, Exception {
 		
 		verifyWriteAccess(Operations.CREATE, request);
@@ -156,12 +160,12 @@ public class AdministrationController extends BaseRest {
 		if(body==null) {
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
 		}
-		for(ItemEntity item: body) {
+		for(ItemEntityImpl item: body) {
 			validateItem(item);
 		}
 		
-		String uploadItemsStatus = enrichmentStoryAndItemStorageService.updateItemsFromInput(body);
-		ResponseEntity<String> response = new ResponseEntity<String>(uploadItemsStatus, HttpStatus.OK);
+		enrichmentStoryAndItemStorageService.updateItemsFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
 		return response;
 	}
 	
@@ -207,11 +211,11 @@ public class AdministrationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method represents an endpoint"
+	@ApiOperation(value = "Receive translated text from eTranslation", nickname = "getFromETranslation", notes = "This method represents an endpoint"
 			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
-	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/receiveETranslation", method = {RequestMethod.POST},
 			produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> getETranslation(
+	public ResponseEntity<String> getFromETranslation(
 			@RequestParam(value = "target-language", required = false) String targetLanguage,
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
@@ -222,6 +226,31 @@ public class AdministrationController extends BaseRest {
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,body);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
 		return response;
+	}
+
+	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method is aimed to be used "
+			+ "when translating with eTranslation locally. Namely, the eTranslation services returns response using a callback function, which should be "
+			+ "accessible from the Internet. When the app is deployed to the test server, it will be accessible from the internet, so this method can be "
+			+ "used to get the eTranslation responses.")
+	@RequestMapping(value = "/administration/eTranslation", method = {RequestMethod.POST},
+			produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> getETranslation(
+			@RequestBody String text,
+			@RequestParam(value = "sourceLang") String sourceLang,
+			@RequestParam(value = "targetLang") String targetLang,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
+			HttpServletRequest request) throws TranslationException, UnsupportedEncodingException, InterruptedException, ApplicationAuthenticationException 
+	{
+		verifyReadAccess(request);
+		String resp = eTranslationService.translateText(text, sourceLang, targetLang);
+		if(resp==null) {
+			ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+			return response;
+		}
+		else {
+			ResponseEntity<String> response = new ResponseEntity<String>(resp, HttpStatus.OK);
+			return response;
+		}
 	}
 
 //	@ApiOperation(value = "Run NER analysis for all items", nickname = "runNERAllItems", notes = "This method performs the Named Entity Recognition (NER) analysis "

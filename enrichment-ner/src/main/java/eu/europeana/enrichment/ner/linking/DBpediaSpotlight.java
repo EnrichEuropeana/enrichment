@@ -69,12 +69,15 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 			if(responseStr==null) return null;
 			
 		    InputStream stream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
-		    try {
-		    	dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
-			} catch (JAXBException e) {
-				logger.error("Cannot unmarschall the dbpedia response. Probably no valid data within it.", e);
-				return null;
-			}
+		    dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+
+//		    try {
+//		    	dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+//			} catch (JAXBException e) {
+//				logger.error("Cannot unmarschall the dbpedia response. Probably no valid data within it.", e);
+//				return null;
+//			}
+
 		    if(dbpediaResp.getWikipageRedirect()==null || dbpediaResp.getWikidataUrls().size()>0) {
 		    	redirect=false;
 		    }
