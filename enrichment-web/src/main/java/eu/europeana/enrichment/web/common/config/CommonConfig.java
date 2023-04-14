@@ -37,12 +37,12 @@ public class CommonConfig {
 	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 	EnrichmentConfiguration config;
 
-    @Bean(EnrichmentConstants.BEAN_ENRICHMENT_I18N_SERVICE)
-    public I18nService europeanaApiClient() {
-        logger.debug("Configuring the I18nService.");
-        I18nService i18nService = new I18nServiceImpl();
-        return i18nService;
-    }
+//    @Bean(EnrichmentConstants.BEAN_ENRICHMENT_I18N_SERVICE)
+//    public I18nService europeanaApiClient() {
+//        logger.debug("Configuring the I18nService.");
+//        I18nService i18nService = new I18nServiceImpl();
+//        return i18nService;
+//    }
     
     /**
      * Create a {@link JAXBContext} for use across the application. JAXBContext is thread-safe,

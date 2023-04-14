@@ -44,9 +44,9 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 	}
 
 	@Override
-	public List<Topic> getByModelIdentifier(String topicModel) {
+	public List<Topic> getByModelIdentifier(String modelIdentif) {
 		// find object in topicModelDao otherwise throw exception; then collect in a list all topics belonging to that model
-		return topicDao.getByModelIdentifier(topicModel);
+		return topicDao.getByModelIdentifier(modelIdentif);
 	}
 	
 	@Override

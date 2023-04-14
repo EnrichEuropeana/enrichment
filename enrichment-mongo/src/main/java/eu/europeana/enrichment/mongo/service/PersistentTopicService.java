@@ -14,7 +14,7 @@ public interface PersistentTopicService {
 
 	public void delete(Topic dbtopiEntity);
 
-	public List<Topic> getByModelIdentifier(String topicModel);
+	public List<Topic> getByModelIdentifier(String modelIdentif);
 
 	public List<Topic> getAll();
 

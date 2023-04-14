@@ -1,26 +1,33 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 
 import dev.morphia.annotations.Entity;
+import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
+import dev.morphia.annotations.Index;
+import dev.morphia.annotations.IndexOptions;
+import dev.morphia.annotations.Indexes;
 
 @Entity(value="PositionEntityImpl")
+@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("fieldUsedForNER"), @Field("namedEntityId") }, options = @IndexOptions(unique = true)))
 public class PositionEntityImpl {
 
-	private List<Integer> offsetsTranslatedText;
+	private Map<Integer, String> offsetsTranslatedText;
 	private List<Integer> offsetsOriginalText;
 	private String storyId;
 	private String itemId;
-	private List<String> nerTools;
 	private String fieldUsedForNER;
 	private ObjectId namedEntityId;
 	@Id
     private ObjectId _id;
+
+	public ObjectId get_id() {
+		return _id;
+	}
 
 	public PositionEntityImpl() {		
 	}
@@ -49,16 +56,12 @@ public class PositionEntityImpl {
 		this.storyId = storyItemId;
 	}	
 	
-	public List<Integer> getOffsetsTranslatedText() {
+	public Map<Integer, String> getOffsetsTranslatedText() {
 		return offsetsTranslatedText;
 	}
 	
-	public void setOffsetsTranslatedText(List<Integer> offsetPositions) {
+	public void setOffsetsTranslatedText(Map<Integer, String> offsetPositions) {
 		this.offsetsTranslatedText = offsetPositions;
-	}
-	
-	public void addOfssetsTranslatedText(int offsetPosition) {
-		offsetsTranslatedText.add(offsetPosition);
 	}
 	
 	public List<Integer> getOffsetsOriginalText() {
@@ -73,58 +76,6 @@ public class PositionEntityImpl {
 	public void addOfssetsOriginalText(int offsetPosition) {
 		offsetsOriginalText.add(offsetPosition);
 		
-	}
-
-	// Overriding equals() to compare two PositionEntity objects  
-	@Override
-    public boolean equals(Object pe){ 
-  
-        // If the object is compared with itself then return true   
-        if (pe == this) { 
-            return true; 
-        } 
-  
-        /* Check if object is an instance of PositionEntity or not 
-          "null instanceof [type]" also returns false */
-        if (!(pe instanceof PositionEntityImpl)) { 
-            return false; 
-        } 
-          
-        // typecast pe to PositionEntity so that we can compare data members  
-        PositionEntityImpl pe_new = (PositionEntityImpl) pe; 
-        
-        if(offsetsTranslatedText!=null) {
-        	Collections.sort(offsetsTranslatedText);
-        }
-        if(pe_new.getOffsetsTranslatedText()!=null) {
-        	Collections.sort(pe_new.getOffsetsTranslatedText());
-        }
-        
-        // Compare the data members and return accordingly  
-        return Objects.equals(pe_new.getStoryId(), storyId)
-                && Objects.equals(pe_new.getItemId(),itemId)
-                && Objects.equals(pe_new.getOffsetsTranslatedText(), offsetsTranslatedText) //compare the 2 lists including the order of elements, that is why we first sorted them
-                && Objects.equals(pe_new.getFieldUsedForNER(), fieldUsedForNER);
-    }     
-    
-	@Override
-    public int hashCode() {
-        int result = 17;
-        result = 31 * result + storyId.hashCode();
-        if(itemId!=null) {
-        	result = 31 * result + itemId.hashCode();
-        }
-        result = 31 * result + offsetsTranslatedText.hashCode();
-        result = 31 * result + fieldUsedForNER.hashCode();
-        return result;
-    }
-    
-	public List<String> getNerTools() {
-		return nerTools;
-	}
-
-	public void setNerTools(List<String> nerTools) {
-		this.nerTools = nerTools;
 	}
 	
 	public ObjectId getNamedEntityId() {

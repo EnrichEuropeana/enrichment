@@ -37,11 +37,11 @@
  			<artifactId>enrichment-translation</artifactId>
 		<version>${version.enrichmentAPI}</version>
 	</dependency>
-	<dependency>
-		<groupId>eu.europeana.enrich</groupId>
- 			<artifactId>enrichment-ner</artifactId>
-		<version>${version.enrichmentAPI}</version>
-	</dependency>
+<!-- 	<dependency> -->
+<!-- 		<groupId>eu.europeana.enrich</groupId> -->
+<!--  			<artifactId>enrichment-ner</artifactId> -->
+<!-- 		<version>${version.enrichmentAPI}</version> -->
+<!-- 	</dependency> -->
 	<!-- dependency>
 		<groupId>eu.europeana.entity</groupId>
 		<artifactId>entity-solr</artifactId>
@@ -104,6 +104,12 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-data-solr</artifactId>
 		<version>2.4.13</version>
+		<exclusions>
+	        <exclusion>
+           		<groupId>org.springframework.boot</groupId>
+           		<artifactId>spring-boot-starter-logging</artifactId>
+       		</exclusion>
+		</exclusions>
 	</dependency>
 	
    

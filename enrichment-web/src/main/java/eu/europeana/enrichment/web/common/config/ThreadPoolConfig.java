@@ -24,11 +24,16 @@ public class ThreadPoolConfig implements AsyncConfigurer {
 	
 	Logger logger = LogManager.getLogger(getClass());
 
+	/*
+	 * For parallel saving of the wikidata jsons, the config that works is: corePoolSize=20, maxPoolSize=50.
+	 * For parallel annotation creation, the config that works is: corePoolSize=20, maxPoolSize=50.
+	 * For parallel linking, the config that works is: corePoolSize=10, maxPoolSize=20.
+	 */
 	@Override
 	public Executor getAsyncExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(20);
-		executor.setMaxPoolSize(30);
+		executor.setMaxPoolSize(50);
 		//executor.setQueueCapacity(100);
 		executor.initialize();
 		return executor;

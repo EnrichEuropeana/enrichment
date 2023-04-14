@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
+import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.WikidataEntity;
@@ -123,21 +124,23 @@ public class WikidataController extends BaseRest {
 	} 
 	
 	
-	@ApiOperation(value = "Get places from Wikidata", nickname = "getPlacesFromWikidata", notes = "This method retrives the wikidata places (including their wikidata ids, labels, etc.)"
+	@ApiOperation(value = "Get places from Wikidata and save them to local files.", nickname = "getPlacesFromWikidata", notes = "This method retrives the wikidata places (including their wikidata ids, labels, etc.)"
 			+ "based on the provided input parameters: \"query\"= query word to search for (e.g. London, Lond*, etc.), \"type\"= entity type (i.e. \"place\"), "
 			+ "\"lang\" = the language filtration for the place labels and other multi-lingual fields, "
 			+ "\"pageSize\" = the number of results returned, if not provided defaults to 5, \"page\" = the results page, if not provided defaults to 0.")
-	@RequestMapping(value = "/enrichment/places", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/enrichment/places", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getPlacesFromWikidata(
 			@RequestParam(value = "query", required = true) String query,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "lang", required = false) String lang,
 			@RequestParam(value = "pageSize", required = false) String pageSize,
 			@RequestParam(value = "page", required = false) String page,
+			@RequestParam(value = "matchInstanceOf", required = false, defaultValue = "true") boolean matchInstanceOf,
 			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 		
-		verifyReadAccess(request);
+		verifyWriteAccess(Operations.CREATE, request);
+		
 		if(pageSize==null || pageSize.isEmpty())
 		{	
 			pageSize="5";
@@ -180,7 +183,7 @@ public class WikidataController extends BaseRest {
 			if(i>=startIndex && i<endIndex)
 			{
 				//getting WikidataEntity, either from local cache or from the wikidata
-				WikidataEntity wikidataEntity = wikidataService.getWikidataEntityUsingLocalCache(wikidataIDs.get(i), type);
+				WikidataEntity wikidataEntity = wikidataService.getWikidataEntityAndSaveToLocalCache(wikidataIDs.get(i), type, matchInstanceOf);
 				
 				if (wikidataEntity!=null) { 
 					items.add(wikidataEntity);						

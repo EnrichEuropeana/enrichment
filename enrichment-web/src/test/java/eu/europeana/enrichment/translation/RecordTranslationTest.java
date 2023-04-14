@@ -57,7 +57,7 @@ public class RecordTranslationTest {
         String testRecordId = "/test/recordId";
         recordTranslation.setRecordId(testRecordId);
         recordTranslation.setDescription(List.of("Das ist ein Text auf Deutsch!"));
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
         assertEquals(RecordTranslation.TRANSLATION_STATUS_COMPLETE, translation.getTranslationStatus());
         assertNotNull(translation.getTranslation());
         assertFalse(translation.getTranslation().isEmpty());
@@ -76,7 +76,7 @@ public class RecordTranslationTest {
         assertEquals(2, description.getDescriptions().size());
 
         RecordTranslation recordTranslation = buildRecordTranslation(description);
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
 
         assertNotNull(translation);
         assertEquals(2, translation.getTranslation().size());
@@ -133,14 +133,14 @@ public class RecordTranslationTest {
     @Test
     public void exportRecordTranslations1418Test() throws Exception {
 
-        List<EuropeanaRecordTranslationImpl> recordTranslations= recordTranslationDao.getAllTranslationRecords();
+        List<EuropeanaRecordTranslationImpl> recordTranslations= recordTranslationDao.getAllTranslationRecords(EuropeanaRecordTranslationImpl.class);
         EuropeanaRecordTranslationImpl serializedRecord;
         int cnt = 0;
         for (EuropeanaRecordTranslationImpl recordTranslation : recordTranslations) {
             serializedRecord = serializeTranslation(recordTranslation, recordTranslation.getIdentifier() + ".json");
             verifyTranslationComplete(serializedRecord);
             cnt++;
-            if((cnt % 100) = 0) {
+            if((cnt % 100) == 0) {
                 logger.info("Serialization Count: " + cnt);
             }
         }
@@ -161,7 +161,7 @@ public class RecordTranslationTest {
     private EuropeanaRecordTranslationImpl translateAndSerialize(String filename, Description1418 description)
             throws IOException, Exception, JsonProcessingException, JsonParseException, JsonMappingException {
         RecordTranslation recordTranslation = buildRecordTranslation(description);
-        RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
         return serializeTranslation(translation, filename);
     }
 

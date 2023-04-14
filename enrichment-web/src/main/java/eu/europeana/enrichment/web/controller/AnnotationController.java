@@ -1,12 +1,9 @@
 package eu.europeana.enrichment.web.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +21,9 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
-import eu.europeana.enrichment.model.ItemEntity;
-import eu.europeana.enrichment.model.NamedEntityAnnotation;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
+import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -86,8 +81,9 @@ public class AnnotationController extends BaseRest {
 			return response;
 	}
 	
-	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method stores the annotations of "
-			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription).")
+	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method creates and stores the annotations of "
+			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription). Please note that the Named Entity "
+			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForItem(
 			@PathVariable("storyId") String storyId,
@@ -107,14 +103,7 @@ public class AnnotationController extends BaseRest {
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
-				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.defaultLinkingTool);
-				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
-				nerTools.add(EnrichmentConstants.stanfordNer);
-				
-				enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, itemId, property);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 
@@ -123,7 +112,8 @@ public class AnnotationController extends BaseRest {
 	}
 
 	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
-			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription).")
+			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). Please note that the Named Entity "
+			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForStory(
 			@PathVariable("storyId") String storyId,
@@ -142,14 +132,7 @@ public class AnnotationController extends BaseRest {
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
-				List<String> linking = new ArrayList<>();
-				linking.add(EnrichmentConstants.defaultLinkingTool);
-				List<String> nerTools = new ArrayList<>();			
-				nerTools.add(EnrichmentConstants.dbpediaSpotlightName);
-				nerTools.add(EnrichmentConstants.stanfordNer);
-				
-				enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerTools, true, linking, EnrichmentConstants.defaultTranslationTool, false, true);
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotations(storyId, null, property);
+				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 
@@ -216,17 +199,8 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 		
 		verifyReadAccess(request);
-		NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
-		String resultJson=null;
-		if(result!=null)
-		{
-			resultJson = jsonLdSerializer.serializeObject(result);
-		}
-		else
-		{
-			resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
-		}
-
+		List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
+		String resultJson=jsonLdSerializer.serializeObject(result);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 		return response;
 	} 
@@ -252,17 +226,8 @@ public class AnnotationController extends BaseRest {
 				HttpServletRequest request) throws Exception, HttpException {
 			
 			verifyReadAccess(request);
-			NamedEntityAnnotation result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
-			String resultJson=null;
-			if(result!=null)
-			{
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-			else
-			{
-				resultJson = "{\"info\" : \"No valid entries found! Please use the POST method first to save the data to the database.\"}";
-			}
-
+			List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
+			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 			return response;
 		}

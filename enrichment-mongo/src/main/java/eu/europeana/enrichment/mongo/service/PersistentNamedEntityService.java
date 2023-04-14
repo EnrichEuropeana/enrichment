@@ -2,22 +2,17 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
 
 public interface PersistentNamedEntityService {
 	
-	/*
-	 * This method retrieves a named entity from the Mongo 
-	 * database based on their key
-	 * 
-	 * @param label						label of the named entity
-	 * @return							a database named entity 
-	 */
-	public NamedEntityImpl findNamedEntityByLabel(String label);
+	public NamedEntityImpl findNamedEntity(ObjectId objId);
 	
-	public NamedEntityImpl findExistingNamedEntity(NamedEntityImpl ne);
+	public List<NamedEntityImpl> findNamedEntities(String label, String type, String dbpediaId);
 	
-	public List<NamedEntityImpl> findAllNamedEntitiesByLabelAndType(String label, String type);
+	public NamedEntityImpl findEqualNamedEntity(NamedEntityImpl ne);
 	
 	public List<NamedEntityImpl> findNamedEntitiesWithAdditionalInformation(String storyId, String itemId, String type, List<String> nerTools, boolean matchNerToolsExactly);
 
@@ -26,7 +21,7 @@ public interface PersistentNamedEntityService {
 	 * 
 	 * @return							list of database named entities
 	 */
-	public List<NamedEntityImpl> getAllNamedEntities();
+	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip);
 	/*
 	 * This method saves and updates named entities into the Mongo database
 	 * 

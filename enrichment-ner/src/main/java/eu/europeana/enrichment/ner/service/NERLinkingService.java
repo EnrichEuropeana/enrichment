@@ -3,12 +3,9 @@ package eu.europeana.enrichment.ner.service;
 import java.util.List;
 
 import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
 
-public interface NERLinkingService {
-
-	final static String TOOL_WIKIDATA = "Wikidata";
-	final static String TOOL_EUROPEANA = "Europeana";
-	
+public interface NERLinkingService {	
 	/**
 	 * This method links named entities with Europeana collection or wikidata
 	 * add their url to the named entities.
@@ -21,5 +18,5 @@ public interface NERLinkingService {
 	 * @return
 	 * @throws Exception
 	 */
-	void addLinkingInformation(NamedEntityImpl newNamedEntity, NamedEntityImpl dbNamedEntity, List<String> linkingTools, String sourceLanguage, String nerTool, boolean matchType) throws Exception;
+	public boolean addLinkingInformation(NamedEntityImpl namedEntity, List<PositionEntityImpl> positions, List<String> linkingTools) throws Exception;
 }

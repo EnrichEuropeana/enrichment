@@ -2,39 +2,13 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.ItemEntity;
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 
 public interface PersistentItemEntityService {
-
-	/*
-	 * This method retrieves a story item entity from the Mongo 
-	 * database based on their key
-	 * 
-	 * @param itemId				story item id of the story item entity
-	 * @return							a database story item entity 
-	 */
-	public ItemEntity findItemEntity(String storyId, String itemId);
 	
-	public ItemEntity findItemEntity(String itemId);
-	
-	public List<ItemEntityImpl> findItemEntities(String storyId, String itemId);
-	
-	/**
-	 * This method retrieves ItemEntity from the db for the given story
-	 * @param storyId
-	 * @param itemId
-	 * @return
-	 */
-	public ItemEntity findItemEntityFromStory(String storyId, String itemId);
-	
-	public List<ItemEntity> findStoryItemEntitiesFromStory(String storyId);
-	/*
-	 * This method retrieves all item entities from the Mongo database
-	 * 
-	 * @return							list of database item entities
-	 */
-	public List<ItemEntity> getAllItemEntities();
+	public List<ItemEntityImpl> get_N_ItemEntities(int limit, int skip);
+	public ItemEntityImpl findItemEntity(String storyId, String itemId);
+	public List<ItemEntityImpl> findAllItemsOfStory(String storyId);
 	/*
 	 * This method saves and updates story item entities into the Mongo database
 	 * 
@@ -42,7 +16,7 @@ public interface PersistentItemEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveItemEntity(ItemEntity entity);
+	public void saveItemEntity(ItemEntityImpl entity);
 	/*
 	 * This method saves and updates a list of story item entities into the Mongo database
 	 * 
@@ -50,14 +24,14 @@ public interface PersistentItemEntityService {
 	 * 									be saved or updated
 	 * @return
 	 */
-	public void saveStoryItemEntities(List<ItemEntity> entities);
+	public void saveStoryItemEntities(List<ItemEntityImpl> entities);
 	/*
 	 * This method deletes story item entities from the Mongo database
 	 * 
 	 * @param entity					story item entity which should be deleted
 	 * @return
 	 */
-	public void deleteItemEntity(ItemEntity entity);
+	public void deleteItemEntity(ItemEntityImpl entity);
 	
 	public void deleteAllItemsOfStory(String storyId);
 
@@ -75,9 +49,5 @@ public interface PersistentItemEntityService {
 	 * @param itemId
 	 * @return
 	 */
-	
-//	int getNumerAnalysedNamedEntities(String field);
-//	
-//	List<String> getNerToolsForItem(String itemId);
 
 }

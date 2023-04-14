@@ -73,12 +73,12 @@
 <!-- 	    	<version>${version.jackson-jsonld}</version> -->
 <!-- 		</dependency> -->
 			
-		<!-- parsing html markup in Java -->
+		<!-- https://mvnrepository.com/artifact/org.mongodb/bson -->
 		<dependency>
-	    	<groupId>org.jsoup</groupId>
-	    	<artifactId>jsoup</artifactId>
-	    	<version>${version.jsoup}</version>
-		</dependency>			
+		    <groupId>org.mongodb</groupId>
+		    <artifactId>bson</artifactId>
+		</dependency>
+			
 	</dependencies>
 		
 	<build>

@@ -104,7 +104,7 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.directory}")
     private String enrichDirectory;
-    
+
     @Value("${enrich.wikidata.json.base.url}")
     private String enrichWikidataJsonBaseUrl;
 

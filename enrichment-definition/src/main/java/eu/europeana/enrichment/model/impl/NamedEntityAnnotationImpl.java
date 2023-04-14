@@ -1,11 +1,13 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,8 +35,8 @@ import eu.europeana.enrichment.model.NamedEntityAnnotation;
 	EnrichmentConstants.TARGET
 })
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
-public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
+//@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("wikidataId"), @Field("property") }, options = @IndexOptions(unique = true)))
+public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEntityAnnotation {
 
 	@JsonIgnore
 	private static String idBaseUrl;
@@ -78,6 +80,10 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 	public String getWikidataId() {
 		return wikidataId;
 	}
+	
+	public void setWikidataId(String wikiId) {
+		this.wikidataId=wikiId;
+	}
 
 	@JsonIgnore
 	public String getStoryId() {
@@ -89,11 +95,15 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		return itemId;
 	}
 	
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+	
 	public NamedEntityAnnotationImpl () {
 	}
 	
 	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
-			double score, List<String> nerTools) {
+			double score, List<String> foundByNerTools, List<String> linkedByNerTools, String body_description, String body_givenName, String body_familyName, List<String> body_professionOrOccupation, Float body_lat, Float body_long) {
 
 		idBaseUrl=idBaseUrlPar;
 		targetItemsBaseUrl=targetItemsBaseUrlPar;
@@ -132,15 +142,36 @@ public class NamedEntityAnnotationImpl implements NamedEntityAnnotation {
 		Map<String,String> bodyHiddenLabel = new HashMap<String, String>();
 		bodyHiddenLabel.put("en", entityHiddenLabel);
 		this.body.put("hiddenLabel", bodyHiddenLabel);
-		
+
+		if(! StringUtils.isBlank(body_description)) {
+			this.body.put("description", body_description);
+		}
+		if(! StringUtils.isBlank(body_givenName)) {
+			this.body.put("givenName", body_givenName);
+		}
+		if(! StringUtils.isBlank(body_familyName)) {
+			this.body.put("familyName", body_familyName);
+		}
+		if(body_professionOrOccupation.size()>0) {
+			this.body.put("professionOrOccupation", body_professionOrOccupation);
+		}
+		if(body_lat!=null) {
+			this.body.put("lat", body_lat);
+		}
+		if(body_long!=null) {
+			this.body.put("long", body_long);
+		}
+
 		this.wikidataId = wikidataId;
 		this.storyId = storyId;		
 		this.property = prop;
 		
 		Processing processing = new Processing();
 		processing.setScore(score);
-		processing.setFoundByNerTools(new ArrayList<String>(nerTools));
+		processing.setFoundByNerTools(new ArrayList<>(foundByNerTools));
+		processing.setLinkedByNerTools(new ArrayList<>(linkedByNerTools));
 		this.processing=processing;
+		this.created = new Date();
 	}
 
 	@JsonProperty(EnrichmentConstants.TARGET)

@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,9 +12,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -25,10 +29,6 @@ import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.parser.Parser;
-import org.jsoup.safety.Whitelist;
 
 public class HelperFunctions {
 	
@@ -155,14 +155,18 @@ public class HelperFunctions {
 	public static void saveWikidataJsonToLocalFileCache (String directory, String wikidataURL, String content) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
+		String fileFullPathName = directory;
+		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
 		
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(pathName))))
-	    {			
-	    	
-			bw.write(content);
-			
-		    logger.debug("Wikidata JSON File is written successfully!");
+		saveToFile(fileFullPathName, wikidataURL);
+	}
+
+	public static void saveToFile (String fileFullPathNameWithExtension, String content) throws IOException
+	{
+	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileFullPathNameWithExtension))))
+	    {    	
+			bw.write(content);	
+		    logger.debug("File: " + fileFullPathNameWithExtension + ", is written successfully to the location!");
 			    
 		} catch (IOException ioe) 
 	    {
@@ -174,12 +178,14 @@ public class HelperFunctions {
 	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
-		String pathName = null;
-
-    	//Specify the file name and path here
-    	pathName = directory + "/" + "wikidata-" + "entity-" + fileName + ".json";
-    	File file = new File(pathName);
-
+		String fileFullPathName = directory;
+		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
+		return readFileFromDisk(fileFullPathName);
+	}
+	
+	public static String readFileFromDisk (String fileFullPathWithExtension) throws IOException 
+	{
+    	File file = new File(fileFullPathWithExtension);
     	/* This logic will make sure that the file 
 		 * gets created if it is not present at the
 		 * specified location
@@ -190,21 +196,34 @@ public class HelperFunctions {
 		else
 		{
 			//String path = pathName.replace("/", "\\\\");
-			String contentJsonFile = null;
+			String content = null;
 
-			try {
-	            
-				contentJsonFile = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-	            
+			try {	            
+				content = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
 	        } catch (IOException e) {
 				throw e;
 	        }
 
-			return contentJsonFile;
+			return content;
 		}
+		/*
+		 * The file can also be read in this way
+		 */
+//		Path filePath = Path.of(fileFullPathWithExtension);
+//		String fileString = Files.readString(filePath);
 
-	    
 	}
+	
+	public static String readFileFromResources(String resourcePath) throws IOException {
+	    try (InputStream resourceAsStream = HelperFunctions.class.getResourceAsStream(resourcePath)) {
+	      List<String> lines = IOUtils.readLines(resourceAsStream, StandardCharsets.UTF_8);
+	      StringBuilder out = new StringBuilder();
+	      for (String line : lines) {
+	        out.append(line);
+	      }
+	      return out.toString();
+	    }
+	}	
 	
 	public static boolean checkWikidataJSONFileExistance (String directory, String wikidataURL) throws IOException
 	{
@@ -398,43 +417,40 @@ public class HelperFunctions {
 		itemArr = itemList.toArray(itemArr);
 		return itemArr;
 	}
+
+//	public static List<String> sortWikiIds(List<String> wikiIds) {
+//		if(wikiIds.isEmpty()) {
+//			return wikiIds;
+//		}
+//		String base = wikiIds.get(0).substring(0, wikiIds.get(0).lastIndexOf('Q') + 1);
+//		List<Integer> wikiIntegerIds = wikiIds.stream().map(el -> Integer.valueOf(el.substring(el.lastIndexOf('Q')+1))).collect(Collectors.toList());
+//		Collections.sort(wikiIntegerIds);
+//		return wikiIntegerIds.stream().map(el -> base + el).collect(Collectors.toList());
+//	}
 	
-	public static String parseHTMLWithJsoup (String htmlText)
-	{
-//		StringBuilder response = new StringBuilder ();
-
-		//https://stackoverflow.com/questions/5640334/how-do-i-preserve-line-breaks-when-using-jsoup-to-convert-html-to-plain-text
-		String response;
-		Document doc = Jsoup.parse(htmlText);		
-		doc.outputSettings(new Document.OutputSettings().prettyPrint(false));//makes html() preserve linebreaks and spacing
-	    doc.select("br").append("\\n");
-	    doc.select("p").prepend("\\n\\n");
-	    String s = doc.html().replaceAll("\\\\n", "\n");
-	    /*
-	     * By passing it Whitelist.none() we make sure that all HTML is removed.
-	     * By passsing new OutputSettings().prettyPrint(false) we make sure that the output is not reformatted and line breaks are preserved.
-	     */
-	    String whole = Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
-
-	    /*
-	     * These are used to escape characters that are markup sensitive in certain contexts:
-		 *	&amp; → & (ampersand, U+0026)
-		 *	&lt; → < (less-than sign, U+003C)
-		 *	&gt; → > (greater-than sign, U+003E)
-		 *	&quot; → " (quotation mark, U+0022)
-		 *	&apos; → ' (apostrophe, U+0027)
-		 *  &nbsp;  → " " (space)
-	     */
-	    response = Parser.unescapeEntities(whole, false);
-	    //logger.debug(response);
-	    //logger.debug(response);
-	    return response;
-
-//	    Elements allParagraphs = doc.getElementsByTag("p");
-//		allParagraphs.forEach(paragraph -> response.append(paragraph.text()));
-//		logger.debug(whole);
-//		logger.debug(whole);
+	public static boolean containsAllListElems(String str, List<String> list) {
+		for(String elem : list) {
+			if(! str.contains(elem)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
+	public static boolean containsAnyListElem(String str, List<String> list) {
+		for(String elem : list) {
+			if(str.contains(elem)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static Set<String> listFilesFromDirUsingJavaIO(String dir) {
+	    return Stream.of(new File(dir).listFiles())
+	      .filter(file -> !file.isDirectory())
+	      .map(File::getName)
+	      .collect(Collectors.toSet());
+	}
 
 }

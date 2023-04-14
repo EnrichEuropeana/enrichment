@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.TranslationEntity;
 import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.dao.TranslationEntityDao;
 
@@ -19,45 +18,30 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	TranslationEntityDao translationEntityDao;
 	
 	@Override
-	public TranslationEntity findTranslationEntity(String key) {
-		return translationEntityDao.findTranslationEntity(key);
-	}
-	@Override
-	public TranslationEntity findTranslationEntityWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
-		return translationEntityDao.findTranslationEntityWithAditionalInformation(storyId, itemId, tool, language, type);
-	}
-	
-	@Override
 	public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId, String tool, String language, String type) {
 		return translationEntityDao.findTranslationEntitiesWithAditionalInformation(storyId, itemId, tool, language, type);
 	}
 
-	
 	@Override
-	public TranslationEntity findTranslationEntityWithAllAditionalInformation(String storyId, String itemId, String tool, String language, String type, String key) {
-		return translationEntityDao.findTranslationEntityWithAllAditionalInformation(storyId, itemId, tool, language, type, key);
-	}
-
-	@Override
-	public List<TranslationEntity> getAllTranslationEntities(boolean onlyItems, boolean onlyStories) {
+	public List<TranslationEntityImpl> getAllTranslationEntities(boolean onlyItems, boolean onlyStories) {
 		// TODO Auto-generated method stub
 		return translationEntityDao.findAllTranslationEntities(onlyItems, onlyStories);
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntity entity) {
+	public void saveTranslationEntity(TranslationEntityImpl entity) {
 		translationEntityDao.saveTranslationEntity(entity);
 	}
 
 	@Override
-	public void saveTranslationEntities(List<TranslationEntity> entities) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		for (TranslationEntity translationEntity : entities) {
+	public void saveTranslationEntities(List<TranslationEntityImpl> entities) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+		for (TranslationEntityImpl translationEntity : entities) {
 			saveTranslationEntity(translationEntity);
 		}
 	}
 
 	@Override
-	public void deleteTranslationEntity(TranslationEntity entity) {
+	public void deleteTranslationEntity(TranslationEntityImpl entity) {
 		translationEntityDao.deleteTranslationEntity(entity);
 	}
 
