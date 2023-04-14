@@ -13,11 +13,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,8 +27,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.EnrichmentApp;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.RecordTranslation;
 import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
+import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
 import eu.europeana.enrichment.translation.view.Description1418;
 import eu.europeana.enrichment.web.service.RecordTranslationService;
 
@@ -39,11 +43,15 @@ public class RecordTranslationTest {
 
     @Autowired
     RecordTranslationService recordTranslationService;
+    
+    @Autowired
+    RecordTranslationDao recordTranslationDao;  
 
     String rawDescriptionsFolder = "/app/enrich/data/1418-descriptions/raw-descriptions/";
     String translationsFolder = "/app/enrich/data/1418-descriptions/translations/";
 
-//    @Test
+    @Test
+    @Disabled
     public void recordTranslationTest() throws Exception {
         RecordTranslation recordTranslation = new EuropeanaRecordTranslationImpl();
         String testRecordId = "/test/recordId";
@@ -58,6 +66,7 @@ public class RecordTranslationTest {
     }
 
     @Test
+    @Disabled
     public void recordTranslation1418Test() throws Exception {
 
         String filename = "100000-nnnnl84.json";
@@ -88,6 +97,7 @@ public class RecordTranslationTest {
     }
 
     @Test
+    @Disabled
     public void allRecordTranslations1418Test() throws Exception {
 
         String[] fileNames = FileUtils.getFile(rawDescriptionsFolder).list();
@@ -119,6 +129,26 @@ public class RecordTranslationTest {
             verifyTranslationComplete(savedTranslation);
         }        
     }
+    
+    @Test
+    public void exportRecordTranslations1418Test() throws Exception {
+
+        List<EuropeanaRecordTranslationImpl> recordTranslations= recordTranslationDao.getAllTranslationRecords();
+        EuropeanaRecordTranslationImpl serializedRecord;
+        int cnt = 0;
+        for (EuropeanaRecordTranslationImpl recordTranslation : recordTranslations) {
+            serializedRecord = serializeTranslation(recordTranslation, recordTranslation.getIdentifier() + ".json");
+            verifyTranslationComplete(serializedRecord);
+            cnt++;
+            if((cnt % 100) = 0) {
+                logger.info("Serialization Count: " + cnt);
+            }
+        }
+        
+        logger.info("Serialization Count: " + cnt);
+        
+    }
+
 
     private void verifyTranslationComplete(EuropeanaRecordTranslationImpl savedTranslation) {
         assertEquals(savedTranslation.getDescription().size(), savedTranslation.getTranslation().size());
@@ -132,6 +162,11 @@ public class RecordTranslationTest {
             throws IOException, Exception, JsonProcessingException, JsonParseException, JsonMappingException {
         RecordTranslation recordTranslation = buildRecordTranslation(description);
         RecordTranslation translation = recordTranslationService.translate(recordTranslation);
+        return serializeTranslation(translation, filename);
+    }
+
+    private EuropeanaRecordTranslationImpl serializeTranslation(RecordTranslation translation, String filename)
+            throws JsonProcessingException, IOException, JsonParseException, JsonMappingException {
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(translation);
         File translatedFile = getTranslationFile(filename);
