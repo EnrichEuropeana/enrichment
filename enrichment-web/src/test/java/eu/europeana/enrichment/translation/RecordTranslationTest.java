@@ -3,11 +3,14 @@ package eu.europeana.enrichment.translation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +29,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.EnrichmentApp;
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.RecordTranslation;
 import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
 import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
@@ -40,6 +41,8 @@ import eu.europeana.enrichment.web.service.RecordTranslationService;
 public class RecordTranslationTest {
     
     Logger logger = LogManager.getLogger(getClass());
+    
+    String[] supportedLanguages = new String[]{"fr", "de", "nl", "hr", "sr", "bs", "sl", "el", "ro", "pl", "pt"};
 
     @Autowired
     RecordTranslationService recordTranslationService;
@@ -48,6 +51,8 @@ public class RecordTranslationTest {
     RecordTranslationDao recordTranslationDao;  
 
     String rawDescriptionsFolder = "/app/enrich/data/1418-descriptions/raw-descriptions/";
+    String rawDescriptionsLangFolder = "/app/enrich/data/1418-descriptions/raw-descriptions-lang/";
+    
     String translationsFolder = "/app/enrich/data/1418-descriptions/translations/";
 
     @Test
@@ -95,6 +100,102 @@ public class RecordTranslationTest {
         assertEquals(savedTranslation.getDescription().size(), savedTranslation.getTranslation().size());
         assertEquals(savedTranslation.getDescription().size(), savedTranslation.getLanguage().size());
     }
+    
+    @Test
+    @Disabled
+    public void importMissingRecordTranslationsTest() throws Exception {
+
+        String[] files =  new String[] {"197874-nnncZx9.json", "197883-nnncZxw.json"};
+        String identifier;
+        for (int i = 0; i < files.length; i++) {
+            Description1418 description = getDescription(rawDescriptionsLangFolder, files[i]);
+            //remove numeric sequence
+            identifier = description.getIdentifier().split("-")[1];
+            description.setIdentifier(identifier);
+            RecordTranslation recordTranslation = buildRecordTranslation(description);
+            RecordTranslation translation = recordTranslationService.translate(recordTranslation, EuropeanaRecordTranslationImpl.class);
+            assertNotNull(translation);
+        }
+     }
+    
+//    @Test
+//    @Disabled
+//    public void fixTrippleBackSlashTest() throws Exception {
+//        String identifier = "https___1914_1918_europeana_eu_contributions_19821";
+//        RecordTranslation recordTranslation = recordTranslationService.getByRecordId(identifier);
+//        System.out.println(recordTranslation.getTranslation().get(0));        
+//        
+//        assertTrue(recordTranslation.getTranslation().get(0).contains("\\\""));
+//        
+//    }
+    
+    @Test
+    @Disabled
+    public void updateDcLanguageTest() throws Exception {
+
+        String filename = "198757-nnnncpS.json";
+        Description1418 description = getDescription(rawDescriptionsLangFolder, filename);
+        assertNotNull(description.getId());
+        assertEquals("198757-nnnncpS", description.getIdentifier());
+        assertEquals(2, description.getDescriptions().size());
+        assertEquals(1, description.getLanguages().size());
+        assertEquals("Slovenščina", description.getLanguages().get(0).getDcLanguage());
+        
+
+        RecordTranslation recordTranslation = buildRecordTranslation(description);
+        RecordTranslation translation = recordTranslationService.updateDcLanguage(recordTranslation, false);
+        assertEquals(recordTranslation.getRecordDclanguage().size(), translation.getRecordDclanguage().size() );
+        assertEquals("Slovenščina", translation.getRecordDclanguage().get(0));
+        
+    }
+    
+    @Test
+    @Disabled
+    public void updateDcLanguageForAllRecordsTest() throws Exception {
+
+        String[] fileNames = FileUtils.getFile(rawDescriptionsLangFolder).list();
+        String filename;
+        logger.info("Total files: " + fileNames.length);
+        int cnt = 0;
+        List<String> notFound = new ArrayList<String>() ;
+        
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < fileNames.length; i++) {
+            filename = fileNames[i];
+            logger.info("Count: " + i +  " Starting translation of file: " + filename);
+            Description1418 description;
+            try {
+                description = getDescription(rawDescriptionsLangFolder, filename);
+            }catch (Throwable e) {
+                logger.error("Failed to parse file: " + filename);
+                continue; 
+            }
+            
+            if(description.getDescriptions() == null || description.getDescriptions().isEmpty()) {
+                logger.info("The record has no descriptions, file: " + filename);
+                continue;
+            }
+            
+            RecordTranslation recordTranslation = buildRecordTranslation(description);
+            assertNotNull(recordTranslation.getRecordDclanguage());
+            RecordTranslation savedTranslation = recordTranslationService.updateDcLanguage(recordTranslation, false);
+            if(savedTranslation == null) {
+                notFound.add(filename);
+                continue;
+            }
+            
+            assertNotNull(savedTranslation);
+            assertEquals(recordTranslation.getRecordDclanguage().size(), savedTranslation.getRecordDclanguage().size() );
+            
+            if(savedTranslation.getModified() != null && savedTranslation.getModified().getTime() > start) {
+                cnt++;
+            }
+        } 
+        logger.info("Total files: " + fileNames.length);
+        logger.info("Updated: " + cnt);
+        logger.info("NotFound: " + notFound);
+    }
+    
 
     @Test
     @Disabled
@@ -131,14 +232,33 @@ public class RecordTranslationTest {
     }
     
     @Test
+//    @Disabled
     public void exportRecordTranslations1418Test() throws Exception {
 
         List<EuropeanaRecordTranslationImpl> recordTranslations= recordTranslationDao.getAllTranslationRecords(EuropeanaRecordTranslationImpl.class);
         EuropeanaRecordTranslationImpl serializedRecord;
         int cnt = 0;
+        Set<String> includedTranslations = Set.of(supportedLanguages);
         for (EuropeanaRecordTranslationImpl recordTranslation : recordTranslations) {
-            serializedRecord = serializeTranslation(recordTranslation, recordTranslation.getIdentifier() + ".json");
-            verifyTranslationComplete(serializedRecord);
+            
+            boolean serializeTranslation = includedTranslations.contains(recordTranslation.getLanguage().get(0));
+            if(!serializeTranslation) {
+                recordTranslation.setTranslation(null);
+                recordTranslation.setTranslationStatus(null);
+            }else {
+                sanitizeTranslations(recordTranslation);
+            }
+            
+            String fileName = recordTranslation.getIdentifier() + ".json";
+            if(recordTranslation.getIdentifier().contains("-")) {
+                String tmpIdentifier = recordTranslation.getIdentifier().split("-")[1];
+                recordTranslation.setIdentifier(tmpIdentifier);
+            }
+            serializedRecord = serializeTranslation(recordTranslation, fileName);
+            
+            if(serializeTranslation) {
+                verifyTranslationComplete(serializedRecord);
+            }
             cnt++;
             if((cnt % 100) == 0) {
                 logger.info("Serialization Count: " + cnt);
@@ -146,8 +266,48 @@ public class RecordTranslationTest {
         }
         
         logger.info("Serialization Count: " + cnt);
-        
     }
+
+    private void sanitizeTranslations(EuropeanaRecordTranslationImpl recordTranslation) {
+        
+        List<String> updatedTranslations = new ArrayList<>(recordTranslation.getTranslation().size());
+        String fixedTranslation;
+        for (String translation : recordTranslation.getTranslation()) {
+            if(translation.contains("\\\"")) {
+                fixedTranslation = translation.replaceAll("\\\\\"", "\"");                
+            }else {
+                if(translation.contains("\\")) {
+                    System.out.println(translation);
+                }
+                fixedTranslation = translation; 
+            }
+            updatedTranslations.add(fixedTranslation);
+        }
+        recordTranslation.setTranslation(updatedTranslations);
+    }
+
+//    @Test
+//    @Disabled
+//    public void fixTrippleBackSlashInTranslations1418Test() throws Exception {
+//
+//        List<EuropeanaRecordTranslationImpl> recordTranslations= recordTranslationDao.getAllTranslationRecords(EuropeanaRecordTranslationImpl.class);
+//        EuropeanaRecordTranslationImpl serializedRecord;
+//        int cnt = 0;
+//        for (EuropeanaRecordTranslationImpl recordTranslation : recordTranslations) {
+//            //serializedRecord = serializeTranslation(recordTranslation, recordTranslation.getIdentifier() + ".json");
+//            //verifyTranslationComplete(serializedRecord);
+//            String fistTranslation = recordTranslation.getTranslation().get(0);
+//            if(fistTranslation.contains("Opa Sciaroni was a hospice.")) {
+//                System.out.println(fistTranslation);
+//            }
+//            cnt++;
+//            if((cnt % 100) == 0) {
+//                logger.info("Serialization Count: " + cnt);
+//            }
+//        }
+//        
+//        logger.info("Serialization Count: " + cnt);
+//    }
 
 
     private void verifyTranslationComplete(EuropeanaRecordTranslationImpl savedTranslation) {
@@ -186,16 +346,33 @@ public class RecordTranslationTest {
         List<String> rawDescriptions = description.getDescriptions().stream().map(desc -> desc.getDescription())
                 .collect(Collectors.toList());
         recordTranslation.setDescription(rawDescriptions);
+        
+        if(description.getLanguages() != null) {
+            List<String> recordDcLanguage = description.getLanguages().stream().map(dcLanguage -> dcLanguage.getDcLanguage())
+                .collect(Collectors.toList());
+            recordTranslation.setRecordDclanguage(recordDcLanguage);
+        }
         return recordTranslation;
     }
 
     private Description1418 getDescription(String filename) throws IOException {
+//        String identifier = filename.substring(0, filename.length() - ".json".length());
+//        File jsonFile = new File(rawDescriptionsFolder + filename);
+//        ObjectMapper mapper = new ObjectMapper();
+//        // JSON file to Java object
+//        Description1418 res = mapper.readValue(jsonFile, Description1418.class);
+//        res.setIdentifier(identifier);
+//        return res;
+        return getDescription(rawDescriptionsFolder, filename);
+    }
+
+    private Description1418 getDescription(String folder, String filename) throws IOException {
         String identifier = filename.substring(0, filename.length() - ".json".length());
+        File jsonFile = new File(folder + filename);
         ObjectMapper mapper = new ObjectMapper();
         // JSON file to Java object
-        Description1418 res = mapper.readValue(new File(rawDescriptionsFolder + filename), Description1418.class);
+        Description1418 res = mapper.readValue(jsonFile, Description1418.class);
         res.setIdentifier(identifier);
         return res;
     }
-
 }
