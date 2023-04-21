@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.model.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -174,5 +175,41 @@ public class RecordTranslationEval implements RecordTranslation {
 	public void setDescriptionDetectedLang(List<RecordTranslationDetectedLang> descriptionDetectedLang) {
 		// TODO Auto-generated method stub
 	}
+
+    @Override
+    public void setModified(Date modified) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Date getModified() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setRecordDclanguage(List<String> recordDclanguage) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public List<String> getRecordDclanguage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setCreated(Date created) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Date getCreated() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 	
 }
