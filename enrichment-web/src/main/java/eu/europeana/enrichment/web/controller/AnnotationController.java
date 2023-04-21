@@ -76,6 +76,7 @@ public class AnnotationController extends BaseRest {
 			}
 
 			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
+			removeGivenNameInResponse(result.getItems());
 			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;
@@ -100,10 +101,12 @@ public class AnnotationController extends BaseRest {
 			String resultJson=null;
 			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
 			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
+				removeGivenNameInResponse(existingAnnos.getItems());
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
+				removeGivenNameInResponse(result.getItems());
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 
@@ -129,10 +132,12 @@ public class AnnotationController extends BaseRest {
 			String resultJson=null;
 			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, null, property);
 			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
+				removeGivenNameInResponse(existingAnnos.getItems());
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
+				removeGivenNameInResponse(result.getItems());
 				resultJson = jsonLdSerializer.serializeObject(result);
 			}
 
@@ -200,36 +205,47 @@ public class AnnotationController extends BaseRest {
 		
 		verifyReadAccess(request);
 		List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, itemId, wikidataIdentifier);
+		removeGivenNameInResponse(result);
 		String resultJson=jsonLdSerializer.serializeObject(result);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
 		return response;
 	} 
 	
-	   /**
-	    * This method represents the /enrichment/annotation/{storyId}/{wikidataIdentifier} end point,
-		* where the annotations for a single NamedEntity of a story are retrieved using the class NamedEntityAnnotationImpl.
-		* All requests on this end point are processed here.
-	    * @param storyId
-	    * @return
-	    * @throws Exception
-	    * @throws HttpException
-	    */
+   /**
+    * This method represents the /enrichment/annotation/{storyId}/{wikidataIdentifier} end point,
+	* where the annotations for a single NamedEntity of a story are retrieved using the class NamedEntityAnnotationImpl.
+	* All requests on this end point are processed here.
+    * @param storyId
+    * @return
+    * @throws Exception
+    * @throws HttpException
+    */
+	
+	@ApiOperation(value = "Get annotation preview for stories", nickname = "getAnnotationStory", notes = "This method retrieves the annotations of "
+			+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}"
+			+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
+	@RequestMapping(value = "/enrichment/annotation/entity/{storyId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<String> getAnnotationStory(
+			@PathVariable("storyId") String storyId,
+			@PathVariable("wikidataIdentifier") String wikidataIdentifier,
+			@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
+			HttpServletRequest request) throws Exception, HttpException {
 		
-		@ApiOperation(value = "Get annotation preview for stories", nickname = "getAnnotationStory", notes = "This method retrieves the annotations of "
-				+ "a single wikidata entity from the whole collection of entities that can be retrieved using the GET method: /enrichment/annotation/{storyId}"
-				+ " The parameter \"wikidataIdentifier\" specifies the wikidata entity we want to retrieve (e.g. Q1569850).")
-		@RequestMapping(value = "/enrichment/annotation/entity/{storyId}/{wikidataIdentifier}", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
-		public ResponseEntity<String> getAnnotationStory(
-				@PathVariable("storyId") String storyId,
-				@PathVariable("wikidataIdentifier") String wikidataIdentifier,
-				@RequestParam(value = CommonApiConstants.PARAM_WSKEY) String wskey,
-				HttpServletRequest request) throws Exception, HttpException {
-			
-			verifyReadAccess(request);
-			List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
-			String resultJson=jsonLdSerializer.serializeObject(result);
-			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
-			return response;
+		verifyReadAccess(request);
+		List<NamedEntityAnnotationImpl> result = enrichmentNerService.getStoryOrItemAnnotation(storyId, null, wikidataIdentifier);
+		removeGivenNameInResponse(result);
+		String resultJson=jsonLdSerializer.serializeObject(result);
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);			
+		return response;
+	}
+	
+	private void removeGivenNameInResponse(List<NamedEntityAnnotationImpl> annos) {
+		if(annos==null) {
+			return;
 		}
+		for(NamedEntityAnnotationImpl anno : annos) {
+			anno.getBody().remove(EnrichmentConstants.GIVEN_NAME_ANNO);
+		}
+	}
 
 } 

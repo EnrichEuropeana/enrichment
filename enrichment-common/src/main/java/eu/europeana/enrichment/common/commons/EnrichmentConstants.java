@@ -139,6 +139,7 @@ public class EnrichmentConstants {
 	public static final String ITEMS = "items";
 	public static final String CREATOR = "creator";
 	public static final String OFFSETS_TRANSLATED_TEXT = "offsetsTranslatedText";
+	public static final String GIVEN_NAME_ANNO = "givenName";
 
 	public static final String TOPIC_MODEL_ID = "id";
 	public static final String TOPIC_MODEL_IDENTIFIER = "identifier";
