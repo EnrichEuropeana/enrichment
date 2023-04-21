@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.model;
 
+import java.util.Date;
 import java.util.List;
 
 import eu.europeana.enrichment.model.impl.RecordTranslationDetectedLang;
@@ -44,5 +45,17 @@ public interface RecordTranslation {
 	List<RecordTranslationDetectedLang> getDescriptionDetectedLang();
 	
 	void setDescriptionDetectedLang(List<RecordTranslationDetectedLang> descriptionDetectedLang);
+
+    void setModified(Date modified);
+
+    Date getModified();
+
+    void setRecordDclanguage(List<String> recordDclanguage);
+
+    List<String> getRecordDclanguage();
+
+    void setCreated(Date created);
+
+    Date getCreated();
 
 }

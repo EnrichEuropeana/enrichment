@@ -1,6 +1,7 @@
 package eu.europeana.enrichment.web.service.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,70 +21,111 @@ import eu.europeana.enrichment.web.service.RecordTranslationService;
 @Service(EnrichmentConstants.BEAN_RECORD_TRANSLATION_SERVICE)
 public class RecordTranslationServiceImpl implements RecordTranslationService {
 
-	/*
-	 * Loading all translation services
-	 */
+    /*
+     * Loading all translation services
+     */
 
-	@Autowired(required=false)
-	TranslationGoogleServiceImpl googleTranslationService;
+    @Autowired(required = false)
+    TranslationGoogleServiceImpl googleTranslationService;
 
-	@Autowired
-        RecordTranslationDao recordTranslationDao;
-        
-	Logger logger = LogManager.getLogger(getClass());
-	
-	/*
-	 * Defining the available tools for translation
-	 */
+    @Autowired
+    RecordTranslationDao recordTranslationDao;
+
+    Logger logger = LogManager.getLogger(getClass());
+
+    /*
+     * Defining the available tools for translation
+     */
 //	private static final String googleToolName = "Google";
-	private String targetLanguage = "en";
-	
-        
-	public RecordTranslationServiceImpl() {
-	    super();
-	}
-	
-	@Override
-	public <T extends RecordTranslation> RecordTranslation translate(RecordTranslation record, Class<T> objClass) throws Exception{
-		
-	    RecordTranslation storedTranslation = recordTranslationDao.findByRecordId(record.getRecordId(), objClass);
-	    if(storedTranslation != null && storedTranslation.isTranslationComplete()) {
-	        return storedTranslation;
-	    } else {
-                return translateAndStore(record, storedTranslation);
-            } 
-	}
+    private String targetLanguage = "en";
 
-
-    private RecordTranslation translateAndStore(RecordTranslation record, RecordTranslation dbRecord) {
-        if(dbRecord == null) {
-            dbRecord = new EuropeanaRecordTranslationImpl();
-        } 
-        resetTranslationObj(dbRecord, record.getRecordId(), record.getDescription(), record.getIdentifier());
-        
-        computeTranslations(dbRecord);
-        return recordTranslationDao.saveTranslationEntity(dbRecord);
-        
+    public RecordTranslationServiceImpl() {
+        super();
     }
 
+    @Override
+    public <T extends RecordTranslation> RecordTranslation translate(RecordTranslation record, Class<T> objClass)
+            throws Exception {
+
+        RecordTranslation storedTranslation = recordTranslationDao.findByRecordId(record.getRecordId(), objClass);
+        if (storedTranslation != null && storedTranslation.isTranslationComplete()) {
+            return storedTranslation;
+        } else {
+            return translateAndStore(record, storedTranslation);
+        }
+    }
+
+    @Override
+    public <T extends RecordTranslation> RecordTranslation getByRecordId(String recordId) throws Exception {
+
+        return recordTranslationDao.findByRecordId(recordId, EuropeanaRecordTranslationImpl.class);
+
+    }
+
+    @Override
+    public RecordTranslation updateDcLanguage(RecordTranslation record, boolean forceUpdate) {
+        RecordTranslation storedTranslation = recordTranslationDao.findByRecordId(record.getRecordId(),
+                record.getClass());
+        if (storedTranslation == null) {
+            return null;
+        }
+
+        // should not happen, but try to prevent overwritting wrong records
+        if (!storedTranslation.getRecordId().equals(record.getRecordId())) {
+            throw new FunctionalRuntimeException(
+                    "Record Id mismatch:" + record.getRecordId() + " <> " + storedTranslation.getRecordId());
+        }
+
+        if (storedTranslation.getRecordDclanguage() != null && !forceUpdate) {
+            // do not update if language exists and update is not forced
+            return storedTranslation;
+        }
+
+        storedTranslation.setRecordDclanguage(record.getRecordDclanguage());
+
+        // mark as updated
+        storedTranslation.setModified(new Date());
+
+        return recordTranslationDao.saveTranslationEntity(storedTranslation);
+    }
+
+    private RecordTranslation translateAndStore(RecordTranslation record, RecordTranslation dbRecord) {
+        Date now = new Date();
+        if (dbRecord == null) {
+            dbRecord = new EuropeanaRecordTranslationImpl();
+            dbRecord.setCreated(now);
+        }
+        resetTranslationObj(dbRecord, record.getRecordId(), record.getDescription(), record.getIdentifier());
+        if(record.getRecordDclanguage()!= null) {
+            dbRecord.setRecordDclanguage(record.getRecordDclanguage());
+        }
+
+        computeTranslations(dbRecord);
+        dbRecord.setModified(now);
+        return recordTranslationDao.saveTranslationEntity(dbRecord);
+
+    }
 
     private void computeTranslations(RecordTranslation recordTranslation) {
-        if(recordTranslation.getDescription() == null || recordTranslation.getDescription().isEmpty()) {
-            throw new FunctionalRuntimeException("Missing descriptions for record:"  + recordTranslation.getRecordId());
-        } 
-        
-		List<String> googleTransTextResp = new ArrayList<>();
-		List<String> googleTransDetectedLangResp = new ArrayList<>();
-        googleTranslationService.translateList(recordTranslation.getDescription(), null, targetLanguage, googleTransTextResp, googleTransDetectedLangResp);
-        if(hasFailedTranslation(googleTransTextResp, recordTranslation.getDescription().size())) {
-            throw new FunctionalRuntimeException("Translation failed for record, see error logs:"  + recordTranslation.getRecordId());
+        if (recordTranslation.getDescription() == null || recordTranslation.getDescription().isEmpty()) {
+            throw new FunctionalRuntimeException("Missing descriptions for record:" + recordTranslation.getRecordId());
         }
-        
-        for (int i=0;i<googleTransTextResp.size();i++) {
-        	String transText = googleTransTextResp.get(i);
-        	String transDetectLang = googleTransDetectedLangResp.get(i);
-            if(StringUtils.isEmpty(transText) || StringUtils.isEmpty(transDetectLang)) {
-                throw new FunctionalRuntimeException("Translation failed for record, see error logs:"  + recordTranslation.getRecordId());
+
+        List<String> googleTransTextResp = new ArrayList<>();
+        List<String> googleTransDetectedLangResp = new ArrayList<>();
+        googleTranslationService.translateList(recordTranslation.getDescription(), null, targetLanguage,
+                googleTransTextResp, googleTransDetectedLangResp);
+        if (hasFailedTranslation(googleTransTextResp, recordTranslation.getDescription().size())) {
+            throw new FunctionalRuntimeException(
+                    "Translation failed for record, see error logs:" + recordTranslation.getRecordId());
+        }
+
+        for (int i = 0; i < googleTransTextResp.size(); i++) {
+            String transText = googleTransTextResp.get(i);
+            String transDetectLang = googleTransDetectedLangResp.get(i);
+            if (StringUtils.isEmpty(transText) || StringUtils.isEmpty(transDetectLang)) {
+                throw new FunctionalRuntimeException(
+                        "Translation failed for record, see error logs:" + recordTranslation.getRecordId());
             }
             recordTranslation.addTranslation(transDetectLang, transText);
         }
@@ -91,24 +133,23 @@ public class RecordTranslationServiceImpl implements RecordTranslationService {
     }
 
     private boolean hasFailedTranslation(List<String> translations, int expectedTranslations) {
-        return translations.size()==0 || (translations.size() != expectedTranslations);
+        return translations.size() == 0 || (translations.size() != expectedTranslations);
     }
 
-
-    private void resetTranslationObj(RecordTranslation storedTranslation, String recordId, List<String> descriptions, String identifier) {
-        //reset descriptions and translations
+    private void resetTranslationObj(RecordTranslation storedTranslation, String recordId, List<String> descriptions,
+            String identifier) {
+        // reset descriptions and translations
         storedTranslation.setRecordId(recordId);
         storedTranslation.setDescription(descriptions);
         storedTranslation.setIdentifier(identifier);
-        storedTranslation.setTool(identifier);
-        if(storedTranslation.getTranslation() != null) {
+        storedTranslation.setTool("Google Translate");
+        if (storedTranslation.getTranslation() != null) {
             storedTranslation.getTranslation().clear();
         }
-        if(storedTranslation.getLanguage() != null) {
+        if (storedTranslation.getLanguage() != null) {
             storedTranslation.getLanguage().clear();
         }
         storedTranslation.setTranslationStatus(null);
     }
-	
-		
+
 }

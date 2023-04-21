@@ -1,11 +1,14 @@
 package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
@@ -14,6 +17,7 @@ import dev.morphia.annotations.Indexed;
 import eu.europeana.enrichment.model.RecordTranslation;
 
 @Entity(value = "recordTranslationEntity")
+@JsonInclude(Include.NON_NULL)
 public class EuropeanaRecordTranslationImpl implements RecordTranslation {
 
     @Id
@@ -21,6 +25,9 @@ public class EuropeanaRecordTranslationImpl implements RecordTranslation {
     private ObjectId _id;
     private List<String> description;
     private List<String> language;
+    private List<String> recordDclanguage;
+    private List<RecordTranslationDetectedLang> descriptionDetectedLanguage;
+
     private List<String> translation;
     private String tool;
     @Indexed(options = @IndexOptions(unique = true))
@@ -28,8 +35,8 @@ public class EuropeanaRecordTranslationImpl implements RecordTranslation {
     @Indexed(options = @IndexOptions(unique = true))
     private String identifier;
     private String translationStatus;
-    private List<RecordTranslationDetectedLang> descriptionDetectedLanguage;
-
+    private Date modified;
+    private Date created;
 
     public EuropeanaRecordTranslationImpl() {
 
@@ -160,5 +167,41 @@ public class EuropeanaRecordTranslationImpl implements RecordTranslation {
 	public void setDescriptionDetectedLang(List<RecordTranslationDetectedLang> descriptionDetectedLang) {
 		this.descriptionDetectedLanguage = descriptionDetectedLang;
 	}
+
+
+    @Override
+    public List<String> getRecordDclanguage() {
+        return recordDclanguage;
+    }
+
+
+    @Override
+    public void setRecordDclanguage(List<String> recordDclanguage) {
+        this.recordDclanguage = recordDclanguage;
+    }
+
+
+    @Override
+    public Date getModified() {
+        return modified;
+    }
+
+
+    @Override
+    public void setModified(Date modified) {
+        this.modified = modified;
+    }
+
+
+    @Override
+    public Date getCreated() {
+        return created;
+    }
+
+
+    @Override
+    public void setCreated(Date created) {
+        this.created = created;
+    }
     
 }
