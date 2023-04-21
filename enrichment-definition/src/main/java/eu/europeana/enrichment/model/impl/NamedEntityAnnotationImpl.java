@@ -16,11 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import dev.morphia.annotations.Entity;
-import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Id;
-import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
-import dev.morphia.annotations.Indexes;
 import dev.morphia.annotations.Property;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.model.NamedEntityAnnotation;
@@ -147,7 +143,7 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 			this.body.put("description", body_description);
 		}
 		if(! StringUtils.isBlank(body_givenName)) {
-			this.body.put("givenName", body_givenName);
+			this.body.put(EnrichmentConstants.GIVEN_NAME_ANNO, body_givenName);
 		}
 		if(! StringUtils.isBlank(body_familyName)) {
 			this.body.put("familyName", body_familyName);
