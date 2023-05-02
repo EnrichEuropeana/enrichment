@@ -70,7 +70,7 @@ public class HelperFunctions {
 		} catch (Exception ex) {
 			//TODO: proper exception handling
 			logger.log(Level.ERROR, "Exception raised during the creation of the Http request to: " + baseUrl, ex);
-			return "";
+			return null;
 		}
 	}
 

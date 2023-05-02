@@ -70,6 +70,10 @@ public class EnrichmentTpApiClient {
 
 	private Story getTranscribathonMinimalStory(String storyId) {
 		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStoriesMinimal() + storyId);
+		if(storyMinimalResponse==null) {
+			return null;
+		}
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			List<Story> storiesMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
@@ -87,6 +91,9 @@ public class EnrichmentTpApiClient {
 	
 	private Item getTranscribathonItem(String itemId) {
 		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
+		if(response==null) {
+			return null;
+		}
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			return objectMapper.readValue(response, new TypeReference<Item>(){});
@@ -100,6 +107,9 @@ public class EnrichmentTpApiClient {
 
 	private Story getTranscribathonFullStory(String storyId) {
 		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId);
+		if(storyFullResponse==null) {
+			return null;
+		}
 		ObjectMapper objectMapper = new ObjectMapper();
 		try {
 			List<Story> storiesFull = objectMapper.readValue(storyFullResponse, new TypeReference<List<Story>>(){});

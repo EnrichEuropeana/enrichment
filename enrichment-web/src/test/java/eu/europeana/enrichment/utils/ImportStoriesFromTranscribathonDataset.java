@@ -55,9 +55,15 @@ public class ImportStoriesFromTranscribathonDataset {
 		String URLStoriesComplete = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
 		String URLItemTranscription = "https://europeana.fresenia.man.poznan.pl/tp-api/transcriptions?ItemId=";
 		String responseDatasets = HelperFunctions.createHttpRequest(null, URLDataset);
+		if(responseDatasets==null) {
+			return;
+		}
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		List<Dataset> listDatasets = objectMapper.readValue(responseDatasets, new TypeReference<List<Dataset>>(){});
-        if(listDatasets==null || listDatasets.isEmpty()) return;
+        if(listDatasets==null || listDatasets.isEmpty()) {
+        	return;
+        }
 		for(Dataset dataset : listDatasets) {
         	if(dataset.Name.equals(datasetName)) {
             	datasetId=dataset.DatasetId.toString();

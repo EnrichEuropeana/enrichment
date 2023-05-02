@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +23,16 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +48,16 @@ public class AnnotationController extends BaseRest {
 
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
+
+	@Autowired
+	PersistentStoryEntityService persistentStoryEntityService;
+
+    @Autowired
+    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
 	
+    @Autowired
+    PersistentPositionEntityServiceImpl persistentPositionEntityService;
+
 	@Autowired 
 	JsonLdSerializer jsonLdSerializer;
 	
@@ -83,8 +100,8 @@ public class AnnotationController extends BaseRest {
 	}
 	
 	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method creates and stores the annotations of "
-			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription). Please note that the Named Entity "
-			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
+			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription)."
+			+ "Please note that this method also updats the item from Transcribathon and performs the Named Entity Recognition analysis if needed.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForItem(
 			@PathVariable("storyId") String storyId,
@@ -99,12 +116,26 @@ public class AnnotationController extends BaseRest {
 			}
 
 			String resultJson=null;
+			//check if the item has changed in the Transcribathon, and if yes update it in the db and perform the NER anylysis again
+			List<String> fieldsToUpdate = new ArrayList<>();
+			fieldsToUpdate.add(property);
+			enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
+			
 			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
 			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
 				removeGivenNameInResponse(existingAnnos.getItems());
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
+				//if there are no named and/or position entities in the db perform the NER analysis
+				List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, itemId, property);
+				if(positionEntities.isEmpty()) {
+					String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
+					List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
+					List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+					enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
+				}
+
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
 				removeGivenNameInResponse(result.getItems());
 				resultJson = jsonLdSerializer.serializeObject(result);
@@ -115,8 +146,8 @@ public class AnnotationController extends BaseRest {
 	}
 
 	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
-			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). Please note that the Named Entity "
-			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
+			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). "
+			+ "Please note that this method also updats a story from Transcribathon and performs the Named Entity Recognition analysis if needed.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForStory(
 			@PathVariable("storyId") String storyId,
@@ -130,12 +161,27 @@ public class AnnotationController extends BaseRest {
 			}
 
 			String resultJson=null;
+			
+			//check if the story has changed in the Transcribathon, and if yes update it in the db and perform the NER anylysis again
+			List<String> fieldsToUpdate = new ArrayList<>();
+			fieldsToUpdate.add(property);
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fieldsToUpdate);			
+			
 			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, null, property);
 			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
 				removeGivenNameInResponse(existingAnnos.getItems());
 				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
 			}
 			else {
+				//if there are no named and/or position entities in the db perform the NER analysis
+				List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, null, property);
+				if(positionEntities.isEmpty()) {
+					String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
+					List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
+					List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+					enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
+				}
+			
 				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
 				removeGivenNameInResponse(result.getItems());
 				resultJson = jsonLdSerializer.serializeObject(result);

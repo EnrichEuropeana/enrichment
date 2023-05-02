@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.common.commons;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -214,7 +215,8 @@ public class EnrichmentConstants {
 	public static final String LONGITUDE_DENORMALIZED = "wgs84_pos";	
 	public static final String PROFESSION_OR_OCCUPATION_DENORMALIZED = "rdagr2_professionOrOccupation";
 
-	public static final String defaultTargetTranslationLanguage = "en";
+	public static final String defaultTargetTranslationLang2Letter = "en";
+	public static final String defaultTargetTranslationLangFull = "english";
 	public static final String defaultTranslationTool = "Google";
 	public static final String eTranslationTool = "eTranslation";
 	public static final String eTranslationFailedSign = "-";
@@ -228,5 +230,7 @@ public class EnrichmentConstants {
 	public static final String MONGO_SKIP_FIELD="mongo_skip_field";
 	public static final List<String> MONGO_SKIP_LIST_FIELD=Collections.singletonList(MONGO_SKIP_FIELD);
 	public static final ObjectId MONGO_SKIP_OBJECT_ID_FIELD=new ObjectId();
+	
+	public static final List<String> transcribathonEnglishLangValues = Arrays.asList("en", "eng", "English", "en || en", "eng || eng", "English || English", "en || eng", "eng || en", "en || English", "English || en", "eng || English", "English || eng");
 }
 

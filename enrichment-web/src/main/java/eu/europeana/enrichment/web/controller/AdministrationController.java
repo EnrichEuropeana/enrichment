@@ -93,14 +93,17 @@ public class AdministrationController extends BaseRest {
 	@RequestMapping(value = "/administration/updateStoriesFromTranscribathon", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> updateStoriesFromTranscribathon(
-			@RequestBody String storiesIds,
+			@RequestBody List<String> storyIdsList,
 			HttpServletRequest request) throws Exception {
 		
 		verifyWriteAccess(Operations.CREATE, request);
-		List<String> storyIdsList = new ArrayList<String>(Arrays.asList(HelperFunctions.toArray(storiesIds,",")));
+		List<String> fieldsToUpdate = new ArrayList<>();
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_SUMMARY);
 		Instant start = Instant.now();
 		for (int i = 0; i < storyIdsList.size(); i++) {
-			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i));
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i), fieldsToUpdate);
 		}
 		Instant finish = Instant.now();
 		long timeElapsed = Duration.between(start, finish).getSeconds();
