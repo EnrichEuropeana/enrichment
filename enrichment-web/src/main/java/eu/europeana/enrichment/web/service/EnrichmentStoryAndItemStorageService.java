@@ -2,17 +2,16 @@ package eu.europeana.enrichment.web.service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import eu.europeana.enrichment.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.model.impl.StoryEntityImpl;
 
 public interface EnrichmentStoryAndItemStorageService {
 	
-	public void updateStoryFromTranscribathon (String storyId);
+	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate);
 	
-	public StoryEntityImpl updateStoryFromTranscribathon (StoryEntityImpl updatedStory);
-	
-	public ItemEntityImpl updateItemFromTranscribathon (ItemEntityImpl updatedItem);
+	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId);
 	
 	public void updateStoriesFromInput(StoryEntityImpl[] stories);
 	

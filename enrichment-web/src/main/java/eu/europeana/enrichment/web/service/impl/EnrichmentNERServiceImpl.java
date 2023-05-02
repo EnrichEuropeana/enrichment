@@ -150,13 +150,12 @@ public class EnrichmentNERServiceImpl {
 	 */
 	public List<NamedEntityImpl> createNamedEntitiesForStory(String storyId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateStory) throws Exception {
 		List<NamedEntityImpl> result = new ArrayList<>();
-		StoryEntityImpl story = persistentStoryEntityService.findStoryEntity(storyId);
-		
+
 		//delete existing position, named entities and annotations
-		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, property);
+		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, property);
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 
-		String [] textAndLanguage = getStoryTextForNER(story, translationTool, property, original, updateStory);
+		String [] textAndLanguage = getStoryTextForNER(storyId, translationTool, property, original, updateStory);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
 			return result;
 		}
@@ -164,7 +163,7 @@ public class EnrichmentNERServiceImpl {
 		String languageForNer = textAndLanguage[1];
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
-		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, story.getStoryId(), null, linking, true);
+		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, null, linking, true);
 		//add linking to the named entities
 		for(ObjectId neId : namedEntitiesToUpdateLinking) {
 			NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(neId);
@@ -196,13 +195,12 @@ public class EnrichmentNERServiceImpl {
 	 */
 	public List<NamedEntityImpl> createNamedEntitiesForItem(String storyId, String itemId, String property, List<String> nerTools, List<String> linking, String translationTool, boolean original, boolean updateItem) throws Exception {
 		List<NamedEntityImpl> result = new ArrayList<>();
-		ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
 
 		//delete existing position and named entities for the given item
-		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), property);
+		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, itemId, property);
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 		
-		String [] textAndLanguage = getItemTextForNER(item, translationTool, property, original, updateItem);
+		String [] textAndLanguage = getItemTextForNER(storyId, itemId, translationTool, property, original, updateItem);
 		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
 			return result;
 		}
@@ -210,7 +208,7 @@ public class EnrichmentNERServiceImpl {
 		String languageForNer = textAndLanguage[1];
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
-		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, item.getStoryId(), item.getItemId(), linking, true);
+		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, itemId, linking, true);
 		//add linking to the named entities
 		for(ObjectId neId : namedEntitiesToUpdateLinking) {
 			NamedEntityImpl ne = persistentNamedEntityService.findNamedEntity(neId);
@@ -355,18 +353,24 @@ public class EnrichmentNERServiceImpl {
 		}
 	}
 
-	public String [] getStoryTextForNER (StoryEntityImpl dbStory, String translationTool, String type, boolean original, boolean updateStory) throws Exception
+	public String [] getStoryTextForNER (String storyId, String translationTool, String type, boolean original, boolean updateStoryBool) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
 		results[1]=null;
+		List<String> fiedlsToUpdate = new ArrayList<String>();
+		fiedlsToUpdate.add(type);
 
 		if(original) {
 			//update story from Transcribathon
-			StoryEntityImpl updatedStory=dbStory;
-			if(updateStory) {
-				updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(dbStory);
-			}		
+			StoryEntityImpl updatedStory=null;
+			if(updateStoryBool) {
+				updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fiedlsToUpdate);
+			}	
+			else {
+				updatedStory = persistentStoryEntityService.findStoryEntity(storyId);
+			}
+			
 			if(updatedStory==null) {
 				return results;
 			}
@@ -391,10 +395,14 @@ public class EnrichmentNERServiceImpl {
 		}
 		
 		//update story from Transcribathon
-		StoryEntityImpl updatedStory=dbStory;
-		if(updateStory) {
-			updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(dbStory);
-		}		
+		StoryEntityImpl updatedStory=null;
+		if(updateStoryBool) {
+			updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fiedlsToUpdate);
+		}	
+		else {
+			updatedStory = persistentStoryEntityService.findStoryEntity(storyId);
+		}
+
 		if(updatedStory==null) {
 			return results;
 		}
@@ -403,12 +411,12 @@ public class EnrichmentNERServiceImpl {
 		if(! StringUtils.isBlank(translatedText))
 		{
 			results[0] = translatedText;
-			results[1] = EnrichmentConstants.defaultTargetTranslationLanguage;
+			results[1] = EnrichmentConstants.defaultTargetTranslationLang2Letter;
 		}
 		return results;
 	}
 
-	public String [] getItemTextForNER (ItemEntityImpl dbItem, String translationTool, String property, boolean original, boolean updateItem) throws Exception
+	public String [] getItemTextForNER (String storyId, String itemId, String translationTool, String property, boolean original, boolean updateItemBool) throws Exception
 	{
 		String [] results =  new String [2];
 		results[0]=null;
@@ -416,10 +424,14 @@ public class EnrichmentNERServiceImpl {
 
 		if(original) {
 			//update item from Transcribathon
-			ItemEntityImpl updatedItem=dbItem;
-			if(updateItem) {
-				updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(dbItem);
+			ItemEntityImpl updatedItem=null;
+			if(updateItemBool) {
+				updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
 			}		
+			else {
+				updatedItem = persistentItemEntityService.findItemEntity(storyId, itemId);
+			}
+			
 			if(updatedItem==null) {
 				return results;
 			}
@@ -430,10 +442,14 @@ public class EnrichmentNERServiceImpl {
 		}
 
 		//update item from Transcribathon
-		ItemEntityImpl updatedItem=dbItem;
-		if(updateItem) {
-			updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(dbItem);
+		ItemEntityImpl updatedItem=null;
+		if(updateItemBool) {
+			updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
 		}		
+		else {
+			updatedItem = persistentItemEntityService.findItemEntity(storyId, itemId);
+		}
+		
 		if(updatedItem==null) {
 			return results;
 		}
@@ -442,7 +458,7 @@ public class EnrichmentNERServiceImpl {
 		if(! StringUtils.isBlank(translatedText))
 		{
 			results[0] = translatedText;
-			results[1] = EnrichmentConstants.defaultTargetTranslationLanguage;
+			results[1] = EnrichmentConstants.defaultTargetTranslationLang2Letter;
 		}
 		return results;
 	}
