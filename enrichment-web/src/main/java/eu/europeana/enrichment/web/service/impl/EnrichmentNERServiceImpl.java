@@ -155,12 +155,12 @@ public class EnrichmentNERServiceImpl {
 		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, property);
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 
-		String [] textAndLanguage = getStoryTextForNER(storyId, translationTool, property, original, updateStory);
-		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
+		Map<String, String> textAndLanguage = getStoryTextForNER(storyId, translationTool, property, original, updateStory);
+		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldText)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage))) {
 			return result;
 		}
-		String textForNer = textAndLanguage[0];
-		String languageForNer = textAndLanguage[1];
+		String textForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldText);
+		String languageForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage);
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, null, linking, true);
@@ -200,12 +200,12 @@ public class EnrichmentNERServiceImpl {
 		persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, itemId, property);
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 		
-		String [] textAndLanguage = getItemTextForNER(storyId, itemId, translationTool, property, original, updateItem);
-		if(StringUtils.isBlank(textAndLanguage[0]) || StringUtils.isBlank(textAndLanguage[1])) {
+		Map<String, String> textAndLanguage = getItemTextForNER(storyId, itemId, translationTool, property, original, updateItem);
+		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldText)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage))) {
 			return result;
 		}
-		String textForNer = textAndLanguage[0];
-		String languageForNer = textAndLanguage[1];
+		String textForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldText);
+		String languageForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage);
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, itemId, linking, true);
@@ -353,11 +353,9 @@ public class EnrichmentNERServiceImpl {
 		}
 	}
 
-	public String [] getStoryTextForNER (String storyId, String translationTool, String type, boolean original, boolean updateStoryBool) throws Exception
+	public Map<String, String> getStoryTextForNER (String storyId, String translationTool, String type, boolean original, boolean updateStoryBool) throws Exception
 	{
-		String [] results =  new String [2];
-		results[0]=null;
-		results[1]=null;
+		Map<String, String> results = new HashMap<>();
 		List<String> fiedlsToUpdate = new ArrayList<String>();
 		fiedlsToUpdate.add(type);
 
@@ -377,19 +375,18 @@ public class EnrichmentNERServiceImpl {
 			
 			if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type)) 
 			{
-				results[0] = updatedStory.getDescription();
-				results[1] = updatedStory.getLanguageDescription();
-				
+				results.put(EnrichmentConstants.POJOFieldText, updatedStory.getDescription());
+				results.put(EnrichmentConstants.POJOFieldLanguage, updatedStory.getLanguageDescription());				
 			}
 			else if(EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type))
 			{
-				results[0] = updatedStory.getSummary();
-				results[1] = updatedStory.getLanguageSummary();
+				results.put(EnrichmentConstants.POJOFieldText, updatedStory.getSummary());
+				results.put(EnrichmentConstants.POJOFieldLanguage, updatedStory.getLanguageSummary());
 			}
 			else if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type))
 			{
-				results[0] = updatedStory.getTranscriptionText();
-				results[1] = ModelUtils.getMainTranslationLanguage(updatedStory);
+				results.put(EnrichmentConstants.POJOFieldText, updatedStory.getTranscriptionText());
+				results.put(EnrichmentConstants.POJOFieldLanguage, ModelUtils.getMainTranslationLanguage(updatedStory));
 			}
 			return results;	
 		}
@@ -410,18 +407,15 @@ public class EnrichmentNERServiceImpl {
 		String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool);
 		if(! StringUtils.isBlank(translatedText))
 		{
-			results[0] = translatedText;
-			results[1] = EnrichmentConstants.defaultTargetTranslationLang2Letter;
+			results.put(EnrichmentConstants.POJOFieldText, translatedText);
+			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
 		}
 		return results;
 	}
 
-	public String [] getItemTextForNER (String storyId, String itemId, String translationTool, String property, boolean original, boolean updateItemBool) throws Exception
+	public Map<String, String> getItemTextForNER (String storyId, String itemId, String translationTool, String property, boolean original, boolean updateItemBool) throws Exception
 	{
-		String [] results =  new String [2];
-		results[0]=null;
-		results[1]=null;
-
+		Map<String, String> results = new HashMap<>();
 		if(original) {
 			//update item from Transcribathon
 			ItemEntityImpl updatedItem=null;
@@ -435,9 +429,10 @@ public class EnrichmentNERServiceImpl {
 			if(updatedItem==null) {
 				return results;
 			}
-			
-			results[0] = updatedItem.getTranscriptionText();
-			results[1] = ModelUtils.getOnlyTranscriptionLanguage(updatedItem);
+	
+			results.put(EnrichmentConstants.POJOFieldText, updatedItem.getTranscriptionText());
+			results.put(EnrichmentConstants.POJOFieldLanguage, ModelUtils.getOnlyTranscriptionLanguage(updatedItem));
+
 			return results;
 		}
 
@@ -457,8 +452,8 @@ public class EnrichmentNERServiceImpl {
 		String translatedText = enrichmentTranslationService.translateItem(updatedItem, property, translationTool);
 		if(! StringUtils.isBlank(translatedText))
 		{
-			results[0] = translatedText;
-			results[1] = EnrichmentConstants.defaultTargetTranslationLang2Letter;
+			results.put(EnrichmentConstants.POJOFieldText, translatedText);
+			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
 		}
 		return results;
 	}
