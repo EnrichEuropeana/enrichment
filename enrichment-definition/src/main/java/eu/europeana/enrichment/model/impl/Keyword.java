@@ -1,6 +1,5 @@
 package eu.europeana.enrichment.model.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -9,7 +8,7 @@ import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Id;
 
 @Entity(value="keyword")
-public class Keyword {
+public class Keyword extends BaseEntityImpl {
 
 	private String propertyId;
 	private String propertyTypeId;
@@ -34,9 +33,6 @@ public class Keyword {
 	private String status;
 	private String approvedWikidataId;
 	
-	Date created;
-	Date modified;
-        	
 	//id will be used for storing MongoDB _id
 	@Id
         private ObjectId _id;
@@ -166,22 +162,6 @@ public class Keyword {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getModified() {
-        return modified;
-    }
-
-    public void setModified(Date modified) {
-        this.modified = modified;
     }
 
     public List<Long> getTpItemIds() {

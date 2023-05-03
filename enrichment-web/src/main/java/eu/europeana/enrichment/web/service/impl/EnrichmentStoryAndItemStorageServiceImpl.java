@@ -1,10 +1,13 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.StringUtils;
@@ -45,7 +48,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	@Autowired
 	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
 
-	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate) {
+	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate) throws ClientProtocolException, IOException {
 		StoryEntityImpl dbStory = persistentStoryEntityService.findStoryEntity(storyId);
 		StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
 		if(tpStory==null) {
@@ -90,7 +93,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}
 	}
 	
-	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) {
+	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException {
 		ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
 		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(itemId);
 
@@ -159,6 +162,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 			}
 			else {
+				Date now = new Date();
+				story.setCreated(now);
+				story.setModified(now);
 				persistentStoryEntityService.saveStoryEntity(story);
 			}
 			
@@ -191,6 +197,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 			}
 			else {
+				Date now = new Date();
+				item.setCreated(now);
+				item.setModified(now);				
 				persistentItemEntityService.saveItemEntity(item);
 			}
 		}

@@ -3,6 +3,7 @@ package eu.europeana.enrichment.web.service.impl;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -228,8 +229,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		}		
 		try {
 			
+			Date now = new Date();
+			dbTranslationEntity.get(0).setCreated(now);
+			dbTranslationEntity.get(0).setModified(now);
 			dbTranslationEntity.get(0).setKey(originalText);
-
 			dbTranslationEntity.get(0).setTranslatedText(translatedText);
 			
 			persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity.get(0));

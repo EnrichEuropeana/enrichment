@@ -1,8 +1,8 @@
 package eu.europeana.enrichment.common.commons;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.bson.types.ObjectId;
 
@@ -231,6 +231,8 @@ public class EnrichmentConstants {
 	public static final List<String> MONGO_SKIP_LIST_FIELD=Collections.singletonList(MONGO_SKIP_FIELD);
 	public static final ObjectId MONGO_SKIP_OBJECT_ID_FIELD=new ObjectId();
 	
-	public static final List<String> transcribathonEnglishLangValues = Arrays.asList("en", "eng", "English", "en || en", "eng || eng", "English || English", "en || eng", "eng || en", "en || English", "English || en", "eng || English", "English || eng");
+	public static final Set<String> transcribathonEnglishLangValues = Set.of("en", "eng", "English", "en || en", "eng || eng", "English || English", "en || eng", "eng || en", "en || English", "English || en", "eng || English", "English || eng");
+	public static final String POJOFieldText = "text";
+	public static final String POJOFieldLanguage = "lang";
 }
 

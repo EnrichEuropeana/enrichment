@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,7 +22,7 @@ import dev.morphia.annotations.Transient;
 
 @Entity(value = "ItemEntityImpl")
 @Indexes(@Index(fields = { @Field("itemId"), @Field("storyId")}, options = @IndexOptions(unique = true)))
-public class ItemEntityImpl {
+public class ItemEntityImpl extends BaseEntityImpl {
 
 	// id will be used for storing MongoDB _id
 	@Id
@@ -40,6 +41,9 @@ public class ItemEntityImpl {
 	private List<String> keywords;
 
 	public ItemEntityImpl(ItemEntityImpl item) {
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);
 		this.itemId = item.getItemId();
 		this.type = item.getType();
 		this.transcriptionText = item.getTranscriptionText();
@@ -52,7 +56,9 @@ public class ItemEntityImpl {
 	}
 	
 	public ItemEntityImpl() {
-
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);
 	}
 
 	public String getStoryId() {
@@ -137,6 +143,7 @@ public class ItemEntityImpl {
 	}
 
 	public void copyFromItem(ItemEntityImpl item) {
+		this.setModified(new Date());
 		this.setItemId(item.getItemId());
 		if(item.getKeywords()!=null) this.setKeywords(new ArrayList<>(item.getKeywords()));
 		this.setSource(item.getSource());
