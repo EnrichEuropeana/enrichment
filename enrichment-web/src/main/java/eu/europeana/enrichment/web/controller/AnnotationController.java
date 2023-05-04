@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,12 +22,9 @@ import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
@@ -93,7 +89,9 @@ public class AnnotationController extends BaseRest {
 			}
 
 			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
-			removeGivenNameInResponse(result.getItems());
+			if(result.getItems()!=null) {
+				removeGivenNameInResponse(result.getItems());
+			}
 			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;
@@ -115,32 +113,11 @@ public class AnnotationController extends BaseRest {
 				property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
 			}
 
-			String resultJson=null;
-			//check if the item has changed in the Transcribathon, and if yes update it in the db and perform the NER anylysis again
-			List<String> fieldsToUpdate = new ArrayList<>();
-			fieldsToUpdate.add(property);
-			enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
-			
-			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
-			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
-				removeGivenNameInResponse(existingAnnos.getItems());
-				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, itemId, property, null);
+			if(annosCollection!=null && annosCollection.getItems()!=null) {
+				removeGivenNameInResponse(annosCollection.getItems());
 			}
-			else {
-				//if there are no named and/or position entities in the db perform the NER analysis
-				List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, itemId, property);
-				if(positionEntities.isEmpty()) {
-					String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
-					List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
-					List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-					enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
-				}
-
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
-				removeGivenNameInResponse(result.getItems());
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-
+			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
@@ -159,34 +136,14 @@ public class AnnotationController extends BaseRest {
 			if(property==null) {
 				property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 			}
-
-			String resultJson=null;
-			
-			//check if the story has changed in the Transcribathon, and if yes update it in the db and perform the NER anylysis again
 			List<String> fieldsToUpdate = new ArrayList<>();
 			fieldsToUpdate.add(property);
-			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fieldsToUpdate);			
 			
-			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, null, property);
-			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
-				removeGivenNameInResponse(existingAnnos.getItems());
-				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, null, property, fieldsToUpdate);
+			if(annosCollection!=null && annosCollection.getItems()!=null) {
+				removeGivenNameInResponse(annosCollection.getItems());
 			}
-			else {
-				//if there are no named and/or position entities in the db perform the NER analysis
-				List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, null, property);
-				if(positionEntities.isEmpty()) {
-					String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
-					List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
-					List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-					enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
-				}
-			
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
-				removeGivenNameInResponse(result.getItems());
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-
+			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
@@ -286,9 +243,6 @@ public class AnnotationController extends BaseRest {
 	}
 	
 	private void removeGivenNameInResponse(List<NamedEntityAnnotationImpl> annos) {
-		if(annos==null) {
-			return;
-		}
 		for(NamedEntityAnnotationImpl anno : annos) {
 			anno.getBody().remove(EnrichmentConstants.GIVEN_NAME_ANNO);
 		}

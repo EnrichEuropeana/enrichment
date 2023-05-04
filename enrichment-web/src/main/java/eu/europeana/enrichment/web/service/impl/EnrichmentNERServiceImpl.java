@@ -2,6 +2,7 @@ package eu.europeana.enrichment.web.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -512,6 +513,39 @@ public class EnrichmentNERServiceImpl {
 	public NamedEntityAnnotationCollection getAnnotations(String storyId, String itemId, String property) throws Exception {
 		List<NamedEntityAnnotationImpl> entities = persistentNamedEntityAnnotationService.findAnnotations(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_LIST_FIELD);
 		return new NamedEntityAnnotationCollection(configuration.getAnnotationsIdBaseUrl(), configuration.getAnnotationsTargetStoriesBaseUrl(), configuration.getAnnotationsTargetItemsBaseUrl() , configuration.getAnnotationsCreator(), entities, storyId, itemId);
+	}
+	
+	public NamedEntityAnnotationCollection createAnnotationsFullWorkflow(String storyId, String itemId, String property, List<String> storyFieldsToUpdateOtherEntities) throws Exception {
+		if(itemId!=null) {
+			enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
+		}
+		else {
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, storyFieldsToUpdateOtherEntities);
+		}
+		
+		NamedEntityAnnotationCollection existingAnnos = getAnnotations(storyId, itemId, property);
+		if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
+			return existingAnnos;
+		}
+		else {
+			//if there are no named and/or position entities in the db perform the NER analysis
+			List<PositionEntityImpl> positionEntities = persistentPositionEntityService.findPositionEntities(EnrichmentConstants.MONGO_SKIP_OBJECT_ID_FIELD, storyId, itemId, property);
+			if(positionEntities.isEmpty()) {
+				String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
+				List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
+				List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
+				if(itemId!=null) {
+					createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);
+				}
+				else {
+					createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false, false);					
+				}
+			}
+
+			NamedEntityAnnotationCollection result = createAnnotationsForStoryOrItem(storyId, itemId, property);
+			return result;
+		}
+		
 	}
 	
 	public NamedEntityAnnotationCollection createAnnotationsForStoryOrItem(String storyId, String itemId, String property) throws Exception {
