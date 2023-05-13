@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.utils;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -55,9 +57,12 @@ public class ImportStoriesFromTranscribathonDataset {
 		String URLStoriesComplete = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
 		String URLItemTranscription = "https://europeana.fresenia.man.poznan.pl/tp-api/transcriptions?ItemId=";
 		String responseDatasets = HelperFunctions.createHttpRequest(null, URLDataset);
+		assertNotNull(responseDatasets);
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		List<Dataset> listDatasets = objectMapper.readValue(responseDatasets, new TypeReference<List<Dataset>>(){});
-        if(listDatasets==null || listDatasets.isEmpty()) return;
+		assertNotNull(listDatasets);
+
 		for(Dataset dataset : listDatasets) {
         	if(dataset.Name.equals(datasetName)) {
             	datasetId=dataset.DatasetId.toString();

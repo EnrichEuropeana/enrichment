@@ -28,9 +28,10 @@ public class TranscribathonConcurrentCallServiceImpl {
 	@Async
 	public CompletableFuture<String> callStoryMinimalService(String storyId) throws Exception {
 		StoryEntityImpl fetchedStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
-		persistentStoryEntityService.saveStoryEntity(fetchedStory);
-		if(fetchedStory!=null)
+		if(fetchedStory!=null) {
+			persistentStoryEntityService.saveStoryEntity(fetchedStory);
 			return CompletableFuture.completedFuture(null);
+		}
 		else
 			return CompletableFuture.completedFuture(storyId);
 	}

@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +26,9 @@ import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -40,7 +44,16 @@ public class AnnotationController extends BaseRest {
 
 	@Autowired
 	PersistentItemEntityService persistentItemEntityService;
+
+	@Autowired
+	PersistentStoryEntityService persistentStoryEntityService;
+
+    @Autowired
+    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
 	
+    @Autowired
+    PersistentPositionEntityServiceImpl persistentPositionEntityService;
+
 	@Autowired 
 	JsonLdSerializer jsonLdSerializer;
 	
@@ -76,15 +89,17 @@ public class AnnotationController extends BaseRest {
 			}
 
 			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
-			removeGivenNameInResponse(result.getItems());
+			if(result.getItems()!=null) {
+				removeGivenNameInResponse(result.getItems());
+			}
 			String resultJson=jsonLdSerializer.serializeObject(result);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;
 	}
 	
 	@ApiOperation(value = "Create annotations for an item", nickname = "createAnnotationsForItem", notes = "This method creates and stores the annotations of "
-			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription). Please note that the Named Entity "
-			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
+			+ "an item to the database. The \"property\" parameter refers to the part of the item being analyzed (e.g. transcription)."
+			+ "Please note that this method also updats the item from Transcribathon and performs the Named Entity Recognition analysis if needed.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForItem(
 			@PathVariable("storyId") String storyId,
@@ -98,25 +113,18 @@ public class AnnotationController extends BaseRest {
 				property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
 			}
 
-			String resultJson=null;
-			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, itemId, property);
-			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
-				removeGivenNameInResponse(existingAnnos.getItems());
-				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, itemId, property, null);
+			if(annosCollection!=null && annosCollection.getItems()!=null) {
+				removeGivenNameInResponse(annosCollection.getItems());
 			}
-			else {
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, itemId, property);
-				removeGivenNameInResponse(result.getItems());
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-
+			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
 
 	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
-			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). Please note that the Named Entity "
-			+ "Recognition analysis needs to be performed using another api method, before calling this method.")
+			+ "a story to the database. The \"property\" parameter refers to the part of the story being analyzed (e.g. description or transcription). "
+			+ "Please note that this method also updats a story from Transcribathon and performs the Named Entity Recognition analysis if needed.")
 	@RequestMapping(value = "/enrichment/annotation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createAnnotationsForStory(
 			@PathVariable("storyId") String storyId,
@@ -128,19 +136,14 @@ public class AnnotationController extends BaseRest {
 			if(property==null) {
 				property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 			}
-
-			String resultJson=null;
-			NamedEntityAnnotationCollection existingAnnos = enrichmentNerService.getAnnotations(storyId, null, property);
-			if(existingAnnos!=null && existingAnnos.getItems().size()>0) {
-				removeGivenNameInResponse(existingAnnos.getItems());
-				resultJson = jsonLdSerializer.serializeObject(existingAnnos);
+			List<String> fieldsToUpdate = new ArrayList<>();
+			fieldsToUpdate.add(property);
+			
+			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, null, property, fieldsToUpdate);
+			if(annosCollection!=null && annosCollection.getItems()!=null) {
+				removeGivenNameInResponse(annosCollection.getItems());
 			}
-			else {
-				NamedEntityAnnotationCollection result = enrichmentNerService.createAnnotationsForStoryOrItem(storyId, null, property);
-				removeGivenNameInResponse(result.getItems());
-				resultJson = jsonLdSerializer.serializeObject(result);
-			}
-
+			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 			return response;		
 	}
@@ -240,9 +243,6 @@ public class AnnotationController extends BaseRest {
 	}
 	
 	private void removeGivenNameInResponse(List<NamedEntityAnnotationImpl> annos) {
-		if(annos==null) {
-			return;
-		}
 		for(NamedEntityAnnotationImpl anno : annos) {
 			anno.getBody().remove(EnrichmentConstants.GIVEN_NAME_ANNO);
 		}

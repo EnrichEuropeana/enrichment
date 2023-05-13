@@ -2,6 +2,7 @@ package eu.europeana.enrichment.model.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
 
 @Entity(value="StoryEntityImpl")
-public class StoryEntityImpl {
+public class StoryEntityImpl extends BaseEntityImpl {
 
 	@Indexed(options = @IndexOptions(unique = true))
 	private String storyId;
@@ -44,6 +45,9 @@ public class StoryEntityImpl {
 	
 	public StoryEntityImpl (StoryEntityImpl copy)
 	{
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);
 		this.storyId = copy.getStoryId();
 		this.title = copy.getTitle();
 		this.source = copy.getSource();
@@ -61,7 +65,9 @@ public class StoryEntityImpl {
 	}
 	
 	public StoryEntityImpl() {
-		
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);
 	}
 
 	
@@ -199,6 +205,7 @@ public class StoryEntityImpl {
 
 	
 	public void copyFromStory(StoryEntityImpl story) {
+		this.setModified(new Date());		
 		this.storyId = story.getStoryId();
 		this.title = story.getTitle();
 		this.source = story.getSource();
