@@ -1,17 +1,17 @@
 package eu.europeana.enrichment.tp.api.service.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.logging.log4j.Level;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -33,7 +33,7 @@ public class EnrichmentTpApiClient {
 	@Autowired
 	EnrichmentConfiguration configuration;
 		
-	public StoryEntityImpl getStoryFromTranscribathonMinimalStory(String storyId) {
+	public StoryEntityImpl getStoryFromTranscribathonMinimalStory(String storyId) throws ClientProtocolException, IOException {
 		Story storyMinimal = getTranscribathonMinimalStory(storyId);
 		if(storyMinimal!=null) {
 			return convertTranscribathonStoryToLocalStory(storyMinimal);
@@ -43,7 +43,7 @@ public class EnrichmentTpApiClient {
 		}
 	}
 
-	public ItemEntityImpl getItemFromTranscribathon(String itemId) {
+	public ItemEntityImpl getItemFromTranscribathon(String itemId) throws ClientProtocolException, IOException {
 		Item tpItem = getTranscribathonItem(itemId);
 		if(tpItem!=null) {
 			return convertTranscribathonItemToLocalItem(tpItem);
@@ -53,7 +53,7 @@ public class EnrichmentTpApiClient {
 		}
 	}
 	
-	public List<String> getItemIdsForStoryFromTranscribathon(String storyId) {
+	public List<String> getItemIdsForStoryFromTranscribathon(String storyId) throws ClientProtocolException, IOException {
 		List<String> itemIds = new ArrayList<>();
 		Story tpStory = getTranscribathonFullStory(storyId);
 		if(tpStory!=null) {
@@ -68,49 +68,42 @@ public class EnrichmentTpApiClient {
 		return itemIds;
 	}
 
-	private Story getTranscribathonMinimalStory(String storyId) {
+	private Story getTranscribathonMinimalStory(String storyId) throws ClientProtocolException, IOException {
 		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStoriesMinimal() + storyId);
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			List<Story> storiesMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
-			if(storiesMinimal!=null && storiesMinimal.size()>0) {
-				return storiesMinimal.get(0);
-			}
-			else {
-				return null;
-			}
-		} catch (JsonProcessingException e) {
-			logger.log(Level.ERROR, "Exception during deserializing a minimal story from Transcribathon with storyId=" + storyId, e);
+		if(storyMinimalResponse==null) {
 			return null;
 		}
-	}
-	
-	private Item getTranscribathonItem(String itemId) {
-		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
-		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			return objectMapper.readValue(response, new TypeReference<Item>(){});
-		}
-		catch (JsonProcessingException e) {
-			logger.log(Level.ERROR, "Exception during deserializing an item from Transcribathon with itemId=" + itemId, e);
-			return null;
-		}
-	}
-	
 
-	private Story getTranscribathonFullStory(String storyId) {
-		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId);
 		ObjectMapper objectMapper = new ObjectMapper();
-		try {
-			List<Story> storiesFull = objectMapper.readValue(storyFullResponse, new TypeReference<List<Story>>(){});
-			if(storiesFull!=null && storiesFull.size()>0) {
-				return storiesFull.get(0);
-			}
-			else {
-				return null;
-			}
-		} catch (JsonProcessingException e) {
-			logger.log(Level.ERROR, "Exception during deserializing a full story from Transcribathon with storyId= " + storyId, e);
+		List<Story> storiesMinimal = objectMapper.readValue(storyMinimalResponse, new TypeReference<List<Story>>(){});
+		if(storiesMinimal!=null && storiesMinimal.size()>0) {
+			return storiesMinimal.get(0);
+		}
+		else {
+			return null;
+		}
+	}
+	
+	private Item getTranscribathonItem(String itemId) throws ClientProtocolException, IOException {
+		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
+		if(response==null) {
+			return null;
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		return objectMapper.readValue(response, new TypeReference<Item>(){});
+	}
+
+	private Story getTranscribathonFullStory(String storyId) throws ClientProtocolException, IOException {
+		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId);
+		if(storyFullResponse==null) {
+			return null;
+		}
+		ObjectMapper objectMapper = new ObjectMapper();
+		List<Story> storiesFull = objectMapper.readValue(storyFullResponse, new TypeReference<List<Story>>(){});
+		if(storiesFull!=null && storiesFull.size()>0) {
+			return storiesFull.get(0);
+		}
+		else {
 			return null;
 		}
 	}

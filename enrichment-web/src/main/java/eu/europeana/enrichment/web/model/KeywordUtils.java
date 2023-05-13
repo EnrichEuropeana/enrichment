@@ -1,5 +1,6 @@
 package eu.europeana.enrichment.web.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,9 @@ public class KeywordUtils {
 
 
     private static List<Long> top5(List<Long> tpItemIds) {
+    	if(tpItemIds==null) {
+    		return Collections.emptyList();
+    	}
         int count = Math.min(5, tpItemIds.size());
         return tpItemIds.subList(0, count);
     }

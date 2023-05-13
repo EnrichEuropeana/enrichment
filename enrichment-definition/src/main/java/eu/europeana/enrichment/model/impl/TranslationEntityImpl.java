@@ -2,6 +2,7 @@ package eu.europeana.enrichment.model.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 import org.bson.types.ObjectId;
 
@@ -15,7 +16,7 @@ import eu.europeana.enrichment.common.commons.HelperFunctions;
 
 @Entity(value="TranslationEntityImpl")
 @Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool") }, options = @IndexOptions(unique = true)))
-public class TranslationEntityImpl {
+public class TranslationEntityImpl extends BaseEntityImpl {
 
 	protected String key;
 	private String language;
@@ -29,6 +30,9 @@ public class TranslationEntityImpl {
 	
 	public TranslationEntityImpl (TranslationEntityImpl copy)
 	{
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);		
 		this.key = copy.getKey();
 		this.language = copy.getLanguage();
 		this.translatedText = copy.getTranslatedText();
@@ -41,7 +45,9 @@ public class TranslationEntityImpl {
 	}
 	
 	public TranslationEntityImpl() {
-		
+		Date now = new Date();
+		this.setCreated(now);
+		this.setModified(now);
 	}
 	
 	@Id

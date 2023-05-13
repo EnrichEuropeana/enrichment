@@ -1,17 +1,18 @@
 # configured in <profiles/> section in parent pom.xml
-# we inject entitymanagment.properties in Jenkins builds, so this property needs to be specified here
 spring.profiles.active=${activeProfile}
-#server.port = 8181
+#server.port = 8167
 enrich.translation.google = false
 
 # mongo connectivity
-spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
+#spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
+spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
 spring.data.mongodb.database=enrichment
 
 # mysql connectivity
 spring.jpa.hibernate.ddl-auto=update
 #spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/tp
-spring.datasource.url=jdbc:mysql://localhost:3306/tp
+#spring.datasource.url=jdbc:mysql://localhost:3306/tp
+spring.datasource.url=jdbc:mysql://<ip_of_the_test_server>/tp
 spring.datasource.username=root
 spring.datasource.password=rootpass
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver

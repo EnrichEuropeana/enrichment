@@ -1,9 +1,13 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
+import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.solr.common.StringUtils;
@@ -44,63 +48,64 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	@Autowired
 	PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;	
 
-	public void updateStoryFromTranscribathon (String storyId) {
-		updateStoryFromTranscribathon(persistentStoryEntityService.findStoryEntity(storyId));
-	}
-
-	public StoryEntityImpl updateStoryFromTranscribathon (StoryEntityImpl dbStory) {
-		StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(dbStory.getStoryId());
-		if(Objects.equals(dbStory, tpStory)) {
-			return dbStory;
-		}
-		else {
-			if(tpStory==null) {
-				persistentStoryEntityService.deleteStoryEntity(dbStory);
-				persistentItemEntityService.deleteAllItemsOfStory(dbStory.getStoryId());
-				persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD);
-				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
-				dbStory=null;
+	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate) throws ClientProtocolException, IOException {
+		StoryEntityImpl dbStory = persistentStoryEntityService.findStoryEntity(storyId);
+		StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
+		if(tpStory == null) {
+			if(dbStory!=null) {
+				return dbStory;
 			}
 			else {
-				if(! StringUtils.equals(dbStory.getDescription(), tpStory.getDescription()))
+				return null;
+			}
+		}
+		else {
+			if(dbStory==null) {
+				persistentStoryEntityService.saveStoryEntity(tpStory);
+				return tpStory;
+			}
+			else {
+				if(fieldsToUpdate.contains(EnrichmentConstants.STORY_ITEM_DESCRIPTION)  && !StringUtils.equals(dbStory.getDescription(), tpStory.getDescription()))
 				{
-					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+					persistentTranslationEntityService.deleteTranslationEntity(storyId, null, EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, EnrichmentConstants.STORY_ITEM_DESCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
-				if(! StringUtils.equals(dbStory.getSummary(), tpStory.getSummary()))
+				if(fieldsToUpdate.contains(EnrichmentConstants.STORY_ITEM_SUMMARY) && !StringUtils.equals(dbStory.getSummary(), tpStory.getSummary()))
 				{
-					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_SUMMARY, EnrichmentConstants.MONGO_SKIP_FIELD);
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+					persistentTranslationEntityService.deleteTranslationEntity(storyId, null, EnrichmentConstants.STORY_ITEM_SUMMARY);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, EnrichmentConstants.STORY_ITEM_SUMMARY, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
-				if(! StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText()))
+				if(fieldsToUpdate.contains(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION) && !StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText()))
 				{
-					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentTranslationEntityService.deleteTranslationEntity(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbStory.getStoryId(), null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentTranslationEntityService.deleteTranslationEntity(storyId, null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 				}
 				
 				dbStory.copyFromStory(tpStory);				
 				persistentStoryEntityService.saveStoryEntity(dbStory);
+				return dbStory;
 			}
-			return dbStory;
-		}		
+		}
 	}
 	
-	public ItemEntityImpl updateItemFromTranscribathon (ItemEntityImpl dbItem) {
-		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(dbItem.getItemId());
-		if(Objects.equals(dbItem, tpItem)) {
-			return dbItem;
+	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException {
+		ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
+		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(itemId);
+		if(tpItem==null) {
+			if(dbItem!=null) {
+				return dbItem;
+			}
+			else {
+				return null;
+			}
 		}
 		else {
-			if(tpItem==null) {
-				persistentItemEntityService.deleteItemEntity(dbItem);
-				persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD);
-				persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD);
-				persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
-				dbItem=null;
+			if(dbItem==null) {
+				persistentItemEntityService.saveItemEntity(tpItem);
+				return tpItem;
 			}
 			else {
 				if(! StringUtils.equals(dbItem.getTranscriptionText(), tpItem.getTranscriptionText()))
@@ -111,9 +116,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}	
 				dbItem.copyFromItem(tpItem);
 				persistentItemEntityService.saveItemEntity(dbItem);
+				return dbItem;
 			}
-			return dbItem;
-		}		
+		}
 	}
 	
 	public void updateStoriesFromInput(StoryEntityImpl[] stories) {
@@ -153,6 +158,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 			}
 			else {
+				Date now = new Date();
+				story.setCreated(now);
+				story.setModified(now);
 				persistentStoryEntityService.saveStoryEntity(story);
 			}
 			
@@ -185,6 +193,9 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 			}
 			else {
+				Date now = new Date();
+				item.setCreated(now);
+				item.setModified(now);				
 				persistentItemEntityService.saveItemEntity(item);
 			}
 		}
