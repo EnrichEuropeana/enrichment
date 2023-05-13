@@ -391,27 +391,28 @@ public class EnrichmentNERServiceImpl {
 			}
 			return results;	
 		}
-		
-		//update story from Transcribathon
-		StoryEntityImpl updatedStory=null;
-		if(updateStoryBool) {
-			updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fiedlsToUpdate);
-		}	
 		else {
-			updatedStory = persistentStoryEntityService.findStoryEntity(storyId);
-		}
-
-		if(updatedStory==null) {
+			//update story from Transcribathon
+			StoryEntityImpl updatedStory=null;
+			if(updateStoryBool) {
+				updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, fiedlsToUpdate);
+			}	
+			else {
+				updatedStory = persistentStoryEntityService.findStoryEntity(storyId);
+			}
+	
+			if(updatedStory==null) {
+				return results;
+			}
+			
+			String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool);
+			if(! StringUtils.isBlank(translatedText))
+			{
+				results.put(EnrichmentConstants.POJOFieldText, translatedText);
+				results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
+			}
 			return results;
 		}
-		
-		String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool);
-		if(! StringUtils.isBlank(translatedText))
-		{
-			results.put(EnrichmentConstants.POJOFieldText, translatedText);
-			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
-		}
-		return results;
 	}
 
 	public Map<String, String> getItemTextForNER (String storyId, String itemId, String translationTool, String property, boolean original, boolean updateItemBool) throws Exception
@@ -436,27 +437,28 @@ public class EnrichmentNERServiceImpl {
 
 			return results;
 		}
-
-		//update item from Transcribathon
-		ItemEntityImpl updatedItem=null;
-		if(updateItemBool) {
-			updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
-		}		
 		else {
-			updatedItem = persistentItemEntityService.findItemEntity(storyId, itemId);
-		}
-		
-		if(updatedItem==null) {
+			//update item from Transcribathon
+			ItemEntityImpl updatedItem=null;
+			if(updateItemBool) {
+				updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
+			}		
+			else {
+				updatedItem = persistentItemEntityService.findItemEntity(storyId, itemId);
+			}
+			
+			if(updatedItem==null) {
+				return results;
+			}
+	
+			String translatedText = enrichmentTranslationService.translateItem(updatedItem, property, translationTool);
+			if(! StringUtils.isBlank(translatedText))
+			{
+				results.put(EnrichmentConstants.POJOFieldText, translatedText);
+				results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
+			}
 			return results;
 		}
-
-		String translatedText = enrichmentTranslationService.translateItem(updatedItem, property, translationTool);
-		if(! StringUtils.isBlank(translatedText))
-		{
-			results.put(EnrichmentConstants.POJOFieldText, translatedText);
-			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
-		}
-		return results;
 	}
 
 	private TreeMap<String, List<NamedEntityImpl>> applyNERTools (String nerTool, String text, String language, String fieldUsedForNER, String storyId, String itemId) throws Exception {
