@@ -51,15 +51,13 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate) throws ClientProtocolException, IOException {
 		StoryEntityImpl dbStory = persistentStoryEntityService.findStoryEntity(storyId);
 		StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
-		if(tpStory==null) {
+		if(tpStory == null) {
 			if(dbStory!=null) {
-				persistentStoryEntityService.deleteStoryEntity(dbStory);
+				return dbStory;
 			}
-			persistentItemEntityService.deleteAllItemsOfStory(storyId);
-			persistentTranslationEntityService.deleteTranslationEntity(storyId, null, EnrichmentConstants.MONGO_SKIP_FIELD);
-			persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, null, EnrichmentConstants.MONGO_SKIP_FIELD);
-			persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
-			return null;
+			else {
+				return null;
+			}
 		}
 		else {
 			if(dbStory==null) {
@@ -96,15 +94,13 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException {
 		ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
 		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(itemId);
-
 		if(tpItem==null) {
 			if(dbItem!=null) {
-				persistentItemEntityService.deleteItemEntity(dbItem);
+				return dbItem;
 			}
-			persistentTranslationEntityService.deleteTranslationEntity(storyId, itemId, EnrichmentConstants.MONGO_SKIP_FIELD);
-			persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(storyId, itemId, EnrichmentConstants.MONGO_SKIP_FIELD);
-			persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, EnrichmentConstants.MONGO_SKIP_FIELD, EnrichmentConstants.MONGO_SKIP_FIELD);
-			return null;
+			else {
+				return null;
+			}
 		}
 		else {
 			if(dbItem==null) {
