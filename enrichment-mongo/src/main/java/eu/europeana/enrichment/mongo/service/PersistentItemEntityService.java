@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 
 public interface PersistentItemEntityService {
 	

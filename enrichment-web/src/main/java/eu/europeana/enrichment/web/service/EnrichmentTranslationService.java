@@ -1,8 +1,8 @@
 package eu.europeana.enrichment.web.service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
 
 public interface EnrichmentTranslationService {

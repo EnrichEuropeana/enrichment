@@ -49,4 +49,5 @@ public class EnrichmentAuthorizationService extends BaseAuthorizationService
   protected Role getRoleByName(String name) {
     return Roles.getRoleByName(name);
   }
+
 }

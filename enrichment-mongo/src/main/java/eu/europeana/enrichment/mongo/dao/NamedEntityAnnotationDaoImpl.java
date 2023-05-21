@@ -9,18 +9,20 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_NAMED_ENTITY_ANNOTATION_DAO)
 public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore; 
 	
 	Logger logger = LogManager.getLogger(getClass());

@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.ner.linking.DBpediaSpotlight;
 import eu.europeana.enrichment.ner.linking.EuropeanaEntityService;

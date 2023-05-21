@@ -2,7 +2,7 @@ package eu.europeana.enrichment.solr.service;
 
 import java.io.IOException;
 
-import eu.europeana.enrichment.model.WikidataEntity;
+import eu.europeana.enrichment.definitions.model.WikidataEntity;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 public interface SolrWikidataEntityService {

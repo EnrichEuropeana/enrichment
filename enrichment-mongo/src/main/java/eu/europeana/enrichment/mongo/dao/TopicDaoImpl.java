@@ -6,21 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.updates.UpdateOperators;
 import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.impl.SequenceGenerator;
-import eu.europeana.enrichment.model.impl.TopicImpl;
+import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.SequenceGenerator;
+import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TOPIC_ENTITY_DAO)
 public class TopicDaoImpl implements TopicDao{
 
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore;
 	
 	@Override

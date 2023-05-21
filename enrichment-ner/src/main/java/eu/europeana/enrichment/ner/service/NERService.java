@@ -3,7 +3,7 @@ package eu.europeana.enrichment.ner.service;
 import java.util.List;
 import java.util.TreeMap;
 
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 
 public interface NERService {
 

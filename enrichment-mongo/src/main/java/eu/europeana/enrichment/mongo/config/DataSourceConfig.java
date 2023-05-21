@@ -40,5 +40,5 @@ public class DataSourceConfig {
         datastore.getMapper().mapPackage("eu.europeana.enrichment.model.impl");
         datastore.ensureIndexes();
         return datastore;
-    }
+    }    
 }

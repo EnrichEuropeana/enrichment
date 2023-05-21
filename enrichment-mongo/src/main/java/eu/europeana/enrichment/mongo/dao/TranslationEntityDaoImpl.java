@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO)
@@ -22,6 +23,7 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	StoryEntityDao storyEntityDao;
 	
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore; 
 	
 	@Override

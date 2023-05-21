@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import eu.europeana.enrichment.model.WikidataEntity;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.WikidataEntity;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 
 public interface WikidataService {
 

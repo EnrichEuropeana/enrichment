@@ -9,18 +9,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.FindOptions;
 import dev.morphia.query.experimental.filters.Filter;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_POSITION_ENTITY_DAO)
 public class PositionEntityDaoImpl {
 
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore; 
 	
 	Logger logger = LogManager.getLogger(getClass());

@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.europeana.enrichment.model.impl.Keyword;
-import eu.europeana.enrichment.model.impl.KeywordWikidataEntity;
+import eu.europeana.enrichment.definitions.model.impl.Keyword;
+import eu.europeana.enrichment.definitions.model.impl.KeywordWikidataEntity;
 
 public class KeywordUtils {
 

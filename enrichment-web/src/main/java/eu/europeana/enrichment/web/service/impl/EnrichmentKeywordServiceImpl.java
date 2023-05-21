@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.Keyword;
-import eu.europeana.enrichment.model.impl.KeywordStatus;
+import eu.europeana.enrichment.definitions.model.impl.Keyword;
+import eu.europeana.enrichment.definitions.model.impl.KeywordStatus;
 import eu.europeana.enrichment.mongo.dao.KeywordDaoImpl;
 import eu.europeana.enrichment.web.model.KeywordUtils;
 import eu.europeana.enrichment.web.model.KeywordView;

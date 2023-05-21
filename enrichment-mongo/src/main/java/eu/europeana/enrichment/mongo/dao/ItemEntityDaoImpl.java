@@ -8,12 +8,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import dev.morphia.query.FindOptions;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_ITEM_ENTITY_DAO)
@@ -23,6 +24,7 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	StoryEntityDao storyEntityDao;
 
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore;
 	
 	private static Map<String, List<String>> nerToolsForItem = new HashMap<String, List<String>>();
