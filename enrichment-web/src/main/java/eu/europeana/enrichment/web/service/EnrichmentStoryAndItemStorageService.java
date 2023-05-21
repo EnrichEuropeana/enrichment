@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
 
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 
 public interface EnrichmentStoryAndItemStorageService {
 	

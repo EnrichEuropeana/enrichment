@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 
 /*
  * This interface defines database actions for named entities

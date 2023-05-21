@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.RecordTranslation;
+import eu.europeana.enrichment.definitions.model.RecordTranslation;
 
 public interface RecordTranslationDao {
 

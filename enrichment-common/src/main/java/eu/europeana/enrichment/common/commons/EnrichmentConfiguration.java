@@ -24,12 +24,6 @@ public class EnrichmentConfiguration  {
 	@Value("${enrich.mongodb.connectionUri}")
     private String mongodbConnectionUri;
 
-    @Value("${enrich.mongodb.truststore}")
-    private String mongodbTruststore;
-
-    @Value("${enrich.mongodb.truststorepass}")
-    private String mongodbTruststorepass;
-
     @Value("${enrich.ner.stanford.url}")
     private String nerStanfordUrl;
 
@@ -175,14 +169,6 @@ public class EnrichmentConfiguration  {
 
   	public String getMongodbConnectionUri() {
 		return mongodbConnectionUri;
-	}
-
-	public String getMongodbTruststore() {
-		return mongodbTruststore;
-	}
-
-	public String getMongodbTruststorepass() {
-		return mongodbTruststorepass;
 	}
 
 	public String getNerStanfordUrl() {

@@ -6,17 +6,19 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import dev.morphia.Datastore;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.RecordTranslation;
+import eu.europeana.enrichment.definitions.model.RecordTranslation;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
 
 @Repository(EnrichmentConstants.BEAN_ENRICHMENT_RECORD_TRANSLATION_DAO)
 public class RecordTranslationDaoImpl implements RecordTranslationDao {
 
 	@Autowired
+	@Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_DATASTORE)
 	private Datastore enrichmentDatastore; 
 	
 	@Override

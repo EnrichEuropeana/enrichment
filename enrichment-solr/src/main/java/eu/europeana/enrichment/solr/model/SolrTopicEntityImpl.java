@@ -10,9 +10,9 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.Term;
-import eu.europeana.enrichment.model.Topic;
-import eu.europeana.enrichment.model.impl.TopicImpl;
+import eu.europeana.enrichment.definitions.model.Term;
+import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
 public class SolrTopicEntityImpl extends TopicImpl implements Topic {

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.Keyword;
+import eu.europeana.enrichment.definitions.model.impl.Keyword;
 import eu.europeana.enrichment.mongo.dao.KeywordDaoImpl;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_KEYWORD_SERVICE)

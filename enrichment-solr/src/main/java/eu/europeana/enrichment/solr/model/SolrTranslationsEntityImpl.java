@@ -2,7 +2,7 @@ package eu.europeana.enrichment.solr.model;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.TranslationsEntitySolrFields;
 
 public class SolrTranslationsEntityImpl extends TranslationEntityImpl {

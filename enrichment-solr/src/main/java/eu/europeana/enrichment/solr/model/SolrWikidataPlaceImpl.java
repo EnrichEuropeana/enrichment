@@ -8,8 +8,8 @@ import java.util.Map;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.WikidataPlace;
-import eu.europeana.enrichment.model.impl.WikidataPlaceImpl;
+import eu.europeana.enrichment.definitions.model.WikidataPlace;
+import eu.europeana.enrichment.definitions.model.impl.WikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
 public class SolrWikidataPlaceImpl extends WikidataPlaceImpl implements WikidataPlace {

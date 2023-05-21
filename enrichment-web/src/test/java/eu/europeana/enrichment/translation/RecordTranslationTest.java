@@ -29,8 +29,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.EnrichmentApp;
-import eu.europeana.enrichment.model.RecordTranslation;
-import eu.europeana.enrichment.model.impl.EuropeanaRecordTranslationImpl;
+import eu.europeana.enrichment.definitions.model.RecordTranslation;
+import eu.europeana.enrichment.definitions.model.impl.EuropeanaRecordTranslationImpl;
 import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
 import eu.europeana.enrichment.translation.view.Description1418;
 import eu.europeana.enrichment.web.service.RecordTranslationService;

@@ -8,8 +8,8 @@ import java.util.Map;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.WikidataAgent;
-import eu.europeana.enrichment.model.impl.WikidataAgentImpl;
+import eu.europeana.enrichment.definitions.model.WikidataAgent;
+import eu.europeana.enrichment.definitions.model.impl.WikidataAgentImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
 public class SolrWikidataAgentImpl extends WikidataAgentImpl implements WikidataAgent{

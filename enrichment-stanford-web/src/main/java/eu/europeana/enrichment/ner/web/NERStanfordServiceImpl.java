@@ -11,9 +11,9 @@ import org.json.JSONObject;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 

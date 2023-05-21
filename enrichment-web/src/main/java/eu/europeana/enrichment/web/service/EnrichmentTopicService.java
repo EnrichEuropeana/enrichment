@@ -10,8 +10,8 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.solr.common.SolrDocumentList;
 
 import eu.europeana.api.commons.web.exception.HttpException;
-import eu.europeana.enrichment.exceptions.UnsupportedEntityTypeException;
-import eu.europeana.enrichment.model.Topic;
+import eu.europeana.enrichment.definitions.exceptions.UnsupportedEntityTypeException;
+import eu.europeana.enrichment.definitions.model.Topic;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.web.model.topic.search.BaseTopicResultPage;
 

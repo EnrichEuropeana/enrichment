@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.beans.Field;
 
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.ItemEntitySolrFields;
 
 public class SolrItemEntityImpl extends ItemEntityImpl {

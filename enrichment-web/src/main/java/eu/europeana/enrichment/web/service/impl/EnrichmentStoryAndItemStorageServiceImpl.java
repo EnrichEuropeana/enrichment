@@ -15,8 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;

@@ -2,8 +2,8 @@ package eu.europeana.enrichment.ner.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 
 public interface NERLinkingService {	
 	/**

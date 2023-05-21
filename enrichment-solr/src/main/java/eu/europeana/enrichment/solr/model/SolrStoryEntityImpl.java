@@ -9,7 +9,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 

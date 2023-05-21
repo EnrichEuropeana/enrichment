@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.ner.linking.model.StanfordNerRequest;
 import eu.europeana.enrichment.ner.service.NERService;
 

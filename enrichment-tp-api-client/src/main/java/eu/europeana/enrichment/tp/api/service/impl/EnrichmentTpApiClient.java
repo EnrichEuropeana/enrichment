@@ -17,8 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.tp.api.client.model.CompletionStatus;
 import eu.europeana.enrichment.tp.api.client.model.Item;
 import eu.europeana.enrichment.tp.api.client.model.Language;

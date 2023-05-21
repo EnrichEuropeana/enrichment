@@ -3,7 +3,7 @@ package eu.europeana.enrichment.solr.service;
 import java.util.List;
 import java.util.TreeMap;
 
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 
 

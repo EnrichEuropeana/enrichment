@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;

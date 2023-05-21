@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.model.impl.RecordTranslationEval;
+import eu.europeana.enrichment.definitions.model.impl.RecordTranslationEval;
 import eu.europeana.enrichment.mongo.dao.RecordTranslationDao;
 import eu.europeana.enrichment.translation.service.impl.DeeplTranslationServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;

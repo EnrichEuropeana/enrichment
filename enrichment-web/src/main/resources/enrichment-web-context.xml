@@ -42,5 +42,18 @@
     <beans:bean id="i18nService" class="eu.europeana.api.commons.config.i18n.I18nServiceImpl">
     	<beans:property name="messageSource" ref="enrichment_i18n_messageSource"/>
     </beans:bean>
+    
+    <!-- mongodb for locking, using the api-commons no-sql db-->
+ 	<!--  abstract dao, reusing the common api abstract implementation -->
+ 	<!-- the constructor-arg is the name of the datastore bean configured using Java (not xml) -->
+<!-- 	<beans:bean id="db_nosql_enrich_dao" abstract="true" class="eu.europeana.api.commons.nosql.dao.impl.NosqlDaoImpl"> -->
+<!-- 		<beans:constructor-arg ref="enrichDatastoreForLock" name="datastore"/> -->
+<!-- 	</beans:bean> -->
+<!-- 	<beans:bean id="enrich_db_lockDao" parent="db_nosql_enrich_dao" class="eu.europeana.api.commons.nosql.dao.impl.ApiWriteLockDaoImpl"> -->
+<!-- 		<beans:constructor-arg type="java.lang.Class" value="eu.europeana.api.commons.nosql.entity.ApiWriteLockImpl" /> -->
+<!-- 	</beans:bean> -->
+<!-- 	<beans:bean name="enrich_db_apilockService" class="eu.europeana.api.commons.nosql.service.impl.ApiWriteLockServiceImpl" -->
+<!-- 		p:dao-ref="enrich_db_lockDao"/>	 -->
+    
     	 
 </beans:beans>

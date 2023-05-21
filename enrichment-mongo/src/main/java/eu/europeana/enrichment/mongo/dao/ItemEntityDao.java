@@ -2,7 +2,7 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 
 /*
  * This interface defines database actions for story items

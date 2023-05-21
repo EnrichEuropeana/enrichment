@@ -1,9 +1,10 @@
 
 enrich.api.endpoint=https://dsi-demo.ait.ac.at/enrichment-web
 
-# MongoDB configuration
+# MongoDB configuration (main db)
 #enrich.mongodb.connectionUri=mongodb://localhost:27017
-enrich.mongodb.connectionUri=mongodb://<ip_of_the_test_server>:27017
+#enrich.mongodb.connectionUri=mongodb://<ip_of_the_test_server>:27017
+enrich.mongodb.connectionUri=mongodb://<ip_of_the_database_server>:27017
 enrich.mongodb.database=enrichment
 #enrich.mongodb.database=keywords
 #enrich.mongodb.database=enrichment_test

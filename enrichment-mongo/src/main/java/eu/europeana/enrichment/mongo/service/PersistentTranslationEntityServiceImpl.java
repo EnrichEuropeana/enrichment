@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.TranslationEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.mongo.dao.TranslationEntityDao;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_TRANSLATION_ENTITY_SERVICE)

@@ -25,9 +25,9 @@ import org.springframework.stereotype.Service;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.model.impl.NamedEntityImpl;
-import eu.europeana.enrichment.model.impl.PositionEntityImpl;
-import eu.europeana.enrichment.model.vocabulary.NerTools;
+import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 import eu.europeana.enrichment.ner.enumeration.NERDBpediaClassification;
 import eu.europeana.enrichment.ner.service.NERService;
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_NER_DBPEDIA_SPOTLIGHT_SERVICE)
