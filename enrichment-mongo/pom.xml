@@ -38,19 +38,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.europeana.api.commons</groupId>
-			<version>${version.commonsApi}</version>
-			<artifactId>commons-nosql</artifactId>
-			<exclusions>
-			<exclusion>
-			<groupId>org.mongodb.morphia</groupId>
-			<artifactId>morphia</artifactId>
-			</exclusion>
-			</exclusions>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>javax.annotation-api</artifactId>
 <!-- 			<version>${version.annotation-api}</version> -->

@@ -19,15 +19,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
+import eu.europeana.api.commons.nosql.entity.ApiWriteLock;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityAnnotationCollection;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityAnnotationImpl;
+import eu.europeana.enrichment.mongo.service.PersistentApiWriteLockService;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
+import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
 import io.swagger.annotations.Api;
@@ -53,6 +56,9 @@ public class AnnotationController extends BaseRest {
 	
     @Autowired
     PersistentPositionEntityServiceImpl persistentPositionEntityService;
+    
+    @Autowired
+    PersistentApiWriteLockService persistentApiWriteLockService;
 
 	@Autowired 
 	JsonLdSerializer jsonLdSerializer;
@@ -106,20 +112,31 @@ public class AnnotationController extends BaseRest {
 			@PathVariable("itemId") String itemId,
 			@RequestParam(value="property", required = false) String property,
 			HttpServletRequest request) throws Exception, HttpException {
+		
+		if(property==null) {
+			property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
+		}
+		
+		//check if the api is already locked (i.e. the analysis has been started)
+		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+		if(annoDbWiteLock!=null) {
+			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
+		}
+		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+		
+		verifyWriteAccess(Operations.CREATE, request);
 
-			verifyWriteAccess(Operations.CREATE, request);
+		NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, itemId, property, null);
+				
+		if(annosCollection!=null && annosCollection.getItems()!=null) {
+			removeGivenNameInResponse(annosCollection.getItems());
+		}
+		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
+		
+		persistentApiWriteLockService.unlock(annoWriteLock);
 
-			if(property==null) {
-				property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
-			}
-
-			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, itemId, property, null);
-			if(annosCollection!=null && annosCollection.getItems()!=null) {
-				removeGivenNameInResponse(annosCollection.getItems());
-			}
-			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
-			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
-			return response;		
+		return response;		
 	}
 
 	@ApiOperation(value = "Create annotations for a story", nickname = "createAnnotationsForStory", notes = "This method stores the annotations of "
@@ -131,21 +148,33 @@ public class AnnotationController extends BaseRest {
 			@RequestParam(value="property", required = false) String property,
 			HttpServletRequest request) throws Exception, HttpException {
 
-			verifyWriteAccess(Operations.CREATE, request);
+		if(property==null) {
+			property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		}
 
-			if(property==null) {
-				property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
-			}
-			List<String> fieldsToUpdate = new ArrayList<>();
-			fieldsToUpdate.add(property);
-			
-			NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, null, property, fieldsToUpdate);
-			if(annosCollection!=null && annosCollection.getItems()!=null) {
-				removeGivenNameInResponse(annosCollection.getItems());
-			}
-			String resultJson = jsonLdSerializer.serializeObject(annosCollection);
-			ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
-			return response;		
+		//check if the api is already locked (i.e. the analysis has been started)
+		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+		if(annoDbWiteLock!=null) {
+			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
+		}
+		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+		
+		verifyWriteAccess(Operations.CREATE, request);
+
+		List<String> fieldsToUpdate = new ArrayList<>();
+		fieldsToUpdate.add(property);
+		
+		NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, null, property, fieldsToUpdate);
+		
+		if(annosCollection!=null && annosCollection.getItems()!=null) {
+			removeGivenNameInResponse(annosCollection.getItems());
+		}
+		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
+		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
+		
+		persistentApiWriteLockService.unlock(annoWriteLock);
+		
+		return response;		
 	}
 	
 	
