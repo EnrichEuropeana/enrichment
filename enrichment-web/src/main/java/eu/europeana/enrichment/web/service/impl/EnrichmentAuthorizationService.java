@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.stereotype.Component;
 
 import eu.europeana.api.commons.definitions.vocabulary.Role;
+import eu.europeana.api.commons.nosql.service.ApiWriteLockService;
 import eu.europeana.api.commons.oauth2.service.impl.EuropeanaClientDetailsService;
 import eu.europeana.api.commons.service.authorization.BaseAuthorizationService;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
@@ -48,6 +49,12 @@ public class EnrichmentAuthorizationService extends BaseAuthorizationService
   @Override
   protected Role getRoleByName(String name) {
     return Roles.getRoleByName(name);
+  }
+
+  @Override
+  protected ApiWriteLockService getApiWriteLockService() {
+	  // TODO Auto-generated method stub
+	  return null;
   }
 
 }

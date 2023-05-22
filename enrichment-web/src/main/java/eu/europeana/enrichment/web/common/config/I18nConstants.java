@@ -24,4 +24,6 @@ public interface I18nConstants extends eu.europeana.api.commons.definitions.conf
 	//replaced by generic constant
 	//static final String SERVER_ERROR_UNEXPECTED =  "error.entity_server_unexpected_error";
 	
+	static final String WRITE_LOCK_EXISTS = "error.write_lock_already_exists";
+	
 }
