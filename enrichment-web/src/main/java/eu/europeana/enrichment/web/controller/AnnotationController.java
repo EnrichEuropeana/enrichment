@@ -118,11 +118,11 @@ public class AnnotationController extends BaseRest {
 		}
 		
 		//check if the api is already locked (i.e. the analysis has been started)
-		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
-		if(annoDbWiteLock!=null) {
-			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
-		}
-		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+//		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+//		if(annoDbWiteLock!=null) {
+//			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
+//		}
+//		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
 		
 		verifyWriteAccess(Operations.CREATE, request);
 
@@ -134,7 +134,7 @@ public class AnnotationController extends BaseRest {
 		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 		
-		persistentApiWriteLockService.unlock(annoWriteLock);
+//		persistentApiWriteLockService.unlock(annoWriteLock);
 
 		return response;		
 	}
@@ -153,11 +153,11 @@ public class AnnotationController extends BaseRest {
 		}
 
 		//check if the api is already locked (i.e. the analysis has been started)
-		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
-		if(annoDbWiteLock!=null) {
-			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
-		}
-		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+//		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
+//		if(annoDbWiteLock!=null) {
+//			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
+//		}
+//		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, null, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
 		
 		verifyWriteAccess(Operations.CREATE, request);
 
@@ -172,7 +172,7 @@ public class AnnotationController extends BaseRest {
 		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 		
-		persistentApiWriteLockService.unlock(annoWriteLock);
+//		persistentApiWriteLockService.unlock(annoWriteLock);
 		
 		return response;		
 	}
