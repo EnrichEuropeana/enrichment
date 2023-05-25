@@ -60,7 +60,6 @@ public class NERController extends BaseRest {
 	 * @param property
 	 * @param linking
 	 * @param nerTools
-	 * @param original
 	 * @return											a list of named entities converted to a json format
 	 * @throws Exception
 	 * @throws HttpException
@@ -69,8 +68,7 @@ public class NERController extends BaseRest {
 	@ApiOperation(value = "Create named entities for a story", nickname = "createNamedEntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
-			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
-			+ "\"original\":true or false (meaning the analysis will be done on the original story or on the corresponding translation).")
+			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createNamedEntitiesStory(
 			@PathVariable("storyId") String storyId,
@@ -78,7 +76,6 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = false) String nerTools,
-			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
 			@RequestParam(value = "force", required = false,defaultValue = "false") Boolean force,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 	
@@ -88,7 +85,6 @@ public class NERController extends BaseRest {
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
 		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
-		if(original==null) original=false;
 		if(force==null) force=false;
 		
 		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
@@ -99,7 +95,7 @@ public class NERController extends BaseRest {
 		
 		String resultJsonLd = null;
 		if(force) {
-			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false);
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, false);
 			resultJsonLd=jsonLdSerializer.serializeObject(result);
 		}
 		else {
@@ -108,7 +104,7 @@ public class NERController extends BaseRest {
 				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 			else {	
-				result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, original, false);
+				result = enrichmentNerService.createNamedEntitiesForStory(storyId, property, nerToolsList, linkingList, translationTool, false);
 				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 		}
@@ -151,8 +147,7 @@ public class NERController extends BaseRest {
 	@ApiOperation(value = "Create named entities for an item", nickname = "createNamedEntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
 			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
-			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),"
-			+ "\"original\":true or false (meaning the analysis will be done on the original item, or on the corresponding translation).")
+			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createNamedEntitiesItem(
 			@PathVariable("storyId") String storyId,
@@ -161,7 +156,6 @@ public class NERController extends BaseRest {
 			@RequestParam(value = "property", required = false) String property,
 			@RequestParam(value = "linking", required = false) String linking,
 			@RequestParam(value = "nerTools", required = false) String nerTools,
-			@RequestParam(value = "original", required = false, defaultValue = "false") Boolean original,
 			@RequestParam(value = "force", required = false, defaultValue = "false") Boolean force,
 			HttpServletRequest request) throws Exception, HttpException, SolrServiceException {
 
@@ -171,7 +165,6 @@ public class NERController extends BaseRest {
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
 		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
-		if(original==null) original=false;
 		if(force==null) force=false;
 		
 		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
@@ -182,7 +175,7 @@ public class NERController extends BaseRest {
 	
 		String resultJsonLd = null;
 		if(force) {
-			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false);
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, false);
 			resultJsonLd=jsonLdSerializer.serializeObject(result);			
 		}
 		else {
@@ -191,7 +184,7 @@ public class NERController extends BaseRest {
 				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 			else {	
-				result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, original, false);
+				result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, false);
 				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 		}

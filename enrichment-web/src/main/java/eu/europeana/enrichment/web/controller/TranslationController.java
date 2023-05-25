@@ -65,7 +65,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool);
+		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool, true);
 		if(result==null) {
 			result="Either story or its property (e.g. description) does not exist!";
 		}
@@ -88,7 +88,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		String result = enrichmentTranslationService.getTranslation(storyId, null, translationTool, property);
+		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool, false);
 		if(result==null) {
 			result="Translation does not exist!";
 		}
@@ -126,7 +126,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 		
-		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool);
+		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool, true);
 		if(result==null) {
 			result="Either item or its property (e.g. transcription) does not exist!";
 		}
@@ -150,7 +150,7 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 	
-		String result = enrichmentTranslationService.getTranslation(storyId, itemId, translationTool, property);
+		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool, false);
 		if(result==null) {
 			result="Translation does not exist!";
 		}		

@@ -9,9 +9,8 @@ public interface EnrichmentTranslationService {
 
 	public String uploadTranslation(EnrichmentTranslationRequest requestParam, int i) throws HttpException;
 
-	public String translateStory(StoryEntityImpl story, String type, String translationTool) throws Exception;
+	public String translateStory(StoryEntityImpl story, String type, String translationTool, boolean translate) throws Exception;
 	
-	public String translateItem(ItemEntityImpl item, String type, String translationTool) throws Exception;
+	public String translateItem(ItemEntityImpl item, String type, String translationTool, boolean translate) throws Exception;
 
-	public String getTranslation(String storyId, String itemId, String translationTool, String type);
 }
