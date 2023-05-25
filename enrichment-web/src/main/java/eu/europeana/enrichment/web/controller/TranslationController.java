@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
+import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
@@ -65,9 +67,10 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool, true);
-		if(result==null) {
-			result="Either story or its property (e.g. description) does not exist!";
+		String result=null;
+		StoryEntityImpl story = persistentStoryEntityService.findStoryEntity(storyId);
+		if(story!=null) {
+			result = enrichmentTranslationService.translateStory(story, property, translationTool, true);
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);	
 		return response;
@@ -88,15 +91,14 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, null, translationTool, property, false);
 		
-		String result = enrichmentTranslationService.translateStory(persistentStoryEntityService.findStoryEntity(storyId), property, translationTool, false);
-		if(result==null) {
-			result="Translation does not exist!";
+		String result=null;
+		StoryEntityImpl story = persistentStoryEntityService.findStoryEntity(storyId);
+		if(story!=null) {
+			result = enrichmentTranslationService.translateStory(story, property, translationTool, false);
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;		
 	} 
-	
-	
 	
 	/**
 	 * This method represents the /enrichment/translation/{storyId}/{itemId} end point,
@@ -126,9 +128,10 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 		
-		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool, true);
-		if(result==null) {
-			result="Either item or its property (e.g. transcription) does not exist!";
+		String result=null;
+		ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
+		if(item!=null) {
+			result = enrichmentTranslationService.translateItem(item, property, translationTool, true);
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;
@@ -150,10 +153,11 @@ public class TranslationController extends BaseRest {
 		
 		validateTranslationParams(storyId, itemId, translationTool, property, true);
 	
-		String result = enrichmentTranslationService.translateItem(persistentItemEntityService.findItemEntity(storyId, itemId), property, translationTool, false);
-		if(result==null) {
-			result="Translation does not exist!";
-		}		
+		String result=null;
+		ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
+		if(item!=null) {
+			result = enrichmentTranslationService.translateItem(item, property, translationTool, false);
+		}
 		ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
 		return response;		
 	} 
