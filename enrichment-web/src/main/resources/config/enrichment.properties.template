@@ -52,14 +52,13 @@ enrich.translation.deepl-free.authenticationKey=/home/ait/enrich/translation-cre
 
 #enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
 #solr.entity-positions.url = http://localhost:8983/solr
-solr.entity-positions.url = http://<ip_of_the_test_server>:8983/solr
+solr.entity-positions.url = http://<ip_of_the_database_server>:8983/solr
 solr.entity-positions.timeout = 60000
 solr.facetLimit=750
 #enrich.solr.translated.entities=C:/java/entitiesRomanian.txt
 enrich.solr.translated.entities=
-#solr.wikidata-search.baseUrl=http://dsi-demo.ait.ac.at/enrichment-web/entity/search
-solr.wikidata-search.baseUrl=http://<ip_of_the_test_server>:8080/enrichment-web-test/entity/search
-#solr.wikidata-search.baseUrl=http://localhost:8181/enrichment-web/entity/search
+solr.wikidata-search.baseUrl=https://<domain_name_of_production_server>/enrichment-web/enrichment/search
+#solr.wikidata-search.baseUrl=http://<ip_of_the_test_server>:8080/enrichment-web-test/enrichment/search
 
 # test case
 enrich.web.book.dumitru=
