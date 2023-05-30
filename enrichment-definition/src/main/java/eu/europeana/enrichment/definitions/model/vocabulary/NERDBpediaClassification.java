@@ -1,6 +1,12 @@
-package eu.europeana.enrichment.ner.enumeration;
+package eu.europeana.enrichment.definitions.model.vocabulary;
 
-public enum NERStanfordClassification {
+/*
+ * Enum for DBpedia spotlight classification
+ * which should convert their classification into the unified 
+ * named entity classification (NERClassification)
+ */
+
+public enum NERDBpediaClassification {
 	AGENT {
 		public String toString() {
 			return NERClassification.AGENT.toString();
@@ -23,22 +29,18 @@ public enum NERStanfordClassification {
 	};
 
 	public static boolean isAgent(String classificationString) {
-		if(classificationString.equals("PERSON") || classificationString.equals("PER"))
+		if(classificationString.contains("DBpedia:Person") || classificationString.contains("DBpedia:Writer"))
 			return true;
 		return false;
 	}
 	public static boolean isPlace(String classificationString) {
-		if(classificationString.equals("LOCATION") || classificationString.equals("LOC"))
+		if(classificationString.contains("DBpedia:Location") || classificationString.contains("DBpedia:Place") || 
+				classificationString.contains("DBpedia:City"))
 			return true;
 		return false;
 	}
 	public static boolean isOrganization(String classificationString) {
-		if(classificationString.equals("ORGANIZATION") || classificationString.equals("ORG"))
-			return true;
-		return false;
-	}
-	public static boolean isMisc(String classificationString) {
-		if(classificationString.equals("MISC"))
+		if(classificationString.contains("DBpedia:Organisation") || classificationString.contains("DBpedia:Company"))
 			return true;
 		return false;
 	}

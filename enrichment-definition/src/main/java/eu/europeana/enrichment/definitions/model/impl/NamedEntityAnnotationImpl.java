@@ -20,6 +20,7 @@ import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Property;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.definitions.model.NamedEntityAnnotation;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 
 @Entity(value="NamedEntityAnnotationImpl")
 @JsonPropertyOrder({ 
@@ -121,16 +122,22 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 		this.motivation = "tagging";
 		this.body = new HashMap<String, Object> ();
 		this.body.put("id", wikidataId);
-		if(entityTypeParam.equalsIgnoreCase("agent"))
+		if(entityTypeParam.equalsIgnoreCase(NERClassification.AGENT.toString()))
 		{
 			this.entityType = "Person";
 			this.body.put("type", "Person");
 		}
-		else 
+		else if(entityTypeParam.equalsIgnoreCase(NERClassification.PLACE.toString()))
 		{
 			this.entityType = "Place";
 			this.body.put("type", "Place");
 		}
+		else if(entityTypeParam.equalsIgnoreCase(NERClassification.ORGANIZATION.toString()))
+		{
+			this.entityType = "Organization";
+			this.body.put("type", "Organization");
+		}
+
 		Map<String,String> bodyPrefLabel = new HashMap<String, String>();
 		bodyPrefLabel.put("en", entityPrefLabel);
 		this.body.put("prefLabel", bodyPrefLabel);

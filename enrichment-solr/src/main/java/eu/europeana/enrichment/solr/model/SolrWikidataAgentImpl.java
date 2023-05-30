@@ -111,7 +111,7 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 
 	
 	@Override
-	@Field(EntitySolrFields.DATE_OF_BIRTH_ALL)
+	@Field(EntitySolrFields.DATE_OF_BIRTH)
 	public void setDateOfBirth(String[] dateOfBirth) {
 		String[] normalizedDateOfBirth = dateOfBirth;
 //		if(dateOfBirth!=null && dateOfBirth.length>0)
@@ -122,7 +122,7 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 	}
 
 	@Override
-	@Field(EntitySolrFields.DATE_OF_DEATH_ALL)
+	@Field(EntitySolrFields.DATE_OF_DEATH)
 	public void setDateOfDeath(String[] dateOfDeath) {
 		String[] normalizedDateOfDeath = dateOfDeath;
 //		if(dateOfDeath!=null && dateOfDeath.length>0)
@@ -134,7 +134,7 @@ public class SolrWikidataAgentImpl extends WikidataAgentImpl implements Wikidata
 
 
 	@Override
-	@Field(EntitySolrFields.PROFESSION_OR_OCCUPATION_ALL)
+	@Field(EntitySolrFields.PROFESSION_OR_OCCUPATION)
 	public void setProfessionOrOccupation(String[] professionOrOccupation) {
 		String[] normalizedProfessionOrOccupation = professionOrOccupation;
 //		if(professionOrOccupation!=null && professionOrOccupation.length>0)

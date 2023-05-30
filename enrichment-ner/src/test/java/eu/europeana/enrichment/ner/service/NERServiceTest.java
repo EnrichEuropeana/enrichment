@@ -8,7 +8,7 @@ import javax.annotation.Resource;
 
 import org.springframework.test.context.ContextConfiguration;
 
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 
 @ContextConfiguration(locations = "classpath:test-ner-config.xml")
 public class NERServiceTest {

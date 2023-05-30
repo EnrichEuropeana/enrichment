@@ -44,13 +44,15 @@ import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.exceptions.FunctionalRuntimeException;
 import eu.europeana.enrichment.definitions.model.WikidataAgent;
 import eu.europeana.enrichment.definitions.model.WikidataEntity;
+import eu.europeana.enrichment.definitions.model.WikidataOrganization;
 import eu.europeana.enrichment.definitions.model.WikidataPlace;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.WikidataAgentImpl;
+import eu.europeana.enrichment.definitions.model.impl.WikidataOrganizationImpl;
 import eu.europeana.enrichment.definitions.model.impl.WikidataPlaceImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
 
@@ -144,6 +146,7 @@ public class WikidataServiceImpl implements WikidataService {
 	 */
 	private Set<String> wikidataSubclassesForPlace;
 	private Set<String> wikidataSubclassesForAgent;
+	private Set<String> wikidataSubclassesForOrganization;
 	
 	@Autowired
 	public WikidataServiceImpl (EnrichmentConfiguration enrichmentConfiguration) throws IOException
@@ -154,7 +157,8 @@ public class WikidataServiceImpl implements WikidataService {
 		Set<String> wikidataSubclassesForPlaceRemove = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesGeographicLocationRemove()));
 		wikidataSubclassesForPlace = new HashSet<>(wikidataSubclassesForPlaceAll);
 		wikidataSubclassesForPlace.removeAll(wikidataSubclassesForPlaceRemove);
-		wikidataSubclassesForAgent = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesHuman()));
+		wikidataSubclassesForAgent = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesNaturalPerson()));
+		wikidataSubclassesForOrganization = new HashSet<String>(readWikidataIdsFromQueryServiceOutput(enrichmentConfiguration.getWikidataSubclassesJuridicalPerson()));
 	}
 	
 	
@@ -650,7 +654,7 @@ public class WikidataServiceImpl implements WikidataService {
 	{
 		List<List<String>> jsonElement;
 		
-		if(type.equalsIgnoreCase("agent"))
+		if(type.equalsIgnoreCase(NERClassification.AGENT.toString()))
 		{
 			WikidataAgent newWikidataAgent = new WikidataAgentImpl ();
 			
@@ -769,7 +773,7 @@ public class WikidataServiceImpl implements WikidataService {
 			return newWikidataAgent;
 
 		}
-		else
+		else if(type.equalsIgnoreCase(NERClassification.PLACE.toString()))
 		{
 			
 			WikidataPlace newWikidataPlace = new WikidataPlaceImpl ();
@@ -868,6 +872,199 @@ public class WikidataServiceImpl implements WikidataService {
 			return newWikidataPlace;
 			
 		}	
+		else if(type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) {
+			
+			WikidataOrganization newWikidataOrganization = new WikidataOrganizationImpl();
+			
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON, EnrichmentConstants.ALTLABEL_JSONPROP);
+			//converting the "jsonElement" to the appropriate object to be saved in Solr
+			Map<String,List<String>> altLabelMap = null;
+			if(!jsonElement.isEmpty()) 
+			{
+				altLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+//			/*this is added because jackson has problems with serializing null values (version 2.9.4 that we use)
+//			 * TODO: find a better fix
+//			 */			
+//			if(altLabelMap==null)
+//			{
+//				altLabelMap = new HashMap<String, List<String>>();
+//				List<String> altLabelMapList = new ArrayList<String>();
+//				altLabelMapList.add("-");
+//				altLabelMap.put("en", altLabelMapList);
+//			}
+			if(altLabelMap!=null) newWikidataOrganization.setAltLabel(altLabelMap);
+
+			String country = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PLACE_COUNTRY_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				country=EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(0).get(0);
+			}
+			if(country!=null) newWikidataOrganization.setCountry(country);
+						
+			String depiction = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DEPICTION_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				depiction = "http://commons.wikimedia.org/wiki/Special:FilePath/" + jsonElement.get(0).get(0);
+			}
+			if(depiction!=null) newWikidataOrganization.setDepiction(depiction);
+			
+			Map<String,List<String>> descriptionsMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.DESCRIPTION_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				descriptionsMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			if(descriptionsMap!=null) newWikidataOrganization.setDescription(descriptionsMap);
+			
+			newWikidataOrganization.setEntityId(wikidataURL);			
+			
+			newWikidataOrganization.setInternalType(type);
+			
+			String modificationDate = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.MODIFICATIONDATE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				modificationDate = jsonElement.get(0).get(0);
+			}
+			if(modificationDate!=null) newWikidataOrganization.setModificationDate(modificationDate);			
+			
+			Map<String,List<String>> prefLabelMap = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{ 
+				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
+			}
+			if(prefLabelMap!=null) newWikidataOrganization.setPrefLabel(prefLabelMap);
+			
+			
+			String [] sameAsArray = null;		
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.SAMEAS_JSONPROP);
+			if(!jsonElement.isEmpty())	
+			{
+				sameAsArray = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					sameAsArray[i]=jsonElement.get(i).get(0);
+				}				
+			}
+			if(sameAsArray!=null) newWikidataOrganization.setSameAs(sameAsArray);
+			
+			String [] officialWebsite = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.OFFICIAL_WEBSITE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				officialWebsite = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					officialWebsite[i] = jsonElement.get(i).get(0);
+				}				
+			}
+			if(officialWebsite!=null) newWikidataOrganization.setOfficialWebsite(officialWebsite);
+			
+			String VIAF_ID = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.VIAF_ID_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				VIAF_ID=jsonElement.get(0).get(0);
+			}
+			if(VIAF_ID!=null) newWikidataOrganization.setVIAF_ID(VIAF_ID);
+
+			String ISNI = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.ISNI_JSONPROP);
+			if(!jsonElement.isEmpty())
+			{
+				ISNI=jsonElement.get(0).get(0);
+			}
+			if(ISNI!=null) newWikidataOrganization.setISNI(ISNI);
+
+			String logo = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.LOGO_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				logo = jsonElement.get(0).get(0);
+			}
+			if(logo!=null) newWikidataOrganization.setLogo(logo);
+
+			String inception = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.INCEPTION_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				inception = jsonElement.get(0).get(0);
+			}
+			if(inception!=null) newWikidataOrganization.setInception(inception);
+
+			String headquartersLoc = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.HEADQUARTERS_LOC_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				headquartersLoc = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(0).get(0);
+			}
+			if(headquartersLoc!=null) newWikidataOrganization.setHeadquartersLoc(headquartersLoc);
+
+			String headquartersPostalCode = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.HEADQUARTERS_POSTAL_CODE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				headquartersPostalCode = jsonElement.get(0).get(0);
+			}
+			if(headquartersPostalCode!=null) newWikidataOrganization.setHeadquartersPostalCode(headquartersPostalCode);
+
+			String headquartersStreetAddress = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.HEADQUARTERS_STREET_ADDRESS_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				headquartersStreetAddress = jsonElement.get(0).get(0);
+			}
+			if(headquartersStreetAddress!=null) newWikidataOrganization.setHeadquartersStreetAddress(headquartersStreetAddress);
+
+			Float headquartersLatitude = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.HEADQUARTERS_LATITUDE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				headquartersLatitude = Float.valueOf(jsonElement.get(0).get(0));
+			}
+			if(headquartersLatitude!=null) newWikidataOrganization.setHeadquartersLatitude(headquartersLatitude);
+
+			Float headquartersLongitude = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.HEADQUARTERS_LONGITUDE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				headquartersLongitude = Float.valueOf(jsonElement.get(0).get(0));
+			}
+			if(headquartersLongitude!=null) newWikidataOrganization.setHeadquartersLongitude(headquartersLongitude);
+
+			String [] industry = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.INDUSTRY_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				industry = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					industry[i] = EnrichmentConstants.WIKIDATA_ENTITY_BASE_URL + jsonElement.get(i).get(0);
+				}				
+			}
+			if(industry!=null) newWikidataOrganization.setIndustry(industry);
+			
+			String [] phone = null;
+			jsonElement = getJSONFieldFromWikidataJSON(WikidataJSON,EnrichmentConstants.PHONE_JSONPROP);
+			if(!jsonElement.isEmpty()) 
+			{
+				phone = new String [jsonElement.size()];
+				for(int i=0;i<jsonElement.size();i++)
+				{
+					phone[i] = jsonElement.get(i).get(0);
+				}				
+			}
+			if(phone!=null) newWikidataOrganization.setPhone(phone);
+			
+			return newWikidataOrganization;
+		}
+		else {
+			return null;
+		}
 	}
 	
 	@Override
@@ -972,6 +1169,11 @@ public class WikidataServiceImpl implements WikidataService {
 				}
 				else if(type.equalsIgnoreCase(NERClassification.PLACE.toString())) {
 					if(wikidataSubclassesForPlace.contains(jsonElement.get(i).get(0))) {
+						return true;
+					}
+				}
+				else if(type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) {
+					if(wikidataSubclassesForOrganization.contains(jsonElement.get(i).get(0))) {
 						return true;
 					}
 				}
@@ -1279,7 +1481,11 @@ public class WikidataServiceImpl implements WikidataService {
 	public Set<String> getWikidataSubclassesForAgent() {
 		return wikidataSubclassesForAgent;
 	}
-	
+
+	public Set<String> getWikidataSubclassesForOrganization() {
+		return wikidataSubclassesForOrganization;
+	}
+
 	@Override
 	@Async
 	public CompletableFuture<String> saveWikidataJSONFromRemoteParallel(String wikidataId) throws Exception {

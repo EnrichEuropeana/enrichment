@@ -129,9 +129,12 @@ public class EnrichmentConfiguration  {
 	@Value("${enrich.wikidata.subclasses.geographic-location.remove}")
     private String wikidataSubclassesGeographicLocationRemove;
 
-	@Value("${enrich.wikidata.subclasses.human}")
-    private String wikidataSubclassesHuman;	
-	
+	@Value("${enrich.wikidata.subclasses.natural-person}")
+    private String wikidataSubclassesNaturalPerson;	
+
+	@Value("${enrich.wikidata.subclasses.juridical-person}")
+    private String wikidataSubclassesJuridicalPerson;	
+
 	@Value("${auth.read.enabled: true}")
 	private boolean authReadEnabled;
 	
@@ -355,10 +358,6 @@ public class EnrichmentConfiguration  {
 	public String getWikidataSubclassesGeographicLocationRemove() {
 		return wikidataSubclassesGeographicLocationRemove;
 	}
-
-	public String getWikidataSubclassesHuman() {
-		return wikidataSubclassesHuman;
-	}
 	
 	public boolean isAuthReadEnabled() {
 	    return authReadEnabled;
@@ -398,6 +397,14 @@ public class EnrichmentConfiguration  {
 	
 	public String getSearchApiBaseUrl() {
 		return searchApiBaseUrl;
+	}
+
+	public String getWikidataSubclassesNaturalPerson() {
+		return wikidataSubclassesNaturalPerson;
+	}
+
+	public String getWikidataSubclassesJuridicalPerson() {
+		return wikidataSubclassesJuridicalPerson;
 	}
 
 }

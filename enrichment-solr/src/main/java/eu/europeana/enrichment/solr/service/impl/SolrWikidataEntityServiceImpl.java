@@ -24,12 +24,15 @@ import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.definitions.model.WikidataAgent;
 import eu.europeana.enrichment.definitions.model.WikidataEntity;
+import eu.europeana.enrichment.definitions.model.WikidataOrganization;
 import eu.europeana.enrichment.definitions.model.WikidataPlace;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntitySolrCollection;
 import eu.europeana.enrichment.definitions.model.impl.WikidataEntityImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.EntityTypes;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
 import eu.europeana.enrichment.solr.model.SolrWikidataAgentImpl;
+import eu.europeana.enrichment.solr.model.SolrWikidataOrganizationImpl;
 import eu.europeana.enrichment.solr.model.SolrWikidataPlaceImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrWikidataEntityService;
@@ -57,6 +60,10 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			}
 			else if(EntityTypes.Place.getEntityType().equalsIgnoreCase(type)) {
 				store(solrCore, new SolrWikidataPlaceImpl((WikidataPlace)entity), true);
+				return 1;
+			}
+			else if(EntityTypes.Organization.getEntityType().equalsIgnoreCase(type)) {
+				store(solrCore, new SolrWikidataOrganizationImpl((WikidataOrganization)entity), true);
 				return 1;
 			}
 			return 0;			
@@ -228,7 +235,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		
 		SolrDocument doc = docList.get(0);		
 
-		if(type.equalsIgnoreCase("agent"))
+		if(type.equalsIgnoreCase(NERClassification.AGENT.toString()))
 		{
 			SolrWikidataAgentImpl entity;
 			Class<SolrWikidataAgentImpl> entityClass = null;
@@ -237,7 +244,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 				    	
 	    	return entity;
 		}
-		else if(type.equalsIgnoreCase("place")) 
+		else if(type.equalsIgnoreCase(NERClassification.PLACE.toString())) 
 		{
 			SolrWikidataPlaceImpl entity;
 			Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -246,9 +253,18 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	
 	    	return entity;
 		}
+		else if(type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) 
+		{
+			SolrWikidataOrganizationImpl entity;
+			Class<SolrWikidataOrganizationImpl> entityClass = null;
+			entityClass = SolrWikidataOrganizationImpl.class;
+			entity = (SolrWikidataOrganizationImpl) binder.getBean(entityClass, doc);
+	    	
+	    	return entity;
+		}
 		else
 		{
-			logger.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
+			logger.error("The type of the Solr WikidataEntity is niether \"agent\", \"place\", nor \"organization\".");
 			return null;
 		}
 		
@@ -298,7 +314,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		 * type of the class that needs to be serialized
 		 */
 
-		if(type.equalsIgnoreCase("agent"))
+		if(type.equalsIgnoreCase(NERClassification.AGENT.toString()))
 		{
 			SolrWikidataAgentImpl entity;
 			Class<SolrWikidataAgentImpl> entityClass = null;
@@ -316,7 +332,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	
 	    	return serializedUserSetJsonLdStr;
 		}
-		else if(type.equalsIgnoreCase("place")) 
+		else if(type.equalsIgnoreCase(NERClassification.PLACE.toString())) 
 		{
 			SolrWikidataPlaceImpl entity;
 			Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -334,9 +350,27 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	
 	    	return serializedUserSetJsonLdStr;
 		}
+		else if(type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) 
+		{
+			SolrWikidataOrganizationImpl entity;
+			Class<SolrWikidataOrganizationImpl> entityClass = null;
+			entityClass = SolrWikidataOrganizationImpl.class;
+			entity = (SolrWikidataOrganizationImpl) binder.getBean(entityClass, doc);
+					
+	    	String serializedUserSetJsonLdStr=null;
+	    	try {
+				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				logger.log(Level.ERROR, "Exception during the serializion of the wikidata organization from Solr.", e);
+				throw e;
+			}
+	    	
+	    	return serializedUserSetJsonLdStr;
+		}
 		else
 		{
-			logger.error("The type of the Solr WikidataEntity is niether \"agent\" nor \"place\".");
+			logger.error("The type of the Solr WikidataEntity is niether \"agent\", \"place\", nor \"organization\".");
 			return null;
 		}
 	}
@@ -392,8 +426,8 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText);
 			
-			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place" + "&lang="+ lang;
-			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place" + "&lang="+ lang;
+			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place,organization" + "&lang="+ lang;
+			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=agent,place,organization" + "&lang="+ lang;
 		}
 		
 		if(solrSortText!=null && !solrSortText.isEmpty())
@@ -461,7 +495,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 
 			WikidataEntityImpl wikidataEntity=null;
 			
-			if(internalType.equalsIgnoreCase("agent"))
+			if(internalType.equalsIgnoreCase(NERClassification.AGENT.toString()))
 			{
 				SolrWikidataAgentImpl entity;
 				Class<SolrWikidataAgentImpl> entityClass = null;
@@ -471,7 +505,7 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 				wikidataEntity=entity;
 								    	
 			}
-			else if(internalType.equalsIgnoreCase("place")) 
+			else if(internalType.equalsIgnoreCase(NERClassification.PLACE.toString())) 
 			{
 				SolrWikidataPlaceImpl entity;
 				Class<SolrWikidataPlaceImpl> entityClass = null;
@@ -480,9 +514,18 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 				items.add(entity);
 				wikidataEntity=entity;
 			}
+			else if(internalType.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) 
+			{
+				SolrWikidataOrganizationImpl entity;
+				Class<SolrWikidataOrganizationImpl> entityClass = null;
+				entityClass = SolrWikidataOrganizationImpl.class;
+				entity = (SolrWikidataOrganizationImpl) binder.getBean(entityClass, doc);
+				items.add(entity);
+				wikidataEntity=entity;
+			}
 			else
 			{
-				logger.error("Solr document retrived is niether of type \"agent\" nor \"place\".");
+				logger.error("Solr document retrived is niether of type \"agent\", \"place\", nor \"organization\".");
 				return null;
 			}
 			

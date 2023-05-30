@@ -19,4 +19,5 @@ public interface NamedEntityDao {
 	public List<NamedEntityImpl> get_N_NamedEntities(int limit, int skip);
 	public long deleteAllNamedEntities();
 	NamedEntityImpl findNamedEntity(ObjectId objId);
+	public void deleteNamedEntitiesBasedOnTypeAndTheirPositionEntities(String type);
 }

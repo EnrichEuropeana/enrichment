@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.enumeration;
+package eu.europeana.enrichment.definitions.model.vocabulary;
 
 /*
  * Enum for unified named entity classification

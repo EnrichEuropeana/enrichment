@@ -32,6 +32,7 @@ import eu.europeana.enrichment.definitions.model.impl.NamedEntityAnnotationImpl;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentNamedEntityAnnotationService;
@@ -39,7 +40,6 @@ import eu.europeana.enrichment.mongo.service.PersistentNamedEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentPositionEntityServiceImpl;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
 import eu.europeana.enrichment.ner.linking.WikidataService;
 import eu.europeana.enrichment.ner.service.NERLinkingService;
 import eu.europeana.enrichment.ner.service.NERService;
@@ -285,7 +285,8 @@ public class EnrichmentNERServiceImpl {
 	
 	private boolean isRestrictedClassificationType(String type) {
 		if(!type.equalsIgnoreCase(NERClassification.AGENT.toString()) 
-			&& !type.equalsIgnoreCase(NERClassification.PLACE.toString())) {
+			&& !type.equalsIgnoreCase(NERClassification.PLACE.toString())
+			&& !type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) {
 			return true;
 		}
 		else return false;
