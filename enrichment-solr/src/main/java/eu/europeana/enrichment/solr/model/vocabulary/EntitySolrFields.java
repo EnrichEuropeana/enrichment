@@ -43,5 +43,17 @@ public class EntitySolrFields {
 	
 	public static final String PROFESSION_OR_OCCUPATION = "rdagr2_professionOrOccupation";
 	public static final String PROFESSION_OR_OCCUPATION_ALL = "rdagr2_professionOrOccupation"+".*";
-
+	
+	public static final String OFFICIAL_WEBSITE = "foaf_officialWebsite";
+	public static final String VIAF_ID = "viaf_id";
+	public static final String ISNI = "viaf_ISNI";
+	public static final String INCEPTION = "schema_inception";
+	public static final String HEADQUARTERS_LOC = "owl_headquartersLoc";
+	public static final String HEADQUARTERS_POSTAL_CODE = "vcard_headquartersPostalCode";
+	public static final String HEADQUARTERS_STREET_ADDRESS = "vcard_headquartersStreetAddress";
+	public static final String HEADQUARTERS_LATITUDE = "vcard_headquartersLatitude";
+	public static final String HEADQUARTERS_LONGITUDE = "vcard_headquartersLongitude";
+	public static final String INDUSTRY = "industry";
+	public static final String PHONE = "foaf_phone";
+	
 }

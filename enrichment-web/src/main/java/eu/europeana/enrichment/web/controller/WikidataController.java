@@ -62,7 +62,7 @@ public class WikidataController extends BaseRest {
      */
 	
 	@ApiOperation(value = "Get entity preview", nickname = "getWikidataEntity", notes = "This method retrives the wikidata objects (including their wikidata ids, labels, etc.)"
-			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677) and its type (agent or place) from the Solr local storage.")
+			+ "based on the provided \"wikidataId\" request parameter (e.g. http://www.wikidata.org/entity/Q2677) and its type (agent, place, or organization) from the Solr local storage.")
 	@RequestMapping(value = "/enrichment/resolve", method = {RequestMethod.GET}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> getWikidataEntity(
 			@RequestParam(value = "wikidataId", required = true) String wikidataId,

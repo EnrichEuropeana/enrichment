@@ -71,7 +71,7 @@ public class NERLinkingServiceImpl implements NERLinkingService {
 		//check for which tools we need linking
 		Set<String> nerTools = computeNerToolsForLinking(positions);
 		
-		if(nerTools.contains(NerTools.Dbpedia.getStringValue()) && ne.getDbpediaWikidataIds()==null) {
+		if(nerTools.contains(NerTools.Dbpedia.getStringValue()) && ne.getDbpediaWikidataIds()==null && ne.getDBpediaId()!=null) {
 			//set the dbpedia wikidata ids
 			List<String> dbpediaWikidataIds = new ArrayList<String>();
 			DBpediaResponse dbpediaResponse = dbpediaSpotlight.getDBpediaResponse(ne.getDBpediaId());

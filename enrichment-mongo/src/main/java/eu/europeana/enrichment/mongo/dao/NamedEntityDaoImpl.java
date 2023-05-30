@@ -234,4 +234,26 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 		}
 	}
 
+	/**
+	 * The type param can be: agent, place or organization.
+	 * @param type
+	 */
+	@Override
+	public void deleteNamedEntitiesBasedOnTypeAndTheirPositionEntities(String type) {
+    	List<NamedEntityImpl> namedEntitiesOfType = enrichmentDatastore.find(NamedEntityImpl.class)
+    			.filter(eq(EnrichmentConstants.TYPE, type))
+    			.iterator().toList();
+    	Set<ObjectId> neIdsSet = namedEntitiesOfType.stream().map(el -> el.get_id()).collect(Collectors.toSet());
+
+		//delete position entities that refer to the given named entities
+		enrichmentDatastore.find(PositionEntityImpl.class)
+			.filter(in(EnrichmentConstants.POSITION_NAMED_ENTITY, neIdsSet))
+            .delete(MorphiaUtils.MULTI_DELETE_OPTS);
+
+		//delete named entities 
+		enrichmentDatastore.find(NamedEntityImpl.class)
+		.filter(eq(EnrichmentConstants.TYPE, type))
+        .delete(MorphiaUtils.MULTI_DELETE_OPTS);
+	}
+
 }

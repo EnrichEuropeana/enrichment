@@ -84,7 +84,7 @@ public class EnrichmentConstants {
     public static final String SAMEAS_JSONPROP = "sitelinks.*.url";
     public static final String MODIFICATIONDATE_JSONPROP = "modified";
     
-    //this is a name property
+    //agent wikidata properties
 	public static final String AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER = "P735";
 	public static final String AGENT_IDENTIFICATION_JSONPROP = "claims."+ AGENT_IDENTIFICATION_JSONPROP_IDENTIFIER +".mainsnak.datavalue.value.id";
 	public static final String AGENT_COUNTRY_JSONPROP = "claims.P27.mainsnak.datavalue.value.id";
@@ -96,7 +96,7 @@ public class EnrichmentConstants {
 	public static final String FAMILY_NAME_JSONPROP = "claims.P734.mainsnak.datavalue.value.id";
 	public static final String GIVEN_NAME_JSONPROP = "claims.P735.mainsnak.datavalue.value.id";
 
-	//this property is the latitude property
+	//place wikidata properties
 	public static final String PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER = "P625";
 	public static final String PLACE_IDENTIFICATION_JSONPROP = "claims."+ PLACE_IDENTIFICATION_JSONPROP_IDENTIFIER+".mainsnak.datavalue.value.latitude";
 	public static final String PLACE_COUNTRY_JSONPROP = "claims.P17.mainsnak.datavalue.value.id";
@@ -104,6 +104,19 @@ public class EnrichmentConstants {
 	public static final String LATITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.latitude";
 	public static final String LONGITUDE_JSONPROP = "claims.P625.mainsnak.datavalue.value.longitude";
 	public static final String INSTANCE_OF_JSONPROP = "claims.P31.mainsnak.datavalue.value.id";
+	
+	//organization wikidata properties
+	public static final String OFFICIAL_WEBSITE_JSONPROP = "claims.P856.mainsnak.datavalue.value";
+	public static final String VIAF_ID_JSONPROP = "claims.P214.mainsnak.datavalue.value";
+	public static final String ISNI_JSONPROP = "claims.P213.mainsnak.datavalue.value";
+	public static final String INCEPTION_JSONPROP = "claims.P571.mainsnak.datavalue.value.time";
+	public static final String HEADQUARTERS_LOC_JSONPROP = "claims.P159.qualifiers.P276.datavalue.value.id";
+	public static final String HEADQUARTERS_POSTAL_CODE_JSONPROP = "claims.P159.qualifiers.P281.datavalue.value";
+	public static final String HEADQUARTERS_STREET_ADDRESS_JSONPROP = "claims.P159.qualifiers.P6375.datavalue.value.text";
+	public static final String HEADQUARTERS_LATITUDE_JSONPROP = "claims.P159.qualifiers.P625.datavalue.value.latitude";
+	public static final String HEADQUARTERS_LONGITUDE_JSONPROP = "claims.P159.qualifiers.P625.datavalue.value.longitude";
+	public static final String INDUSTRY_JSONPROP = "claims.P452.mainsnak.datavalue.value.id";
+	public static final String PHONE_JSONPROP = "claims.P1329.mainsnak.datavalue.value";
 	
 	//entity fields
 	public static final String ITEM_ID = "itemId";

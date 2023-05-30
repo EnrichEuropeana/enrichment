@@ -20,7 +20,7 @@ public class KeywordView {
     private String translatedValue;
     private String detectedOriginalLanguage;
     private String prefLabelEn;
-    //typeFoundByNER: agent/place
+    //typeFoundByNER: agent/place/organization
     private String type;
     private int position;
     //prefferedWikidataEntity.wikidataType.*.value

@@ -13,9 +13,9 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
+import eu.europeana.enrichment.definitions.model.vocabulary.NERStanfordClassification;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
-import eu.europeana.enrichment.ner.enumeration.NERClassification;
-import eu.europeana.enrichment.ner.enumeration.NERStanfordClassification;
 
 //@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN)
 public class NERStanfordServiceImpl{
