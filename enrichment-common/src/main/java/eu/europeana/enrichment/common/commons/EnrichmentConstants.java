@@ -234,6 +234,7 @@ public class EnrichmentConstants {
 	public static final String defaultTargetTranslationLangFull = "english";
 	public static final String defaultTranslationTool = "Google";
 	public static final String eTranslationTool = "eTranslation";
+	public static final String deeplTranslationTool = "DeepL";
 	public static final String eTranslationFailedSign = "-";
 
 	//translation evaluation

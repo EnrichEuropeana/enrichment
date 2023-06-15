@@ -67,7 +67,7 @@ public class NERController extends BaseRest {
 	 */
 	@ApiOperation(value = "Create named entities for a story", nickname = "createNamedEntitiesStory", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for stories using the given set of parameters. Please note that if the given story is not in the language it can be analysed (English or German)" 
-			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
+			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google, eTranslation or DeepL, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),")
 	@RequestMapping(value = "/enrichment/ner/{storyId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createNamedEntitiesStory(
@@ -146,7 +146,7 @@ public class NERController extends BaseRest {
 	
 	@ApiOperation(value = "Create named entities for an item", nickname = "createNamedEntitiesItem", notes = "This method performs the Named Entity Recognition (NER) analysis "
 			+ "for items using the given set of parameters. Please note that if the text of the given item is not in the language it can be analysed (English or German)" 
-			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google or eTranslation, "
+			+ "it should be first translated using the given API. The possible values for the parameters are: \"translationTool\"=Google, eTranslation or DeepL, "
 			+ "\"linking\"=Wikidata, \"nerTools\"=Stanford_NER or DBpedia_Spotlight (or both, comma separated),")
 	@RequestMapping(value = "/enrichment/ner/{storyId}/{itemId}", method = {RequestMethod.POST}, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<String> createNamedEntitiesItem(
