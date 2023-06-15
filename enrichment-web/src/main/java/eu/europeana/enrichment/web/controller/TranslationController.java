@@ -53,7 +53,7 @@ public class TranslationController extends BaseRest {
 	 * @return
 	 * @throws Exception 
 	 */
-	@ApiOperation(value = "Translate text (Google, eTranslation) for Stories", nickname = "postTranslationStory", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
+	@ApiOperation(value = "Translate text (Google, eTranslation, DeepL) for Stories", nickname = "postTranslationStory", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
 			+ " The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
 			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\", \"DeepL\".")
 	@RequestMapping(value = "/enrichment/translation/{storyId}", method = {RequestMethod.POST}, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -76,7 +76,7 @@ public class TranslationController extends BaseRest {
 		return response;
 	}
 	
-	@ApiOperation(value = "Get translated text (Google, eTranslation) for Stories", nickname = "getTranslationStory", notes = "This method retrieves the translated story elements. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
+	@ApiOperation(value = "Get translated text (Google, eTranslation, DeepL) for Stories", nickname = "getTranslationStory", notes = "This method retrieves the translated story elements. \"storyId\" represents the identifier of the document in Transcribathon platform.\n"  
 			+ " The \"property\" parameter indicates which textual information has been translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
 			"The \"translationTool\" parameter indicates which machine translation tool has been used for performing the translation, supported value: \"Google\", \"eTranslation\", \"DeepL\".")
 	@RequestMapping(value = "/enrichment/translation/{storyId}", method = {RequestMethod.GET}, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -112,7 +112,7 @@ public class TranslationController extends BaseRest {
 	 * @return
 	 * @throws Exception 
 	 */
-	@ApiOperation(value = "Translate text (Google, eTranslation) for Items", nickname = "postTranslationItem", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
+	@ApiOperation(value = "Translate text (Google, eTranslation, DeepL) for Items", nickname = "postTranslationItem", notes = "This method translates the textual information of transcribathon documents. \"storyId\" represents the identifier of the document in Transcribathon platform.\n" + 
 			" The parameter \"itemId\" further enables considering only specific story item. " +
 			" The \"property\" parameter indicates which textual information will be translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
 			"The \"translationTool\" parameter indicates which machine translation tool will be used for performing the translation, supported value: \"Google\", \"eTranslation\", \"DeepL\".")
@@ -137,7 +137,7 @@ public class TranslationController extends BaseRest {
 		return response;
 	}
 	
-	@ApiOperation(value = "Get translated text (Google, eTranslation) for Items", nickname = "getTranslationItem", notes = "This method retrieves the translated item elements. \"storyId\" and \"itemId\" enable the identification of the document in Transcribathon platform.\n"  
+	@ApiOperation(value = "Get translated text (Google, eTranslation, DeepL) for Items", nickname = "getTranslationItem", notes = "This method retrieves the translated item elements. \"storyId\" and \"itemId\" enable the identification of the document in Transcribathon platform.\n"  
 			+ " The \"property\" parameter indicates which textual information has been translated, supported values: \"summary\", \"description\" and \"transcription\".\n" + 
 			"The \"translationTool\" parameter indicates which machine translation tool has been used for performing the translation, supported value: \"Google\", \"eTranslation\", \"DeepL\".")
 	@RequestMapping(value = "/enrichment/translation/{storyId}/{itemId}", method = {RequestMethod.GET}, produces = MediaType.TEXT_PLAIN_VALUE)
