@@ -83,7 +83,7 @@ public abstract class BaseRest  extends BaseRestController{
 
 	protected void validateTranslationParams(String storyId, String itemId, String translationTool, String type, boolean validateItem) throws ParamValidationException {
 		validateBaseParamsForNEROrTranslation(storyId, itemId, type, validateItem);
-		if(! (EnrichmentConstants.defaultTranslationTool.equals(translationTool) || EnrichmentConstants.eTranslationTool.equals(translationTool)))
+		if(! (EnrichmentConstants.defaultTranslationTool.equals(translationTool) || EnrichmentConstants.eTranslationTool.equals(translationTool) || EnrichmentConstants.deeplTranslationTool.equals(translationTool)))
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);		
 	}
 

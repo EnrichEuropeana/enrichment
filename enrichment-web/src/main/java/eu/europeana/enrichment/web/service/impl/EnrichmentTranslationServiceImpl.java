@@ -23,6 +23,7 @@ import eu.europeana.enrichment.definitions.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
+import eu.europeana.enrichment.translation.service.impl.DeeplTranslationServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.translation.service.impl.TranslationGoogleServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
@@ -43,14 +44,11 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 	@Autowired
 	ETranslationEuropaServiceImpl eTranslationService;
 	
+	@Autowired
+	DeeplTranslationServiceImpl deeplTranslationService;
+	
 	Logger logger = LogManager.getLogger(getClass());
-	
-	/*
-	 * Defining the available tools for translation
-	 */
-	private static final String googleToolName = "Google";
-	private static final String eTranslationToolName = "eTranslation";
-	
+		
     @Autowired
 	TranslationLanguageTool translationLanguageTool;
 	
@@ -137,9 +135,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			tmpTranslationEntity.setKey(textToTranslate);
 
 			switch (translationTool) {
-			case googleToolName:
+			case EnrichmentConstants.defaultTranslationTool:
 				if(googleTranslationService==null) {
-					logger.debug("The google translation service is currently disabled.");
+					logger.info("The google translation service is currently disabled.");
 					return null;
 				}
 				List<String> googleTransTextResp = new ArrayList<>();
@@ -150,7 +148,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 					tmpTranslationEntity.setOriginLangGoogle(googleTransDetectedLangResp.get(0));
 				}
 				break;
-			case eTranslationToolName:
+			case EnrichmentConstants.eTranslationTool:
 				if(StringUtils.isBlank(sourceLanguage)) {
 					logger.info("The eTranslation source language is empty! Skipping translation!");
 					return null;					
@@ -159,6 +157,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				if(! eTranslationResponse.equals(EnrichmentConstants.eTranslationFailedSign)) {
 					tmpTranslationEntity.setTranslatedText(eTranslationResponse);
 				}
+				break;
+			case EnrichmentConstants.deeplTranslationTool:
+				String deeplResp = deeplTranslationService.translateText(textToTranslate, EnrichmentConstants.defaultTargetTranslationLang2Letter);
+				tmpTranslationEntity.setTranslatedText(deeplResp);
 				break;
 			default:
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
