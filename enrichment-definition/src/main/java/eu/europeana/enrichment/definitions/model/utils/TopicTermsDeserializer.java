@@ -9,19 +9,19 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
-import eu.europeana.enrichment.definitions.model.Term;
+import eu.europeana.enrichment.definitions.model.impl.TermImpl;
 
 
-public class TopicTermsDeserializer extends JsonDeserializer<List<Term>>{
+public class TopicTermsDeserializer extends JsonDeserializer<List<TermImpl>>{
 
 	@Override
-	public List<Term> deserialize(JsonParser p, DeserializationContext ctxt)
+	public List<TermImpl> deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		
 		return p.readValueAs(TYPE_REF);
 	}
 	
-	private static final TypeReference<List<Term>> TYPE_REF = 
-            new TypeReference<List<Term>>() {};
+	private static final TypeReference<List<TermImpl>> TYPE_REF = 
+            new TypeReference<List<TermImpl>>() {};
 
 }

@@ -41,7 +41,7 @@ import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.definitions.exceptions.UnsupportedEntityTypeException;
-import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.EntityTypes;
 import eu.europeana.enrichment.definitions.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.mongo.service.PersistentTopicService;
@@ -71,8 +71,8 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	EnrichmentConfiguration config;
 
 	@Override
-	public Topic createTopic(Topic topic) throws HttpException, UnsupportedEntityTypeException {
-		Topic dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
+	public TopicImpl createTopic(TopicImpl topic) throws HttpException, UnsupportedEntityTypeException {
+		TopicImpl dbtopicEntity = persistentTopicService.getByIdentifier(topic.getIdentifier());
 		if (dbtopicEntity != null)
 			return dbtopicEntity;
 				
@@ -94,8 +94,8 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public Topic updateTopic(long id, Topic topic) {
-		Topic dbtopicEntity = persistentTopicService.getById(id);
+	public TopicImpl updateTopic(long id, TopicImpl topic) {
+		TopicImpl dbtopicEntity = persistentTopicService.getById(id);
 		if (dbtopicEntity != null)
 		{
 			if (topic.getTerms() != null)
@@ -121,7 +121,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		}
 	}
 	
-	public List<Topic> detectTopics (String text, int topics) throws URISyntaxException, ClientProtocolException, IOException, HttpException {
+	public List<TopicImpl> detectTopics (String text, int topics) throws URISyntaxException, ClientProtocolException, IOException, HttpException {
 		
 	    CloseableHttpClient client = HttpClients.createDefault();
 	    
@@ -167,10 +167,10 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    unsortedResponseMap.entrySet().stream().sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
 	        .forEachOrdered(x -> sortedResponseMap.put(x.getKey(), x.getValue()));
 
-	    List<Topic> result = new ArrayList<>();
+	    List<TopicImpl> result = new ArrayList<>();
 	    Set<String> topicIdsKeys = sortedResponseMap.keySet();
 	    for(String topicId : topicIdsKeys) {
-			Topic dbtopicEntity = persistentTopicService.getById(Integer.valueOf(topicId)+1);
+			TopicImpl dbtopicEntity = persistentTopicService.getById(Integer.valueOf(topicId)+1);
 			if (dbtopicEntity != null) {
 				updateTopicForSerialization(dbtopicEntity);
 				dbtopicEntity.setScore(sortedResponseMap.get(topicId));
@@ -184,8 +184,8 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	}
 
 	@Override
-	public Topic deleteTopic(long topicId) {
-		Topic dbtopicEntity = persistentTopicService.getById(topicId);
+	public TopicImpl deleteTopic(long topicId) {
+		TopicImpl dbtopicEntity = persistentTopicService.getById(topicId);
 		if (dbtopicEntity == null)
 			return null;
 				
@@ -212,7 +212,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    long totalInCollection = solrResults.getNumFound();
 	    
 	    //validate the page number
-	    if(totalInCollection-pageSize*currentPageNum<=0) {
+	    if(totalInCollection>0 && totalInCollection-pageSize*currentPageNum<=0) {
 	    	throw new HttpException(null, "Invalid combination of the " + CommonApiConstants.QUERY_PARAM_PAGE + " and " +
 	    			CommonApiConstants.QUERY_PARAM_PAGE_SIZE + " parameters (out of range).", null, HttpStatus.BAD_REQUEST);
 	    }    
@@ -250,6 +250,9 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    	counter++;
 	    }
 	    long lastPageNum = totalInCollection/pageSize + (totalInCollection%pageSize>0 ? 1 : 0) - 1;
+	    if(lastPageNum<0) {
+	    	lastPageNum=0;
+	    }
 	    String firstPage = wholePageUrlWithoutPageAndPageSize + "&" + CommonApiConstants.QUERY_PARAM_PAGE + "=0"
 	    		+ "&" + CommonApiConstants.QUERY_PARAM_PAGE_SIZE + "=" + pageSize;
 	    String lastPage = wholePageUrlWithoutPageAndPageSize + "&" + CommonApiConstants.QUERY_PARAM_PAGE + "=" + lastPageNum
@@ -281,14 +284,14 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		    ((TopicIdsResultPage)resPage).setItems(solrTopicsIds);
 	    }
 	    else if(LdProfile.STANDARD.equals(profile)) {
-	    	List<Topic> dbTopics = new ArrayList<>();
+	    	List<TopicImpl> dbTopics = new ArrayList<>();
 	    	if(solrResults.size()>0) {
 				DocumentObjectBinder binder = new DocumentObjectBinder();
 			    Iterator<SolrDocument> iteratorSolrDocs = solrResults.iterator();
 			    while (iteratorSolrDocs.hasNext()) {
 			    	SolrDocument doc = iteratorSolrDocs.next();
 			    	SolrTopicEntityImpl solrTopic = (SolrTopicEntityImpl) binder.getBean(SolrTopicEntityImpl.class, doc);
-					Topic dbtopicEntity = persistentTopicService.getById(solrTopic.getId());
+					TopicImpl dbtopicEntity = persistentTopicService.getById(solrTopic.getId());
 					if (dbtopicEntity != null) {
 						updateTopicForSerialization(dbtopicEntity);
 				    	dbTopics.add(dbtopicEntity);
@@ -321,7 +324,7 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 	    resPage.setNextPageUri(nextPage);		
 	}
 	
-	public void updateTopicForSerialization (Topic topic) {
+	public void updateTopicForSerialization (TopicImpl topic) {
 		topic.setUrlId(config.getEnrichApiEndpoint() + "/topic/" + topic.getId());
 		topic.getModel().setId(config.getEnrichApiEndpoint() + "/model/" + topic.getModel().getIdentifier());
 	}

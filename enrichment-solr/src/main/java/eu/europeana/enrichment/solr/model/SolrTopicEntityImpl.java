@@ -10,12 +10,11 @@ import org.apache.solr.client.solrj.beans.Field;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.definitions.model.Term;
-import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.TermImpl;
 import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.solr.model.vocabulary.EntitySolrFields;
 
-public class SolrTopicEntityImpl extends TopicImpl implements Topic {
+public class SolrTopicEntityImpl extends TopicImpl {
 	
 	public SolrTopicEntityImpl() {
 		super();
@@ -27,7 +26,7 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	@Field(EnrichmentConstants.TOPIC_KEYWORDS)
 	private List<String> solrKeywords;
 	
-	public SolrTopicEntityImpl(Topic copy)
+	public SolrTopicEntityImpl(TopicImpl copy)
 	{
 		this.setIdentifier(copy.getIdentifier());
 		this.setId(copy.getId());
@@ -82,9 +81,9 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	}
 	
 	@Override
-	public void setTerms(List<Term> terms) {
+	public void setTerms(List<TermImpl> terms) {
 		this.solrTerms = new ArrayList<String>();
-		for (Term te: terms)
+		for (TermImpl te: terms)
 		{
 			for (int i = 0; i<te.getScore();i++) {
 				String solrTerm = te.getTerm();
@@ -95,9 +94,9 @@ public class SolrTopicEntityImpl extends TopicImpl implements Topic {
 	}
 
 	@Override
-	public void setKeywords(List<Term> keywords) {
+	public void setKeywords(List<TermImpl> keywords) {
 		this.solrKeywords = new ArrayList<String>();
-		for (Term te : keywords)
+		for (TermImpl te : keywords)
 		{
 			for (int i=0;i<te.getScore();i++) {
 				String solrTerm = te.getTerm();

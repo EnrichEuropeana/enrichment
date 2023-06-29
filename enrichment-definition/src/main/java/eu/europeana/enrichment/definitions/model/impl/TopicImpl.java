@@ -20,9 +20,6 @@ import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexed;
 import dev.morphia.annotations.Transient;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.definitions.model.Term;
-import eu.europeana.enrichment.definitions.model.Topic;
-import eu.europeana.enrichment.definitions.model.TopicModel;
 import eu.europeana.enrichment.definitions.model.utils.TopicTermsDeserializer;
 
 @JsonPropertyOrder({
@@ -40,7 +37,7 @@ import eu.europeana.enrichment.definitions.model.utils.TopicTermsDeserializer;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @Entity(value="TopicEntity")
-public class TopicImpl implements Topic {
+public class TopicImpl {
 	
 	//id will be used for storing MongoDB _id
 	@Id
@@ -52,7 +49,7 @@ public class TopicImpl implements Topic {
 	private String modelId;	
 	
 	@JsonProperty(EnrichmentConstants.TOPIC_MODEL)
-	private TopicModel model;
+	private TopicModelImpl model;
 	
 	// <{baseurl}/topic/1>
 	@JsonIgnore
@@ -76,11 +73,11 @@ public class TopicImpl implements Topic {
 	
 	@JsonDeserialize(using=TopicTermsDeserializer.class)
 	@JsonProperty(EnrichmentConstants.TOPIC_TERMS)
-	private List<Term> terms;
+	private List<TermImpl> terms;
 	
 	@JsonDeserialize(using=TopicTermsDeserializer.class)
 	@JsonProperty(EnrichmentConstants.TOPIC_KEYWORDS)
-	private List<Term> keywords;
+	private List<TermImpl> keywords;
 	
 	@JsonProperty(EnrichmentConstants.TOPIC_CREATED)
 	private Date created;
@@ -96,99 +93,80 @@ public class TopicImpl implements Topic {
 		
 	}
 
-	@Override
 	public long getId() {
 		return this.id;
 	}
 
-	@Override
 	public void setId(long id) {
 		this.id = id;
 
 	}
 
-	@Override
 	public String getIdentifier() {
 		return this.identifier;
 	}
 
-	@Override
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
 
 	}
 
-	@Override
 	public List<String> getLabels() {
 		return this.labels;
 	}
 
-	@Override
 	public void setLabels(List<String> label) {
 		this.labels = label;
 	}
 
-	@Override
 	public Map<String, String> getDescriptions() {
 		return this.descriptions;
 	}
 
-	@Override
 	public void setDescriptions(Map<String, String> descr) {
 		this.descriptions = descr;
 	}
 
-	@Override
-	public List<Term> getTerms() {
+	public List<TermImpl> getTerms() {
 		return this.terms;
 	}
 
-	@Override
-	public void setTerms(List<Term> terms) {
+	public void setTerms(List<TermImpl> terms) {
 		this.terms = terms;
 	}
 
-	@Override
-	public List<Term> getKeywords() {
+	public List<TermImpl> getKeywords() {
 		return this.keywords;
 	}
 
-	@Override
-	public void setKeywords(List<Term> keywords) {
+	public void setKeywords(List<TermImpl> keywords) {
 		this.keywords = keywords;
 	}
 
-	@Override
-	public TopicModel getModel() {
+	public TopicModelImpl getModel() {
 		return this.model;
 	}
 
-	@Override
-	public void setModel(TopicModel model) {
+	public void setModel(TopicModelImpl model) {
 		this.model = model;
 	}
 
-	@Override
 	public Date getCreated() {
 		return this.created;
 	}
 
-	@Override
 	public Date getModified() {
 		return this.modified;
 	}
 
-	@Override
 	public void setCreated(Date date) {
 		this.created = date;
 	}
 
-	@Override
 	public void setModified(Date date) {
 		this.modified = date;
 	}
 
-	@Override
 	public String getModelId() {
 		return modelId;
 	}
@@ -210,7 +188,6 @@ public class TopicImpl implements Topic {
 		return  Objects.equals(identifier, other.identifier);
 	}
 
-	@Override
 	public void setModelId(String modelId) {
 		if (model != null)
 			this.modelId = this.model.getIdentifier();
