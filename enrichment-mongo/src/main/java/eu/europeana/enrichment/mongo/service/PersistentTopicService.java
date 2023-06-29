@@ -2,23 +2,23 @@ package eu.europeana.enrichment.mongo.service;
 
 import java.util.List;
 
-import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 
 public interface PersistentTopicService {
 	
-	public void save(Topic topicEntity);
+	public void save(TopicImpl topicEntity);
 
-	public Topic getByIdentifier(String topicIdentifier);
+	public TopicImpl getByIdentifier(String topicIdentifier);
 
-	public void update(Topic dbtopicEntity);
+	public void update(TopicImpl dbtopicEntity);
 
-	public void delete(Topic dbtopiEntity);
+	public void delete(TopicImpl dbtopiEntity);
 
-	public List<Topic> getByModelIdentifier(String modelIdentif);
+	public List<TopicImpl> getByModelIdentifier(String modelIdentif);
 
-	public List<Topic> getAll();
+	public List<TopicImpl> getAll();
 
-	Topic getById(long topicId);
+	TopicImpl getById(long topicId);
 	
 	public long generateAutoIncrement(String entityType);
 

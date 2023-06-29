@@ -32,7 +32,6 @@ import eu.europeana.api.commons.web.http.HttpHeaders;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
-import eu.europeana.enrichment.definitions.model.Topic;
 import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.LdProfile;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
@@ -70,7 +69,7 @@ public class TopicController extends BaseRest{
 	{
 		verifyWriteAccess(Operations.CREATE, request);
 
-		List<Topic> result = new ArrayList<>();
+		List<TopicImpl> result = new ArrayList<>();
 		for(TopicImpl topic : topics) {
 			// check mandatory fields
 			if (topic.getIdentifier()==null || topic.getIdentifier().isBlank())
@@ -84,7 +83,7 @@ public class TopicController extends BaseRest{
 			Date date = new Date();
 			topic.setCreated(date);
 			
-			Topic createdTopic = enrichmentTopicService.createTopic(topic);
+			TopicImpl createdTopic = enrichmentTopicService.createTopic(topic);
 			
 			enrichmentTopicService.updateTopicForSerialization(createdTopic);
 			
@@ -124,7 +123,7 @@ public class TopicController extends BaseRest{
 		
 		Date date = new Date();
 		topic.setModified(date);
-		Topic topicEntity = enrichmentTopicService.updateTopic(topicId, topic);
+		TopicImpl topicEntity = enrichmentTopicService.updateTopic(topicId, topic);
 
 		if (topicEntity == null)
 			throw new HttpException(null, "The required topic does not exist. Invalid topic id.", null, HttpStatus.NOT_FOUND);
@@ -161,7 +160,7 @@ public class TopicController extends BaseRest{
 		verifyReadAccess(request);
 		
 		Date date = new Date();
-		List<Topic> result = enrichmentTopicService.detectTopics(text, topics);
+		List<TopicImpl> result = enrichmentTopicService.detectTopics(text, topics);
 
 		String etag = generateETag(date, WebFields.JSON_LD_REST);
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>(5);
@@ -189,7 +188,7 @@ public class TopicController extends BaseRest{
 	{
 		verifyWriteAccess(Operations.DELETE, request);
 	
-		Topic topicEntity = enrichmentTopicService.deleteTopic(topicId);
+		TopicImpl topicEntity = enrichmentTopicService.deleteTopic(topicId);
 		
 		if (topicEntity == null)
 			throw new HttpException(null, "The topic to be deleted does not exist.", null, HttpStatus.UNPROCESSABLE_ENTITY);

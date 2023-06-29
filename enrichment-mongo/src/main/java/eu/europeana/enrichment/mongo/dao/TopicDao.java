@@ -2,21 +2,21 @@ package eu.europeana.enrichment.mongo.dao;
 
 import java.util.List;
 
-import eu.europeana.enrichment.definitions.model.Topic;
+import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 
 public interface TopicDao {
 	
-	public void save (Topic topicEntity);
+	public void save (TopicImpl topicEntity);
 
-	public Topic getByIdentifier(String identifier);
+	public TopicImpl getByIdentifier(String identifier);
 
-	public void delete(Topic dbtopicEntity);
+	public void delete(TopicImpl dbtopicEntity);
 
-	public List<Topic> getByModelIdentifier(String modelIdentifier);
+	public List<TopicImpl> getByModelIdentifier(String modelIdentifier);
 
-	public List<Topic> getAll();
+	public List<TopicImpl> getAll();
 
-	Topic getByTopicId(long topicId);
+	TopicImpl getByTopicId(long topicId);
 	
 	public long generateAutoIncrement(String internalType);
 

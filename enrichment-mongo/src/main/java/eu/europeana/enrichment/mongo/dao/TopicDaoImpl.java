@@ -13,7 +13,6 @@ import dev.morphia.Datastore;
 import dev.morphia.query.experimental.updates.UpdateOperators;
 import dev.morphia.query.internal.MorphiaCursor;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.definitions.model.Topic;
 import eu.europeana.enrichment.definitions.model.impl.SequenceGenerator;
 import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 import eu.europeana.enrichment.mongo.utils.MorphiaUtils;
@@ -26,12 +25,12 @@ public class TopicDaoImpl implements TopicDao{
 	private Datastore enrichmentDatastore;
 	
 	@Override
-	public void save(Topic topicEntity) {
+	public void save(TopicImpl topicEntity) {
 		this.enrichmentDatastore.save(topicEntity);
 	}
 
 	@Override
-	public Topic getByTopicId(long topicId) {
+	public TopicImpl getByTopicId(long topicId) {
 		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
                 eq(EnrichmentConstants.TOPIC_ID, topicId)
                 )
@@ -40,7 +39,7 @@ public class TopicDaoImpl implements TopicDao{
 	}
 
 	@Override
-	public Topic getByIdentifier(String identifier) {
+	public TopicImpl getByIdentifier(String identifier) {
 		TopicImpl dbEntity = enrichmentDatastore.find(TopicImpl.class).filter(
                 eq(EnrichmentConstants.TOPIC_IDENTIFIER, identifier)
                 )
@@ -49,9 +48,9 @@ public class TopicDaoImpl implements TopicDao{
 	}
 	
 	@Override
-	public List<Topic> getAll() {
+	public List<TopicImpl> getAll() {
 		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class).iterator();
-		List<Topic> result = new ArrayList<>();
+		List<TopicImpl> result = new ArrayList<>();
 		while (iter.hasNext())
 		{
 			result.add(iter.next());
@@ -61,16 +60,16 @@ public class TopicDaoImpl implements TopicDao{
 
 
 	@Override
-	public void delete(Topic dbtopicEntity) {
+	public void delete(TopicImpl dbtopicEntity) {
 		enrichmentDatastore.delete(dbtopicEntity);
 	}
 
 	@Override
-	public List<Topic> getByModelIdentifier(String modelIdentifier) {
+	public List<TopicImpl> getByModelIdentifier(String modelIdentifier) {
 		MorphiaCursor<TopicImpl> iter = enrichmentDatastore.find(TopicImpl.class)
 				.filter(eq(EnrichmentConstants.TOPIC_MODEL + "." + EnrichmentConstants.TOPIC_MODEL_IDENTIFIER, modelIdentifier))
 				.iterator();
-		List<Topic> list = new ArrayList<Topic>();
+		List<TopicImpl> list = new ArrayList<>();
 		while (iter.hasNext())
 		{
 			list.add(iter.next());

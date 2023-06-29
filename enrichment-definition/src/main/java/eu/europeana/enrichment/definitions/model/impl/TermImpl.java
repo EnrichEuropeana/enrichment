@@ -2,12 +2,13 @@ package eu.europeana.enrichment.definitions.model.impl;
 
 import java.util.Objects;
 
+import dev.morphia.annotations.Embedded;
 import eu.europeana.enrichment.definitions.exceptions.UnsupportedRangeTermEntityException;
-import eu.europeana.enrichment.definitions.model.Term;
 
 //@Entity(value="TermEntityImpl")
 //@Embedded
-public class TermImpl implements Term {
+@Embedded
+public class TermImpl {
 	
 	// must be UTF-8 aware to allow special chars
 	private String term;
@@ -52,39 +53,32 @@ public class TermImpl implements Term {
 				&& Objects.equals(term, other.term);
 	}
 
-	@Override
 	public String getTerm() {
 		return term;
 	}
 
-	@Override
 	public void setTerm(String term) {
 		this.term = term;
 
 	}
 
-	@Override
 	public Double getScore() {
 		return this.score;
 	}
 
-	@Override
 	public void setScore(Double score) throws UnsupportedRangeTermEntityException {
 //		if (!(0<=score.intValue() && score.intValue()<=100))
 //			throw new UnsupportedRangeTermEntityException("Score not in [0,100]");
 		this.score = score;
 	}
 
-	@Override
 	public Integer getRank() {
 		return rank;
 	}
 
-	@Override
 	public void setRank(Integer rank) throws UnsupportedRangeTermEntityException {
 //		if (!(1<=rank.intValue() && rank.intValue()<=250))
 //			throw new UnsupportedRangeTermEntityException("Range not in [1,250]");
 		this.rank = rank;
 	}
-
 }
