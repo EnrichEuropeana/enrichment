@@ -174,8 +174,8 @@ public class NamedEntityDaoImpl implements NamedEntityDao {
 	}
 
 	@Override
-	public void saveNamedEntity(NamedEntityImpl entity) {
-		this.enrichmentDatastore.save(entity);
+	public NamedEntityImpl saveNamedEntity(NamedEntityImpl entity) {
+		return this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

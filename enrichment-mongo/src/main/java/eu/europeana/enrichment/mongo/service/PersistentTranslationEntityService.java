@@ -20,7 +20,7 @@ public interface PersistentTranslationEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveTranslationEntity(TranslationEntityImpl entity);
+	public TranslationEntityImpl saveTranslationEntity(TranslationEntityImpl entity);
 	/*
 	 * This method saves and updates a list of translation entries into the Mongo database
 	 * 

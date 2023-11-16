@@ -7,7 +7,7 @@ import eu.europeana.enrichment.definitions.model.impl.NamedEntityAnnotationImpl;
 public interface PersistentNamedEntityAnnotationService {
 
 	public List<NamedEntityAnnotationImpl> findAnnotations(String storyId, String itemId, String property, String wikidataId, List<String> linkedByNerTools);
-	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity);	
+	public NamedEntityAnnotationImpl saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity);	
 	public void deleteNamedEntityAnnotation(String storyId,String itemId, String property, String wikidataId);
 
 	

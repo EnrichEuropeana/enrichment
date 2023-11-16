@@ -132,8 +132,12 @@ public class EnrichmentConstants {
 	public static final String STORY_ITEM_DESCRIPTION = "description";
 	public static final String LANGUAGE_DESCRIPTION = "languageDescription";
 	public static final String STORY_ITEM_TRANSCRIPTION = "transcription";
+	public static final String ITEM_HTR_TRANSCRIPTION = "htrdataTranscription";
+	public static final String ITEM_HTRDATA = "htrdata";
 	public static final String LANGUAGE_TRANSCRIPTION = "languageTranscription";
 	public static final String TRANSCRIPTION_LANGUAGES = "transcriptionLanguages";
+	public static final String ITEM_HTR_TRANSCRIPTION_LANGUAGES = "htrdataTranscriptionLangs";
+	
 	public static final String STORY_ITEM_SUMMARY = "summary";
 	public static final String LANGUAGE_SUMMARY = "languageSummary";
 	public static final String TITLE = "title";

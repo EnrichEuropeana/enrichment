@@ -66,7 +66,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 		String sourceLanguage = null;
 		if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(story.getTranscriptionText())) {
 			textToTranslate = story.getTranscriptionText();
-			sourceLanguage = ModelUtils.getMainTranslationLanguage(story);
+			sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(story.getTranscriptionLanguages());
 		}
 		else if(EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type) && !StringUtils.isBlank(story.getDescription())) {
 			textToTranslate = story.getDescription();
@@ -103,8 +103,17 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 			return dbTranslationEntity.get(0).getTranslatedText();
 		}						
 
-		String textToTranslate = item.getTranscriptionText();
-		String sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item);
+		String textToTranslate = null;
+		String sourceLanguage = null;
+		if(EnrichmentConstants.ITEM_HTRDATA.equalsIgnoreCase(property) && !StringUtils.isBlank(item.getHtrdataTranscription())) {
+			textToTranslate = item.getHtrdataTranscription();
+			sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getHtrdataTranscriptionLangs());
+		}
+		else if(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(property) && !StringUtils.isBlank(item.getTranscriptionText())) {
+			textToTranslate = item.getTranscriptionText();
+			sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getTranscriptionLanguages());
+		}
+
 		if(StringUtils.isBlank(textToTranslate))
 		{
 			logger.debug("The text of the item to be translated is empty!");
@@ -166,8 +175,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 				throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);
 			}
 
-			persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
-			return tmpTranslationEntity;
+			return persistentTranslationEntityService.saveTranslationEntity(tmpTranslationEntity);
 			/*
 			 * Check English word ratio based on sentences
 			 */

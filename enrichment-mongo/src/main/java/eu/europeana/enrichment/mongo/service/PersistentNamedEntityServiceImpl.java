@@ -41,8 +41,8 @@ public class PersistentNamedEntityServiceImpl implements PersistentNamedEntitySe
 		return namedEntityDao.get_N_NamedEntities(limit, skip);
 	}
 	
-	public void saveNamedEntity(NamedEntityImpl entity) {
-		namedEntityDao.saveNamedEntity(entity);
+	public NamedEntityImpl saveNamedEntity(NamedEntityImpl entity) {
+		return namedEntityDao.saveNamedEntity(entity);
 	}
 	
 	public void saveNamedEntities(List<NamedEntityImpl> entities) {

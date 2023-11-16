@@ -19,6 +19,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -26,6 +27,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -40,14 +42,20 @@ public class HelperFunctions {
 	 * @throws ClientProtocolException 
 	 */
 	
-	public static String createHttpRequest(String content, String baseUrl) throws ClientProtocolException, IOException {
+	public static String createHttpRequest(String content, String baseUrl, Map<String, String> headers) throws ClientProtocolException, IOException {
 //			CredentialsProvider credsProvider = new BasicCredentialsProvider();
 //		    credsProvider.setCredentials(AuthScope.ANY,
 //		      new UsernamePasswordCredentials(credentialUsername, credentialPwd));
 //			CloseableHttpClient httpClient = HttpClientBuilder.create()
 //					.setDefaultCredentialsProvider(credsProvider).build();
 
-		CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+		List<Header> defaultHeaders = new ArrayList<Header>();
+		if(headers!=null) {
+			for (Map.Entry<String, String> headerEntry : headers.entrySet()) {
+				defaultHeaders.add(new BasicHeader(headerEntry.getKey(), headerEntry.getValue()));
+		    }
+		}
+		CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultHeaders(defaultHeaders).build();
 
 		HttpResponse result;
 		if(content!=null && !content.isEmpty())
@@ -64,6 +72,10 @@ public class HelperFunctions {
 			result = httpClient.execute(request);
 		}
 
+		if(result.getEntity()==null) {
+			return null;
+		}
+		
 		return EntityUtils.toString(result.getEntity(), "UTF-8");
 	}
 

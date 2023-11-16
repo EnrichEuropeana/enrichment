@@ -56,7 +56,7 @@ public class ImportStoriesFromTranscribathonDataset {
 		String URLStoriesMinimal = "https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal?DatasetId=";
 		String URLStoriesComplete = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
 		String URLItemTranscription = "https://europeana.fresenia.man.poznan.pl/tp-api/transcriptions?ItemId=";
-		String responseDatasets = HelperFunctions.createHttpRequest(null, URLDataset);
+		String responseDatasets = HelperFunctions.createHttpRequest(null, URLDataset, null);
 		assertNotNull(responseDatasets);
 		
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -70,14 +70,14 @@ public class ImportStoriesFromTranscribathonDataset {
             }
         }
 		
-		String responseStoriesMinimal = HelperFunctions.createHttpRequest(null, URLStoriesMinimal+datasetId);
+		String responseStoriesMinimal = HelperFunctions.createHttpRequest(null, URLStoriesMinimal+datasetId, null);
 
 		List<Story> listStoriesMinimal = objectMapper.readValue(responseStoriesMinimal, new TypeReference<List<Story>>(){});
 		if(listStoriesMinimal==null || listStoriesMinimal.isEmpty()) return;
 		
 		for (Story minimalStory : listStoriesMinimal) {
 
-			String responseStoriesComplete = HelperFunctions.createHttpRequest(null, URLStoriesComplete+minimalStory.StoryId.toString());
+			String responseStoriesComplete = HelperFunctions.createHttpRequest(null, URLStoriesComplete+minimalStory.StoryId.toString(), null);
 
 			List<Story> listStoriesComplete = objectMapper.readValue(responseStoriesComplete, new TypeReference<List<Story>>(){});
 
@@ -87,7 +87,7 @@ public class ImportStoriesFromTranscribathonDataset {
 			String storyTranscription = "";
 			for(Item item : storyItems) {
 				
-				String responseItemTranscription = HelperFunctions.createHttpRequest(null, URLItemTranscription+item.ItemId.toString());
+				String responseItemTranscription = HelperFunctions.createHttpRequest(null, URLItemTranscription+item.ItemId.toString(), null);
 				List<Transcription> listItemTranscription = objectMapper.readValue(responseItemTranscription, new TypeReference<List<Transcription>>(){});
 				if(listItemTranscription!=null && listItemTranscription.size()>0) {
 					storyTranscription+=listItemTranscription.get(0).Text;

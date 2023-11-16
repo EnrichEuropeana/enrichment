@@ -35,8 +35,8 @@ public class PersistentItemEntityServiceImpl implements PersistentItemEntityServ
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntityImpl entity) {
-		itemEntityDao.saveItemEntity(entity);
+	public ItemEntityImpl saveItemEntity(ItemEntityImpl entity) {
+		return itemEntityDao.saveItemEntity(entity);
 	}
 
 	@Override
