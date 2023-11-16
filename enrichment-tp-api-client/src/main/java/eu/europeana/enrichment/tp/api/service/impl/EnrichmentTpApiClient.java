@@ -6,9 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +28,7 @@ import eu.europeana.enrichment.tp.api.client.model.Item;
 import eu.europeana.enrichment.tp.api.client.model.Language;
 import eu.europeana.enrichment.tp.api.client.model.Story;
 import eu.europeana.enrichment.tp.api.client.model.Transcription;
+import eu.europeana.enrichment.tp.api.utils.XsltXmlParser;
 
 @Service
 public class EnrichmentTpApiClient {
@@ -43,7 +48,7 @@ public class EnrichmentTpApiClient {
 		}
 	}
 
-	public ItemEntityImpl getItemFromTranscribathon(String itemId) throws ClientProtocolException, IOException {
+	public ItemEntityImpl getItemFromTranscribathon(String itemId) throws ClientProtocolException, IOException, TransformerException {
 		Item tpItem = getTranscribathonItem(itemId);
 		if(tpItem!=null) {
 			return convertTranscribathonItemToLocalItem(tpItem);
@@ -69,7 +74,7 @@ public class EnrichmentTpApiClient {
 	}
 
 	private Story getTranscribathonMinimalStory(String storyId) throws ClientProtocolException, IOException {
-		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStoriesMinimal() + storyId);
+		String storyMinimalResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStoriesMinimal() + storyId, null);
 		if(storyMinimalResponse==null) {
 			return null;
 		}
@@ -85,16 +90,34 @@ public class EnrichmentTpApiClient {
 	}
 	
 	private Item getTranscribathonItem(String itemId) throws ClientProtocolException, IOException {
-		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId);
+		String response = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlItems() + itemId, null);
 		if(response==null) {
 			return null;
 		}
 		ObjectMapper objectMapper = new ObjectMapper();
 		return objectMapper.readValue(response, new TypeReference<Item>(){});
 	}
+	
+	/**
+	 * Returns a json string.
+	 * @param itemId
+	 * @return
+	 * @throws ClientProtocolException
+	 * @throws IOException
+	 * @throws TransformerException
+	 */
+	private String getHtrdataItemTranscription(String itemId) throws ClientProtocolException, IOException, TransformerException {
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("Authorization", configuration.getHtrdataItemsAuthorization());
+		String htrdataResp = HelperFunctions.createHttpRequest(null, configuration.getHtrdataItemsBaseUrl() + itemId + configuration.getHtrdataItemsSuffix(), headers);
+		if(htrdataResp==null) {
+			return null;
+		}
+		return htrdataResp;
+	}
 
 	private Story getTranscribathonFullStory(String storyId) throws ClientProtocolException, IOException {
-		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId);
+		String storyFullResponse = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonBaseUrlStories() + storyId, null);
 		if(storyFullResponse==null) {
 			return null;
 		}
@@ -131,24 +154,41 @@ public class EnrichmentTpApiClient {
 		return newStory;
 	}
 
-	private ItemEntityImpl convertTranscribathonItemToLocalItem (Item item) {
-		if(item.Transcriptions==null) return null;
+	private ItemEntityImpl convertTranscribathonItemToLocalItem (Item item) throws ClientProtocolException, IOException, TransformerException {
 		ItemEntityImpl newItem = new ItemEntityImpl();
-		boolean foundTranscription = false;
-		for (Transcription trElem : item.Transcriptions) {
-			if(trElem.TextNoTags!=null && !trElem.TextNoTags.isBlank())
-			{
-				newItem.setTranscriptionText(trElem.TextNoTags);
-				newItem.setTranscriptionLanguages(getLanguages(trElem.Languages));
-				foundTranscription = true;
-				break;
+		if(item.Transcriptions!=null) {
+			for (Transcription trElem : item.Transcriptions) {
+				if(trElem.TextNoTags!=null && !trElem.TextNoTags.isBlank())
+				{
+					newItem.setTranscriptionText(trElem.TextNoTags);
+					if(trElem.Languages!=null) {
+						newItem.setTranscriptionLanguages(getLanguages(trElem.Languages));
+					}
+					break;
+				}
 			}
 		}
-		if(!foundTranscription) return null;
-
 		newItem.setItemId(String.valueOf(item.ItemId));
 		newItem.setStoryId(String.valueOf(item.StoryId));
 		newItem.setTitle(item.Title);
+
+		//update the htrdata data, i.e. fetch it from the remote url
+		String htrdataResp = getHtrdataItemTranscription(String.valueOf(item.ItemId));
+		if(htrdataResp!=null) {
+			JSONObject htrdataRespJson = new JSONObject(htrdataResp);
+			//check the response is right -> "success": true 
+			if(htrdataRespJson.getBoolean("success")) {
+				String pageXml = htrdataRespJson.getJSONObject("data").getString("TranscriptionData");
+				String htrdataTranscr = XsltXmlParser.transfromXmlToString(configuration.getHtrdataItemsXslFile(), pageXml);
+				List<String> htrdataTranscrLangs = new ArrayList<String>();
+				JSONArray langsJson = htrdataRespJson.getJSONObject("data").getJSONArray("Language");
+				for(int i=0; i<langsJson.length(); i++) {
+					htrdataTranscrLangs.add(langsJson.getJSONObject(i).getString("Code"));
+				}
+				newItem.setHtrdataTranscription(htrdataTranscr);
+				newItem.setHtrdataTranscriptionLangs(htrdataTranscrLangs);
+			}
+		}
 
 		return newItem;
 	}

@@ -14,10 +14,12 @@ public class SolrItemEntityImpl extends ItemEntityImpl {
 		this.setStoryId(copy.getStoryId());
 		this.setItemId(copy.getItemId());
 		this.setTranscriptionText(copy.getTranscriptionText());
+		this.setHtrdataTranscription(copy.getHtrdataTranscription());
 		this.setSource(copy.getSource());
 		this.setTitle(copy.getTitle());
 		if (copy.getKeywords()!=null) this.setKeywords(new ArrayList<>(copy.getKeywords()));
 		if (copy.getTranscriptionLanguages()!=null) this.setTranscriptionLanguages(new ArrayList<>(copy.getTranscriptionLanguages()));
+		if (copy.getHtrdataTranscriptionLangs()!=null) this.setHtrdataTranscriptionLangs(new ArrayList<>(copy.getHtrdataTranscriptionLangs()));
 	}
 
 	@Override
@@ -38,6 +40,12 @@ public class SolrItemEntityImpl extends ItemEntityImpl {
 	public void setTranscriptionLanguages(List<String> transcriptionLanguages) {
 		super.setTranscriptionLanguages(transcriptionLanguages);
 	}
+	
+	@Override
+	@Field(ItemEntitySolrFields.HTR_TRANSCRIPTION_LANGUAGES)
+	public void setHtrdataTranscriptionLangs(List<String> htrTranscrLangs) {
+		super.setHtrdataTranscriptionLangs(htrTranscrLangs);
+	}
 
 	@Override
 	@Field(ItemEntitySolrFields.KEYWORDS)
@@ -49,6 +57,12 @@ public class SolrItemEntityImpl extends ItemEntityImpl {
 	@Field(ItemEntitySolrFields.TRANSCRIPTION)
 	public void setTranscriptionText(String text) {
 		super.setTranscriptionText(text);
+	}
+	
+	@Override
+	@Field(ItemEntitySolrFields.HTR_TRANSCRIPTION)
+	public void setHtrdataTranscription(String htrTranscrText) {
+		super.setHtrdataTranscription(htrTranscrText);
 	}
 	
 	@Override

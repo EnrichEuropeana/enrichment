@@ -29,8 +29,8 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
 	}
 
 	@Override
-	public void saveTranslationEntity(TranslationEntityImpl entity) {
-		translationEntityDao.saveTranslationEntity(entity);
+	public TranslationEntityImpl saveTranslationEntity(TranslationEntityImpl entity) {
+		return translationEntityDao.saveTranslationEntity(entity);
 	}
 
 	@Override

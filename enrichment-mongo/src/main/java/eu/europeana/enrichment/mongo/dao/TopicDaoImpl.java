@@ -25,8 +25,8 @@ public class TopicDaoImpl implements TopicDao{
 	private Datastore enrichmentDatastore;
 	
 	@Override
-	public void save(TopicImpl topicEntity) {
-		this.enrichmentDatastore.save(topicEntity);
+	public TopicImpl save(TopicImpl topicEntity) {
+		return this.enrichmentDatastore.save(topicEntity);
 	}
 
 	@Override

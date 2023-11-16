@@ -56,8 +56,8 @@ public class ItemEntityDaoImpl implements ItemEntityDao{
 	}
 
 	@Override
-	public void saveItemEntity(ItemEntityImpl entity) {
-		this.enrichmentDatastore.save(entity);
+	public ItemEntityImpl saveItemEntity(ItemEntityImpl entity) {
+		return this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

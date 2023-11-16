@@ -175,7 +175,7 @@ public class NERController extends BaseRest {
 	
 		String resultJsonLd = null;
 		if(force) {
-			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, false);
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, true);
 			resultJsonLd=jsonLdSerializer.serializeObject(result);			
 		}
 		else {

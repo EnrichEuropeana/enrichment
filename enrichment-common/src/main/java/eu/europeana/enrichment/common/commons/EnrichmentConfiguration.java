@@ -162,6 +162,18 @@ public class EnrichmentConfiguration  {
 	@Value("${search.api.base.url}")
 	private String searchApiBaseUrl;
 	
+	@Value("${htrdata.items.baseUrl}")
+	private String htrdataItemsBaseUrl;
+
+	@Value("${htrdata.items.suffix}")
+	private String htrdataItemsSuffix;
+
+	@Value("${htrdata.items.authorization}")
+	private String htrdataItemsAuthorization;
+	
+	@Value("${htrdata.items.xsl.file}")
+	private String htrdataItemsXslFile;
+	
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -407,4 +419,19 @@ public class EnrichmentConfiguration  {
 		return wikidataSubclassesJuridicalPerson;
 	}
 
+	public String getHtrdataItemsBaseUrl() {
+		return htrdataItemsBaseUrl;
+	}
+
+	public String getHtrdataItemsSuffix() {
+		return htrdataItemsSuffix;
+	}
+	
+	public String getHtrdataItemsAuthorization() {
+		return htrdataItemsAuthorization;
+	}
+	
+	public String getHtrdataItemsXslFile() {
+		return htrdataItemsXslFile;
+	}
 }

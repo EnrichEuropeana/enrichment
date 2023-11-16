@@ -76,8 +76,8 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	}
 	
 	@Override
-	public void saveTranslationEntity(TranslationEntityImpl entity) {
-		this.enrichmentDatastore.save(entity);
+	public TranslationEntityImpl saveTranslationEntity(TranslationEntityImpl entity) {
+		return this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

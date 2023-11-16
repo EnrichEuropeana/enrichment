@@ -347,10 +347,10 @@ public class EnrichmentNERServiceImpl {
 			}
 		}
 		else {
-			persistentNamedEntityService.saveNamedEntity(newNamedEntity);
-			newNamedEntity.getPositionEntity().setNamedEntityId(newNamedEntity.get_id());
+			NamedEntityImpl newSavedNamedEntity = persistentNamedEntityService.saveNamedEntity(newNamedEntity);
+			newNamedEntity.getPositionEntity().setNamedEntityId(newSavedNamedEntity.get_id());
 			persistentPositionEntityService.savePositionEntity(newNamedEntity.getPositionEntity());
-			namedEntityObjectsToRecomputeLinking.add(persistentNamedEntityService.findNamedEntities(newNamedEntity.getLabel(), newNamedEntity.getType(), newNamedEntity.getDBpediaId()).get(0).get_id());
+			namedEntityObjectsToRecomputeLinking.add(newSavedNamedEntity.get_id());
 		}
 	}
 
@@ -634,8 +634,7 @@ public class EnrichmentNERServiceImpl {
 									
 			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
 					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
-			persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
-			return newAnno;
+			return persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
 		}
 		return null;
 	}

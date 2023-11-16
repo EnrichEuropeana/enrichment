@@ -70,19 +70,20 @@ public abstract class BaseRest  extends BaseRestController{
     	return enrichmentAuthorizationService;
     }
     
-	protected void validateBaseParamsForNEROrTranslation(String storyId, String itemId, String type, boolean validateItem) throws ParamValidationException {
+	protected void validateBaseParamsForNEROrTranslation(String storyId, String itemId, String property, boolean validateItem) throws ParamValidationException {
 		if(StringUtils.isBlank(storyId))
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ID, null);
 		if(validateItem) {
 			if(StringUtils.isBlank(itemId))
 				throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentTranslationRequest.PARAM_STORY_ITEM_ID, null);
 		}
-		if(!(type.equals(EnrichmentConstants.STORY_ITEM_SUMMARY) || type.equals(EnrichmentConstants.STORY_ITEM_DESCRIPTION) || type.equals(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION)))
-			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TYPE, type);	
+		if(!(property.equals(EnrichmentConstants.STORY_ITEM_SUMMARY) || property.equals(EnrichmentConstants.STORY_ITEM_DESCRIPTION) 
+				|| property.equals(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION) || property.equals(EnrichmentConstants.ITEM_HTRDATA)))
+			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TYPE, property);	
 	}
 
-	protected void validateTranslationParams(String storyId, String itemId, String translationTool, String type, boolean validateItem) throws ParamValidationException {
-		validateBaseParamsForNEROrTranslation(storyId, itemId, type, validateItem);
+	protected void validateTranslationParams(String storyId, String itemId, String translationTool, String property, boolean validateItem) throws ParamValidationException {
+		validateBaseParamsForNEROrTranslation(storyId, itemId, property, validateItem);
 		if(! (EnrichmentConstants.defaultTranslationTool.equals(translationTool) || EnrichmentConstants.eTranslationTool.equals(translationTool) || EnrichmentConstants.deeplTranslationTool.equals(translationTool)))
 			throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE, EnrichmentTranslationRequest.PARAM_TRANSLATION_TOOL, translationTool);		
 	}
@@ -124,12 +125,14 @@ public abstract class BaseRest  extends BaseRestController{
 	protected void validateItem(ItemEntityImpl item) throws ParamValidationException {
 		if(item.getStoryId() == null)
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ID, null);
-		if(item.getTranscriptionLanguages() == null)
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TRANSCRIPTION_LANGUAGES, null);
+		if(item.getTranscriptionLanguages()==null && item.getHtrdataTranscriptionLangs()==null) {
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "(either " + EnrichmentConstants.TRANSCRIPTION_LANGUAGES + " or " + EnrichmentConstants.ITEM_HTR_TRANSCRIPTION_LANGUAGES + " should exist)", null);
+		}
 		if(item.getTitle() == null)
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TITLE, null);
-		if(item.getTranscriptionText() == null)
-			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, null);
+		if(item.getTranscriptionText()==null && item.getHtrdataTranscription()==null) {
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, "(either " + EnrichmentConstants.STORY_ITEM_TRANSCRIPTION + " or " + EnrichmentConstants.ITEM_HTR_TRANSCRIPTION + " should exist)", null);
+		}
 		if(item.getItemId() == null)
 			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.ITEM_ID, null);		
 	}
