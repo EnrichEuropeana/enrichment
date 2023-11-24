@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  springboot-docker-compose-app-container:
+    image: springboot-docker-compose-app:1
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - C:\home\ait\enrich\enrichment-logs:/home/ait/enrich/enrichment-logs
+      - C:\home\ait\enrich\translation-credentials:/home/ait/enrich/translation-credentials
+      - C:\home\ait\enrich\translation-eval:/home/ait/enrich/translation-eval
+      - C:\home\ait\enrich\wikidata:/home/ait/enrich/wikidata
+      - C:\home\ait\enrich\wikidata-types:/home/ait/enrich/wikidata-types
+      - C:\home\ait\enrich\xslt:/home/ait/enrich/xslt
+    ports:
+      - "8181:8080"
+    extra_hosts:
+      - "host.docker.internal:10.103.64.101"
+      
