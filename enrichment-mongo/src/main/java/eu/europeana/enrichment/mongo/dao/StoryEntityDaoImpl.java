@@ -33,9 +33,9 @@ public class StoryEntityDaoImpl implements StoryEntityDao{
 	}
 	
 	@Override
-	public void saveStoryEntity(StoryEntityImpl entity) {
-		if(entity==null) return;
-		this.enrichmentDatastore.save(entity);
+	public StoryEntityImpl saveStoryEntity(StoryEntityImpl entity) {
+		if(entity==null) return null;
+		return this.enrichmentDatastore.save(entity);
 	}
 
 	@Override

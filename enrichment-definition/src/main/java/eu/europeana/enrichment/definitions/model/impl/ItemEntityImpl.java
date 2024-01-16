@@ -18,7 +18,6 @@ import dev.morphia.annotations.Id;
 import dev.morphia.annotations.Index;
 import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
-import dev.morphia.annotations.Transient;
 
 @Entity(value = "ItemEntityImpl")
 @Indexes(@Index(fields = { @Field("itemId"), @Field("storyId")}, options = @IndexOptions(unique = true)))
@@ -28,8 +27,6 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	@Id
 	private ObjectId _id;
 
-	@Transient
-	private StoryEntityImpl storyEntity;
 	private String itemId;
 	private List<String> transcriptionLanguages;
 	private String type;
@@ -39,6 +36,8 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	private String title;
 	private String source;
 	private List<String> keywords;
+	private String htrdataTranscription;
+	private List<String> htrdataTranscriptionLangs;
 
 	public ItemEntityImpl(ItemEntityImpl item) {
 		Date now = new Date();
@@ -47,12 +46,14 @@ public class ItemEntityImpl extends BaseEntityImpl {
 		this.itemId = item.getItemId();
 		this.type = item.getType();
 		this.transcriptionText = item.getTranscriptionText();
+		this.htrdataTranscription = item.getHtrdataTranscription();
 		this.hashKey = item.getKey();
 		this.storyId = item.getStoryId();
 		this.title = item.getTitle();
 		this.source = item.getSource();
 		if (item.getKeywords() != null)	this.keywords = new ArrayList<>(item.getKeywords());
 		if (item.getTranscriptionLanguages()!=null) this.transcriptionLanguages = new ArrayList<>(item.getTranscriptionLanguages());
+		if (item.getHtrdataTranscriptionLangs()!=null) this.htrdataTranscriptionLangs = new ArrayList<>(item.getHtrdataTranscriptionLangs());
 	}
 	
 	public ItemEntityImpl() {
@@ -152,6 +153,8 @@ public class ItemEntityImpl extends BaseEntityImpl {
 		if(item.getTranscriptionLanguages()!=null) this.setTranscriptionLanguages(new ArrayList<>(item.getTranscriptionLanguages()));
 		this.setTranscriptionText(item.getTranscriptionText());
 		this.setType(item.getType());
+		if(item.getHtrdataTranscriptionLangs()!=null) this.setHtrdataTranscriptionLangs(new ArrayList<>(item.getHtrdataTranscriptionLangs()));
+		this.setHtrdataTranscription(item.getHtrdataTranscription());
 	}
 	
 	@Override
@@ -170,13 +173,21 @@ public class ItemEntityImpl extends BaseEntityImpl {
         if(item_new.getTranscriptionLanguages()!=null) {
         	Collections.sort(item_new.getTranscriptionLanguages());
         }
+        if(htrdataTranscriptionLangs!=null) {
+        	Collections.sort(htrdataTranscriptionLangs);
+        }
+        if(item_new.getHtrdataTranscriptionLangs()!=null) {
+        	Collections.sort(item_new.getHtrdataTranscriptionLangs());
+        }
         
         // Compare the data members and return accordingly  
         return Objects.equals(item_new.getItemId(), itemId)
         		&& Objects.equals(item_new.getSource(), source)
         		&& Objects.equals(item_new.getTitle(), title)
         		&& Objects.equals(item_new.getTranscriptionLanguages(), transcriptionLanguages)
-        		&& Objects.equals(item_new.getTranscriptionText(), transcriptionText);
+        		&& Objects.equals(item_new.getTranscriptionText(), transcriptionText)
+        		&& Objects.equals(item_new.getHtrdataTranscriptionLangs(), htrdataTranscriptionLangs)
+        		&& Objects.equals(item_new.getHtrdataTranscription(), htrdataTranscription);
     }     
     
 	@Override
@@ -195,7 +206,30 @@ public class ItemEntityImpl extends BaseEntityImpl {
         if(transcriptionText!=null) {
         	result = 31 * result + transcriptionText.hashCode();
         }
+        if(htrdataTranscriptionLangs!=null) {
+        	result = 31 * result + htrdataTranscriptionLangs.hashCode();
+        }
+        if(htrdataTranscription!=null) {
+        	result = 31 * result + htrdataTranscription.hashCode();
+        }
+
         return result;
     }
+
+	public String getHtrdataTranscription() {
+		return htrdataTranscription;
+	}
+
+	public void setHtrdataTranscription(String htrdataTranscription) {
+		this.htrdataTranscription = htrdataTranscription;
+	}
+
+	public List<String> getHtrdataTranscriptionLangs() {
+		return htrdataTranscriptionLangs;
+	}
+
+	public void setHtrdataTranscriptionLangs(List<String> htrdataTranscriptionLangs) {
+		this.htrdataTranscriptionLangs = htrdataTranscriptionLangs;
+	}
 	
 }

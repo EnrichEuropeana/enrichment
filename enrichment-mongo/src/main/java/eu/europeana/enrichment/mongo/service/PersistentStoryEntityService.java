@@ -27,7 +27,7 @@ public interface PersistentStoryEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveStoryEntity(StoryEntityImpl entity);
+	public StoryEntityImpl saveStoryEntity(StoryEntityImpl entity);
 	/*
 	 * This method saves and updates a list of story entities into the Mongo database
 	 * 

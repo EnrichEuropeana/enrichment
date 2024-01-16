@@ -26,8 +26,8 @@ public class PersistentStoryEntityServiceImpl implements PersistentStoryEntitySe
 	}
 
 	@Override
-	public void saveStoryEntity(StoryEntityImpl entity) {
-		storyEntityDao.saveStoryEntity(entity);
+	public StoryEntityImpl saveStoryEntity(StoryEntityImpl entity) {
+		return storyEntityDao.saveStoryEntity(entity);
 	}
 
 	@Override

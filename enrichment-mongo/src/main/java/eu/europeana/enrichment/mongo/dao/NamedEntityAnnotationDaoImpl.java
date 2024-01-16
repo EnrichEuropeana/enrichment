@@ -35,8 +35,8 @@ public class NamedEntityAnnotationDaoImpl implements NamedEntityAnnotationDao {
 	}
 
 	@Override
-	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
-		this.enrichmentDatastore.save(entity);
+	public NamedEntityAnnotationImpl saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
+		return this.enrichmentDatastore.save(entity);
 	}
 	
 	@Override

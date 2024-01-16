@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.definitions.model.utils;
 
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -10,18 +12,9 @@ public class ModelUtils {
 	
 	static Logger logger = LogManager.getLogger(ModelUtils.class);
 	
-	public static String getOnlyTranscriptionLanguage (ItemEntityImpl item) {
-		if(item.getTranscriptionLanguages()!=null && item.getTranscriptionLanguages().size()==1) {
-			return item.getTranscriptionLanguages().get(0);
-		}
-		else {
-			return null;
-		}
-	}
-	
-	public static String getMainTranslationLanguage (StoryEntityImpl story) {
-		if(story.getTranscriptionLanguages()!=null && story.getTranscriptionLanguages().size()==1) {
-			return story.getTranscriptionLanguages().get(0);
+	public static String getOnlyTranscriptionLanguage (List<String> transcriptionLangs) {
+		if(transcriptionLangs!=null && transcriptionLangs.size()==1) {
+			return transcriptionLangs.get(0);
 		}
 		else {
 			return null;

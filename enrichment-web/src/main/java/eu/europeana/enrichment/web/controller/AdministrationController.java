@@ -57,6 +57,7 @@ public class AdministrationController extends BaseRest {
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
    
+    String testingETranslationCallback="";
 	/*
 	 * This method represents the /administration/updateStories endpoint,
 	 * where a request with an array of StoryEntity to be updated in the database is sent.
@@ -223,11 +224,15 @@ public class AdministrationController extends BaseRest {
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
 			@RequestParam(value = "external-reference", required = false) String externalReference,
-			@RequestBody String body) throws UnsupportedEncodingException 
+			@RequestBody String body)
+			    throws UnsupportedEncodingException 
 	{
-		
-		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,body);
-		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
+		logger.info("eTranslation callback received with translated text: " + translatedTextSnippet);;
+		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,null);
+		if(requestId!=null) {
+		  testingETranslationCallback="translated-text: " + translatedTextSnippet + ";" + "body: " + body;
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>("Last received callback: " + testingETranslationCallback, HttpStatus.OK);
 		return response;
 	}
 

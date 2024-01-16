@@ -6,7 +6,7 @@ import eu.europeana.enrichment.definitions.model.impl.TopicImpl;
 
 public interface PersistentTopicService {
 	
-	public void save(TopicImpl topicEntity);
+	public TopicImpl save(TopicImpl topicEntity);
 
 	public TopicImpl getByIdentifier(String topicIdentifier);
 

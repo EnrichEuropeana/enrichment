@@ -9,7 +9,7 @@ import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
  */
 public interface StoryEntityDao {
 	public StoryEntityImpl findStoryEntity(String key);
-	public void saveStoryEntity(StoryEntityImpl entity);
+	public StoryEntityImpl saveStoryEntity(StoryEntityImpl entity);
 	public void deleteStoryEntity(StoryEntityImpl entity);
 	public long deleteStoryEntityByStoryId(String key);
 	public void updateNerToolsForStory(String storyId, String nerTool);

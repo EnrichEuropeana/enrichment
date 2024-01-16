@@ -29,7 +29,7 @@ public interface PersistentNamedEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveNamedEntity(NamedEntityImpl entity);
+	public NamedEntityImpl saveNamedEntity(NamedEntityImpl entity);
 	/*
 	 * This method saves and updates a list of named entities into the Mongo database
 	 * 

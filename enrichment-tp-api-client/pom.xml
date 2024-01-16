@@ -38,6 +38,18 @@
 		<artifactId>enrichment-definition</artifactId>
 		<version>${version.enrichmentAPI}</version>
 	</dependency>	
+	<dependency>
+		<groupId>org.json</groupId>
+		<artifactId>json</artifactId>
+		<version>${version.json}</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+	<dependency>
+	    <groupId>net.sf.saxon</groupId>
+	    <artifactId>Saxon-HE</artifactId>
+	    <version>${version.saxon-he}</version>
+	</dependency>
+	
   </dependencies>
 
 </project>
