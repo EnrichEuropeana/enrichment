@@ -16,7 +16,7 @@ public interface PersistentItemEntityService {
 	 * 									or updated
 	 * @return
 	 */
-	public void saveItemEntity(ItemEntityImpl entity);
+	public ItemEntityImpl saveItemEntity(ItemEntityImpl entity);
 	/*
 	 * This method saves and updates a list of story item entities into the Mongo database
 	 * 

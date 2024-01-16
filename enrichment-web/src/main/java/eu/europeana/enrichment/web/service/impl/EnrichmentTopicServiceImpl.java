@@ -83,14 +83,15 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 		long id = persistentTopicService.generateAutoIncrement(EntityTypes.Topic.getEntityType());
 		topic.setId(id);		
 
-		persistentTopicService.save(topic);
-		
+		TopicImpl savedTopic = persistentTopicService.save(topic);
+
 		try {
 			solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(topic), true);
 		} catch (SolrServiceException e) {
 			logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 		}
-		return topic;
+
+		return savedTopic;
 	}
 
 	@Override
@@ -108,13 +109,13 @@ public class EnrichmentTopicServiceImpl implements EnrichmentTopicService{
 				dbtopicEntity.setLabels(topic.getLabels());
 			
 			dbtopicEntity.setModified(new Date());
-			persistentTopicService.save(dbtopicEntity);
+			TopicImpl dbtopicEntityUpdated = persistentTopicService.save(dbtopicEntity);
 			try {
 				solrTopicService.store(EnrichmentConstants.TOPIC_SOLR_CORE, new SolrTopicEntityImpl(dbtopicEntity), true);
 			} catch (SolrServiceException e) {
 				logger.log(Level.ERROR, "Exception is thrown during saving of the topic to Solr.", e);
 			}
-			return dbtopicEntity;
+			return dbtopicEntityUpdated;
 		}
 		else {
 			return null;

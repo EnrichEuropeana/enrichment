@@ -21,8 +21,8 @@ public class PersistentNamedEntityAnnotationServiceImpl implements PersistentNam
 	}
 
 	@Override
-	public void saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
-		namedEntityAnnotationDao.saveNamedEntityAnnotation(entity);		
+	public NamedEntityAnnotationImpl saveNamedEntityAnnotation(NamedEntityAnnotationImpl entity) {
+		return namedEntityAnnotationDao.saveNamedEntityAnnotation(entity);		
 	}
 	
 	@Override

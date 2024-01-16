@@ -16,8 +16,8 @@ public class PersistentTopicServiceImpl implements PersistentTopicService{
 	private TopicDao topicDao;
 
 	@Override
-	public void save(TopicImpl topicEntity) {
-		topicDao.save(topicEntity);
+	public TopicImpl save(TopicImpl topicEntity) {
+		return topicDao.save(topicEntity);
 	}
 
 	@Override

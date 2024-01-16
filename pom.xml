@@ -96,6 +96,7 @@
 <!-- 		<version.jackson-jsonld>0.0.5</version.jackson-jsonld> -->
 		<version.apache-commons-csv>1.9.0</version.apache-commons-csv>
 		<version.commons-text>1.9</version.commons-text>
+		<version.saxon-he>12.3</version.saxon-he>
 	</properties>
 
 	<modules>

@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,8 +63,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}
 		else {
 			if(dbStory==null) {
-				persistentStoryEntityService.saveStoryEntity(tpStory);
-				return tpStory;
+				return persistentStoryEntityService.saveStoryEntity(tpStory);
 			}
 			else {
 				if(fieldsToUpdate.contains(EnrichmentConstants.STORY_ITEM_DESCRIPTION)  && !StringUtils.equals(dbStory.getDescription(), tpStory.getDescription()))
@@ -85,13 +86,12 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 				}
 				
 				dbStory.copyFromStory(tpStory);				
-				persistentStoryEntityService.saveStoryEntity(dbStory);
-				return dbStory;
+				return persistentStoryEntityService.saveStoryEntity(dbStory);
 			}
 		}
 	}
 	
-	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException {
+	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException, TransformerException {
 		ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
 		ItemEntityImpl tpItem = enrichmentTpApiClient.getItemFromTranscribathon(itemId);
 		if(tpItem==null) {
@@ -104,8 +104,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 		}
 		else {
 			if(dbItem==null) {
-				persistentItemEntityService.saveItemEntity(tpItem);
-				return tpItem;
+				return persistentItemEntityService.saveItemEntity(tpItem);
 			}
 			else {
 				if(! StringUtils.equals(dbItem.getTranscriptionText(), tpItem.getTranscriptionText()))
@@ -113,10 +112,15 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(),EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 					persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
-				}	
+				}
+				if(! StringUtils.equals(dbItem.getHtrdataTranscription(), tpItem.getHtrdataTranscription()))
+				{
+					persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(),EnrichmentConstants.ITEM_HTRDATA);
+					persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.ITEM_HTRDATA);
+					persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(), EnrichmentConstants.ITEM_HTRDATA, EnrichmentConstants.MONGO_SKIP_FIELD);
+				}				
 				dbItem.copyFromItem(tpItem);
-				persistentItemEntityService.saveItemEntity(dbItem);
-				return dbItem;
+				return persistentItemEntityService.saveItemEntity(dbItem);
 			}
 		}
 	}
@@ -188,6 +192,13 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 						persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
 						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.STORY_ITEM_TRANSCRIPTION, EnrichmentConstants.MONGO_SKIP_FIELD);
 					}	
+					if(dbItemEntity.getHtrdataTranscription().compareTo(item.getHtrdataTranscription())!=0)
+					{
+						persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(item.getStoryId(), item.getItemId(), EnrichmentConstants.ITEM_HTRDATA);
+						persistentTranslationEntityService.deleteTranslationEntity(item.getStoryId(), item.getItemId(), EnrichmentConstants.ITEM_HTRDATA);
+						persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(item.getStoryId(), item.getItemId(), EnrichmentConstants.ITEM_HTRDATA, EnrichmentConstants.MONGO_SKIP_FIELD);
+					}	
+
 					dbItemEntity.copyFromItem(item);
 					persistentItemEntityService.saveItemEntity(dbItemEntity);
 				}
