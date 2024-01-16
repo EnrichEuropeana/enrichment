@@ -208,16 +208,6 @@ public class ETranslationEuropaServiceImpl {
 	 * @throws UnsupportedEncodingException 
 	 */
 	private String createTranslationBodyForDirectCallback(String text, String sourceLanguage, String externalReference) throws UnsupportedEncodingException {
-//		String base64content;
-//		try {
-//			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
-//			base64content = new String(bytesEncoded);
-//		}catch(UnsupportedEncodingException ex) {
-//			throw ex;
-//		}
-
-		// .put("externalReference", "123")
-		
 		JSONObject jsonBody = new JSONObject().put("priority", 0)
 				.put("requesterCallback", requesterCallback)
 				.put("externalReference", externalReference)
@@ -276,21 +266,7 @@ public class ETranslationEuropaServiceImpl {
 	        }
 	        else {
 	          logger.debug("eTranslation obtained translated text original: " + translatedText);
-			
-//			byte[] bytesEncoded = Base64.decodeBase64(translatedText);
-//			String base64DecodedContent = new String(bytesEncoded);
-//			
-//			logger.debug("eTranslation obtained translated text (base64 decoded): " + base64DecodedContent);
-			
-//			String URLDecodedTranslatedText = "";
-//			try {
-//				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
-//			} catch (UnsupportedEncodingException e) {
-//
-//				throw e;
-//			}
-//			logger.debug("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
-			
+						
 	          createdRequestsSynchronized.put(externalReference, translatedText);
 	        }
 			
