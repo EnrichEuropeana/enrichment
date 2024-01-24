@@ -35,9 +35,9 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 //public class ETranslationEuropaServiceImpl implements TranslationService {
 public class ETranslationEuropaServiceImpl {
 
-	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
+	private String baseUrl;
 	private String domain;
-	private String requesterCallback = "http://dsi-demo.ait.ac.at/enrichment-web/administration/eTranslation";
+	private String requesterCallback;
 	private String errorCallback;
 	private String emailDestination;
 	private String fileFormat = "txt";
@@ -70,6 +70,7 @@ public class ETranslationEuropaServiceImpl {
 	@Autowired
 	public ETranslationEuropaServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws Exception {
 		readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
+		this.baseUrl=enrichmentConfiguration.getTranslationETranslationBaseUrl();
 		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
 		this.requesterCallback = enrichmentConfiguration.getTranslationETranslationRequesterCallback();
 		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
@@ -216,7 +217,7 @@ public class ETranslationEuropaServiceImpl {
 				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
 				.put("domain", domain)
 //				.put("destinations",
-//						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://dsi-demo.ait.ac.at/enrichment-web")))
+//						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://<prod_server_ip>/enrichment-web")))
 //				.put("documentToTranslateBase64", new JSONObject().put("format", fileFormat).put("content", base64content));
 		        .put("textToTranslate", text);
 

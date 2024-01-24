@@ -2,12 +2,11 @@ package eu.europeana.enrichment.web.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
 import eu.europeana.enrichment.definitions.model.WikidataEntity;
@@ -47,6 +47,9 @@ public class WikidataController extends BaseRest {
 	@Autowired
 	JsonLdSerializer jsonLdSerializer;
 
+   @Autowired
+   @Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
+   EnrichmentConfiguration config;
 	
     /**
      * 	 * This method represents the /enrichment/wikidata end point,
@@ -168,8 +171,8 @@ public class WikidataController extends BaseRest {
 			return new ResponseEntity<>(HttpStatus.OK);			
 		}
 		
-		String URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?" + "query=" + query + "&type=" + type + "&lang="+ lang;
-		String URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/places?" + "query=" + query + "&type=" + type + "&lang="+ lang;
+		String URLPage = config.getWikidataSearchPlacesBaseUrl() + "?" + "query=" + query + "&type=" + type + "&lang="+ lang;
+		String URLWithoutPage = config.getWikidataSearchPlacesBaseUrl() + "?" + "query=" + query + "&type=" + type + "&lang="+ lang;
 		URLPage+="&page="+ page +"&pageSize=" + pageSize;
 		
 		int totalResultsAll = wikidataIDs.size();
