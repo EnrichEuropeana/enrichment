@@ -1,0 +1,128 @@
+
+enrich.api.endpoint=https://<prod_server_ip>/enrichment-web
+
+# MongoDB configuration (main db)
+#enrich.mongodb.connectionUri=mongodb://localhost:27017
+###test env.
+#enrich.mongodb.connectionUri=mongodb://<test_server_ip>:27017
+###docker env. (use mongo from the local machine)
+#enrich.mongodb.connectionUri=mongodb://host.docker.internal:27017
+###production env. (database-server)
+enrich.mongodb.connectionUri=mongodb://<database_server_ip>:27017
+
+enrich.mongodb.database=enrichment
+#enrich.mongodb.database=keywords
+#enrich.mongodb.database=enrichment_test
+enrich.mongodb.truststore=
+enrich.mongodb.truststorepass=
+
+# Named entity recognition and classification section
+# NER Stanford classifier configuration
+enrich.ner.stanford.model=
+enrich.ner.stanford.url=
+
+# NER Python configuration
+enrich.ner.python.path=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv64\\Scripts\\python.exe
+enrich.ner.python.script=python/main.py
+# NER python spaCy NLP model
+enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Lib\\site-packages\\en_core_web_sm\\en_core_web_sm-2.0.0
+# NER DBpedia spotlight configuration
+# Additional: 
+#	Docker command: docker pull dbpedia/spotlight-english
+#	Docker command: docker run --name spotlight -p 2222:80 -it dbpedia/spotlight-english spotlight.sh
+enrich.ner.dbpedia.baseUrl=http://<test_server_ip>:9090/dbpedia/en/rest/annotate
+
+# Named entity linking section
+enrich.ner.linking.europeana.apikey=apidemo
+
+# Translation
+# Translation Google configuration
+enrich.translation.google.credentials=<path_to_json_credentials_file>
+enrich.translation.google.waittime=2
+# Translation eTranslation configuration
+#enrich.translation.eTranslation.credentials=/home/denis/config/eTranslation.txt
+enrich.translation.eTranslation.credentials=/home/ait/enrich/translation-credentials/eTranslation.txt
+# 	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
+enrich.translation.eTranslation.domain=SPD
+###production env
+enrich.translation.eTranslation.requesterCallback=http://<prod_server_ip>/enrichment-web/administration/receiveETranslation
+###test env
+#enrich.translation.eTranslation.requesterCallback=http://<test_server_ip>/enrichment-web-test/administration/receiveETranslation
+enrich.translation.eTranslation.baseUrl=
+###production env
+enrich.translation.eTranslation.baseUrl.local=http://<prod_server_ip>/enrichment-web/administration/eTranslation
+enrich.translation.eTranslation.errorCallback=
+enrich.translation.eTranslation.emailDestination=
+enrich.translation.deepl-free.baseUrl=
+enrich.translation.deepl-free.authenticationKey=<path_to_deepl_authentication>
+
+#enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
+#solr.entity-positions.url = http://localhost:8983/solr
+###test solr
+#solr.entity-positions.url = http://<test_server_ip>:8983/solr
+###docker solr (use the one from the local machine)
+#solr.entity-positions.url = http://host.docker.internal:8983/solr
+###production solr (database-server)
+solr.entity-positions.url = http://<database_server_ip>:8983/solr
+
+solr.entity-positions.timeout = 60000
+solr.facetLimit=750
+#enrich.solr.translated.entities=C:/java/entitiesRomanian.txt
+enrich.solr.translated.entities=
+###prod env
+solr.wikidata-search.baseUrl=https://<prod_server_ip>/enrichment-web/enrichment/search
+###test env
+#solr.wikidata-search.baseUrl=http://<test_server_ip>:8080/enrichment-web-test/enrichment/search
+
+# test case
+enrich.web.book.dumitru=
+enrich.web.book.dumitru.original=
+enrich.web.book.dumitru.output=
+enrich.web.book.dumitru.output.formatted.translatedText.pdf=
+enrich.web.book.dumitru.output.formatted.originalText.pdf=
+enrich.stories.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\StoriesExport.json
+enrich.items.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\ItemsExport.json
+
+# saving Wikidata info into files
+#enrich.wikidata.directory = C:/wikidata
+#enrich.wikidata.directory = /home/srdjan/wikidata
+enrich.directory = /home/ait/enrich/
+enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
+
+transcribathon.base.url.stories=
+transcribathon.base.url.stories.minimal=
+transcribathon.base.url.items=
+
+enrich.annotations.id.base.url=http://<prod_server_ip>/enrichment-web/enrichment/annotation/
+enrich.annotations.target.items.base.url=
+enrich.annotations.target.stories.base.url=
+enrich.annotations.creator=
+
+search.api.base.url=
+
+###enrich.wikidata.subclasses.geographic-location=/home/ait/enrich/wikidata-types/Q2221906-geographic-location-subclasses.json
+###enrich.wikidata.subclasses.geographic-location.remove=/home/ait/enrich/wikidata-types/Q2221906-types-to-exclude.json
+###enrich.wikidata.subclasses.human=/home/ait/enrich/wikidata-types/Q5-human-subclasses.json
+enrich.wikidata.subclasses.geographic-location=/wikidata-types/Q2221906-geographic-location-subclasses.json
+enrich.wikidata.subclasses.geographic-location.remove=/wikidata-types/Q2221906-types-to-exclude.json
+#enrich.wikidata.subclasses.human=/wikidata-types/Q5-human-subclasses.json
+enrich.wikidata.subclasses.natural-person=/wikidata-types/Q154954-natural-person-subclasses.json
+enrich.wikidata.subclasses.juridical-person=/wikidata-types/Q155076-juridical-person-subclasses.json
+enrich.wikidata.search.places.baseUrl=http://<prod_server_ip>/enrichment-web/enrichment/places
+
+#string value representing the key used for JWT signature verification 
+europeana.apikey.jwttoken.signaturekey=
+# Resource name embedded in JWT token
+authorization.api.name=entities
+# Useful for local development. If false, unauthenticated read/write requests can be sent to API
+auth.read.enabled=true
+auth.write.enabled=true
+europeana.apikey.serviceurl=
+
+spark.topic.detection.serviceurl=http://<test_server_ip>:8181/spark-topic-detection
+spark.language.detection.serviceurl=http://<test_server_ip>:8181/spark-language-detection
+
+htrdata.items.baseUrl=
+htrdata.items.suffix=
+htrdata.items.authorization=
+htrdata.items.xsl.file=

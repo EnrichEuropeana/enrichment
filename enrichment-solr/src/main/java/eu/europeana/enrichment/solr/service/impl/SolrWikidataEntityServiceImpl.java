@@ -415,8 +415,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			
-//			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
-//			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			

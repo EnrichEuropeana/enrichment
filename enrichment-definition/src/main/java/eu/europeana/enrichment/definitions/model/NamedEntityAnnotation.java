@@ -14,7 +14,7 @@ import eu.europeana.enrichment.definitions.model.impl.SpecificResource;
 public interface NamedEntityAnnotation {
 	
 	/**
-	 * annoId (e.g. "http://dsi-demo.ait.ac.at/enrichment-web/enrichment/annotation/<story_id>/<wikidata_identifier>"), where
+	 * annoId (e.g. "http://<prod_Server_ip>/enrichment-web/enrichment/annotation/<story_id>/<wikidata_identifier>"), where
 	 * story_id = storyId
 	 * wikidata_identifier = last part of the wikidatId (e.g. Q123621)
 	 * @return

@@ -60,6 +60,9 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.translation.eTranslation.requesterCallback}")
     private String translationETranslationRequesterCallback;
 
+    @Value("${enrich.translation.eTranslation.baseUrl}")
+    private String translationETranslationBaseUrl;
+
     @Value("${enrich.translation.eTranslation.baseUrl.local}")
     private String translationETranslationBaseUrlLocal;
 
@@ -134,6 +137,9 @@ public class EnrichmentConfiguration  {
 
 	@Value("${enrich.wikidata.subclasses.juridical-person}")
     private String wikidataSubclassesJuridicalPerson;	
+	
+    @Value("${enrich.wikidata.search.places.baseUrl}")
+    private String wikidataSearchPlacesBaseUrl;   
 
 	@Value("${auth.read.enabled: true}")
 	private boolean authReadEnabled;
@@ -229,7 +235,11 @@ public class EnrichmentConfiguration  {
 	public String getTranslationETranslationRequesterCallback() {
 		return translationETranslationRequesterCallback;
 	}
-	
+
+    public String getTranslationETranslationBaseUrl() {
+      return translationETranslationBaseUrl;
+    }   
+
     public String getTranslationETranslationBaseUrlLocal() {
 		return translationETranslationBaseUrlLocal;
 	}	
@@ -434,4 +444,8 @@ public class EnrichmentConfiguration  {
 	public String getHtrdataItemsXslFile() {
 		return htrdataItemsXslFile;
 	}
+
+  public String getWikidataSearchPlacesBaseUrl() {
+    return wikidataSearchPlacesBaseUrl;
+  }
 }
