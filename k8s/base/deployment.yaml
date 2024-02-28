@@ -38,11 +38,18 @@ spec:
           initialDelaySeconds: 55
           periodSeconds: 20
         volumeMounts:
-          - name: app-properties
+          - name: enrichment-properties
             mountPath: "/opt/app/config/enrichment.properties"
             readOnly: true
             subPath: enrichment.properties
+          - name: app-properties
+            mountPath: "/opt/app/config/application.properties"
+            readOnly: true
+            subPath: application.properties  
       volumes:
-        - name: app-properties
+        - name: enrichment-properties
           secret:
             secretName: enrichment-web-properties
+        - name: app-properties
+          secret:
+            secretName: application-properties

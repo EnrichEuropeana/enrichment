@@ -9,3 +9,6 @@ secretGenerator:
   - name: enrichment-web-properties
     files:
       - enrichment.properties
+  - name: application-properties
+    files:
+      - application.properties    
