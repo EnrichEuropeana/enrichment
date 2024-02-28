@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enrichment-web-deployment
+spec:
+  # selector.matchLabels is provided via Kustomize
+  #selector:
+  #  matchLabels:
+  #    app: annotation-api
+  template:
+    spec:
+      containers:
+      - name: enrichment-web
+        image: gsergiu79/enrichment-web
+        env:
+          - name: SPRING_CONFIG_NAME
+            value: "enrichment"
+          - name: SPRING_CONFIG_ADDITIONAL_LOCATION
+            value: "/opt/app/config/enrichment.properties"
+        ports:
+          - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/liveness
+            httpHeaders:
+            - name: Accept
+              value: application/json
+          initialDelaySeconds: 55
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /actuator/health/readiness
+            httpHeaders:
+            - name: Accept
+              value: application/json
+          initialDelaySeconds: 55
+          periodSeconds: 20
+        volumeMounts:
+          - name: app-properties
+            mountPath: "/opt/app/config/enrichment.properties"
+            readOnly: true
+            subPath: enrichment.properties
+      volumes:
+        - name: app-properties
+          secret:
+            secretName: enrichment-web-properties
