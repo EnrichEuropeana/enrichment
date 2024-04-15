@@ -227,10 +227,16 @@ public class AdministrationController extends BaseRest {
 			@RequestBody String body)
 			    throws UnsupportedEncodingException 
 	{
-		logger.info("eTranslation callback received with translated text: " + translatedTextSnippet);;
+		logger.info("eTranslation callback received with targetLanguage: " + targetLanguage + ", translated-text: " + translatedTextSnippet + ", request-id: " + requestId + ", external-reference: " + externalReference + ", and body: " + body);
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,null);
 		if(requestId!=null) {
-		  testingETranslationCallback="translated-text: " + translatedTextSnippet + ";" + "body: " + body;
+		  testingETranslationCallback=
+		      "target-language: " + targetLanguage + ";" +
+		      "translated-text: " + translatedTextSnippet + ";" + 
+		      "request-id: " + requestId + ";" +
+		      "external-reference: " + externalReference + ";" +
+		      "body: " + body + ";" + 
+		      "received-at: " + java.time.LocalTime.now();
 		}
 		ResponseEntity<String> response = new ResponseEntity<String>("Last received callback: " + testingETranslationCallback, HttpStatus.OK);
 		return response;
