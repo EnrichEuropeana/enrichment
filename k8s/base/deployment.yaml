@@ -45,7 +45,11 @@ spec:
           - name: app-properties
             mountPath: "/opt/app/config/application.properties"
             readOnly: true
-            subPath: application.properties  
+            subPath: application.properties
+          - name: log4j-config
+            mountPath: "/opt/app/config/log4j2-spring.xml"
+            readOnly: true
+            subPath: log4j2-spring.xml    
       volumes:
         - name: enrichment-properties
           secret:
@@ -53,3 +57,6 @@ spec:
         - name: app-properties
           secret:
             secretName: application-properties
+        - name: log4j-config
+          configMap:
+            name: log4j2-properties    
