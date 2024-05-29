@@ -13,4 +13,11 @@ secretGenerator:
       - enrichment.properties
   - name: application-properties
     files:
-      - application.properties    
+      - application.properties
+      
+#generate config mapping for log4j2.xml file
+configMapGenerator:
+  - name: log4j2-properties
+    files:
+      - log4j2-spring.xml
+          
