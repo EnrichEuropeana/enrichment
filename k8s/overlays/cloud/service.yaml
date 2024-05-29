@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: enrichment-web-service
+spec:
+  ## selector provided via kustomize
+  #selector:
+  #  app: enrichment-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

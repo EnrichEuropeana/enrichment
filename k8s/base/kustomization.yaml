@@ -1,8 +1,10 @@
 resources:
   - deployment.yaml
 
-commonLabels:
-  app: enrichment-web
+labels:
+  - includeSelectors: true
+    pairs:
+      app: enrichment-web
 
 # expects files to be in the same directory
 secretGenerator:
