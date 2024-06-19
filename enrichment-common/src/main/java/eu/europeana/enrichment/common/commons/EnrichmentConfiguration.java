@@ -12,8 +12,11 @@ import org.springframework.context.annotation.PropertySources;
  * file and optionally override from enrichment.user.properties file
  */
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
-@PropertySources({ @PropertySource("classpath:config/enrichment.properties"),
-	@PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true) })
+@PropertySources({ 
+    @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true), 
+    @PropertySource(value = "/opt/app/config/enrichment.properties", ignoreResourceNotFound = true)    
+})
 public class EnrichmentConfiguration  {
 
 	Logger logger = LogManager.getLogger(getClass());
