@@ -14,7 +14,16 @@ secretGenerator:
   - name: application-properties
     files:
       - application.properties
-      
+  - name: gtanslate-secret
+    files:
+      - ./secrets/gtanslate.json
+  - name: etanslate-secret
+    files:
+      - ./secrets/eTranslation.txt
+  - name: deepl-secret
+    files:
+      - ./secrets/deeplAuthentication.txt
+          
 #generate config mapping for log4j2.xml file
 configMapGenerator:
   - name: log4j2-properties

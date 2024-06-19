@@ -1,0 +1,8 @@
+# Send only unzipped war directory to Docker
+**
+!/set-web/target/
+!k8s/enrich/wikidata-types/
+!k8s/enrich/xslt/
+**/*.user.properties
+**/*.properties
+**/*.jks
