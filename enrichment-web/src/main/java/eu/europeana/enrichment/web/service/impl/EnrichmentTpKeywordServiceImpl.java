@@ -32,7 +32,7 @@ public class EnrichmentTpKeywordServiceImpl {
     @Autowired
     KeywordRepository keywordRepository;
 
-    @Autowired
+//    @Autowired
     private KeywordItemRepository keywordItemRepository;
 
     Logger logger = LogManager.getLogger(getClass());

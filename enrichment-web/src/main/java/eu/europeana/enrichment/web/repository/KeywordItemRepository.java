@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 import eu.europeana.enrichment.web.model.KeywordItemView;
 
 @Repository()
+/**
+ * mysql Repository accessing a copy of tp database 
+ */
 public interface KeywordItemRepository extends JpaRepository<KeywordItemView, Long>{
 
     @Query("SELECT keywordItem FROM KeywordItemView keywordItem WHERE keywordItem.keywordId = :keywordId")
