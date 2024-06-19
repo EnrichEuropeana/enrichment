@@ -14,9 +14,9 @@ spec:
         image: gsergiu79/enrichment-web
         env:
           - name: SPRING_CONFIG_NAME
-            value: "enrichment"
+            value: "application,enrichment"
           - name: SPRING_CONFIG_ADDITIONAL_LOCATION
-            value: "/opt/app/config/enrichment.properties"
+            value: "file:/opt/app/config/application.properties,file:/opt/app/config/enrichment.properties"
         ports:
           - containerPort: 8080
         livenessProbe:
