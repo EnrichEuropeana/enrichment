@@ -3,10 +3,12 @@ package eu.europeana.enrichment;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -22,12 +24,15 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
         exclude = {
                 // Remove these exclusions to re-enable security
                 SecurityAutoConfiguration.class,
-                ManagementWebSecurityAutoConfiguration.class
+                ManagementWebSecurityAutoConfiguration.class,
                 // DataSources are manually configured for the enrichment DB
+                DataSourceAutoConfiguration.class, 
+                DataSourceTransactionManagerAutoConfiguration.class, 
+                HibernateJpaAutoConfiguration.class
 //                DataSourceAutoConfiguration.class
         }
 )
-@EnableBatchProcessing
+//@EnableBatchProcessing
 @EnableMongoRepositories(repositoryFactoryBeanClass = DataTablesRepositoryFactoryBean.class, 
     basePackageClasses = {eu.europeana.enrichment.web.repository.KeywordRepository.class})
 //@EnableJpaRepositories(basePackages = "eu.europeana.enrichment.web.repository")
