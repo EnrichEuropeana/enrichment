@@ -126,16 +126,16 @@ public class EnrichmentConfiguration  {
 	@Value("${enrich.annotations.creator}")
     private String annotationsCreator;	
 	
-	@Value("${enrich.wikidata.subclasses.geographic-location}")
+	@Value("${enrich.wikidata.subclasses.geographic-location:/wikidata-types/Q2221906-geographic-location-subclasses.json}")
     private String wikidataSubclassesGeographicLocation;
 	
-	@Value("${enrich.wikidata.subclasses.geographic-location.remove}")
+	@Value("${enrich.wikidata.subclasses.geographic-location.remove:/wikidata-types/Q2221906-types-to-exclude.json}")
     private String wikidataSubclassesGeographicLocationRemove;
 
-	@Value("${enrich.wikidata.subclasses.natural-person}")
+	@Value("${enrich.wikidata.subclasses.natural-person:/wikidata-types/Q154954-natural-person-subclasses.json}")
     private String wikidataSubclassesNaturalPerson;	
 
-	@Value("${enrich.wikidata.subclasses.juridical-person}")
+	@Value("${enrich.wikidata.subclasses.juridical-person:/wikidata-types/Q155076-juridical-person-subclasses.json}")
     private String wikidataSubclassesJuridicalPerson;	
 
 	@Value("${auth.read.enabled: true}")
