@@ -22,23 +22,23 @@ spec:
         livenessProbe:
           httpGet:
             port: 8080
-            path: /swagger-ui/index.html
+            path: /index.html
             #path: /actuator/health/liveness
             #httpHeaders:
             #- name: Accept
             #  value: application/json
-          initialDelaySeconds: 100
-          periodSeconds: 50
+          initialDelaySeconds: 300
+          periodSeconds: 100
         readinessProbe:
           httpGet:
             port: 8080
-            path: /swagger-ui/index.html
+            path: /index.html
             #path: /actuator/health/readiness
             #httpHeaders:
             #- name: Accept
             #  value: application/json
-          initialDelaySeconds: 100
-          periodSeconds: 50
+          initialDelaySeconds: 300
+          periodSeconds: 100
         volumeMounts:
           - name: enrichment-properties
             mountPath: "/opt/app/config/enrichment.properties"
