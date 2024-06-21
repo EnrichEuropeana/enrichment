@@ -22,21 +22,20 @@ spec:
         livenessProbe:
           httpGet:
             port: 8080
-            path: /index.html
-            #path: /actuator/health/liveness
-            #httpHeaders:
-            #- name: Accept
-            #  value: application/json
+            #path: /index.html
+            path: /enrichment-web/actuator/health/liveness
+            httpHeaders:
+            - name: Accept
+              value: application/json
           initialDelaySeconds: 300
           periodSeconds: 100
         readinessProbe:
           httpGet:
             port: 8080
-            path: /index.html
-            #path: /actuator/health/readiness
-            #httpHeaders:
-            #- name: Accept
-            #  value: application/json
+            path: /enrichment-web/actuator/health/readiness
+            httpHeaders:
+            - name: Accept
+              value: application/json
           initialDelaySeconds: 300
           periodSeconds: 100
         volumeMounts:
