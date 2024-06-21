@@ -26,8 +26,8 @@ spec:
             httpHeaders:
             - name: Accept
               value: application/json
-          initialDelaySeconds: 90
-          periodSeconds: 40
+          initialDelaySeconds: 300
+          periodSeconds: 100
         readinessProbe:
           httpGet:
             port: 8080
@@ -35,8 +35,8 @@ spec:
             httpHeaders:
             - name: Accept
               value: application/json
-          initialDelaySeconds: 90
-          periodSeconds: 40
+          initialDelaySeconds: 300
+          periodSeconds: 100
         volumeMounts:
           - name: enrichment-properties
             mountPath: "/opt/app/config/enrichment.properties"
