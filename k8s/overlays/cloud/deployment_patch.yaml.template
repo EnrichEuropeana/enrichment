@@ -12,6 +12,24 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Dlogging.config=/opt/app/config/log4j2-spring.xml"
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health/liveness
+              httpHeaders:
+              - name: Accept
+                value: application/json
+            initialDelaySeconds: ${LIVE_CHECK_INIT_DELAY}
+            periodSeconds: ${LIVE_CHECK_PERIOD}   
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /actuator/health/readiness
+              httpHeaders:
+              - name: Accept
+                value: application/json
+            initialDelaySeconds: ${READY_CHECK_INIT_DELAY}
+            periodSeconds: ${READY_CHECK_PERIOD}  
           resources:
             requests:
               memory: "${MEMORY_REQUEST}M"
