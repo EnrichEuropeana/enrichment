@@ -19,25 +19,6 @@ spec:
             value: "file:/opt/app/config/application.properties,file:/opt/app/config/enrichment.properties"
         ports:
           - containerPort: 8080
-        livenessProbe:
-          httpGet:
-            port: 8080
-            #path: /index.html
-            path: /enrichment-web/actuator/health/liveness
-            httpHeaders:
-            - name: Accept
-              value: application/json
-          initialDelaySeconds: 300
-          periodSeconds: 100
-        readinessProbe:
-          httpGet:
-            port: 8080
-            path: /enrichment-web/actuator/health/readiness
-            httpHeaders:
-            - name: Accept
-              value: application/json
-          initialDelaySeconds: 300
-          periodSeconds: 100
         volumeMounts:
           - name: enrichment-properties
             mountPath: "/opt/app/config/enrichment.properties"
