@@ -4,8 +4,10 @@ metadata:
   name: enrichment-web-ingress
   annotations:
     ${K8S_INGRESS_ANNOTATIONS}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/preserve-trailing-slash: "true"
 spec:
-  ingressClassName: kong
+  ingressClassName: nginx
   tls:
     - hosts:
         - ${K8S_HOSTNAME}
