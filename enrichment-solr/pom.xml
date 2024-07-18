@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.europeana.enrich</groupId>
+    <relativePath>../pom.xml</relativePath>
+    <!-- version>${version.enrichmentAPI}</version-->
+	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>enrichment-services</artifactId>
+
+  </parent>
+
+  <artifactId>enrichment-solr</artifactId>
+  <name>Enrichment - Solr module</name>
+  
+  <dependencies>
+  
+ 	<!-- enrichment  -->
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 			<artifactId>enrichment-definition</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 			<artifactId>enrichment-common</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 			<artifactId>enrichment-mongo</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 			<artifactId>enrichment-translation</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>
+<!-- 	<dependency> -->
+<!-- 		<groupId>eu.europeana.enrich</groupId> -->
+<!--  			<artifactId>enrichment-ner</artifactId> -->
+<!-- 		<version>${version.enrichmentAPI}</version> -->
+<!-- 	</dependency> -->
+	<!-- dependency>
+		<groupId>eu.europeana.entity</groupId>
+		<artifactId>entity-solr</artifactId>
+		<version>${version.entityApi}</version>
+	</dependency-->
+	
+
+	
+	<!-- dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 			<artifactId>enrichment-web</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency> -->
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+<!-- 			<version>${version.spring-boot-starter-test}</version> -->
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+        		<exclusion>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-logging</artifactId>
+        		</exclusion>
+			</exclusions>
+		</dependency>
+		<!--testcontainers for integration testing-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
+			<scope>test</scope>
+		</dependency>
+    
+	 <dependency>
+	  	<groupId>org.apache.solr</groupId>
+	  	<artifactId>solr-solrj</artifactId>	  
+<!-- 	  	<version>${version.solrj}</version>	 -->
+	</dependency>
+	
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-data-solr</artifactId>
+		<version>2.4.13</version>
+		<exclusions>
+	        <exclusion>
+           		<groupId>org.springframework.boot</groupId>
+           		<artifactId>spring-boot-starter-logging</artifactId>
+       		</exclusion>
+		</exclusions>
+	</dependency>
+	
+   
+   	<!-- https://mvnrepository.com/artifact/com.googlecode.json-simple/json-simple -->
+	<dependency>
+    	<groupId>com.googlecode.json-simple</groupId>
+    	<artifactId>json-simple</artifactId>
+    	<version>1.1.1</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
+	<dependency>
+    	<groupId>com.google.code.gson</groupId>
+    	<artifactId>gson</artifactId>
+    	<!--version>2.8.5</version-->
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+	<dependency>
+    	<groupId>com.google.guava</groupId>
+   	 	<artifactId>guava</artifactId>
+   	 	<version>13.0-rc1</version>
+	</dependency>
+	
+	
+  
+
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-core</artifactId>
+    	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-annotations</artifactId>
+     	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-databind</artifactId>
+     	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.github.rholder/snowball-stemmer -->
+	<dependency>
+    	<groupId>com.github.rholder</groupId>
+    	<artifactId>snowball-stemmer</artifactId>
+    	<version>1.3.0.581.1</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>co.aurasphere</groupId>
+    	<artifactId>jyandex</artifactId>
+    	<version>1.0.0</version>
+	</dependency>	
+	<dependency>
+    	<groupId>javax.ws.rs</groupId>
+    	<artifactId>javax.ws.rs-api</artifactId>
+    	<version>2.1</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+	<dependency>
+	    <groupId>org.apache.commons</groupId>
+	    <artifactId>commons-collections4</artifactId>
+	    <version>4.4</version>
+	</dependency>
+   
+  </dependencies>
+    
+	<build>
+		<!-- it seems that final name is not inhereted from parent pom -->
+		<finalName>${project.artifactId}-${project.version}</finalName>
+	</build>
+  
+</project>

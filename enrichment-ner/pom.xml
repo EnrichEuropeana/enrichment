@@ -16,6 +16,7 @@
 	<parent>
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
+<<<<<<< HEAD
 		<version>0.0.1-SNAPSHOT</version>
 		<artifactId>enrichment-services</artifactId>
 	</parent>
@@ -33,6 +34,205 @@
 		</dependency>
 		
 	</dependencies>
+=======
+		<!-- version>${version.enrichmentAPI}</version-->
+		<version>0.0.1-SNAPSHOT</version>
+		
+		<artifactId>enrichment-services</artifactId>
+	</parent>
+
+	<artifactId>enrichment-ner</artifactId>
+	<name>Enrichment - Named Entity Recognition module</name>
+	
+	<dependencies>
+		<!-- enrichment  -->
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-definition</artifactId>
+			<version>${version.enrichmentAPI}</version>			
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-mongo</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-solr</artifactId>
+			<version>${version.enrichmentAPI}</version>			
+		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!--   			<artifactId>entity-client</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
+<!-- 		</dependency> -->
+		
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!--   			<artifactId>entity-definitions</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+<!-- 			<version>${version.commonsLang3}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+<!-- 			<version>${version.apacheHttp}</version> -->
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpmime</artifactId>
+<!-- 		    <version>${version.apacheHttp}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+		
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${version.json}</version>
+		</dependency>
+			
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>eu.europeana.entity</groupId> -->
+<!-- 			<artifactId>entity-utils</artifactId> -->
+<!-- 			<version>${version.entityApi}</version> -->
+			
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<artifactId>slf4j-jdk14</artifactId> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>slf4j-api</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>jcl-over-slf4j</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>org.slf4j</groupId> -->
+<!-- 					<artifactId>slf4j-log4j12</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
+		
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<!--version>2.2.3</version-->
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+<!-- 			<version>${version.annotation-api}</version> -->
+		</dependency>
+			 
+<!-- 		<dependency> -->
+<!--     		<groupId>eu.fbk.dh</groupId> -->
+<!--     		<artifactId>tint-runner</artifactId> -->
+<!--     		<version>0.2</version> -->
+<!-- 		</dependency> -->
+		
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+<!-- 			<version>${version.jackson}</version> -->
+		</dependency>
+		
+		<dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-xml</artifactId>
+<!-- 		    <version>${version.jackson}</version> -->
+		</dependency>
+			
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+<!-- 			<version>${version.spring-boot-starter-test}</version> -->
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+        		<exclusion>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-logging</artifactId>
+        		</exclusion>
+			</exclusions>
+		</dependency>
+		<!--testcontainers for integration testing-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
+			<scope>test</scope>
+		</dependency>
+
+		
+		<!-- Test Geolocation -->
+		<dependency>
+		  <groupId>com.google.maps</groupId>
+		  <artifactId>google-maps-services</artifactId>
+		  <version>0.9.1</version>
+		</dependency>
+		<!-- dependency>
+		  <groupId>me.atlis</groupId>
+		  <artifactId>nominatim-api</artifactId>
+		  <version>1.0.0</version>
+		</dependency-->
+		<dependency>
+		  <groupId>fr.dudie</groupId>
+		  <artifactId>nominatim-api</artifactId>
+		  <version>3.3</version>
+		</dependency>
+		<!-- Test Geolocation -->
+		
+		<!-- iText library for creating PDF files, used to ease testing -->
+		<dependency>
+    		<groupId>com.itextpdf</groupId>
+    		<artifactId>itextpdf</artifactId>
+    		<version>5.5.13</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>org.jsoup</groupId>
+    		<artifactId>jsoup</artifactId>
+    		<version>${version.jsoup}</version>
+		</dependency>
+		
+	</dependencies>
+	
+>>>>>>> branch 'master' of https://github.com/EnrichEuropeana/enrichment.git
 	
 	<build>
 		<!-- it seems that final name is not inhereted from parent pom -->

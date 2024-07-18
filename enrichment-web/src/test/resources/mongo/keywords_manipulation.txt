@@ -1,0 +1,8 @@
+### keywords without status
+db.getCollection("keyword").find({"status":{$exists:false}});
+
+### set default status if doesn't exist
+db.getCollection("keyword").updateMany(
+{"status":{$exists:false}},
+{$set : {"status": "to_validate"}}
+);

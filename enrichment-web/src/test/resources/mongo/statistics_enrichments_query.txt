@@ -1,0 +1,6 @@
+### distinct items in annotations
+db.getCollection("NamedEntityAnnotationImpl").distinct('itemId').length
+
+### number annos for stories
+db.getCollection("NamedEntityAnnotationImpl").find({'itemId':null}).count()
+

@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.europeana.enrich</groupId>
+    <artifactId>enrichment-services</artifactId>
+    <!-- version>${version.enrichmentAPI}</version-->
+	<version>0.0.1-SNAPSHOT</version>
+    
+  </parent>
+  <artifactId>enrichment-definition</artifactId>
+  <name>enrichment-definition</name>
+
+  <dependencies>
+       	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-core</artifactId>
+    	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+    	
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-annotations</artifactId>
+    	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+	<dependency>
+    	<groupId>com.fasterxml.jackson.core</groupId>
+    	<artifactId>jackson-databind</artifactId>
+    	<!-- version>2.9.8</version-->
+<!-- 		<version>${version.jackson}</version>    	 -->
+	</dependency>
+    <!-- https://mvnrepository.com/artifact/com.io-informatics.oss/jackson-jsonld -->
+<!-- 	<dependency> -->
+<!--     	<groupId>com.io-informatics.oss</groupId> -->
+<!--     	<artifactId>jackson-jsonld</artifactId> -->
+<!--     	<version>${version.jackson-jsonld}</version> -->
+<!-- 	</dependency> -->
+	<dependency>
+		<groupId>eu.europeana.enrich</groupId>
+ 		<artifactId>enrichment-common</artifactId>
+		<version>${version.enrichmentAPI}</version>
+	</dependency>  
+	    <dependency>
+        	<groupId>dev.morphia.morphia</groupId>
+        	<artifactId>morphia-core</artifactId>
+        	<version>${version.morphia}</version>        	
+        </dependency>  
+     	<dependency>
+			<groupId>eu.europeana.api.commons</groupId>
+			<artifactId>commons-definitions</artifactId>
+			<version>${version.commonsApi}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mongodb</groupId>
+					<artifactId>mongo-java-driver</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>eu.europeana.api.commons</groupId>
+			<version>${version.commonsApi}</version>
+			<artifactId>commons-nosql</artifactId>
+			<exclusions>
+			<exclusion>
+			<groupId>org.mongodb.morphia</groupId>
+			<artifactId>morphia</artifactId>
+			</exclusion>
+			</exclusions>
+<!-- 			<scope>compile</scope> -->
+		</dependency>		
+        
+  </dependencies>
+</project>

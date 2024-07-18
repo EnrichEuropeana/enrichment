@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.europeana.enrich</groupId>
+		<relativePath>../pom.xml</relativePath>
+		<!-- version>${version.enrichmentAPI}</version-->
+	    <version>0.0.1-SNAPSHOT</version>
+		
+		<artifactId>enrichment-services</artifactId>
+	</parent>
+	<artifactId>enrichment-mongo</artifactId>
+	<name>Enrichment - Mongo database module</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<dependencies>
+		<!-- enrichment projects  -->
+		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-definition</artifactId>
+			<version>${version.enrichmentAPI}</version>
+		</dependency>
+		
+	
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+<!-- 			<version>${version.annotation-api}</version> -->
+		</dependency>
+
+		
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+<!-- 			<version>${version.spring-boot-starter-test}</version> -->
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>				
+        		<exclusion>
+            		<groupId>org.springframework.boot</groupId>
+            		<artifactId>spring-boot-starter-logging</artifactId>
+        		</exclusion>
+			</exclusions>
+		</dependency>
+		<!--testcontainers for integration testing-->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${version.testcontainers}</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+<!-- 			<version>${version.junit-jupiter-api}</version> -->
+			<scope>test</scope>
+		</dependency>
+
+    	<dependency>
+        	<groupId>dev.morphia.morphia</groupId>
+        	<artifactId>morphia-core</artifactId>
+        	<version>${version.morphia}</version>        	
+        </dependency>
+		
+	</dependencies>	
+</project>

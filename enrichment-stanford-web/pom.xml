@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>eu.europeana.enrich</groupId>
+    <artifactId>enrichment-services</artifactId>
+    <!--version>${version.enrichmentAPI}</version-->
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  <artifactId>ROOT</artifactId>
+  <packaging>war</packaging>
+  <!-- version>${version.enrichmentAPI}</version-->
+  <name>enrichment-stanford-web</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.maven-surfire-plugin>2.19.1</version.maven-surfire-plugin>
+  </properties>
+  <dependencies>
+  		<dependency>
+			<groupId>eu.europeana.enrich</groupId>
+  			<artifactId>enrichment-ner</artifactId>
+			<version>${version.enrichmentAPI}</version>			
+		</dependency>
+<!-- 		<dependency> -->
+<!--     		<groupId>edu.stanford.nlp</groupId> -->
+<!--     		<artifactId>stanford-corenlp</artifactId> -->
+<!--     		<version>${version.stanfordCoreNLP}</version> -->
+<!--     		<classifier>models</classifier> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>edu.stanford.nlp</groupId>
+			<artifactId>stanford-corenlp</artifactId>
+			<version>${version.stanfordCoreNLP}</version>
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>xalan</groupId> -->
+<!-- 					<artifactId>xalan</artifactId>				 -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/xalan/xalan -->
+		<!-- Srdjan: this library new version is added here and excluded from the stanford-corenlp above, 
+		because the embedded spring-boot Tomcat expected a xalan serializer.jar to exist as a dependency in xalan,
+		which was not the case for the version 2.7.0, the stanford-corenlp was using. This caused a WARN from
+		Tomcat that the serializer.jar cannot be found.-->
+<!-- 		<dependency> -->
+<!-- 		    <groupId>xalan</groupId> -->
+<!-- 		    <artifactId>xalan</artifactId> -->
+<!-- 		    <version>${version.xalan}</version> -->
+<!-- 		</dependency> -->
+		
+
+		<!-- spring -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>io.springfox</groupId> -->
+<!-- 			<artifactId>springfox-swagger2</artifactId> -->
+<!-- 			<version>${version.swagger}</version> -->
+<!-- 			<exclusions> -->
+<!-- 				<exclusion> -->
+<!-- 					<groupId>com.google.guava</groupId> -->
+<!-- 					<artifactId>guava</artifactId> -->
+<!-- 				</exclusion> -->
+<!-- 			</exclusions> -->
+<!-- 		</dependency> -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>${version.swagger}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-api</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${version.swagger}</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0-m01</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+<!-- 			<version>${version.jackson}</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.module</groupId>
+			<artifactId>jackson-module-jaxb-annotations</artifactId>
+<!-- 			<version>${version.jackson}</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-jdk8</artifactId>
+			<version>${version.mapstruct}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+<!-- 			<version>${version.servletJstl}</version> -->
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+			<version>2.5</version>
+		</dependency>  
+  			<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot</artifactId>
+<!-- 			<version>${version.springBoot}</version> -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- Test dependencies -->
+		<!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-test -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-test</artifactId>
+		    <scope>test</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+<!-- 			<version>${version.spring}</version> -->
+		</dependency>
+  </dependencies>
+  <build>
+  		<!--  plugins -->
+		<pluginManagement>
+			<plugins>
+				<!--
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</plugin>
+				 -->
+<!-- 			<plugin> -->
+<!-- 				<inherited>true</inherited> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-compiler-plugin</artifactId> -->
+<!-- 				<configuration> -->
+<!-- 					<source>${version.java}</source> -->
+<!-- 					<target>${version.java}</target> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			    <version>${version.maven-surfire-plugin}</version>
+				<configuration>
+	    		<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+<!-- banned dependencies which will cause project build to fail -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>        
+                  <!-- deps with excludes will be banned -->      
+                    <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+	</plugins>
+	</pluginManagement>	
+  <finalName>${project.artifactId}</finalName>
+  </build>
+</project>
