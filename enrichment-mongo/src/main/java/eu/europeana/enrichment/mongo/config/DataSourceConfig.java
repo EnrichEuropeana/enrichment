@@ -16,7 +16,11 @@ import dev.morphia.mapping.MapperOptions;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 @Configuration
+<<<<<<< HEAD
 @PropertySource(value = {"classpath:config/enrichment.properties", "classpath:config/enrichment.user.properties", "/opt/app/config/enrichment.properties"}, ignoreResourceNotFound = true)
+=======
+@PropertySource(value = {"classpath:config/enrichment.properties", "classpath:config/enrichment.user.properties"}, ignoreResourceNotFound = true)
+>>>>>>> refs/remotes/origin/develop
 public class DataSourceConfig {
 
     Logger logger = LogManager.getLogger(getClass());

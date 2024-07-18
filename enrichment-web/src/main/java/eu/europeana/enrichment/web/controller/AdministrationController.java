@@ -57,6 +57,7 @@ public class AdministrationController extends BaseRest {
     @Autowired
     EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
    
+<<<<<<< HEAD
 	/*
 	 * This method represents the /administration/updateStories endpoint,
 	 * where a request with an array of StoryEntity to be updated in the database is sent.
@@ -228,6 +229,190 @@ public class AdministrationController extends BaseRest {
 		
 		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,body);
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
+=======
+    String testingETranslationCallback="";
+	/*
+	 * This method represents the /administration/updateStories endpoint,
+	 * where a request with an array of StoryEntity to be updated in the database is sent.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param stories				    an array of StoryEntity to be updated in the database
+	 * 
+	 * @return							"Done" if everything ok
+	 */
+	@ApiOperation(value = "Update StoryEntities from input in the database.", nickname = "updateStories", notes = "This method enables updating a set of stories from input in the database."
+			+ "directly from the HTTP request, meaning that the story fields are specified as an array of JSON formatted objects directly in the request body. In case the input stories do not exist"
+			+ "in the db, they will be stored as new.")
+	@RequestMapping(value = "/administration/updateStories", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> updateStories(
+			@RequestBody StoryEntityImpl [] body,
+			HttpServletRequest request) throws HttpException {
+		
+		verifyWriteAccess(Operations.CREATE, request);
+		
+		if(body==null) {
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
+		}
+		for(StoryEntityImpl story: body) {
+			validateStory(story);
+		}
+		
+		enrichmentStoryAndItemStorageService.updateStoriesFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+		return response;	
+	}
+	
+	@ApiOperation(value = "Update stories from Transcribathon using their ids.", nickname = "updateStoriesFromTranscribathon", notes = "This method updates a set of stories from Transcribathon to the db.")
+	@RequestMapping(value = "/administration/updateStoriesFromTranscribathon", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> updateStoriesFromTranscribathon(
+			@RequestBody List<String> storyIdsList,
+			HttpServletRequest request) throws Exception {
+		
+		verifyWriteAccess(Operations.CREATE, request);
+		List<String> fieldsToUpdate = new ArrayList<>();
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_DESCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_SUMMARY);
+		Instant start = Instant.now();
+		for (int i = 0; i < storyIdsList.size(); i++) {
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i), fieldsToUpdate);
+		}
+		Instant finish = Instant.now();
+		long timeElapsed = Duration.between(start, finish).getSeconds();
+		logger.debug("Total time: " + timeElapsed + " s.");
+		/*
+		 * The commented-out code below is for the parallel fetching of stories 
+		 */
+//		Instant start = Instant.now();
+//		List<CompletableFuture<String>> allFutures = new ArrayList<>();
+//		for (int i=0; i<storyIdsList.size(); i++) {
+//			allFutures.add(transcribathonConcurrentCallServiceImpl.callStoryMinimalService(storyIdsList.get(i)));
+//		}
+//		CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0])).join();
+//		//fetching the stories that from some reason failed to be fetched
+//		int numberInitiallyNotFetchedStories = 0;
+//		int numberFinalNotFetchedStories = 0;
+//		for (int i = 0; i < storyIdsList.size(); i++) {
+//			if(allFutures.get(i).get()!=null) {
+//				StoryEntity storyFetchedAgain = enrichmentStoryAndItemStorageService.fetchAndSaveStoryFromTranscribathon(allFutures.get(i).get().toString());
+//				if(storyFetchedAgain==null) numberFinalNotFetchedStories++;
+//				numberInitiallyNotFetchedStories ++;
+//			}				
+//		}
+//		Instant finish = Instant.now();
+//		long timeElapsed = Duration.between(start, finish).getSeconds();
+//
+//		logger.debug("Total time: " + timeElapsed + " s.");
+//		logger.debug("Number initially not fetched stories: " + String.valueOf(numberInitiallyNotFetchedStories) + ".");
+//		logger.debug("Number final not fetched stories: " + String.valueOf(numberFinalNotFetchedStories) + ".");
+			
+		String responseString = "{\"info\": \"Done successfully!\"}";		
+		ResponseEntity<String> response = new ResponseEntity<String>(responseString, HttpStatus.OK);
+		return response;		
+	}
+	
+	/*
+	 * This method represents the /administration/uploadItems end point,
+	 * where a request with a ItemEntity information to be saved in the database is sent
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param items				         an array of ItemEntity to be uploaded to the database (each StoryEntity represents a list of ItemEntity)
+	 * 
+	 * @return							"Done" if everything ok
+	 */
+	
+	@ApiOperation(value = "Update items in the database from input.", nickname = "updateItems", notes = "This method enables updating a set of items in the database."
+			+ "directly from the HTTP request, meaning that the item fields are specified as an array of JSON formatted objects directly in the request body. Please "
+			+ "note that to create new items (if they do not exist in the db), a story with the given storyId must exist in the db.")
+	@RequestMapping(value = "/administration/updateItems", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> updateItems(
+			@RequestBody ItemEntityImpl [] body,
+			HttpServletRequest request) throws HttpException, Exception {
+		
+		verifyWriteAccess(Operations.CREATE, request);
+		
+		if(body==null) {
+			throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, null);
+		}
+		for(ItemEntityImpl item: body) {
+			validateItem(item);
+		}
+		
+		enrichmentStoryAndItemStorageService.updateItemsFromInput(body);
+		ResponseEntity<String> response = new ResponseEntity<String>(HttpStatus.OK);
+		return response;
+	}
+	
+	@ApiOperation(value = "Upload translated text (Google, eTranslation)", nickname = "uploadTranslation", notes = "This method enables uploading already translated text of the story or item"
+			+ "to the database, by specifying the required translation fields directly in the request body. In case of story translation upload, please specify the \"itemId\" field to be \"all\". In case the translation of the given story or item does not exist in the system at all, "
+			+ "please first translate the story or item using the given translation API (i.e. either /enrichment/translation/{storyId}/{itemId} or /enrichment/translation/{storyId}). Example: <br /> "
+			+ "[ <br />" + 
+			"  { <br />" + 
+			"  \"originalText\":\"Franz Joseph I., Kaiser von Österreich, zusammen mit seiner Frau : Kaiserin Elisabeth von Österreich, Königin von Ungarn.\", <br />" +
+			"  \"text\":\"Franz Joseph I, an Emperor of Austria, along with his wife: Empress Elizabeth of Austria, Queen of Hungary.\", <br />" +  
+			"  \"storyId\":\"1\", <br />" + 
+			"  \"itemId\":\"1\", <br />" + 
+			"  \"translationTool\":\"Google\", <br />" + 
+			"  \"type\":\"transcription\" <br />" +
+			"  } <br />" + 
+			"  ] <br />")
+	@RequestMapping(value = "/administration/uploadTranslation", method = {RequestMethod.POST},
+			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> uploadTranslation(
+			@RequestBody EnrichmentTranslationRequest [] body,
+			HttpServletRequest request) throws HttpException  {
+
+		verifyWriteAccess(Operations.CREATE, request);
+		int i=1;
+		String translation = "{info: ";
+		for (EnrichmentTranslationRequest translationRequest : body)
+		{
+			translation += enrichmentTranslationService.uploadTranslation(translationRequest, i);	
+		}
+			
+		translation += "}";
+		ResponseEntity<String> response = new ResponseEntity<String>(translation, HttpStatus.OK);
+		return response;
+	}
+	
+	/*
+	 * This method represents the /enrichment/eTranslation end point,
+	 * where a translation response from eTranslation will be processed.
+	 * All requests on this end point are processed here.
+	 * 
+	 * @param translationRequest		is the Rest Post body with the original
+	 * 									text for translation into English
+	 * return 							the translated text or for eTranslation
+	 * 									only an ID
+	 */
+	@ApiOperation(value = "Receive translated text from eTranslation", nickname = "getFromETranslation", notes = "This method represents an endpoint"
+			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
+	@RequestMapping(value = "/administration/receiveETranslation", method = {RequestMethod.POST},
+			produces = MediaType.TEXT_PLAIN_VALUE)
+	public ResponseEntity<String> getFromETranslation(
+			@RequestParam(value = "target-language", required = false) String targetLanguage,
+			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
+			@RequestParam(value = "request-id", required = false) String requestId,
+			@RequestParam(value = "external-reference", required = false) String externalReference,
+			@RequestBody String body)
+			    throws UnsupportedEncodingException 
+	{
+		logger.info("eTranslation callback received with targetLanguage: " + targetLanguage + ", translated-text: " + translatedTextSnippet + ", request-id: " + requestId + ", external-reference: " + externalReference + ", and body: " + body);
+		eTranslationService.eTranslationResponse(targetLanguage,translatedTextSnippet,requestId,externalReference,null);
+		if(requestId!=null) {
+		  testingETranslationCallback=
+		      "target-language: " + targetLanguage + ";" +
+		      "translated-text: " + translatedTextSnippet + ";" + 
+		      "request-id: " + requestId + ";" +
+		      "external-reference: " + externalReference + ";" +
+		      "body: " + body + ";" + 
+		      "received-at: " + java.time.LocalTime.now();
+		}
+		ResponseEntity<String> response = new ResponseEntity<String>("Last received callback: " + testingETranslationCallback, HttpStatus.OK);
+>>>>>>> refs/remotes/origin/develop
 		return response;
 	}
 

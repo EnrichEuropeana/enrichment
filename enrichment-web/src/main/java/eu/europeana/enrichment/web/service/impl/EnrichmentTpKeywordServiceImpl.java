@@ -32,7 +32,11 @@ public class EnrichmentTpKeywordServiceImpl {
     @Autowired
     KeywordRepository keywordRepository;
 
+<<<<<<< HEAD
 //    @Autowired
+=======
+    @Autowired
+>>>>>>> refs/remotes/origin/develop
     private KeywordItemRepository keywordItemRepository;
 
     Logger logger = LogManager.getLogger(getClass());
