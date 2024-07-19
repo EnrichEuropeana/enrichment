@@ -1,2 +1,0 @@
-user=European_Enrich_20181026
-pwd=fnK5eyLP2A7w5UUR
