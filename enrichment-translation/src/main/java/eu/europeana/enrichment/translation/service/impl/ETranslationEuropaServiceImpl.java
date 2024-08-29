@@ -36,10 +36,10 @@ import eu.europeana.enrichment.translation.exception.TranslationException;
 //public class ETranslationEuropaServiceImpl implements TranslationService {
 public class ETranslationEuropaServiceImpl {
 
-	private String baseUrl = "https://webgate.ec.europa.eu/etranslation/si/translate";
 	private String domain;
-	private String requesterCallback = "http://dsi-demo.ait.ac.at/enrichment-web/administration/eTranslation";
-	private String errorCallback;
+	private String translationEndpoint;
+	private String requesterCallback;
+//	private String errorCallback;
 	private String emailDestination;
 	private String fileFormat = "txt";
 	private String targetLanguage = "en";
@@ -70,8 +70,9 @@ public class ETranslationEuropaServiceImpl {
 	public ETranslationEuropaServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws Exception {
 		readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
 		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
+		this.translationEndpoint = enrichmentConfiguration.getTranslationETranslationEndpoint();
 		this.requesterCallback = enrichmentConfiguration.getTranslationETranslationRequesterCallback();
-		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
+//		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
 		this.emailDestination = enrichmentConfiguration.getTranslationETranslationEmailDestination();
 	}
 	
@@ -239,7 +240,7 @@ public class ETranslationEuropaServiceImpl {
 			CloseableHttpClient httpClient = HttpClientBuilder.create()
 					.setDefaultCredentialsProvider(credsProvider).build();
 			
-			HttpPost request = new HttpPost(baseUrl);
+			HttpPost request = new HttpPost(translationEndpoint);
 			StringEntity params = new StringEntity(content, "UTF-8");
 			request.addHeader("content-type", "application/json");
 			request.setEntity(params);

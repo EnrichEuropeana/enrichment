@@ -22,7 +22,7 @@
 	    <version>2.5.7</version>
 	</parent>
 
-  <repositories>
+    <repositories>
 		<repository>
 			<id>artifactory.eanadev.org</id>
 			<name>artifactory.eanadev.org-releases (external libs)</name>

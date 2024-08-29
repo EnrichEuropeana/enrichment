@@ -1,4 +1,6 @@
 enrich.api.endpoint=https://dsi-demo.ait.ac.at/enrichment-web
+#enrich.api.endpoint=http://localhost:8080/enrichment-web
+#enrich.api.endpoint=http://localhost:8080/
 
 # MongoDB configuration (main db)
 #enrich.mongodb.connectionUri=mongodb://localhost:27017
@@ -16,11 +18,6 @@ enrich.ner.stanford.model=classifiers/stanford/english.all.3class.distsim.crf.se
 enrich.ner.stanford.url=http://<ip_of_the_test_server>:9090/stanford/en/namedEntityRecognition
 
 #C:\Users\katicd\Documents\Europeana\Code\Ait\Enrichment_workspace\enrichment\enrichment-ner\src\main\resources\classifiers\stanford\english.all.3class.distsim.crf.ser.gz
-# NER Python configuration
-enrich.ner.python.path=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv64\\Scripts\\python.exe
-enrich.ner.python.script=python/main.py
-# NER python spaCy NLP model
-enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\Code\\AIT\\venv\\Lib\\site-packages\\en_core_web_sm\\en_core_web_sm-2.0.0
 # NER DBpedia spotlight configuration
 # Additional: 
 #	Docker command: docker pull dbpedia/spotlight-english
@@ -28,22 +25,20 @@ enrich.ner.python.spacy.model=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait
 enrich.ner.dbpedia.baseUrl=http://<ip_of_the_test_server>:9090/dbpedia/en/rest/annotate
 
 # Named entity linking section
-enrich.ner.linking.europeana.apikey=apidemo
+enrich.ner.linking.europeana.apikey=<yourapikey>
 
 # Translation
 # Translation Google configuration
-#enrich.translation.google.credentials=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\EU-Europeana-enrichment-d92edee4115a.json
-#enrich.translation.google.credentials=/home/denis/config/enricheuropeana-3df22ae9c69d.json
-enrich.translation.google.credentials=/home/ait/enrich/translation-credentials/enricheuropeana-3df22ae9c69d.json
+#may overwrite default value 
+#enrich.translation.google.credentials=
 enrich.translation.google.waittime=2
 # Translation eTranslation configuration
-#enrich.translation.eTranslation.credentials=/home/denis/config/eTranslation.txt
-enrich.translation.eTranslation.credentials=/home/ait/enrich/translation-credentials/eTranslation.txt
+
+#may overwrite default value
+#enrich.translation.eTranslation.credentials=/opt/app/secrets/eTranslation.txt
 # 	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
 enrich.translation.eTranslation.domain=SPD
-enrich.translation.eTranslation.requesterCallback=http://dsi-demo2.ait.ac.at/enrichment-web-test/administration/receiveETranslation
-enrich.translation.eTranslation.baseUrl.local=http://dsi-demo2.ait.ac.at/enrichment-web-test/administration/eTranslation
-#enrich.translation.eTranslation.requesterCallback=http://192.168.43.116:8080/administration/receiveETranslation
+enrich.translation.eTranslation.endpoint=https://<host>/etranslation/si/translate
 enrich.translation.eTranslation.errorCallback=
 enrich.translation.eTranslation.emailDestination=srdjan.stevanetic@ait.ac.at
 enrich.translation.deepl-free.baseUrl=https://api-free.deepl.com/v2/translate
