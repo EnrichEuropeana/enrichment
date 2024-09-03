@@ -1,14 +1,17 @@
-#enrich.api.endpoint=http://localhost:8080/
-
+#overwrite endpoint for server deployment
+enrich.api.endpoint=http://localhost:8080/
 
 # mongo connectivity
-#spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
 spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
 spring.data.mongodb.database=enrichment
 
 #if required
 #enrich.mongodb.truststore=
 #enrich.mongodb.truststorepass=
+
+#SOLR Connection
+#enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
+solr.connection.url=http://<host:port>/solr
 
 
 # Named entity recognition and classification section
@@ -18,7 +21,6 @@ spring.data.mongodb.database=enrichment
 #TODO: deploy on K8s in EE-384
 enrich.ner.stanford.url=http://<ip_of_the_test_server>:9090/stanford/en/namedEntityRecognition
 
-#C:\Users\katicd\Documents\Europeana\Code\Ait\Enrichment_workspace\enrichment\enrichment-ner\src\main\resources\classifiers\stanford\english.all.3class.distsim.crf.ser.gz
 # NER DBpedia spotlight configuration
 # Additional: 
 #	Docker command: docker pull dbpedia/spotlight-english
@@ -37,10 +39,11 @@ enrich.translation.google.waittime=2
 
 #may overwrite default value
 #enrich.translation.eTranslation.credentials=/opt/app/secrets/eTranslation.txt
-# 	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
-enrich.translation.eTranslation.domain=GEN
+#may overwrite default model,	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
+#enrich.translation.eTranslation.domain=GEN
 enrich.translation.eTranslation.endpoint=https://<host>/etranslation/si/translate
 
+#configure deepl access
 enrich.translation.deepl-free.baseUrl=https://api-free.deepl.com/v2/translate
 enrich.translation.deepl-free.authenticationKey=/opt/app/secrets/eTranslation.txt
 
@@ -53,38 +56,27 @@ solr.facetLimit=750
 solr.wikidata-search.baseUrl=https://<domain_name_of_production_server>/enrichment-web/enrichment/search
 #solr.wikidata-search.baseUrl=http://<ip_of_the_test_server>:8080/enrichment-web-test/enrichment/search
 
-# test case
-TODO: removeall or move to tools repository
-enrich.web.book.dumitru=
-enrich.web.book.dumitru.original=
-enrich.web.book.dumitru.output=
-enrich.web.book.dumitru.output.formatted.translatedText.pdf=
-enrich.web.book.dumitru.output.formatted.originalText.pdf=
-enrich.stories.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\StoriesExport.json
-enrich.items.import=C:\\Users\\katicd\\Documents\\Europeana\\Code\\Ait\\additional_data\\ItemsExport.json
-
 # saving Wikidata info into files
-#enrich.wikidata.directory = C:/wikidata
-#enrich.wikidata.directory = /home/srdjan/wikidata
-#TODO: configure to use shared folder copy data to shared folder
-enrich.directory = /home/ait/enrich/
-enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
+# folder to store files created by the application (e.g. in wikidata subfolder) 
+#enrich.directory = /opt/app/data/
+#enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
 
-#TODO: replace with TP API base URL
-transcribathon.base.url.stories=https://europeana.fresenia.man.poznan.pl/tp-api/stories/
-transcribathon.base.url.stories.minimal=https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal/
-transcribathon.base.url.items=https://europeana.fresenia.man.poznan.pl/tp-api/items/
+# base URL of TP API
+transcribathon.api.base.url=https://europeana.fresenia.man.poznan.pl/tp-api/
 
-#TODO: change to use the API endpoint
-enrich.annotations.id.base.url=http://dsi-demo.ait.ac.at/enrichment-web/enrichment/annotation/
-#TODO: change to use TP UI Endpoint
-enrich.annotations.target.items.base.url=https://europeana.transcribathon.eu/documents/story/item/?
-enrich.annotations.target.stories.base.url=https://europeana.transcribathon.eu/documents/story/?
-enrich.annotations.creator=https://pro.europeana.eu/project/enrich-europeana
+# base URL of TP API V2
+transcribathon.api.v2.base.url=https://api.transcribathon.eu/v2/
+transcribathon.api.v2.authorization=Bearer <token>
+#may overwrtite default
+#transcribathon.htrtotext.xsl.file=/opt/app/enrich/xslt/PageToTextfile.xsl
 
-search.api.base.url=https://api.europeana.eu/record/v2/search.json
+# base URL of TP UI
+transcribathon.api.base.url=https://europeana.transcribathon.eu/
 
-#TODO: make consistent with the k8s configs
+# default creator of annotations (enrichments)
+#enrich.annotations.creator=https://pro.europeana.eu/project/enrich-europeana
+
+#TODO: make consistent with the k8s configs (requires support for using absolute paths)
 enrich.wikidata.subclasses.geographic-location=/wikidata-types/Q2221906-geographic-location-subclasses.json
 enrich.wikidata.subclasses.geographic-location.remove=/wikidata-types/Q2221906-types-to-exclude.json
 enrich.wikidata.subclasses.natural-person=/wikidata-types/Q154954-natural-person-subclasses.json

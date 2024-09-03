@@ -14,7 +14,7 @@ import org.springframework.context.annotation.PropertySources;
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
 @PropertySources({ @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
         @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "/opt/app/config/enrichment.properties", ignoreResourceNotFound = true) })
+        @PropertySource(value = "/opt/app/config/enrichment.user.properties", ignoreResourceNotFound = true) })
 public class EnrichmentConfiguration {
 
     Logger logger = LogManager.getLogger(getClass());
@@ -24,9 +24,6 @@ public class EnrichmentConfiguration {
 
     @Value("${enrich.ner.stanford.url}")
     private String nerStanfordUrl;
-
-    @Value("${enrich.ner.stanford.model}")
-    private String nerStanfordModel;
 
     @Value("${enrich.ner.dbpedia.baseUrl}")
     private String nerDbpediaBaseUrl;
@@ -55,52 +52,34 @@ public class EnrichmentConfiguration {
     @Value("${enrich.translation.deepl-free.authenticationKey}")
     private String translationDeeplFreeAuthenticationKey;
 
-    @Value("${solr.entity-positions.url}")
-    private String solrEntityPositionsUrl;
+    @Value("${solr.connection.url}")
+    private String solrConnectionUrl;
 
-    @Value("${solr.entity-positions.timeout}")
-    private int solrEntityPositionsTimeout;
+    @Value("${solr.timeout}")
+    private int solrTimeout;
 
     @Value("${solr.facetLimit}")
     private int solrFacetLimit;
 
-    @Value("${solr.wikidata-search.baseUrl}")
-    private String solrWikidataBaseUrl;
-
-    @Value("${enrich.solr.translated.entities}")
+     @Value("${enrich.solr.translated.entities}")
     private String solrTranslatedEntities;
 
-    @Value("${enrich.stories.import}")
-    private String storiesImport;
-
-    @Value("${enrich.items.import}")
-    private String itemsImport;
-
-    @Value("${enrich.directory}")
+    @Value("${enrich.directory:/opt/app/data/}")
     private String enrichDirectory;
 
-    @Value("${enrich.wikidata.json.base.url}")
+    @Value("${enrich.wikidata.json.base.url: 'https://www.wikidata.org/wiki/Special:EntityData/'}")
     private String enrichWikidataJsonBaseUrl;
 
-    @Value("${transcribathon.base.url.stories}")
-    private String transcribathonBaseUrlStories;
+    @Value("${transcribathon.api.base.url}")
+    private String transcribathonApiBaseUrl;
+    
+    @Value("${transcribathon.api.v2.base.url}")
+    private String transcribathonApiV2BaseUrl;
 
-    @Value("${transcribathon.base.url.stories.minimal}")
-    private String transcribathonBaseUrlStoriesMinimal;
+    @Value("${transcribathon.ui.base.url}")
+    private String transcribathonUiBaseUrl;
 
-    @Value("${transcribathon.base.url.items}")
-    private String transcribathonBaseUrlItems;
-
-    @Value("${enrich.annotations.id.base.url}")
-    private String annotationsIdBaseUrl;
-
-    @Value("${enrich.annotations.target.items.base.url}")
-    private String annotationsTargetItemsBaseUrl;
-
-    @Value("${enrich.annotations.target.stories.base.url}")
-    private String annotationsTargetStoriesBaseUrl;
-
-    @Value("${enrich.annotations.creator}")
+    @Value("${enrich.annotations.creator:'https://pro.europeana.eu/project/enrich-europeana'}")
     private String annotationsCreator;
 
     @Value("${enrich.wikidata.subclasses.geographic-location:/wikidata-types/Q2221906-geographic-location-subclasses.json}")
@@ -142,16 +121,10 @@ public class EnrichmentConfiguration {
     @Value("${search.api.base.url}")
     private String searchApiBaseUrl;
 
-    @Value("${htrdata.items.baseUrl}")
-    private String htrdataItemsBaseUrl;
+    @Value("${transcribathon.api.v2.authorization}")
+    private String tpAapiV2Authorization;
 
-    @Value("${htrdata.items.suffix}")
-    private String htrdataItemsSuffix;
-
-    @Value("${htrdata.items.authorization}")
-    private String htrdataItemsAuthorization;
-
-    @Value("${htrdata.items.xsl.file}")
+    @Value("${transcribathon.htrtotext.xsl.file:/opt/app/enrich/xslt/PageToTextfile.xsl}")
     private String htrdataItemsXslFile;
 
     public EnrichmentConfiguration() {
@@ -195,20 +168,24 @@ public class EnrichmentConfiguration {
     }
 
     private String buildApiEndpointUrl(String endpointPath) {
-        return getEnrichApiEndpoint().endsWith("/") ? getEnrichApiEndpoint() + endpointPath
-                : getEnrichApiEndpoint() + '/' + endpointPath;
+        return buildFullUrl(getEnrichApiEndpoint(), endpointPath);
+    }
+
+    private String buildFullUrl( String baseUrl, String relativePath) {
+        return baseUrl.endsWith("/") ? baseUrl + relativePath
+                : baseUrl + '/' + relativePath;
     }
 
     public String getTranslationETranslationErrorCallback() {
         return buildApiEndpointUrl("administration/etranslationErrorCallback");
     }
 
-    public String getSolrEntityPositionsUrl() {
-        return solrEntityPositionsUrl;
+    public String getSolrConnectionUrl() {
+        return solrConnectionUrl;
     }
 
-    public int getSolrEntityPositionsTimeout() {
-        return solrEntityPositionsTimeout;
+    public int getSolrTimeout() {
+        return solrTimeout;
     }
 
     public int getSolrFacetLimit() {
@@ -217,14 +194,6 @@ public class EnrichmentConfiguration {
 
     public String getSolrTranslatedEntities() {
         return solrTranslatedEntities;
-    }
-
-    public String getStoriesImport() {
-        return storiesImport;
-    }
-
-    public String getItemsImport() {
-        return itemsImport;
     }
 
     public String getEnrichDirectory() {
@@ -260,36 +229,24 @@ public class EnrichmentConfiguration {
         }
     }
 
-    public String getNerStanfordModel() {
-        return nerStanfordModel;
+    public String getEntitySearchBaseUrl() {
+        return buildApiEndpointUrl("entity/search");
     }
 
-    public String getSolrWikidataBaseUrl() {
-        return solrWikidataBaseUrl;
+    public String getTranscribathonApiBaseUrl() {
+        return transcribathonApiBaseUrl;
     }
-
+    
     public String getTranscribathonBaseUrlStories() {
-        return transcribathonBaseUrlStories;
-    }
-
-    public void setTranscribathonBaseUrlStories(String transcribathonBaseUrlStories) {
-        this.transcribathonBaseUrlStories = transcribathonBaseUrlStories;
+        return buildFullUrl(getTranscribathonApiBaseUrl(), "stories/");
     }
 
     public String getTranscribathonBaseUrlStoriesMinimal() {
-        return transcribathonBaseUrlStoriesMinimal;
-    }
-
-    public void setTranscribathonBaseUrlStoriesMinimal(String transcribathonBaseUrlStoriesMinimal) {
-        this.transcribathonBaseUrlStoriesMinimal = transcribathonBaseUrlStoriesMinimal;
+        return buildFullUrl(getTranscribathonApiBaseUrl(), "storiesMinimal/");
     }
 
     public String getTranscribathonBaseUrlItems() {
-        return transcribathonBaseUrlItems;
-    }
-
-    public void setTranscribathonBaseUrlItems(String transcribathonBaseUrlItems) {
-        this.transcribathonBaseUrlItems = transcribathonBaseUrlItems;
+        return buildFullUrl(getTranscribathonApiBaseUrl(), "items/");
     }
 
     public String getTranslationDeeplFreeBaseUrl() {
@@ -309,15 +266,15 @@ public class EnrichmentConfiguration {
     }
 
     public String getAnnotationsIdBaseUrl() {
-        return annotationsIdBaseUrl;
+        return buildApiEndpointUrl("enrichment/annotation/");
     }
 
     public String getAnnotationsTargetItemsBaseUrl() {
-        return annotationsTargetItemsBaseUrl;
+        return buildFullUrl(getTranscribathonUiBaseUrl(), "documents/story/item/?");
     }
 
     public String getAnnotationsTargetStoriesBaseUrl() {
-        return annotationsTargetStoriesBaseUrl;
+        return buildFullUrl(getTranscribathonUiBaseUrl(), "documents/story/item/?");
     }
 
     public String getAnnotationsCreator() {
@@ -368,10 +325,6 @@ public class EnrichmentConfiguration {
         return enrichWikidataJsonBaseUrl;
     }
 
-    public String getSearchApiBaseUrl() {
-        return searchApiBaseUrl;
-    }
-
     public String getWikidataSubclassesNaturalPerson() {
         return wikidataSubclassesNaturalPerson;
     }
@@ -380,16 +333,16 @@ public class EnrichmentConfiguration {
         return wikidataSubclassesJuridicalPerson;
     }
 
-    public String getHtrdataItemsBaseUrl() {
-        return htrdataItemsBaseUrl;
+    public String getTranscribathonAPiV2ItemsBaseUrl() {
+        return buildFullUrl(transcribathonApiV2BaseUrl, "items/") ;
     }
 
     public String getHtrdataItemsSuffix() {
-        return htrdataItemsSuffix;
+        return "/htrdata/active";
     }
 
-    public String getHtrdataItemsAuthorization() {
-        return htrdataItemsAuthorization;
+    public String getTpAapiV2Authorization() {
+        return tpAapiV2Authorization;
     }
 
     public String getHtrdataItemsXslFile() {
@@ -398,5 +351,9 @@ public class EnrichmentConfiguration {
 
     public String getTranslationETranslationEndpoint() {
         return translationETranslationEndpoint;
+    }
+
+    public String getTranscribathonUiBaseUrl() {
+        return transcribathonUiBaseUrl;
     }
 }

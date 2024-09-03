@@ -1,8 +1,6 @@
 # configured in <profiles/> section in parent pom.xml
 # we inject entitymanagment.properties in Jenkins builds, so this property needs to be specified here
 spring.profiles.active=${activeProfile}
-#server.port = 
-#enrich.translation.google = true
 
 info.app.name=${spring.application.name}
 info.app.version=${project.version}

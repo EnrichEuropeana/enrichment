@@ -16,7 +16,7 @@ public class SolrConfig {
 
 	@Autowired
 	public SolrConfig(EnrichmentConfiguration enrichmentConfiguration) {
-		this.solrURL = enrichmentConfiguration.getSolrEntityPositionsUrl();
+		this.solrURL = enrichmentConfiguration.getSolrConnectionUrl();
 	}
 
 	String solrURL;
