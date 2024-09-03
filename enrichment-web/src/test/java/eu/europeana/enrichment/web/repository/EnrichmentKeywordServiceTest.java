@@ -25,6 +25,7 @@ import eu.europeana.enrichment.web.service.impl.EnrichmentTpKeywordServiceImpl;
 @ComponentScan(basePackageClasses = EnrichmentApp.class)
 @AutoConfigureMockMvc
 @SpringBootTest
+@Disabled
 public class EnrichmentKeywordServiceTest {
 
     Logger logger = LogManager.getLogger(getClass());

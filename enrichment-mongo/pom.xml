@@ -87,6 +87,5 @@
         	<artifactId>morphia-core</artifactId>
         	<version>${version.morphia}</version>        	
         </dependency>
-		
 	</dependencies>	
 </project>

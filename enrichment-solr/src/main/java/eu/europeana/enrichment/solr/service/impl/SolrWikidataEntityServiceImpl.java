@@ -295,7 +295,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			throw e;
 		}
 
-		//ResultSet<T> resultSet = new ResultSet<>();		
 		binder = new DocumentObjectBinder();
 		docList = rsp.getResults();		
 		if(docList.size() == 0)
@@ -305,15 +304,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 		}
 		
 		SolrDocument doc = docList.get(0);		
-		//String type = (String) doc.get(EntitySolrFields.INTERNAL_TYPE);
-		
-		
-		//entityClass = (Class<T>) EntityObjectFactory.getInstance().getClassForType(type);
-		/*
-		 * TODO: create a class of types as in the entity-api EntityTypes and check there for the 
-		 * type of the class that needs to be serialized
-		 */
-
 		if(type.equalsIgnoreCase(NERClassification.AGENT.toString()))
 		{
 			SolrWikidataAgentImpl entity;
@@ -325,7 +315,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	try {
 				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the serializion of the wikidata agent from Solr.", e);
 				throw e;
 			}
@@ -343,7 +332,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	try {
 				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the serializion of the wikidata place from Solr.", e);
 				throw e;
 			}
@@ -361,7 +349,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 	    	try {
 				serializedUserSetJsonLdStr = jsonLdSerializer.serializeObject(entity);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				logger.log(Level.ERROR, "Exception during the serializion of the wikidata organization from Solr.", e);
 				throw e;
 			}
@@ -415,6 +402,8 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			queryOnePage.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			queryAllPages.set("q", EntitySolrFields.LABEL+ ":" + queryText + " AND " + EntitySolrFields.INTERNAL_TYPE + ":" + typeQueryText);
 			
+//			URLPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
+//			URLWithoutPage = "http://dsi-demo.ait.ac.at/enrichment-web/entity/search?wskey=" + wskey + "&query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			URLPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			URLWithoutPage = enrichmentConfiguration.getSolrWikidataBaseUrl() + "?query=" + queryText + "&type=" + entityType + "&lang="+ lang;
 			
@@ -463,7 +452,6 @@ public class SolrWikidataEntityServiceImpl extends SolrBaseClientServiceImpl imp
 			rspOnePage = query(solrCore, queryOnePage);
 			rspAllPages = query(solrCore, queryAllPages);
 		} catch (SolrServiceException e) {
-			// TODO Auto-generated catch block
 			logger.log(Level.ERROR, "Exception during the search for the NamedEntity from Solr.", e);
 			throw e;
 		}

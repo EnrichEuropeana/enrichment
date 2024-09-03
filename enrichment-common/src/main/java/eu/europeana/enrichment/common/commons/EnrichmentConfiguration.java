@@ -12,8 +12,11 @@ import org.springframework.context.annotation.PropertySources;
  * file and optionally override from enrichment.user.properties file
  */
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
-@PropertySources({ @PropertySource("classpath:config/enrichment.properties"),
-	@PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true) })
+@PropertySources({ 
+    @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true), 
+    @PropertySource(value = "/opt/app/config/enrichment.properties", ignoreResourceNotFound = true)    
+})
 public class EnrichmentConfiguration  {
 
 	Logger logger = LogManager.getLogger(getClass());
@@ -30,15 +33,6 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.ner.stanford.model}")
     private String nerStanfordModel;
 
-	@Value("${enrich.ner.python.path}")
-    private String nerPythonPath;
-
-    @Value("${enrich.ner.python.script}")
-    private String nerPythonScript;
-
-    @Value("${enrich.ner.python.spacy.model}")
-    private String nerPythonSpacyModel;
-
     @Value("${enrich.ner.dbpedia.baseUrl}")
     private String nerDbpediaBaseUrl;
 
@@ -51,22 +45,16 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.translation.google.waittime}")
     private int translationGoogleWaittime;
 
-    @Value("${enrich.translation.eTranslation.credentials}")
+    @Value("${enrich.translation.eTranslation.credentials: /opt/app/secrets/eTranslation.txt}")
     private String translationETranslationCredentials;
 
     @Value("${enrich.translation.eTranslation.domain}")
     private String translationETranslationDomain;
+    
+    @Value("${enrich.translation.eTranslation.endpoint}")
+    private String translationETranslationEndpoint;
 
-    @Value("${enrich.translation.eTranslation.requesterCallback}")
-    private String translationETranslationRequesterCallback;
-
-    @Value("${enrich.translation.eTranslation.baseUrl}")
-    private String translationETranslationBaseUrl;
-
-    @Value("${enrich.translation.eTranslation.baseUrl.local}")
-    private String translationETranslationBaseUrlLocal;
-
-	@Value("${enrich.translation.eTranslation.errorCallback}")
+    @Value("${enrich.translation.eTranslation.errorCallback}")
     private String translationETranslationErrorCallback;
 
     @Value("${enrich.translation.eTranslation.emailDestination}")
@@ -126,20 +114,17 @@ public class EnrichmentConfiguration  {
 	@Value("${enrich.annotations.creator}")
     private String annotationsCreator;	
 	
-	@Value("${enrich.wikidata.subclasses.geographic-location}")
+	@Value("${enrich.wikidata.subclasses.geographic-location:/wikidata-types/Q2221906-geographic-location-subclasses.json}")
     private String wikidataSubclassesGeographicLocation;
 	
-	@Value("${enrich.wikidata.subclasses.geographic-location.remove}")
+	@Value("${enrich.wikidata.subclasses.geographic-location.remove:/wikidata-types/Q2221906-types-to-exclude.json}")
     private String wikidataSubclassesGeographicLocationRemove;
 
-	@Value("${enrich.wikidata.subclasses.natural-person}")
+	@Value("${enrich.wikidata.subclasses.natural-person:/wikidata-types/Q154954-natural-person-subclasses.json}")
     private String wikidataSubclassesNaturalPerson;	
 
-	@Value("${enrich.wikidata.subclasses.juridical-person}")
+	@Value("${enrich.wikidata.subclasses.juridical-person:/wikidata-types/Q155076-juridical-person-subclasses.json}")
     private String wikidataSubclassesJuridicalPerson;	
-	
-    @Value("${enrich.wikidata.search.places.baseUrl}")
-    private String wikidataSearchPlacesBaseUrl;   
 
 	@Value("${auth.read.enabled: true}")
 	private boolean authReadEnabled;
@@ -180,6 +165,8 @@ public class EnrichmentConfiguration  {
 	@Value("${htrdata.items.xsl.file}")
 	private String htrdataItemsXslFile;
 	
+	
+	
 	public EnrichmentConfiguration() {
 		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
@@ -194,18 +181,6 @@ public class EnrichmentConfiguration  {
 
 	public String getNerStanfordUrl() {
 		return nerStanfordUrl;
-	}
-
-	public String getNerPythonPath() {
-		return nerPythonPath;
-	}
-
-	public String getNerPythonScript() {
-		return nerPythonScript;
-	}
-
-	public String getNerPythonSpacyModel() {
-		return nerPythonSpacyModel;
 	}
 
 	public String getNerDbpediaBaseUrl() {
@@ -233,18 +208,16 @@ public class EnrichmentConfiguration  {
 	}
 
 	public String getTranslationETranslationRequesterCallback() {
-		return translationETranslationRequesterCallback;
+		return buildApiEndpointUrl("administration/eTranslation");
 	}
 
-    public String getTranslationETranslationBaseUrl() {
-      return translationETranslationBaseUrl;
-    }   
+	private String buildApiEndpointUrl(String endpointPath) {
+	    return getEnrichApiEndpoint().endsWith("/") ? 
+	            getEnrichApiEndpoint() + endpointPath :
+	            getEnrichApiEndpoint() + '/' + endpointPath;
+        }
 
-    public String getTranslationETranslationBaseUrlLocal() {
-		return translationETranslationBaseUrlLocal;
-	}	
-
-	public String getTranslationETranslationErrorCallback() {
+    public String getTranslationETranslationErrorCallback() {
 		return translationETranslationErrorCallback;
 	}
 
@@ -445,7 +418,7 @@ public class EnrichmentConfiguration  {
 		return htrdataItemsXslFile;
 	}
 
-  public String getWikidataSearchPlacesBaseUrl() {
-    return wikidataSearchPlacesBaseUrl;
-  }
+    public String getTranslationETranslationEndpoint() {
+        return translationETranslationEndpoint;
+    }
 }

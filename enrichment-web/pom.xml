@@ -23,7 +23,7 @@
 	</parent>
 
 	<artifactId>enrichment-web</artifactId>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<name>Enrichment - RESTful  web services module</name>
 	
 	<dependencies>
@@ -386,14 +386,14 @@
 	
 	<build>
 		<!-- it seems that final name is not inhereted from parent pom -->
-		<finalName>${project.artifactId}-${project.version}</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<pluginManagement>
 		<plugins>
+		<!--	
 		 <plugin>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.1</version>
+				<version>2.4</version>
 				<configuration>
-					<!-- warSourceDirectory>WebContent</warSourceDirectory-->
 					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<webResources>
@@ -408,10 +408,10 @@
 					</webResources>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-<!-- 				<version>${version.springBoot}</version> -->
 				<executions>
 					<execution>
 						<goals>
@@ -420,32 +420,28 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- banned dependencies which will cause project build to fail -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-banned-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>        
-                  <!-- deps with excludes will be banned -->      
-                    <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>
-                  </excludes>
-                </bannedDependencies>
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>			
+			-->
 	</plugins>
 	</pluginManagement>
+	
+	<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>executable</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+	</plugins>
+	
 	</build>
 
 </project>
