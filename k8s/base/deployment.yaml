@@ -15,14 +15,14 @@ spec:
         image: gsergiu79/enrichment-web
         env:
           - name: SPRING_CONFIG_NAME
-            value: "application,enrichment"
+            value: "application,enrichment,enrichment.user"
           - name: SPRING_CONFIG_ADDITIONAL_LOCATION
-            value: "file:/opt/app/config/application.properties,file:/opt/app/config/enrichment.properties"
+            value: "file:/opt/app/config/application.properties,file:/opt/app/config/enrichment.user.properties"
         ports:
           - containerPort: 8080
         volumeMounts:
           - name: enrichment-properties
-            mountPath: "/opt/app/config/enrichment.properties"
+            mountPath: "/opt/app/config/enrichment.user.properties"
             readOnly: true
             subPath: enrichment.properties
           - name: app-properties
@@ -34,15 +34,15 @@ spec:
             readOnly: true
             subPath: log4j2-spring.xml
           - name: gtanslate-credentials
-            mountPath: "/opt/app/secrets/gtanslate.json"
+            mountPath: "/opt/app/enrich/secrets/gtanslate.json"
             readOnly: true
             subPath: gtanslate.json
           - name: etanslate-credentials
-            mountPath: "/opt/app/secrets/eTranslation.txt"
+            mountPath: "/opt/app/enrich/secrets/eTranslation.txt"
             readOnly: true
             subPath: eTranslation.txt
           - name: deepl-credentials
-            mountPath: "/opt/app/secrets/deeplAuthentication.txt"
+            mountPath: "/opt/app/enrich/secrets/deeplAuthentication.txt"
             readOnly: true
             subPath: deeplAuthentication.txt      
                 

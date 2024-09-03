@@ -10,7 +10,7 @@ labels:
 secretGenerator:
   - name: enrichment-web-properties
     files:
-      - enrichment.properties
+      - enrichment.user.properties
   - name: application-properties
     files:
       - application.properties

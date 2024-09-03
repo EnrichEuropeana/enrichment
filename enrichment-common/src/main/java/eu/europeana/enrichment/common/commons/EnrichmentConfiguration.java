@@ -31,13 +31,13 @@ public class EnrichmentConfiguration {
     @Value("${enrich.ner.linking.europeana.apikey}")
     private String nerLinkingEuropeanaApikey;
 
-    @Value("${enrich.translation.google.credentials}")
+    @Value("${enrich.translation.google.credentials: /opt/app/enrich/secrets/gtanslate.json}")
     private String translationGoogleCredentials;
 
     @Value("${enrich.translation.google.waittime}")
     private int translationGoogleWaittime;
 
-    @Value("${enrich.translation.eTranslation.credentials: /opt/app/secrets/eTranslation.txt}")
+    @Value("${enrich.translation.eTranslation.credentials: /opt/app/enrich/secrets/eTranslation.txt}")
     private String translationETranslationCredentials;
 
     @Value("${enrich.translation.eTranslation.domain}")
