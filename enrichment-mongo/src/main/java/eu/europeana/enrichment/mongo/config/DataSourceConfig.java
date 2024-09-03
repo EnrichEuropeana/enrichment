@@ -21,10 +21,10 @@ public class DataSourceConfig {
 
     Logger logger = LogManager.getLogger(getClass());
 
-    @Value("${enrich.mongodb.connectionUri}")
+    @Value("${spring.data.mongodb.uri}")
     private String hostUri;
 
-    @Value("${enrich.mongodb.database}")
+    @Value("${spring.data.mongodb.database}")
     private String emDatabase;
 
     @Bean

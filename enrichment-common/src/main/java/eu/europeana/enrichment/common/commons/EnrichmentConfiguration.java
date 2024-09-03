@@ -8,24 +8,19 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 
 /**
- * Container for all settings that we load from the enrichment.properties
- * file and optionally override from enrichment.user.properties file
+ * Container for all settings that we load from the enrichment.properties file
+ * and optionally override from enrichment.user.properties file
  */
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
-@PropertySources({ 
-    @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
-    @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true), 
-    @PropertySource(value = "/opt/app/config/enrichment.properties", ignoreResourceNotFound = true)    
-})
-public class EnrichmentConfiguration  {
+@PropertySources({ @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
+        @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true),
+        @PropertySource(value = "/opt/app/config/enrichment.properties", ignoreResourceNotFound = true) })
+public class EnrichmentConfiguration {
 
-	Logger logger = LogManager.getLogger(getClass());
-	
+    Logger logger = LogManager.getLogger(getClass());
+
     @Value("${enrich.api.endpoint}")
     private String enrichApiEndpoint;
-
-	@Value("${enrich.mongodb.connectionUri}")
-    private String mongodbConnectionUri;
 
     @Value("${enrich.ner.stanford.url}")
     private String nerStanfordUrl;
@@ -50,7 +45,7 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.translation.eTranslation.domain}")
     private String translationETranslationDomain;
-    
+
     @Value("${enrich.translation.eTranslation.endpoint}")
     private String translationETranslationEndpoint;
 
@@ -59,14 +54,14 @@ public class EnrichmentConfiguration  {
 
     @Value("${enrich.translation.eTranslation.emailDestination}")
     private String translationETranslationEmailDestination;
-    
+
     @Value("${enrich.translation.deepl-free.baseUrl}")
     private String translationDeeplFreeBaseUrl;
-    
+
     @Value("${enrich.translation.deepl-free.authenticationKey}")
     private String translationDeeplFreeAuthenticationKey;
 
-	@Value("${solr.entity-positions.url}")
+    @Value("${solr.entity-positions.url}")
     private String solrEntityPositionsUrl;
 
     @Value("${solr.entity-positions.timeout}")
@@ -74,11 +69,11 @@ public class EnrichmentConfiguration  {
 
     @Value("${solr.facetLimit}")
     private int solrFacetLimit;
-    
+
     @Value("${solr.wikidata-search.baseUrl}")
     private String solrWikidataBaseUrl;
 
-	@Value("${enrich.solr.translated.entities}")
+    @Value("${enrich.solr.translated.entities}")
     private String solrTranslatedEntities;
 
     @Value("${enrich.stories.import}")
@@ -93,330 +88,323 @@ public class EnrichmentConfiguration  {
     @Value("${enrich.wikidata.json.base.url}")
     private String enrichWikidataJsonBaseUrl;
 
-	@Value("${transcribathon.base.url.stories}")
+    @Value("${transcribathon.base.url.stories}")
     private String transcribathonBaseUrlStories;
 
     @Value("${transcribathon.base.url.stories.minimal}")
     private String transcribathonBaseUrlStoriesMinimal;
-    
-	@Value("${transcribathon.base.url.items}")
+
+    @Value("${transcribathon.base.url.items}")
     private String transcribathonBaseUrlItems;
 
-	@Value("${enrich.annotations.id.base.url}")
+    @Value("${enrich.annotations.id.base.url}")
     private String annotationsIdBaseUrl;
 
-	@Value("${enrich.annotations.target.items.base.url}")
+    @Value("${enrich.annotations.target.items.base.url}")
     private String annotationsTargetItemsBaseUrl;
 
-	@Value("${enrich.annotations.target.stories.base.url}")
+    @Value("${enrich.annotations.target.stories.base.url}")
     private String annotationsTargetStoriesBaseUrl;
-	
-	@Value("${enrich.annotations.creator}")
-    private String annotationsCreator;	
-	
-	@Value("${enrich.wikidata.subclasses.geographic-location:/wikidata-types/Q2221906-geographic-location-subclasses.json}")
+
+    @Value("${enrich.annotations.creator}")
+    private String annotationsCreator;
+
+    @Value("${enrich.wikidata.subclasses.geographic-location:/wikidata-types/Q2221906-geographic-location-subclasses.json}")
     private String wikidataSubclassesGeographicLocation;
-	
-	@Value("${enrich.wikidata.subclasses.geographic-location.remove:/wikidata-types/Q2221906-types-to-exclude.json}")
+
+    @Value("${enrich.wikidata.subclasses.geographic-location.remove:/wikidata-types/Q2221906-types-to-exclude.json}")
     private String wikidataSubclassesGeographicLocationRemove;
 
-	@Value("${enrich.wikidata.subclasses.natural-person:/wikidata-types/Q154954-natural-person-subclasses.json}")
-    private String wikidataSubclassesNaturalPerson;	
+    @Value("${enrich.wikidata.subclasses.natural-person:/wikidata-types/Q154954-natural-person-subclasses.json}")
+    private String wikidataSubclassesNaturalPerson;
 
-	@Value("${enrich.wikidata.subclasses.juridical-person:/wikidata-types/Q155076-juridical-person-subclasses.json}")
-    private String wikidataSubclassesJuridicalPerson;	
+    @Value("${enrich.wikidata.subclasses.juridical-person:/wikidata-types/Q155076-juridical-person-subclasses.json}")
+    private String wikidataSubclassesJuridicalPerson;
 
-	@Value("${auth.read.enabled: true}")
-	private boolean authReadEnabled;
-	
-	@Value("${auth.write.enabled: true}")
-	private boolean authWriteEnabled;
-	
-	@Value("${europeana.apikey.jwttoken.signaturekey}")
-	private String apiKeyPublicKey;
-	
-	@Value("${authorization.api.name}")
-	private String authorizationApiName;
-	
-	@Value("${europeana.apikey.serviceurl}")
-	private String apiKeyUrl;
-	
-	@Value("${spark.topic.detection.serviceurl}")
-	private String sparkTopicDetectionUrl;
+    @Value("${auth.read.enabled: true}")
+    private boolean authReadEnabled;
 
-	@Value("${spark.language.detection.serviceurl}")
-	private String sparkLanguageDetectionUrl;
-	
-	@Value("${enrich.wikidata.save.json.to.local.cache: true}")
-	private boolean wikidataSaveJsonToLocalCache;
-	
-	@Value("${search.api.base.url}")
-	private String searchApiBaseUrl;
-	
-	@Value("${htrdata.items.baseUrl}")
-	private String htrdataItemsBaseUrl;
+    @Value("${auth.write.enabled: true}")
+    private boolean authWriteEnabled;
 
-	@Value("${htrdata.items.suffix}")
-	private String htrdataItemsSuffix;
+    @Value("${europeana.apikey.jwttoken.signaturekey}")
+    private String apiKeyPublicKey;
 
-	@Value("${htrdata.items.authorization}")
-	private String htrdataItemsAuthorization;
-	
-	@Value("${htrdata.items.xsl.file}")
-	private String htrdataItemsXslFile;
-	
-	
-	
-	public EnrichmentConfiguration() {
-		logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
+    @Value("${authorization.api.name}")
+    private String authorizationApiName;
+
+    @Value("${europeana.apikey.serviceurl}")
+    private String apiKeyUrl;
+
+    @Value("${spark.topic.detection.serviceurl}")
+    private String sparkTopicDetectionUrl;
+
+    @Value("${spark.language.detection.serviceurl}")
+    private String sparkLanguageDetectionUrl;
+
+    @Value("${enrich.wikidata.save.json.to.local.cache: true}")
+    private boolean wikidataSaveJsonToLocalCache;
+
+    @Value("${search.api.base.url}")
+    private String searchApiBaseUrl;
+
+    @Value("${htrdata.items.baseUrl}")
+    private String htrdataItemsBaseUrl;
+
+    @Value("${htrdata.items.suffix}")
+    private String htrdataItemsSuffix;
+
+    @Value("${htrdata.items.authorization}")
+    private String htrdataItemsAuthorization;
+
+    @Value("${htrdata.items.xsl.file}")
+    private String htrdataItemsXslFile;
+
+    public EnrichmentConfiguration() {
+        logger.debug("Initializing EnrichmentConfiguration bean as: configuration");
     }
 
     public String getEnrichApiEndpoint() {
-		return enrichApiEndpoint;
-	}
+        return enrichApiEndpoint;
+    }
 
-  	public String getMongodbConnectionUri() {
-		return mongodbConnectionUri;
-	}
+    public String getNerStanfordUrl() {
+        return nerStanfordUrl;
+    }
 
-	public String getNerStanfordUrl() {
-		return nerStanfordUrl;
-	}
+    public String getNerDbpediaBaseUrl() {
+        return nerDbpediaBaseUrl;
+    }
 
-	public String getNerDbpediaBaseUrl() {
-		return nerDbpediaBaseUrl;
-	}
+    public String getNerLinkingEuropeanaApikey() {
+        return nerLinkingEuropeanaApikey;
+    }
 
-	public String getNerLinkingEuropeanaApikey() {
-		return nerLinkingEuropeanaApikey;
-	}
+    public String getTranslationGoogleCredentials() {
+        return translationGoogleCredentials;
+    }
 
-	public String getTranslationGoogleCredentials() {
-		return translationGoogleCredentials;
-	}
+    public int getTranslationGoogleWaittime() {
+        return translationGoogleWaittime;
+    }
 
-	public int getTranslationGoogleWaittime() {
-		return translationGoogleWaittime;
-	}
+    public String getTranslationETranslationCredentials() {
+        return translationETranslationCredentials;
+    }
 
-	public String getTranslationETranslationCredentials() {
-		return translationETranslationCredentials;
-	}
+    public String getTranslationETranslationDomain() {
+        return translationETranslationDomain;
+    }
 
-	public String getTranslationETranslationDomain() {
-		return translationETranslationDomain;
-	}
+    public String getTranslationETranslationRequesterCallback() {
+        return buildApiEndpointUrl("administration/eTranslation");
+    }
 
-	public String getTranslationETranslationRequesterCallback() {
-		return buildApiEndpointUrl("administration/eTranslation");
-	}
-
-	private String buildApiEndpointUrl(String endpointPath) {
-	    return getEnrichApiEndpoint().endsWith("/") ? 
-	            getEnrichApiEndpoint() + endpointPath :
-	            getEnrichApiEndpoint() + '/' + endpointPath;
-        }
+    private String buildApiEndpointUrl(String endpointPath) {
+        return getEnrichApiEndpoint().endsWith("/") ? getEnrichApiEndpoint() + endpointPath
+                : getEnrichApiEndpoint() + '/' + endpointPath;
+    }
 
     public String getTranslationETranslationErrorCallback() {
-		return translationETranslationErrorCallback;
-	}
+        return translationETranslationErrorCallback;
+    }
 
-	public String getTranslationETranslationEmailDestination() {
-		return translationETranslationEmailDestination;
-	}
+    public String getTranslationETranslationEmailDestination() {
+        return translationETranslationEmailDestination;
+    }
 
-	public String getSolrEntityPositionsUrl() {
-		return solrEntityPositionsUrl;
-	}
+    public String getSolrEntityPositionsUrl() {
+        return solrEntityPositionsUrl;
+    }
 
-	public int getSolrEntityPositionsTimeout() {
-		return solrEntityPositionsTimeout;
-	}
+    public int getSolrEntityPositionsTimeout() {
+        return solrEntityPositionsTimeout;
+    }
 
-	public int getSolrFacetLimit() {
-		return solrFacetLimit;
-	}
+    public int getSolrFacetLimit() {
+        return solrFacetLimit;
+    }
 
-	public String getSolrTranslatedEntities() {
-		return solrTranslatedEntities;
-	}
+    public String getSolrTranslatedEntities() {
+        return solrTranslatedEntities;
+    }
 
-	public String getStoriesImport() {
-		return storiesImport;
-	}
+    public String getStoriesImport() {
+        return storiesImport;
+    }
 
-	public String getItemsImport() {
-		return itemsImport;
-	}
+    public String getItemsImport() {
+        return itemsImport;
+    }
 
-	public String getEnrichDirectory() {
-		return enrichDirectory;
-	} 
+    public String getEnrichDirectory() {
+        return enrichDirectory;
+    }
 
-	public String getEnrichWikidataDirectory() {
-		if(enrichDirectory.endsWith("/")) {
-			return enrichDirectory + EnrichmentConstants.WIKIDATA_DIR;
-		}
-		else {
-			return enrichDirectory + "/" + EnrichmentConstants.WIKIDATA_DIR;
-		}
-		
-	} 
-	
-	public String getEnrichDRICollectionDirectory() {
-		if(enrichDirectory.endsWith("/")) {
-			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
-		}
-		else {
-			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.DRI_COLLECTION_DIR;
-		}
-	} 
-	
-	public String getEnrichUWRCollectionDirectory() {
-		if(enrichDirectory.endsWith("/")) {
-			return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
-		}
-		else {
-			return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/" + EnrichmentConstants.UWR_COLLECTION_DIR;
-		}
-	} 
+    public String getEnrichWikidataDirectory() {
+        if (enrichDirectory.endsWith("/")) {
+            return enrichDirectory + EnrichmentConstants.WIKIDATA_DIR;
+        } else {
+            return enrichDirectory + "/" + EnrichmentConstants.WIKIDATA_DIR;
+        }
 
-	
+    }
+
+    public String getEnrichDRICollectionDirectory() {
+        if (enrichDirectory.endsWith("/")) {
+            return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/"
+                    + EnrichmentConstants.DRI_COLLECTION_DIR;
+        } else {
+            return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/"
+                    + EnrichmentConstants.DRI_COLLECTION_DIR;
+        }
+    }
+
+    public String getEnrichUWRCollectionDirectory() {
+        if (enrichDirectory.endsWith("/")) {
+            return enrichDirectory + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/"
+                    + EnrichmentConstants.UWR_COLLECTION_DIR;
+        } else {
+            return enrichDirectory + "/" + EnrichmentConstants.TRANSLATION_EVALUATION_DIR + "/"
+                    + EnrichmentConstants.UWR_COLLECTION_DIR;
+        }
+    }
+
     public String getNerStanfordModel() {
-		return nerStanfordModel;
-	}
+        return nerStanfordModel;
+    }
 
     public String getSolrWikidataBaseUrl() {
-		return solrWikidataBaseUrl;
-	}
+        return solrWikidataBaseUrl;
+    }
 
     public String getTranscribathonBaseUrlStories() {
-		return transcribathonBaseUrlStories;
-	}
+        return transcribathonBaseUrlStories;
+    }
 
-	public void setTranscribathonBaseUrlStories(String transcribathonBaseUrlStories) {
-		this.transcribathonBaseUrlStories = transcribathonBaseUrlStories;
-	}
+    public void setTranscribathonBaseUrlStories(String transcribathonBaseUrlStories) {
+        this.transcribathonBaseUrlStories = transcribathonBaseUrlStories;
+    }
 
     public String getTranscribathonBaseUrlStoriesMinimal() {
-		return transcribathonBaseUrlStoriesMinimal;
-	}
+        return transcribathonBaseUrlStoriesMinimal;
+    }
 
-	public void setTranscribathonBaseUrlStoriesMinimal(String transcribathonBaseUrlStoriesMinimal) {
-		this.transcribathonBaseUrlStoriesMinimal = transcribathonBaseUrlStoriesMinimal;
-	}
+    public void setTranscribathonBaseUrlStoriesMinimal(String transcribathonBaseUrlStoriesMinimal) {
+        this.transcribathonBaseUrlStoriesMinimal = transcribathonBaseUrlStoriesMinimal;
+    }
 
-	public String getTranscribathonBaseUrlItems() {
-		return transcribathonBaseUrlItems;
-	}
+    public String getTranscribathonBaseUrlItems() {
+        return transcribathonBaseUrlItems;
+    }
 
-	public void setTranscribathonBaseUrlItems(String transcribathonBaseUrlItems) {
-		this.transcribathonBaseUrlItems = transcribathonBaseUrlItems;
-	}
+    public void setTranscribathonBaseUrlItems(String transcribathonBaseUrlItems) {
+        this.transcribathonBaseUrlItems = transcribathonBaseUrlItems;
+    }
 
     public String getTranslationDeeplFreeBaseUrl() {
-		return translationDeeplFreeBaseUrl;
-	}
+        return translationDeeplFreeBaseUrl;
+    }
 
-	public void setTranslationDeeplFreeBaseUrl(String translationDeeplFreeBaseUrl) {
-		this.translationDeeplFreeBaseUrl = translationDeeplFreeBaseUrl;
-	}
-	
-	public String getTranslationDeeplFreeAuthenticationKey() {
-		return translationDeeplFreeAuthenticationKey;
-	}
+    public void setTranslationDeeplFreeBaseUrl(String translationDeeplFreeBaseUrl) {
+        this.translationDeeplFreeBaseUrl = translationDeeplFreeBaseUrl;
+    }
 
-	public void setTranslationDeeplFreeAuthenticationKey(String translationDeeplFreeAuthenticationKey) {
-		this.translationDeeplFreeAuthenticationKey = translationDeeplFreeAuthenticationKey;
-	}
-	
-	public String getAnnotationsIdBaseUrl() {
-		return annotationsIdBaseUrl;
-	}
+    public String getTranslationDeeplFreeAuthenticationKey() {
+        return translationDeeplFreeAuthenticationKey;
+    }
 
-	public String getAnnotationsTargetItemsBaseUrl() {
-		return annotationsTargetItemsBaseUrl;
-	}
+    public void setTranslationDeeplFreeAuthenticationKey(String translationDeeplFreeAuthenticationKey) {
+        this.translationDeeplFreeAuthenticationKey = translationDeeplFreeAuthenticationKey;
+    }
 
-	public String getAnnotationsTargetStoriesBaseUrl() {
-		return annotationsTargetStoriesBaseUrl;
-	}
-	
-  	public String getAnnotationsCreator() {
-		return annotationsCreator;
-	}
-  	
-	public String getWikidataSubclassesGeographicLocation() {
-		return wikidataSubclassesGeographicLocation;
-	}
+    public String getAnnotationsIdBaseUrl() {
+        return annotationsIdBaseUrl;
+    }
 
-	public String getWikidataSubclassesGeographicLocationRemove() {
-		return wikidataSubclassesGeographicLocationRemove;
-	}
-	
-	public boolean isAuthReadEnabled() {
-	    return authReadEnabled;
-	}
-	
-	public boolean isAuthWriteEnabled() {
-		return authWriteEnabled;
-	}
-	
-	public String getApiKeyPublicKey() {
-		return apiKeyPublicKey;
-	}
+    public String getAnnotationsTargetItemsBaseUrl() {
+        return annotationsTargetItemsBaseUrl;
+    }
 
-	public String getAuthorizationApiName() {
-	    return authorizationApiName;
-	}
+    public String getAnnotationsTargetStoriesBaseUrl() {
+        return annotationsTargetStoriesBaseUrl;
+    }
 
-	public String getApiKeyUrl() {
-	    return apiKeyUrl;
-	}
+    public String getAnnotationsCreator() {
+        return annotationsCreator;
+    }
 
-	public String getSparkTopicDetectionUrl() {
-		return sparkTopicDetectionUrl;
-	}	
-	
-	public String getSparkLanguageDetectionUrl() {
-		return sparkLanguageDetectionUrl;
-	}	
-	
-	public boolean getWikidataSaveJsonToLocalCache() {
-		return wikidataSaveJsonToLocalCache;
-	}	
-	
+    public String getWikidataSubclassesGeographicLocation() {
+        return wikidataSubclassesGeographicLocation;
+    }
+
+    public String getWikidataSubclassesGeographicLocationRemove() {
+        return wikidataSubclassesGeographicLocationRemove;
+    }
+
+    public boolean isAuthReadEnabled() {
+        return authReadEnabled;
+    }
+
+    public boolean isAuthWriteEnabled() {
+        return authWriteEnabled;
+    }
+
+    public String getApiKeyPublicKey() {
+        return apiKeyPublicKey;
+    }
+
+    public String getAuthorizationApiName() {
+        return authorizationApiName;
+    }
+
+    public String getApiKeyUrl() {
+        return apiKeyUrl;
+    }
+
+    public String getSparkTopicDetectionUrl() {
+        return sparkTopicDetectionUrl;
+    }
+
+    public String getSparkLanguageDetectionUrl() {
+        return sparkLanguageDetectionUrl;
+    }
+
+    public boolean getWikidataSaveJsonToLocalCache() {
+        return wikidataSaveJsonToLocalCache;
+    }
+
     public String getEnrichWikidataJsonBaseUrl() {
-		return enrichWikidataJsonBaseUrl;
-	}
-	
-	public String getSearchApiBaseUrl() {
-		return searchApiBaseUrl;
-	}
+        return enrichWikidataJsonBaseUrl;
+    }
 
-	public String getWikidataSubclassesNaturalPerson() {
-		return wikidataSubclassesNaturalPerson;
-	}
+    public String getSearchApiBaseUrl() {
+        return searchApiBaseUrl;
+    }
 
-	public String getWikidataSubclassesJuridicalPerson() {
-		return wikidataSubclassesJuridicalPerson;
-	}
+    public String getWikidataSubclassesNaturalPerson() {
+        return wikidataSubclassesNaturalPerson;
+    }
 
-	public String getHtrdataItemsBaseUrl() {
-		return htrdataItemsBaseUrl;
-	}
+    public String getWikidataSubclassesJuridicalPerson() {
+        return wikidataSubclassesJuridicalPerson;
+    }
 
-	public String getHtrdataItemsSuffix() {
-		return htrdataItemsSuffix;
-	}
-	
-	public String getHtrdataItemsAuthorization() {
-		return htrdataItemsAuthorization;
-	}
-	
-	public String getHtrdataItemsXslFile() {
-		return htrdataItemsXslFile;
-	}
+    public String getHtrdataItemsBaseUrl() {
+        return htrdataItemsBaseUrl;
+    }
+
+    public String getHtrdataItemsSuffix() {
+        return htrdataItemsSuffix;
+    }
+
+    public String getHtrdataItemsAuthorization() {
+        return htrdataItemsAuthorization;
+    }
+
+    public String getHtrdataItemsXslFile() {
+        return htrdataItemsXslFile;
+    }
 
     public String getTranslationETranslationEndpoint() {
         return translationETranslationEndpoint;

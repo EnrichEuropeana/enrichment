@@ -36,11 +36,6 @@ server.error.include-exception=false
 #server.error.see-also=https://github.com/EnrichEuropeana/Technical-Documentation
 
 
-# mongo connectivity
-#spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
-spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
-spring.data.mongodb.database=enrichment
-
 # mysql connectivity
 #spring.jpa.hibernate.ddl-auto=update
 #spring.datasource.url=jdbc:mysql://${MYSQL_HOST:localhost}:3306/tp
