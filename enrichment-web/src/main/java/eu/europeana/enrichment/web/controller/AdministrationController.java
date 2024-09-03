@@ -214,11 +214,11 @@ public class AdministrationController extends BaseRest {
 	 * return 							the translated text or for eTranslation
 	 * 									only an ID
 	 */
-	@ApiOperation(value = "Receive translated text from eTranslation", nickname = "getFromETranslation", notes = "This method represents an endpoint"
+	@ApiOperation(value = "Callback method to receive translated text from eTranslation", nickname = "etranslationCallback", notes = "This method represents an endpoint"
 			+ "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
-	@RequestMapping(value = "/administration/receiveETranslation", method = {RequestMethod.POST},
+	@RequestMapping(value = "/administration/etranslationCallback", method = {RequestMethod.POST},
 			produces = MediaType.TEXT_PLAIN_VALUE)
-	public ResponseEntity<String> getFromETranslation(
+	public ResponseEntity<String> etranslationCallback(
 			@RequestParam(value = "target-language", required = false) String targetLanguage,
 			@RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
 			@RequestParam(value = "request-id", required = false) String requestId,
@@ -230,6 +230,41 @@ public class AdministrationController extends BaseRest {
 		ResponseEntity<String> response = new ResponseEntity<String>("{\"info\" : \"eTranslation callback has been executed!\"}", HttpStatus.OK);
 		return response;
 	}
+	
+	       /*
+         * This method represents the /enrichment/eTranslation end point,
+         * where a translation response from eTranslation will be processed.
+         * All requests on this end point are processed here.
+         * 
+         * @param translationRequest            is the Rest Post body with the original
+         *                                                                      text for translation into English
+         * return                                                       the translated text or for eTranslation
+         *                                                                      only an ID
+         */
+        @ApiOperation(value = "Receive translated text from eTranslation", nickname = "getFromETranslation", notes = "This method represents an endpoint"
+                        + "where the callback from the eTranslation service is received. The method is not aimed to be used by an and user.")
+        @RequestMapping(value = "/administration/etranslationErrorCallback", method = {RequestMethod.POST},
+                        produces = MediaType.TEXT_PLAIN_VALUE)
+        public ResponseEntity<String> etranslationErrorCallback(
+                        @RequestParam(value = "target-language", required = false) String targetLanguage,
+                        @RequestParam(value = "translated-text", required = false) String translatedTextSnippet,
+                        @RequestParam(value = "request-id", required = false) String requestId,
+                        @RequestParam(value = "external-reference", required = false) String externalReference,
+                        @RequestBody String body) throws UnsupportedEncodingException 
+        {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "eTranslation callback has been received with the request-id: {}, and the"
+                        + " external-reference: {}",  requestId, externalReference);
+              }
+            //TODO: improve exception handling
+                String errorMEssage = "Translation Error: " + translatedTextSnippet;
+                eTranslationService.eTranslationResponse(targetLanguage, errorMEssage, requestId,externalReference,body);
+                ResponseEntity<String> response = new ResponseEntity<String>("{\"error\" : \"" + errorMEssage +"\"}", HttpStatus.ACCEPTED);
+                return response;
+        }
+
+        
 
 	@ApiOperation(value = "Get translated text from eTranslation", nickname = "getETranslation", notes = "This method is aimed to be used "
 			+ "when translating with eTranslation locally. Namely, the eTranslation services returns response using a callback function, which should be "

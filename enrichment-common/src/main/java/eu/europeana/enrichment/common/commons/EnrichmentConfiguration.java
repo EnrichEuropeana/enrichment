@@ -49,12 +49,6 @@ public class EnrichmentConfiguration {
     @Value("${enrich.translation.eTranslation.endpoint}")
     private String translationETranslationEndpoint;
 
-    @Value("${enrich.translation.eTranslation.errorCallback}")
-    private String translationETranslationErrorCallback;
-
-    @Value("${enrich.translation.eTranslation.emailDestination}")
-    private String translationETranslationEmailDestination;
-
     @Value("${enrich.translation.deepl-free.baseUrl}")
     private String translationDeeplFreeBaseUrl;
 
@@ -196,7 +190,7 @@ public class EnrichmentConfiguration {
         return translationETranslationDomain;
     }
 
-    public String getTranslationETranslationRequesterCallback() {
+    public String getETranslationCallback() {
         return buildApiEndpointUrl("administration/eTranslation");
     }
 
@@ -206,11 +200,7 @@ public class EnrichmentConfiguration {
     }
 
     public String getTranslationETranslationErrorCallback() {
-        return translationETranslationErrorCallback;
-    }
-
-    public String getTranslationETranslationEmailDestination() {
-        return translationETranslationEmailDestination;
+        return buildApiEndpointUrl("administration/etranslationErrorCallback");
     }
 
     public String getSolrEntityPositionsUrl() {

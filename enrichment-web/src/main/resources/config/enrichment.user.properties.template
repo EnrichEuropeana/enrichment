@@ -1,7 +1,6 @@
 #enrich.api.endpoint=http://localhost:8080/
 
 
-
 # mongo connectivity
 #spring.data.mongodb.uri=mongodb://localhost:27017/enrichment
 spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
@@ -41,9 +40,6 @@ enrich.translation.google.waittime=2
 # 	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
 enrich.translation.eTranslation.domain=GEN
 enrich.translation.eTranslation.endpoint=https://<host>/etranslation/si/translate
-enrich.translation.eTranslation.errorCallback=
-#TODO: remove
-enrich.translation.eTranslation.emailDestination=srdjan.stevanetic@ait.ac.at
 
 enrich.translation.deepl-free.baseUrl=https://api-free.deepl.com/v2/translate
 #TODO: update

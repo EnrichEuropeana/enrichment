@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -38,8 +37,7 @@ public class ETranslationEuropaServiceImpl {
 	private String domain;
 	private String translationEndpoint;
 	private String requesterCallback;
-//	private String errorCallback;
-	private String emailDestination;
+	private String errorCallback;
 	private String fileFormat = "txt";
 	private String targetLanguage = "en";
 	private EnrichmentConfiguration enrichmentConfiguration;
@@ -55,7 +53,7 @@ public class ETranslationEuropaServiceImpl {
 	
 	private static Map<String, String> createdRequests = new HashMap<String, String>();
 	
-	public String getTargetLanguage() {
+	protected String getTargetLanguage() {
 		return targetLanguage;
 	}
 
@@ -72,9 +70,8 @@ public class ETranslationEuropaServiceImpl {
 	    readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
 		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
 		this.translationEndpoint = enrichmentConfiguration.getTranslationETranslationEndpoint();
-		this.requesterCallback = enrichmentConfiguration.getTranslationETranslationRequesterCallback();
-//		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
-		this.emailDestination = enrichmentConfiguration.getTranslationETranslationEmailDestination();
+		this.requesterCallback = enrichmentConfiguration.getETranslationCallback();
+		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
 	}
 	
 	/**
@@ -113,8 +110,6 @@ public class ETranslationEuropaServiceImpl {
 		
 		//TODO: handle textArray with more then one request
 		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
-//		String contentBody =  createTranslationBodyForEmailCallback(text, sourceLanguage);
-		
 		
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);
@@ -156,41 +151,6 @@ public class ETranslationEuropaServiceImpl {
         return String.valueOf(sourceLanguage.hashCode() + targetLang.hashCode() + text.hashCode());
     }
 
-	/**
-	 * This method creates the translation request body including all information
-	 * and the base64 encoded text (appropriate when the translated text is sent to the email)
-	 * 
-	 * @param text 						this is the transcribed text
-	 * @param sourceLanguage			is the original language of transcribed text
-	 * @return							a stringified JSON including the transcribed
-	 * 									text as a base64 string
-	 * @throws UnsupportedEncodingException 
-	 */
-	
-	private String createTranslationBodyForEmailCallback(String text, String sourceLanguage) throws UnsupportedEncodingException {
-		String base64content;
-		try {
-			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
-			base64content = new String(bytesEncoded);
-		}catch(UnsupportedEncodingException ex) {
-
-			throw ex;
-		}
-
-		// .put("externalReference", "123")
-		JSONObject jsonBody = new JSONObject().put("priority", 0)
-				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
-				.put("sourceLanguage", sourceLanguage.toUpperCase())
-				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
-				.put("domain", domain)
-				.put("destinations",
-						new JSONObject().put("emailDestinations", new JSONArray().put(0, emailDestination)))
-				.put("documentToTranslateBase64",
-						new JSONObject().put("format", fileFormat).put("content", base64content));
-
-		return jsonBody.toString();
-	}
-	
 
 	/**
 	 * This method creates the translation request body where the response is sent back
@@ -208,7 +168,8 @@ public class ETranslationEuropaServiceImpl {
 	        String endpointUri = enrichmentConfiguration.getEnrichApiEndpoint();
 		JSONObject jsonBody = new JSONObject().put("priority", 0)
 				.put("requesterCallback", requesterCallback)
-				.put("externalReference", externalReference)
+				.put("errorCallback", errorCallback)
+                                .put("externalReference", externalReference)
 				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
 				.put("sourceLanguage", sourceLanguage.toUpperCase())
 				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
