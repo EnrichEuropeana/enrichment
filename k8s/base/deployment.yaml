@@ -17,7 +17,7 @@ spec:
           - name: SPRING_CONFIG_NAME
             value: "application,enrichment,enrichment.user"
           - name: SPRING_CONFIG_ADDITIONAL_LOCATION
-            value: "file:/opt/app/config/application.properties,file:/opt/app/config/enrichment.user.properties"
+            value: "file:/opt/app/config/enrichment.user.properties"
         ports:
           - containerPort: 8080
         volumeMounts:
