@@ -45,33 +45,31 @@ enrich.translation.eTranslation.endpoint=https://<host>/etranslation/si/translat
 
 #configure deepl access
 enrich.translation.deepl-free.baseUrl=https://api-free.deepl.com/v2/translate
-enrich.translation.deepl-free.authenticationKey=/opt/app/secrets/eTranslation.txt
+enrich.translation.deepl-free.authenticationKey=/opt/app/enrich/secrets/eTranslation.txt
 
 #enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
 #solr.entity-positions.url = http://localhost:8983/solr
 #TODO: deploy on k8s-db
-solr.entity-positions.url = http://<ip_of_the_database_server>:8983/solr
-solr.entity-positions.timeout = 60000
-solr.facetLimit=750
-solr.wikidata-search.baseUrl=https://<domain_name_of_production_server>/enrichment-web/enrichment/search
-#solr.wikidata-search.baseUrl=http://<ip_of_the_test_server>:8080/enrichment-web-test/enrichment/search
+solr.connection.url = http://<ip_of_the_database_server>:8983/solr
+#solr.timeout = 60000
+#solr.facetLimit=750
 
 # saving Wikidata info into files
 # folder to store files created by the application (e.g. in wikidata subfolder) 
-#enrich.directory = /opt/app/data/
+#enrich.directory = /opt/app/enrich/data/
 #enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
 
 # base URL of TP API
-transcribathon.api.base.url=https://europeana.fresenia.man.poznan.pl/tp-api/
+transcribathon.api.base.url=https://<TP API HOST>/tp-api/
 
 # base URL of TP API V2
-transcribathon.api.v2.base.url=https://api.transcribathon.eu/v2/
+transcribathon.api.v2.base.url=https://<TP API 2 HOST>/v2/
 transcribathon.api.v2.authorization=Bearer <token>
 #may overwrtite default
 #transcribathon.htrtotext.xsl.file=/opt/app/enrich/xslt/PageToTextfile.xsl
 
 # base URL of TP UI
-transcribathon.api.base.url=https://europeana.transcribathon.eu/
+transcribathon.ui.base.url=https://europeana.transcribathon.eu/
 
 # default creator of annotations (enrichments)
 #enrich.annotations.creator=https://pro.europeana.eu/project/enrich-europeana

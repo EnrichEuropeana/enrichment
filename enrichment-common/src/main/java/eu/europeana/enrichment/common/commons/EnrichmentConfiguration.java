@@ -10,11 +10,13 @@ import org.springframework.context.annotation.PropertySources;
 /**
  * Container for all settings that we load from the enrichment.properties file
  * and optionally override from enrichment.user.properties file
+ * NOTE: for server deployment use  
  */
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_CONFIGURATION)
-@PropertySources({ @PropertySource(value = "classpath:config/enrichment.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "/opt/app/config/enrichment.user.properties", ignoreResourceNotFound = true) })
+@PropertySources({
+    @PropertySource(value = "classpath:config/application.properties"),
+    @PropertySource(value = "classpath:config/enrichment.properties"),
+        @PropertySource(value = "classpath:config/enrichment.user.properties", ignoreResourceNotFound = true)})
 public class EnrichmentConfiguration {
 
     Logger logger = LogManager.getLogger(getClass());
@@ -61,10 +63,10 @@ public class EnrichmentConfiguration {
     @Value("${solr.facetLimit}")
     private int solrFacetLimit;
 
-     @Value("${enrich.solr.translated.entities}")
+    @Value("${enrich.solr.translated.entities: null}")
     private String solrTranslatedEntities;
 
-    @Value("${enrich.directory:/opt/app/data/}")
+    @Value("${enrich.directory:/opt/app/enrich/data/}")
     private String enrichDirectory;
 
     @Value("${enrich.wikidata.json.base.url: 'https://www.wikidata.org/wiki/Special:EntityData/'}")
@@ -117,9 +119,6 @@ public class EnrichmentConfiguration {
 
     @Value("${enrich.wikidata.save.json.to.local.cache: true}")
     private boolean wikidataSaveJsonToLocalCache;
-
-    @Value("${search.api.base.url}")
-    private String searchApiBaseUrl;
 
     @Value("${transcribathon.api.v2.authorization}")
     private String tpAapiV2Authorization;
@@ -192,6 +191,7 @@ public class EnrichmentConfiguration {
         return solrFacetLimit;
     }
 
+    @Deprecated
     public String getSolrTranslatedEntities() {
         return solrTranslatedEntities;
     }

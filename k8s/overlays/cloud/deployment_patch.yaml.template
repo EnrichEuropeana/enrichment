@@ -15,7 +15,7 @@ spec:
           livenessProbe:
             httpGet:
               port: 8080
-              path: /enrichment-k8s/actuator/health/liveness
+              path: /actuator/health/liveness
               httpHeaders:
               - name: Accept
                 value: application/json
@@ -24,7 +24,7 @@ spec:
           readinessProbe:
             httpGet:
               port: 8080
-              path: /enrichment-k8s/actuator/health/readiness
+              path: /actuator/health/readiness
               httpHeaders:
               - name: Accept
                 value: application/json

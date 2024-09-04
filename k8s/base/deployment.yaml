@@ -24,11 +24,7 @@ spec:
           - name: enrichment-properties
             mountPath: "/opt/app/config/enrichment.user.properties"
             readOnly: true
-            subPath: enrichment.properties
-          - name: app-properties
-            mountPath: "/opt/app/config/application.properties"
-            readOnly: true
-            subPath: application.properties
+            subPath: enrichment.user.properties
           - name: log4j-config
             mountPath: "/opt/app/config/log4j2-spring.xml"
             readOnly: true
@@ -59,9 +55,6 @@ spec:
         - name: deepl-credentials
           secret:
             secretName: deepl-secret        
-        - name: app-properties
-          secret:
-            secretName: application-properties
         - name: log4j-config
           configMap:
             name: log4j2-properties    

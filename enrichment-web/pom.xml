@@ -19,12 +19,12 @@
 		<!-- version>${version.enrichmentAPI}</version-->
 		<version>0.0.1-SNAPSHOT</version>
 		<artifactId>enrichment-services</artifactId>
-		
 	</parent>
 
 	<artifactId>enrichment-web</artifactId>
 	<packaging>jar</packaging>
-	<name>Enrichment - RESTful  web services module</name>
+	<name>Enrichment API</name>
+	<description>Restfull API used for computing enrichments for Transcribathon transcriptions and translations</description>
 	
 	<dependencies>
 		<!-- enrichment projects  -->
@@ -387,42 +387,28 @@
 	<build>
 		<!-- it seems that final name is not inhereted from parent pom -->
 		<finalName>${project.artifactId}</finalName>
-		<pluginManagement>
-		<plugins>
-		<!--	
-		 <plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<warSourceDirectory>${basedir}/src/main/webapp</warSourceDirectory>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<webResources>
-						<resource>
-						<directory>${basedir}/lib</directory>
-						<targetPath>WEB-INF/lib</targetPath>
-						<filtering>false</filtering>
-						<includes>
-							<include>**/*.jar</include>
-						</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			-->
-	</plugins>
-	</pluginManagement>
+		<resources>
+		    <resource>
+		        <directory>src/main/resources</directory>
+		        <filtering>true</filtering>
+		        <includes>
+		            <include>**/*.properties</include>
+		            <include>**/*.xml</include>
+		            <include>**/*.json</include>
+		        </includes>
+		        <excludes>
+		            <exclude>**/*.jks</exclude>
+		        </excludes>
+		    </resource>
+		    <resource>
+		        <directory>src/main/resources</directory>
+		        <filtering>false</filtering>
+		        <includes>
+		            <include>**/*.jks</include>
+		            <include>public/**</include>
+		        </includes>
+		    </resource>
+		</resources>
 	
 	<plugins>
 			<plugin>
