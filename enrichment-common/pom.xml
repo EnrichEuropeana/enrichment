@@ -81,8 +81,4 @@
 			
 	</dependencies>
 		
-	<build>
-		<!-- it seems that final name is not inhereted from parent pom -->
-		<finalName>${project.artifactId}-${project.version}</finalName>
-	</build>
 </project>
