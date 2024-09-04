@@ -11,9 +11,6 @@ secretGenerator:
   - name: enrichment-web-properties
     files:
       - enrichment.user.properties
-  - name: application-properties
-    files:
-      - application.properties
   - name: gtanslate-secret
     files:
       - ./secrets/gtanslate.json
