@@ -378,6 +378,7 @@ http://joinup.ec.europa.eu/software/page/eupl
 			<version>5.5.13</version>
 		</dependency>
 
+<!--
 		<dependency>
 			<groupId>tp-api</groupId>
 			<artifactId>tp-api</artifactId>
@@ -385,6 +386,7 @@ http://joinup.ec.europa.eu/software/page/eupl
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/tp-api.jar</systemPath>
 		</dependency>
+		-->
 
 	</dependencies>
 

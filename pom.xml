@@ -107,13 +107,17 @@
     <module>enrichment-mongo</module>
     <module>enrichment-definition</module>
     <module>enrichment-solr</module>
+    <!--
     <module>enrichment-solr-positions-highlighter</module>
+    -->
     <module>enrichment-utils</module>
     <!--
     <module>enrichment-stanford-web</module>
     -->
     <module>enrichment-tp-api-client</module>
+    <!--
     <module>enrichment-translation-evaluation</module>
+    -->
   </modules>
 
 	<build>
