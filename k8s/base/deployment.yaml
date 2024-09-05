@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: enrichment-web-deployment
+  name: enrichment-deployment
 spec:
   # selector.matchLabels is provided via Kustomize ()
   #selector:
@@ -11,7 +11,7 @@ spec:
   template:
     spec:
       containers:
-      - name: enrichment-web
+      - name: enrichment
         image: gsergiu79/enrichment-web
         env:
           - name: SPRING_CONFIG_NAME
