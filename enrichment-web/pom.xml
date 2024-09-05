@@ -403,6 +403,8 @@ http://joinup.ec.europa.eu/software/page/eupl
 				</includes>
 				<excludes>
 					<exclude>**/*.jks</exclude>
+					<exclude>public/**</exclude>
+					<exclude>static/**</exclude>
 				</excludes>
 			</resource>
 			<resource>
@@ -411,6 +413,7 @@ http://joinup.ec.europa.eu/software/page/eupl
 				<includes>
 					<include>**/*.jks</include>
 					<include>public/**</include>
+					<include>static/**</include>
 				</includes>
 			</resource>
 		</resources>
