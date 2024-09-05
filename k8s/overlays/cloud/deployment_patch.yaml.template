@@ -12,10 +12,12 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Dlogging.config=/opt/app/config/log4j2-spring.xml"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: "/${APP_CONTEXT_PATH}"  
           livenessProbe:
             httpGet:
               port: 8080
-              path: /enrichment-k8s/actuator/health/liveness
+              path: /${APP_CONTEXT_PATH}/actuator/health/liveness
               httpHeaders:
               - name: Accept
                 value: application/json
@@ -24,7 +26,7 @@ spec:
           readinessProbe:
             httpGet:
               port: 8080
-              path: /enrichment-k8s/actuator/health/readiness
+              path: /${APP_CONTEXT_PATH}/actuator/health/readiness
               httpHeaders:
               - name: Accept
                 value: application/json

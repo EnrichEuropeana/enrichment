@@ -24,15 +24,12 @@ import org.apache.logging.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.tartarus.snowball.SnowballStemmer;
 import org.tartarus.snowball.ext.englishStemmer;
 import org.tartarus.snowball.ext.germanStemmer;
 import org.tartarus.snowball.ext.romanianStemmer;
 
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
-import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.definitions.model.utils.ModelUtils;
@@ -45,26 +42,27 @@ import eu.europeana.enrichment.solr.model.vocabulary.StoryEntitySolrFields;
 import eu.europeana.enrichment.solr.service.SolrEntityPositionsService;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 
-@Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
+//@Service(EnrichmentConstants.BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE)
+@Deprecated
 public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl implements SolrEntityPositionsService{
 
 	Logger logger = LogManager.getLogger(getClass());
 	
 	//@Resource(name = "javaJSONParser")
-	@Autowired
+//	@Autowired
 	JavaGsonJSONParser javaJSONParser;
 
 	//@Resource(name = "levenschteinDistance")
-	@Autowired
+//	@Autowired
 	LevenschteinDistance levenschteinDistance;
 	
 	//@Resource(name = "googleTranslator")
-	@Autowired
+//	@Autowired
 	GoogleTranslator googleTranslator;
 
 	
 	//@Resource(name = "eTranslationService")
-	@Autowired
+//	@Autowired
 	ETranslationEuropaServiceImpl eTranslationService;
 
 	/*
@@ -102,7 +100,7 @@ public class SolrEntityPositionsServiceImpl extends SolrBaseClientServiceImpl im
 	private int indexByNowOriginal=0;
 	//private Jyandex clientJyandex;
 
-	@Autowired
+//	@Autowired
 	public SolrEntityPositionsServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws IOException {
 		
 		//clientJyandex = new Jyandex("trnsl.1.1.20190321T145012Z.5582e98b0b19430e.69e76d055bdf6b87efbda7891df751a1df9ba33f");

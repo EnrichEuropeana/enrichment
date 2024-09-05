@@ -108,8 +108,8 @@ public class EnrichmentTpApiClient {
 	 */
 	private String getHtrdataItemTranscription(String itemId) throws ClientProtocolException, IOException, TransformerException {
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("Authorization", configuration.getHtrdataItemsAuthorization());
-		String htrdataResp = HelperFunctions.createHttpRequest(null, configuration.getHtrdataItemsBaseUrl() + itemId + configuration.getHtrdataItemsSuffix(), headers);
+		headers.put("Authorization", configuration.getTpAapiV2Authorization());
+		String htrdataResp = HelperFunctions.createHttpRequest(null, configuration.getTranscribathonAPiV2ItemsBaseUrl() + itemId + configuration.getHtrdataItemsSuffix(), headers);
 		if(htrdataResp==null) {
 			return null;
 		}

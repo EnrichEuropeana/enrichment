@@ -1,8 +1,10 @@
-package eu.europeana.enrichment.common.commons;
+package eu.europeana.enrichment.web.config.swagger;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+
+import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 
 /**
  * Makes build information and the application name and description from the project's pom.xml available.
@@ -10,20 +12,17 @@ import org.springframework.context.annotation.PropertySource;
  * Note that the same information is also available in the Spring-Boot /actuator/info endpoint
  */
 @Configuration(EnrichmentConstants.BEAN_ENRICHMENT_BUILD_INFO)
-@PropertySource("classpath:config/build.properties")
+@PropertySource("classpath:META-INF/build-info.properties")
 public class BuildInfo {
 
-    @Value("${info.app.name}")
+    @Value("${build.name:}")
     private String appName;
 
-    @Value("${info.app.version}")
+    @Value("${build.version:}")
     private String appVersion;
 
-    @Value("${info.app.description}")
+    @Value("${build.project.description:}")
     private String appDescription;
-
-    @Value("${info.build.number}")
-    private String buildNumber;
 
     public String getAppName() {
         return appName;
@@ -36,8 +35,5 @@ public class BuildInfo {
     public String getAppVersion() {
         return appVersion;
     }
-
-    public String getBuildNumber() {
-        return buildNumber;
-    }
+    
 }

@@ -67,7 +67,7 @@ public class EnrichmentTranslationEval
 
     public void saveDRICollectionItemsToJsonFiles() throws Exception {
 		try {
-			URIBuilder builder = new URIBuilder(configuration.getSearchApiBaseUrl());
+			URIBuilder builder = new URIBuilder(getSearchApiBaseUrl());
 			builder.addParameter("query", "europeana_collectionName:\"15405__Royal_Irish_Academy\"");
 			builder.addParameter("wskey", "apidemo");
 			builder.addParameter("profile", "minimal");
@@ -104,9 +104,15 @@ public class EnrichmentTranslationEval
 				}				
 			}
 		} catch (URISyntaxException | IOException e) {
-			logger.log(Level.ERROR, "Data cannot be fetched from: " + configuration.getSearchApiBaseUrl(), e);
+			logger.log(Level.ERROR, "Data cannot be fetched from: " + getSearchApiBaseUrl(), e);
 			throw e;
 		}
+    }
+
+    private String getSearchApiBaseUrl() {
+        //configuration.getSearchApiBaseUrl();
+        return "https://api.europeana.eu/record/v2/search.json";
+        
     }
     
     public void saveUWRCollectionItemsToJsonFiles() throws IOException, URISyntaxException {
@@ -115,7 +121,7 @@ public class EnrichmentTranslationEval
             Reader reader = Files.newBufferedReader(Paths.get(UWrCollectionRecordsFile));
             CSVParser csvParser = CSVParser.parse(reader, CSVFormat.DEFAULT.builder().setDelimiter(',').setHeader("Record identifier", "Content URL", "Metadata URL").setSkipHeaderRecord(true).build());
         ) {
-			URIBuilder builder = new URIBuilder(configuration.getSearchApiBaseUrl());
+			URIBuilder builder = new URIBuilder(getSearchApiBaseUrl());
 			builder.setParameter("wskey", "apidemo");
 			builder.setParameter("profile", "minimal");
 			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
@@ -219,7 +225,8 @@ public class EnrichmentTranslationEval
     
     public void addEtTranslation(RecordTranslationEval record) throws URISyntaxException, ClientProtocolException, IOException {
     	if(record.getDescription()!=null && record.getEtTranslation()==null) {
-			URIBuilder builder = new URIBuilder(configuration.getTranslationETranslationBaseUrlLocal());
+    	                //TODO: restore correct URL    
+			URIBuilder builder = new URIBuilder(configuration.getEnrichApiEndpoint());
 			builder.setParameter("wskey", "apidemo");
 			builder.setParameter("sourceLang", record.getLanguage().get(0));
 			builder.setParameter("targetLang", "en");

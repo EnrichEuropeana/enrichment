@@ -10,10 +10,7 @@ labels:
 secretGenerator:
   - name: enrichment-web-properties
     files:
-      - enrichment.properties
-  - name: application-properties
-    files:
-      - application.properties
+      - enrichment.user.properties
   - name: gtanslate-secret
     files:
       - ./secrets/gtanslate.json

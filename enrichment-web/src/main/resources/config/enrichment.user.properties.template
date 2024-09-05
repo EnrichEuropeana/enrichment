@@ -1,0 +1,95 @@
+#overwrite endpoint for server deployment
+enrich.api.endpoint=http://localhost:8080/
+
+# mongo connectivity
+spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
+spring.data.mongodb.database=enrichment
+
+#if required
+#enrich.mongodb.truststore=
+#enrich.mongodb.truststorepass=
+
+#SOLR Connection
+#enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
+solr.connection.url=http://<host:port>/solr
+
+
+# Named entity recognition and classification section
+# NER Stanford classifier configuration
+#TOOD: remove models from resources in EE-384
+#enrich.ner.stanford.model=classifiers/stanford/english.all.3class.distsim.crf.ser.gz
+#TODO: deploy on K8s in EE-384
+enrich.ner.stanford.url=http://<ip_of_the_test_server>:9090/stanford/en/namedEntityRecognition
+
+# NER DBpedia spotlight configuration
+# Additional: 
+#	Docker command: docker pull dbpedia/spotlight-english
+#	Docker command: docker run --name spotlight -p 2222:80 -it dbpedia/spotlight-english spotlight.sh
+enrich.ner.dbpedia.baseUrl=http://<ip_of_the_test_server>:9090/dbpedia/en/rest/annotate
+
+# Named entity linking section
+enrich.ner.linking.europeana.apikey=<yourapikey>
+
+# Translation
+# Translation Google configuration
+#may overwrite default value 
+#enrich.translation.google.credentials=
+enrich.translation.google.waittime=2
+# Translation eTranslation configuration
+
+#may overwrite default value
+#enrich.translation.eTranslation.credentials=/opt/app/secrets/eTranslation.txt
+#may overwrite default model,	eTranslation domain could be "SPD" (for neural and speed-optimized statistical engines on the cloud. This is the default.) else "Europeana"
+#enrich.translation.eTranslation.domain=GEN
+enrich.translation.eTranslation.endpoint=https://<host>/etranslation/si/translate
+
+#configure deepl access
+enrich.translation.deepl-free.baseUrl=https://api-free.deepl.com/v2/translate
+enrich.translation.deepl-free.authenticationKey=/opt/app/enrich/secrets/eTranslation.txt
+
+#enrich.solr.translated.entities=http://localhost:8983/solr/solr-enrichment
+#solr.entity-positions.url = http://localhost:8983/solr
+#TODO: deploy on k8s-db
+solr.connection.url = http://<ip_of_the_database_server>:8983/solr
+#solr.timeout = 60000
+#solr.facetLimit=750
+
+# saving Wikidata info into files
+# folder to store files created by the application (e.g. in wikidata subfolder) 
+#enrich.directory = /opt/app/enrich/data/
+#enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
+
+# base URL of TP API
+transcribathon.api.base.url=https://<TP API HOST>/tp-api/
+
+# base URL of TP API V2
+transcribathon.api.v2.base.url=https://<TP API 2 HOST>/v2/
+transcribathon.api.v2.authorization=Bearer <token>
+#may overwrtite default
+#transcribathon.htrtotext.xsl.file=/opt/app/enrich/xslt/PageToTextfile.xsl
+
+# base URL of TP UI
+transcribathon.ui.base.url=https://europeana.transcribathon.eu/
+
+# default creator of annotations (enrichments)
+#enrich.annotations.creator=https://pro.europeana.eu/project/enrich-europeana
+
+#TODO: make consistent with the k8s configs (requires support for using absolute paths)
+enrich.wikidata.subclasses.geographic-location=/wikidata-types/Q2221906-geographic-location-subclasses.json
+enrich.wikidata.subclasses.geographic-location.remove=/wikidata-types/Q2221906-types-to-exclude.json
+enrich.wikidata.subclasses.natural-person=/wikidata-types/Q154954-natural-person-subclasses.json
+enrich.wikidata.subclasses.juridical-person=/wikidata-types/Q155076-juridical-person-subclasses.json
+
+#string value representing the key used for JWT signature verification 
+europeana.apikey.jwttoken.signaturekey=<signature-key>
+# Resource name embedded in JWT token
+authorization.api.name=entities
+# Useful for local development. If false, unauthenticated read/write requests can be sent to API
+auth.read.enabled=true
+auth.write.enabled=true
+europeana.apikey.serviceurl=https://apikey.eanadev.org/apikey
+
+#spark.topic.detection.serviceurl=http://<ip_of_the_spark_master>:8181/spark-topic-detection
+#spark.language.detection.serviceurl=http://<ip_of_the_spark_master>:8181/spark-language-detection
+spark.topic.detection.serviceurl=http://<ip_of_the_test_server>:8181/spark-topic-detection
+spark.language.detection.serviceurl=http://<ip_of_the_test_server>:8181/spark-language-detection

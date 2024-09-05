@@ -35,6 +35,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_NER_LINKING_SERVICE= "nerLinkingService";
     public static final String BEAN_ENRICHMENT_NER_STANFORD_SERVICE= "nerStanfordService";
     public static final String BEAN_ENRICHMENT_SOLR_BASE_CLIENT_SERVICE= "solrBaseClientService";
+    @Deprecated
     public static final String BEAN_ENRICHMENT_SOLR_ENTITY_POSITIONS_SERVICE= "solrEntityPositionsService";
     public static final String BEAN_ENRICHMENT_SOLR_WIKIDATA_ENTITY_SERVICE= "solrWikidataEntityService";
     public static final String BEAN_ENRICHMENT_SOLR_TOPIC_SERVICE= "solrTopicService";

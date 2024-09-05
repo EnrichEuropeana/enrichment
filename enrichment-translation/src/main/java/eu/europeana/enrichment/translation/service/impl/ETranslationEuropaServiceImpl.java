@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -19,7 +18,6 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -27,9 +25,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_E_TRANSLATION_EUROPA_SERVICE)
@@ -39,10 +37,10 @@ public class ETranslationEuropaServiceImpl {
 	private String domain;
 	private String translationEndpoint;
 	private String requesterCallback;
-//	private String errorCallback;
-	private String emailDestination;
+	private String errorCallback;
 	private String fileFormat = "txt";
 	private String targetLanguage = "en";
+	private EnrichmentConfiguration enrichmentConfiguration;
 	
 	Logger logger = LogManager.getLogger(getClass());
 	
@@ -55,7 +53,7 @@ public class ETranslationEuropaServiceImpl {
 	
 	private static Map<String, String> createdRequests = new HashMap<String, String>();
 	
-	public String getTargetLanguage() {
+	protected String getTargetLanguage() {
 		return targetLanguage;
 	}
 
@@ -68,12 +66,12 @@ public class ETranslationEuropaServiceImpl {
 
 	@Autowired
 	public ETranslationEuropaServiceImpl(EnrichmentConfiguration enrichmentConfiguration) throws Exception {
-		readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
+		this.enrichmentConfiguration = enrichmentConfiguration;
+	    readCredentialFile(enrichmentConfiguration.getTranslationETranslationCredentials());
 		this.domain = enrichmentConfiguration.getTranslationETranslationDomain();
 		this.translationEndpoint = enrichmentConfiguration.getTranslationETranslationEndpoint();
-		this.requesterCallback = enrichmentConfiguration.getTranslationETranslationRequesterCallback();
-//		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
-		this.emailDestination = enrichmentConfiguration.getTranslationETranslationEmailDestination();
+		this.requesterCallback = enrichmentConfiguration.getETranslationCallback();
+		this.errorCallback = enrichmentConfiguration.getTranslationETranslationErrorCallback();
 	}
 	
 	/**
@@ -106,14 +104,12 @@ public class ETranslationEuropaServiceImpl {
 	public String translateText(String text, String sourceLanguage, String targetLang) throws TranslationException, InterruptedException, UnsupportedEncodingException {
 		// TODO: check if credential != null
 		targetLanguage=targetLang;
-		String externalReference = String.valueOf((int)(Math.random() * 100000 + 1));
+		String externalReference = generateExternalReference(sourceLanguage, targetLang, text);
 		//String externalReference = "123";
 		createdRequests.put(externalReference, null);
 		
 		//TODO: handle textArray with more then one request
 		String contentBody = createTranslationBodyForDirectCallback(text, sourceLanguage, externalReference);
-//		String contentBody =  createTranslationBodyForEmailCallback(text, sourceLanguage);
-		
 		
 		String reponseCode = createHttpRequest(contentBody);
 		logger.info("Created and sent eTranslation request. Response code: " + reponseCode + ". External reference: " + externalReference);
@@ -150,41 +146,11 @@ public class ETranslationEuropaServiceImpl {
 		
 	}
 
-	/**
-	 * This method creates the translation request body including all information
-	 * and the base64 encoded text (appropriate when the translated text is sent to the email)
-	 * 
-	 * @param text 						this is the transcribed text
-	 * @param sourceLanguage			is the original language of transcribed text
-	 * @return							a stringified JSON including the transcribed
-	 * 									text as a base64 string
-	 * @throws UnsupportedEncodingException 
-	 */
-	
-	private String createTranslationBodyForEmailCallback(String text, String sourceLanguage) throws UnsupportedEncodingException {
-		String base64content;
-		try {
-			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
-			base64content = new String(bytesEncoded);
-		}catch(UnsupportedEncodingException ex) {
+    private String generateExternalReference(String sourceLanguage, String targetLang, String text) {
+        //return String.valueOf((int)(Math.random() * 100000 + 1));
+        return String.valueOf(sourceLanguage.hashCode() + targetLang.hashCode() + text.hashCode());
+    }
 
-			throw ex;
-		}
-
-		// .put("externalReference", "123")
-		JSONObject jsonBody = new JSONObject().put("priority", 0)
-				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
-				.put("sourceLanguage", sourceLanguage.toUpperCase())
-				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
-				.put("domain", domain)
-				.put("destinations",
-						new JSONObject().put("emailDestinations", new JSONArray().put(0, emailDestination)))
-				.put("documentToTranslateBase64",
-						new JSONObject().put("format", fileFormat).put("content", base64content));
-
-		return jsonBody.toString();
-	}
-	
 
 	/**
 	 * This method creates the translation request body where the response is sent back
@@ -199,27 +165,18 @@ public class ETranslationEuropaServiceImpl {
 	 * @throws UnsupportedEncodingException 
 	 */
 	private String createTranslationBodyForDirectCallback(String text, String sourceLanguage, String externalReference) throws UnsupportedEncodingException {
-//		String base64content;
-//		try {
-//			byte[] bytesEncoded = Base64.encodeBase64(text.getBytes("UTF-8"));
-//			base64content = new String(bytesEncoded);
-//		}catch(UnsupportedEncodingException ex) {
-//			throw ex;
-//		}
-
-		// .put("externalReference", "123")
-		
+	        String endpointUri = enrichmentConfiguration.getEnrichApiEndpoint();
 		JSONObject jsonBody = new JSONObject().put("priority", 0)
 				.put("requesterCallback", requesterCallback)
-				.put("externalReference", externalReference)
+				.put("errorCallback", errorCallback)
+                                .put("externalReference", externalReference)
 				.put("callerInformation", new JSONObject().put("application", credentialUsername).put("username", credentialUsername))
 				.put("sourceLanguage", sourceLanguage.toUpperCase())
 				.put("targetLanguages", new JSONArray().put(0, targetLanguage.toUpperCase()))
 				.put("domain", domain)
 				.put("destinations",
-						new JSONObject().put("httpDestinations", new JSONArray().put(0, "http://dsi-demo.ait.ac.at/enrichment-web")))
-				//.put("documentToTranslateBase64", new JSONObject().put("format", fileFormat).put("content", base64content));
-		        .put("textToTranslate", text);
+						new JSONObject().put("httpDestinations", new JSONArray().put(0, endpointUri)))
+				.put("textToTranslate", text);
 
 		return jsonBody.toString();
 	}
@@ -248,15 +205,15 @@ public class ETranslationEuropaServiceImpl {
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 			return responeString;
 		} catch (Exception ex) {
-			//TODO: proper exception handling
-			logger.log(Level.ERROR, "Exception during the creation of eTranslation request.", ex);
-			return null;
+			throw new TranslationException("Unexpected error occured during the creation of eTranslation request.", ex);
 		}
 	}
 		
 	public void eTranslationResponse (String targetLanguage, String translatedText, String requestId, String externalReference, String body) throws UnsupportedEncodingException
 	{
-		logger.debug("eTranslation response has been received with the following parameters: targetLanguage="+ targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId + ", externalReference="+externalReference+" ." + ", body="+body+" .");
+		logger.debug("eTranslation response has been received with the following parameters: targetLanguage="
+		        + targetLanguage + ", translatedText="+ translatedText + ", requestId=" + requestId 
+		        + ", externalReference="+externalReference+" ." + ", body="+body+" .");
 		
 		if(translatedText==null)
 		{
@@ -266,22 +223,7 @@ public class ETranslationEuropaServiceImpl {
 		
 		if(createdRequests.containsKey(externalReference))
 		{	
-			logger.debug("eTranslation obtained translated text original: " + translatedText);
-			
-//			byte[] bytesEncoded = Base64.decodeBase64(translatedText);
-//			String base64DecodedContent = new String(bytesEncoded);
-//			
-//			logger.debug("eTranslation obtained translated text (base64 decoded): " + base64DecodedContent);
-			
-//			String URLDecodedTranslatedText = "";
-//			try {
-//				URLDecodedTranslatedText = URLDecoder.decode(translatedText, "UTF-8");
-//			} catch (UnsupportedEncodingException e) {
-//
-//				throw e;
-//			}
-//			logger.debug("eTranslation obtained translated text (url decoded): " + URLDecodedTranslatedText);
-			
+			logger.debug("eTranslation obtained translated text original: " + translatedText);			
 			createdRequests.put(externalReference, translatedText);
 			
 		}
