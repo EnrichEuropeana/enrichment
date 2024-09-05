@@ -12,6 +12,8 @@ spec:
           env:
             - name: JAVA_TOOL_OPTIONS
               value: "-Dlogging.config=/opt/app/config/log4j2-spring.xml"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: ${APP_CONTEXT}  
           livenessProbe:
             httpGet:
               port: 8080
