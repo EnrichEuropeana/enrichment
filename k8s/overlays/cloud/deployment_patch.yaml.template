@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: enrichment-web-deployment
+  name: enrichment-deployment
 spec:
   replicas: 1
   template:
     spec:
       containers:
-        - name: enrichment-web
+        - name: enrichment
           imagePullPolicy: Always
           env:
             - name: JAVA_TOOL_OPTIONS
