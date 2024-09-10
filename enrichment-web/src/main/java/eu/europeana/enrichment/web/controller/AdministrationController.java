@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,14 +26,13 @@ import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
-import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.service.impl.ETranslationEuropaServiceImpl;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
-import eu.europeana.enrichment.web.model.EnrichmentTranslationRequest;
+import eu.europeana.enrichment.web.model.TranslationRequest;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 import io.swagger.annotations.Api;
@@ -188,13 +186,13 @@ public class AdministrationController extends BaseRest {
 	@RequestMapping(value = "/administration/uploadTranslation", method = {RequestMethod.POST},
 			consumes = {MediaType.APPLICATION_JSON_VALUE}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public ResponseEntity<String> uploadTranslation(
-			@RequestBody EnrichmentTranslationRequest [] body,
+			@RequestBody TranslationRequest [] body,
 			HttpServletRequest request) throws HttpException  {
 
 		verifyWriteAccess(Operations.CREATE, request);
 		int i=1;
 		String translation = "{info: ";
-		for (EnrichmentTranslationRequest translationRequest : body)
+		for (TranslationRequest translationRequest : body)
 		{
 			translation += enrichmentTranslationService.uploadTranslation(translationRequest, i);	
 		}

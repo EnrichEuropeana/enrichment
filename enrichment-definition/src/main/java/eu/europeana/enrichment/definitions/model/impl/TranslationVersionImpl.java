@@ -3,19 +3,18 @@ package eu.europeana.enrichment.definitions.model.impl;
 import dev.morphia.annotations.Entity;
 import dev.morphia.annotations.Field;
 import dev.morphia.annotations.Index;
-import dev.morphia.annotations.IndexOptions;
 import dev.morphia.annotations.Indexes;
 
-@Entity(value = "TranslationEntityImpl")
+@Entity(value = "TranslationVersionImpl")
 @Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"),
-        @Field("tool") }, options = @IndexOptions(unique = true)))
-public class TranslationEntityImpl extends BaseTranslationImpl {
+        @Field("tool") }))
+public class TranslationVersionImpl extends BaseTranslationImpl {
 
-    public TranslationEntityImpl(BaseTranslationImpl copy) {
+    public TranslationVersionImpl(BaseTranslationImpl copy) {
         super(copy);
     }
 
-    public TranslationEntityImpl() {
+    public TranslationVersionImpl() {
         super();
     }
 

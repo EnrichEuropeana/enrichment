@@ -142,7 +142,7 @@ public class RecordTranslationServiceImpl implements RecordTranslationService {
         storedTranslation.setRecordId(recordId);
         storedTranslation.setDescription(descriptions);
         storedTranslation.setIdentifier(identifier);
-        storedTranslation.setTool("Google Translate");
+        storedTranslation.setTool(RecordTranslation.TOOL_GOOGLE);
         if (storedTranslation.getTranslation() != null) {
             storedTranslation.getTranslation().clear();
         }

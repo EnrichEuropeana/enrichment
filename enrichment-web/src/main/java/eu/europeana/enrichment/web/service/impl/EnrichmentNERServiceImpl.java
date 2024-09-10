@@ -119,10 +119,7 @@ public class EnrichmentNERServiceImpl {
     }
     
     //Transcribathon URL for getting the item information
-    private static final String transcribathonBaseURLItems = "https://europeana.fresenia.man.poznan.pl/tp-api/items/";
-    private static final String transcribathonBaseURLStories = "https://europeana.fresenia.man.poznan.pl/tp-api/stories/";
-    private static final String transcribathonBaseURLStoriesMinimal = "https://europeana.fresenia.man.poznan.pl/tp-api/storiesMinimal/";
-    private static int cascadeCall = 0;
+    //private static int cascadeCall = 0;
 		
 	//@Cacheable("nerResults")
 	public List<NamedEntityImpl> getEntities(String storyId, String itemId, String property, List<String> nerTools) throws Exception {
