@@ -218,7 +218,7 @@ public class TranslationController extends BaseRest {
                 if(StringUtils.isEmpty(body.getTranslationTool())) {
                     body.setTranslationTool(EnrichmentConstants.defaultTranslationTool);
                 }
-                validateTranslationParams(storyId, null, body.getTranslationTool(), body.getProperty(), true);
+                validateTranslationParams(storyId, null, body.getTranslationTool(), body.getProperty(), false);
                 
                 if(StringUtils.isEmpty(body.getText())) {
                     throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY, body.getText());

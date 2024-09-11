@@ -26,8 +26,16 @@ public class BaseTranslationImpl extends BaseEntityImpl {
     
     public BaseTranslationImpl(BaseTranslationImpl copy) {
         Date now = new Date();
-        this.setCreated(now);
-        this.setModified(now);
+        if(copy.getCreated() == null) {
+            setCreated(now);
+        } else {
+            setCreated(copy.getCreated());
+        }
+        if(copy.getModified() == null) {
+            setModified(now);
+        } else {
+          setModified(copy.getModified());  
+        }
         this.key = copy.getKey();
         this.language = copy.getLanguage();
         this.translatedText = copy.getTranslatedText();
