@@ -8,6 +8,16 @@ import eu.europeana.enrichment.definitions.model.impl.TranslationVersionImpl;
 
 public interface PersistentTranslationEntityService {
 
+    @Deprecated
+    /**
+     * @deprecated should use {@link #findTranslation(String, String, String, String, String)} instead
+     * @param storyId
+     * @param itemId
+     * @param tool
+     * @param language
+     * @param type
+     * @return
+     */
     public List<TranslationEntityImpl> findTranslationEntitiesWithAditionalInformation(String storyId, String itemId,
             String tool, String language, String type);
 

@@ -24,6 +24,7 @@ import eu.europeana.enrichment.definitions.model.impl.TranslationEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.TranslationVersionImpl;
 import eu.europeana.enrichment.definitions.model.utils.ModelUtils;
 import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentTranslationEntityService;
 import eu.europeana.enrichment.translation.exception.TranslationException;
 import eu.europeana.enrichment.translation.internal.TranslationLanguageTool;
@@ -64,6 +65,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
     @Autowired
     @Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE)
     PersistentItemEntityService persistentItemEntityService;
+    
+    @Autowired
+    @Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE)
+    PersistentStoryEntityService persistentStoryEntityService;
 
     @Override
     public String translateStory(StoryEntityImpl story, String type, String translationTool, boolean translate)
@@ -288,19 +293,19 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
     }
 
     @Override
-    public TranslationEntityImpl updateItemTranslation(TranslationUpdateRequest updateRequest) throws HttpException{
+    public TranslationEntityImpl updateItemTranslation(String storyId, String itemId, TranslationUpdateRequest updateRequest) throws HttpException{
         
-        ItemEntityImpl item = persistentItemEntityService.findItemEntity(updateRequest.getStoryId(), updateRequest.getItemId());
+        ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
         if(item==null) {
-          throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(updateRequest.getStoryId(), updateRequest.getItemId()));
+          throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
         } 
         
 
         TranslationEntityImpl dbTranslationEntity;
-        String resourcePath = EnrichmentUtils.buildResourcePath(updateRequest.getStoryId(), updateRequest.getItemId(), updateRequest.getTranslationTool());
+        String resourcePath = EnrichmentUtils.buildResourcePath(storyId, itemId, updateRequest.getProperty(), updateRequest.getTranslationTool());
         try {
             dbTranslationEntity = persistentTranslationEntityService
-                    .findTranslation(updateRequest.getStoryId(), updateRequest.getItemId(), updateRequest.getTranslationTool(),
+                    .findTranslation(storyId, itemId, updateRequest.getTranslationTool(),
                             EnrichmentConstants.defaultTargetTranslationLang2Letter, updateRequest.getProperty());
         } catch (EntityRetrievalException e) {
             //SG: consider switching to 400
@@ -311,6 +316,12 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
             throw new ResourceNotFoundException("translation", resourcePath);
         }
 
+        return saveVersionAndUpdateTranslation(dbTranslationEntity, updateRequest);
+        
+    }
+
+    private TranslationEntityImpl saveVersionAndUpdateTranslation(TranslationEntityImpl dbTranslationEntity,
+            TranslationUpdateRequest updateRequest) {
         //create version for old translation
         TranslationVersionImpl version = new TranslationVersionImpl(dbTranslationEntity);
         persistentTranslationEntityService.saveTranslationVersion(version);
@@ -319,7 +330,35 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
         dbTranslationEntity.setTranslatedText(updateRequest.getText());
         dbTranslationEntity.setModified(new Date());
         return persistentTranslationEntityService.saveTranslationEntity(dbTranslationEntity);
+    }
+    
+    @Override
+    public TranslationEntityImpl updateStoryTranslation(String storyId, TranslationUpdateRequest updateRequest) throws HttpException{
+        
+        StoryEntityImpl story = persistentStoryEntityService.findStoryEntity(storyId);
+        
+        if(story == null) {
+          throw new ResourceNotFoundException("story", EnrichmentUtils.buildResourcePath(storyId));
+        } 
+        
+        TranslationEntityImpl dbTranslationEntity;
+        String resourcePath = EnrichmentUtils.buildResourcePath(storyId, updateRequest.getProperty(),  updateRequest.getTranslationTool());
+        try {
+            dbTranslationEntity = persistentTranslationEntityService
+                    .findTranslation(storyId, null, updateRequest.getTranslationTool(),
+                            EnrichmentConstants.defaultTargetTranslationLang2Letter, updateRequest.getProperty());
+        } catch (EntityRetrievalException e) {
+            //SG: consider switching to 400
+            throw new ResourceNotFoundException("translation", resourcePath);
+        }
+
+        if (dbTranslationEntity == null) {
+            throw new ResourceNotFoundException("translation", resourcePath);
+        }
+
+        return saveVersionAndUpdateTranslation(dbTranslationEntity, updateRequest);
         
     }
+
 
 }

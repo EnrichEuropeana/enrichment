@@ -15,6 +15,8 @@ public interface EnrichmentTranslationService {
 	
 	public String translateItem(ItemEntityImpl item, String type, String translationTool, boolean translate) throws Exception;
 
-        public TranslationEntityImpl updateItemTranslation(TranslationUpdateRequest translationRequest) throws HttpException;
+        public TranslationEntityImpl updateItemTranslation(String storyId, String itemId, TranslationUpdateRequest translationRequest) throws HttpException;
+
+        public TranslationEntityImpl updateStoryTranslation(String storyId, TranslationUpdateRequest body) throws HttpException;
 
 }

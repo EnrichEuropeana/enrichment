@@ -9,6 +9,8 @@ public class TranslationRequest extends BaseTranslationRequest {
 
     private String originalText;
     private String type;
+    private String storyId;
+    private String itemId;
 
     public String getOriginalText() {
         return originalText;
@@ -24,6 +26,22 @@ public class TranslationRequest extends BaseTranslationRequest {
 
     public void setType(String type) {
         this.type = type;
+    }
+    
+    public String getStoryId() {
+        return storyId;
+    }
+
+    public void setStoryId(String storyId) {
+        this.storyId = storyId;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 
 }
