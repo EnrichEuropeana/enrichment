@@ -16,7 +16,7 @@ public class ResourceNotFoundException extends HttpException{
 	
 	
 	public ResourceNotFoundException(String parameterName, String parameterValue){
-		this(I18nConstants.RESOURCE_NOT_FOUND, parameterName, parameterValue, null);
+		this(I18nConstants.RESOURCE_NOT_FOUND, parameterName, parameterValue);
 	}
 	
 	public ResourceNotFoundException(String i18nKey, String parameterName, String parameterValue){
@@ -27,7 +27,7 @@ public class ResourceNotFoundException extends HttpException{
 	}
 	
 	public ResourceNotFoundException(String i18nKey, String parameterName, String parameterValue, HttpStatus status, Throwable th){
-		this(null, i18nKey, new String[]{parameterName, parameterValue}, status, th);
+		this(MESSAGE_BLANK_PARAMETER_VALUE + parameterValue, i18nKey, new String[]{parameterName, parameterValue}, status, th);
 	}
 	
 	public ResourceNotFoundException(String message, String i18nKey, String[] i18nParams, HttpStatus status, Throwable th){
