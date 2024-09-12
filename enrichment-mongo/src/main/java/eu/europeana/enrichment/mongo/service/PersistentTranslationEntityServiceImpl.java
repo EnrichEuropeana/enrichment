@@ -38,7 +38,7 @@ public class PersistentTranslationEntityServiceImpl implements PersistentTransla
             String type) throws EntityRetrievalException {
         List<TranslationEntityImpl> translations = findTranslationEntitiesWithAditionalInformation(storyId, itemId,
                 tool, language, type);
-        if (translations == null) {
+        if (translations == null || translations.isEmpty()) {
             return null;
         } else if (translations.size() > 1) {
             throw new EntityRetrievalException("Expected to retrieve one translation for property: " + type
