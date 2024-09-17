@@ -4,6 +4,7 @@ enrich.api.endpoint=http://localhost:8080/
 # mongo connectivity
 spring.data.mongodb.uri=mongodb://<ip_of_the_test_server>:27017/enrichment
 spring.data.mongodb.database=enrichment
+enrich.mongodb.database=enrichment
 
 #if required
 #enrich.mongodb.truststore=

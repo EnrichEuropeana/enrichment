@@ -19,6 +19,7 @@ public class EnrichmentConstants {
     public static final String BEAN_ENRICHMENT_KEYWORD_DAO= "keywordDao";
     public static final String BEAN_ENRICHMENT_STORY_ENTITY_DAO= "storyEntityDao";
     public static final String BEAN_ENRICHMENT_TRANSLATION_ENTITY_DAO= "translationEntityDao";
+    public static final String BEAN_ENRICHMENT_TRANSLATION_VERSION_DAO= "translationVersionDao";
     public static final String BEAN_ENRICHMENT_RECORD_TRANSLATION_DAO= "recordTranslationDao";
     public static final String BEAN_ENRICHMENT_PERSISTENT_ITEM_ENTITY_SERVICE= "persistentItemEntityService";
     public static final String BEAN_ENRICHMENT_PERSISTENT_NAMED_ENTITY_ANNOTATION_SERVICE= "persistentNamedEntityAnnotationService";

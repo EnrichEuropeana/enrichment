@@ -19,8 +19,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.europeana.api.commons.config.i18n.I18nService;
-import eu.europeana.api.commons.config.i18n.I18nServiceImpl;
 import eu.europeana.api.commons.oauth2.service.impl.EuropeanaClientDetailsService;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
@@ -76,6 +74,9 @@ public class CommonConfig {
     public EuropeanaClientDetailsService getClientDetailsService() {
       EuropeanaClientDetailsService clientDetailsService = new EuropeanaClientDetailsService();
       clientDetailsService.setApiKeyServiceUrl(config.getApiKeyUrl());
+      if(logger.isTraceEnabled()) {
+          logger.trace("Client details service is configured.");
+      }
       return clientDetailsService;
     }
 
