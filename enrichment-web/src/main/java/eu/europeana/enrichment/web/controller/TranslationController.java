@@ -28,10 +28,8 @@ import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
-import eu.europeana.enrichment.web.exception.ResourceNotFoundException;
 import eu.europeana.enrichment.web.model.TranslationUpdateRequest;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
-import eu.europeana.enrichment.web.service.impl.EnrichmentUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
