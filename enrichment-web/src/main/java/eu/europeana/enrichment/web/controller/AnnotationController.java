@@ -36,7 +36,6 @@ import io.swagger.annotations.ApiOperation;
 
 @RestController
 @EnableCaching
-//@SwaggerSelect
 @Api(tags = "Enrichment service", description=" ")
 public class AnnotationController extends BaseRest {
 
@@ -115,13 +114,6 @@ public class AnnotationController extends BaseRest {
 			property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
 		}
 		
-		//check if the api is already locked (i.e. the analysis has been started)
-//		ApiWriteLock annoDbWiteLock = persistentApiWriteLockService.getActiveLock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
-//		if(annoDbWiteLock!=null) {
-//			throw new HttpException(null, I18nConstants.WRITE_LOCK_EXISTS, HttpStatus.ACCEPTED);
-//		}
-//		ApiWriteLock annoWriteLock = persistentApiWriteLockService.lock(storyId, itemId, property, EnrichmentConstants.ENTITY_TYPE_ANNOTATION);
-		
 		verifyWriteAccess(Operations.CREATE, request);
 
 		NamedEntityAnnotationCollection annosCollection = enrichmentNerService.createAnnotationsFullWorkflow(storyId, itemId, property, null);
@@ -132,8 +124,6 @@ public class AnnotationController extends BaseRest {
 		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
 		
-//		persistentApiWriteLockService.unlock(annoWriteLock);
-
 		return response;		
 	}
 
@@ -169,8 +159,6 @@ public class AnnotationController extends BaseRest {
 		}
 		String resultJson = jsonLdSerializer.serializeObject(annosCollection);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJson, HttpStatus.OK);
-		
-//		persistentApiWriteLockService.unlock(annoWriteLock);
 		
 		return response;		
 	}

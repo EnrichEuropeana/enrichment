@@ -9,6 +9,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.http.client.ClientProtocolException;
 
+import eu.europeana.enrichment.definitions.exceptions.EntityRetrievalException;
 import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 
@@ -16,7 +17,7 @@ public interface EnrichmentStoryAndItemStorageService {
 	
 	public StoryEntityImpl updateStoryFromTranscribathon (String storyId, List<String> fieldsToUpdate) throws ClientProtocolException, IOException;
 	
-	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws ClientProtocolException, IOException, TransformerException;
+	public ItemEntityImpl updateItemFromTranscribathon (String storyId, String itemId) throws EntityRetrievalException;
 	
 	public void updateStoriesFromInput(StoryEntityImpl[] stories);
 	

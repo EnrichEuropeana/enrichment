@@ -165,7 +165,9 @@ public class NERController extends BaseRest {
 		if(property==null) property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
 		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
-		if(force==null) force=false;
+		if(force==null) {
+		    force=false;
+		}
 		
 		List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(linking,",")));
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
@@ -175,7 +177,7 @@ public class NERController extends BaseRest {
 	
 		String resultJsonLd = null;
 		if(force) {
-			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, false);
+			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, force);
 			resultJsonLd=jsonLdSerializer.serializeObject(result);			
 		}
 		else {
