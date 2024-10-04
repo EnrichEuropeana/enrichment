@@ -42,7 +42,7 @@ spec:
           volumeMounts:
             - name: wikidata-cache
               mountPath: "/opt/app/enrich/data/wikidata"
-              readOnly: true
+              readOnly: false
       volumes:
         - name: wikidata-cache
           hostPath:
