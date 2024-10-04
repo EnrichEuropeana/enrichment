@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: set-api-hpa
+  name: enrichment-hpa
 spec:
   maxReplicas: ${MAX_REPLICAS}
   minReplicas: ${MIN_REPLICAS}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: set-api-deployment
+    name: enrichment-deployment
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 900
