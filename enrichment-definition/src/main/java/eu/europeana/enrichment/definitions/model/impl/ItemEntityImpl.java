@@ -31,6 +31,7 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	private List<String> transcriptionLanguages;
 	private String type;
 	private String transcriptionText;
+	private String transcriptionType;
 	private String hashKey;
 	private String storyId;
 	private String title;
@@ -231,5 +232,13 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	public void setHtrdataTranscriptionLangs(List<String> htrdataTranscriptionLangs) {
 		this.htrdataTranscriptionLangs = htrdataTranscriptionLangs;
 	}
+
+    public String getTranscriptionType() {
+        return transcriptionType;
+    }
+
+    public void setTranscriptionType(String transcriptionType) {
+        this.transcriptionType = transcriptionType;
+    }
 	
 }

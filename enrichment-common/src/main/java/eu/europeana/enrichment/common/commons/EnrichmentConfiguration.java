@@ -246,7 +246,8 @@ public class EnrichmentConfiguration {
     }
 
     public String getTranscribathonBaseUrlItems() {
-        return buildFullUrl(getTranscribathonApiBaseUrl(), "items/");
+        //return buildFullUrl(getTranscribathonApiBaseUrl(), "items/");
+        return buildFullUrl(getTranscribathonApiV2ItemsBaseUrl(), "items/");
     }
 
     public String getTranslationDeeplFreeBaseUrl() {
@@ -333,7 +334,7 @@ public class EnrichmentConfiguration {
         return wikidataSubclassesJuridicalPerson;
     }
 
-    public String getTranscribathonAPiV2ItemsBaseUrl() {
+    public String getTranscribathonApiV2ItemsBaseUrl() {
         return buildFullUrl(transcribathonApiV2BaseUrl, "items/") ;
     }
 

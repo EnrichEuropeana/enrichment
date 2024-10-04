@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import eu.europeana.api.commons.web.exception.HttpException;
@@ -121,17 +122,22 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
         List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService
                 .findTranslationEntitiesWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool,
                         EnrichmentConstants.defaultTargetTranslationLang2Letter, property);
+        //TODO translate=true should force new translation
         if (!dbTranslationEntity.isEmpty()) {
             return dbTranslationEntity.get(0).getTranslatedText();
         }
+        
+        //TODO verify if the property was changed by using transcription version/date 
 
         String textToTranslate = null;
         String sourceLanguage = null;
-        if (EnrichmentConstants.ITEM_HTRDATA.equalsIgnoreCase(property)
-                && !StringUtils.isBlank(item.getHtrdataTranscription())) {
-            textToTranslate = item.getHtrdataTranscription();
-            sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getHtrdataTranscriptionLangs());
-        } else if (EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(property)
+//        if (EnrichmentConstants.ITEM_HTRDATA.equalsIgnoreCase(property)
+//                && !StringUtils.isBlank(item.getHtrdataTranscription())) {
+//            textToTranslate = item.getHtrdataTranscription();
+//            sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getHtrdataTranscriptionLangs());
+//        } else
+        //do not use htr data anymore, 
+        if (EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(property)
                 && !StringUtils.isBlank(item.getTranscriptionText())) {
             textToTranslate = item.getTranscriptionText();
             sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getTranscriptionLanguages());
@@ -170,8 +176,10 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
             switch (translationTool) {
             case EnrichmentConstants.defaultTranslationTool:
                 if (googleTranslationService == null) {
-                    logger.info("The google translation service is currently disabled.");
-                    return null;
+                    throw new ParamValidationException(
+                            I18nConstants.INVALID_PARAM_VALUE,
+                            TranslationRequest.PARAM_TRANSLATION_TOOL, 
+                            translationTool + " is disabled, please contact the system administrator");
                 }
                 List<String> googleTransTextResp = new ArrayList<>();
                 List<String> googleTransDetectedLangResp = new ArrayList<>();
