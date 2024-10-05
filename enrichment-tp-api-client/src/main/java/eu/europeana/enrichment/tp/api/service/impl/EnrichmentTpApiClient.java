@@ -2,6 +2,7 @@ package eu.europeana.enrichment.tp.api.service.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,11 +95,7 @@ public class EnrichmentTpApiClient {
         }
     }
 
-    private ItemV2 getTranscribathonItemV2(String itemId) throws ClientProtocolException, IOException {
-        return getItemV2FromTpApi(itemId);
-    }
-
-    private ItemV2 getItemV2FromTpApi(String itemId)
+    private ItemV2 getTranscribathonItemV2(String itemId)
             throws ClientProtocolException, IOException, JsonProcessingException, JsonMappingException {
         String response = fetchApiV2ItemResponse(itemId);
         if (response == null) {
@@ -216,6 +213,8 @@ public class EnrichmentTpApiClient {
     private ItemEntityImpl buildFromTPItemV2(ItemV2 tpItem) {
         
         ItemEntityImpl item = new ItemEntityImpl();
+        item.setCreated(tpItem.getTimestamp());
+        item.setModified(tpItem.getLastUpdated());
 
         item.setItemId(String.valueOf(tpItem.getItemId()));
         item.setStoryId(String.valueOf(tpItem.getStoryId()));
@@ -234,6 +233,9 @@ public class EnrichmentTpApiClient {
     private ItemEntityImpl convertTranscribathonItemToLocalItem(Item item)
             throws ClientProtocolException, IOException, TransformerException {
         ItemEntityImpl newItem = new ItemEntityImpl();
+        Date now = new Date();
+        newItem.setCreated(now);
+        newItem.setModified(now);
         if (item.Transcriptions != null) {
             for (Transcription trElem : item.Transcriptions) {
                 if (trElem.TextNoTags != null && !trElem.TextNoTags.isBlank()) {

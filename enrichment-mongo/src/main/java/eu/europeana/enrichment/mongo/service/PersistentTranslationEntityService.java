@@ -68,4 +68,6 @@ public interface PersistentTranslationEntityService {
      */
     public void saveTranslationVersion(TranslationVersionImpl version);
 
+    void deleteTranslationEntity(String storyId, String itemId, String type, boolean includeManual);
+
 }

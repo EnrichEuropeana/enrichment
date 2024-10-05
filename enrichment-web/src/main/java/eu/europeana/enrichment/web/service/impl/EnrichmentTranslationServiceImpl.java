@@ -83,15 +83,15 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
         String textToTranslate = null;
         String sourceLanguage = null;
-        if (EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(type)
+        if (EnrichmentConstants.TRANSCRIPTION.equalsIgnoreCase(type)
                 && !StringUtils.isBlank(story.getTranscriptionText())) {
             textToTranslate = story.getTranscriptionText();
             sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(story.getTranscriptionLanguages());
-        } else if (EnrichmentConstants.STORY_ITEM_DESCRIPTION.equalsIgnoreCase(type)
+        } else if (EnrichmentConstants.DESCRIPTION.equalsIgnoreCase(type)
                 && !StringUtils.isBlank(story.getDescription())) {
             textToTranslate = story.getDescription();
             sourceLanguage = story.getLanguageDescription();
-        } else if (EnrichmentConstants.STORY_ITEM_SUMMARY.equalsIgnoreCase(type)
+        } else if (EnrichmentConstants.SUMMARY.equalsIgnoreCase(type)
                 && !StringUtils.isBlank(story.getSummary())) {
             textToTranslate = story.getSummary();
             sourceLanguage = story.getLanguageSummary();
@@ -122,7 +122,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
         List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService
                 .findTranslationEntitiesWithAditionalInformation(item.getStoryId(), item.getItemId(), translationTool,
                         EnrichmentConstants.defaultTargetTranslationLang2Letter, property);
-        //TODO translate=true should force new translation
+        //TODO translate=true should force new translation but not for manual
         if (!dbTranslationEntity.isEmpty()) {
             return dbTranslationEntity.get(0).getTranslatedText();
         }
@@ -137,7 +137,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 //            sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getHtrdataTranscriptionLangs());
 //        } else
         //do not use htr data anymore, 
-        if (EnrichmentConstants.STORY_ITEM_TRANSCRIPTION.equalsIgnoreCase(property)
+        if (EnrichmentConstants.TRANSCRIPTION.equalsIgnoreCase(property)
                 && !StringUtils.isBlank(item.getTranscriptionText())) {
             textToTranslate = item.getTranscriptionText();
             sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getTranscriptionLanguages());
@@ -183,6 +183,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
                 }
                 List<String> googleTransTextResp = new ArrayList<>();
                 List<String> googleTransDetectedLangResp = new ArrayList<>();
+                //TODO use source language?
                 googleTranslationService.translateText(textToTranslate, null,
                         EnrichmentConstants.defaultTargetTranslationLang2Letter, googleTransTextResp,
                         googleTransDetectedLangResp);

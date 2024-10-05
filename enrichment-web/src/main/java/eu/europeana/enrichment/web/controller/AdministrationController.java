@@ -96,9 +96,9 @@ public class AdministrationController extends BaseRest {
 		
 		verifyWriteAccess(Operations.CREATE, request);
 		List<String> fieldsToUpdate = new ArrayList<>();
-		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION);
-		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_DESCRIPTION);
-		fieldsToUpdate.add(EnrichmentConstants.STORY_ITEM_SUMMARY);
+		fieldsToUpdate.add(EnrichmentConstants.TRANSCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.DESCRIPTION);
+		fieldsToUpdate.add(EnrichmentConstants.SUMMARY);
 		Instant start = Instant.now();
 		for (int i = 0; i < storyIdsList.size(); i++) {
 			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i), fieldsToUpdate);

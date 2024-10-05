@@ -42,8 +42,18 @@ public class ItemEntityImpl extends BaseEntityImpl {
 
 	public ItemEntityImpl(ItemEntityImpl item) {
 		Date now = new Date();
-		this.setCreated(now);
-		this.setModified(now);
+		if(item.getCreated() == null) {
+		    this.setCreated(now);    
+		} else {
+		    this.setCreated(item.getCreated());
+		}
+		
+		if(item.getModified() == null) {
+		    this.setModified(now);    
+		} else {
+		    this.setModified(item.getModified());
+		}
+		
 		this.itemId = item.getItemId();
 		this.type = item.getType();
 		this.transcriptionText = item.getTranscriptionText();
@@ -58,11 +68,11 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	}
 	
 	public ItemEntityImpl() {
-		Date now = new Date();
-		this.setCreated(now);
-		this.setModified(now);
+//		Date now = new Date();
+//		this.setCreated(now);
+//		this.setModified(now);
 	}
-
+	
 	public String getStoryId() {
 		return storyId;
 	}
@@ -79,10 +89,12 @@ public class ItemEntityImpl extends BaseEntityImpl {
 		this.itemId = storyItemId;
 	}
 
+	@Deprecated
 	public String getType() {
 		return this.type;
 	}
 
+	@Deprecated
 	public void setType(String textType) {
 		this.type = textType;
 	}
@@ -145,7 +157,11 @@ public class ItemEntityImpl extends BaseEntityImpl {
 	}
 
 	public void copyFromItem(ItemEntityImpl item) {
-		this.setModified(new Date());
+	        if(item.getModified() != null) {
+	            this.setModified(item.getModified());
+	        }else {
+	            this.setModified(new Date());
+	        }
 		this.setItemId(item.getItemId());
 		if(item.getKeywords()!=null) this.setKeywords(new ArrayList<>(item.getKeywords()));
 		this.setSource(item.getSource());
@@ -217,18 +233,22 @@ public class ItemEntityImpl extends BaseEntityImpl {
         return result;
     }
 
+	@Deprecated
 	public String getHtrdataTranscription() {
 		return htrdataTranscription;
 	}
 
+	@Deprecated
 	public void setHtrdataTranscription(String htrdataTranscription) {
 		this.htrdataTranscription = htrdataTranscription;
 	}
 
+	@Deprecated
 	public List<String> getHtrdataTranscriptionLangs() {
 		return htrdataTranscriptionLangs;
 	}
 
+	@Deprecated
 	public void setHtrdataTranscriptionLangs(List<String> htrdataTranscriptionLangs) {
 		this.htrdataTranscriptionLangs = htrdataTranscriptionLangs;
 	}

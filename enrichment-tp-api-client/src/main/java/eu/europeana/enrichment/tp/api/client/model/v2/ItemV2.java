@@ -1,5 +1,8 @@
 package eu.europeana.enrichment.tp.api.client.model.v2;
 
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,6 +27,13 @@ public class ItemV2 {
     private String TranscriptionSource;
     @JsonProperty("Transcription")
     private TranscriptionV2 Transcription;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="UTC")
+    @JsonProperty("LastUpdated")
+    public Date lastUpdated;
+    @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone="UTC")
+    @JsonProperty("Timestamp")
+    public Date timestamp;
+    
     
     public Integer getItemId() {
         return ItemId;
@@ -67,6 +77,19 @@ public class ItemV2 {
     public void setTranscription(TranscriptionV2 transcription) {
         Transcription = transcription;
     }
+    public Date getLastUpdated() {
+        return lastUpdated;
+    }
+    public void setLastUpdated(Date lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+    public Date getTimestamp() {
+        return timestamp;
+    }
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
 
    
 

@@ -153,11 +153,11 @@ public class EnrichmentNERServiceImpl {
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, null, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 
 		Map<String, String> textAndLanguage = getStoryTextForNER(storyId, translationTool, property, updateStory);
-		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldText)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage))) {
+		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.FIELD_TEXT)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.FIELD_LANG))) {
 			return result;
 		}
-		String textForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldText);
-		String languageForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage);
+		String textForNer = textAndLanguage.get(EnrichmentConstants.FIELD_TEXT);
+		String languageForNer = textAndLanguage.get(EnrichmentConstants.FIELD_LANG);
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, null, linking, true);
@@ -198,11 +198,11 @@ public class EnrichmentNERServiceImpl {
 		persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(storyId, itemId, property, EnrichmentConstants.MONGO_SKIP_FIELD);
 		
 		Map<String, String> textAndLanguage = getItemTextForNER(storyId, itemId, translationTool, property, updateItem);
-		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldText)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage))) {
+		if(StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.FIELD_TEXT)) || StringUtils.isBlank(textAndLanguage.get(EnrichmentConstants.FIELD_LANG))) {
 			return result;
 		}
-		String textForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldText);
-		String languageForNer = textAndLanguage.get(EnrichmentConstants.POJOFieldLanguage);
+		String textForNer = textAndLanguage.get(EnrichmentConstants.FIELD_TEXT);
+		String languageForNer = textAndLanguage.get(EnrichmentConstants.FIELD_LANG);
 		
 		//sometimes some fields for NER can be empty for items which causes problems in the method applyNERTools
 		Set<ObjectId> namedEntitiesToUpdateLinking = updatedNamedEntitiesForText(nerTools, textForNer, languageForNer, property, storyId, itemId, linking, true);
@@ -373,8 +373,8 @@ public class EnrichmentNERServiceImpl {
 		String translatedText=enrichmentTranslationService.translateStory(updatedStory, type, translationTool, true);
 		if(! StringUtils.isBlank(translatedText))
 		{
-			results.put(EnrichmentConstants.POJOFieldText, translatedText);
-			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
+			results.put(EnrichmentConstants.FIELD_TEXT, translatedText);
+			results.put(EnrichmentConstants.FIELD_LANG, EnrichmentConstants.defaultTargetTranslationLang2Letter);
 		}
 		return results;
 		
@@ -385,7 +385,7 @@ public class EnrichmentNERServiceImpl {
 		Map<String, String> results = new HashMap<>();
 		//update item from Transcribathon
 		ItemEntityImpl updatedItem=null;
-		if(updateItemBool) {
+		if(updateItemBool) { //TODO reundant with the full workflow
 			updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
 		}		
 		else {
@@ -399,8 +399,8 @@ public class EnrichmentNERServiceImpl {
 		String translatedText = enrichmentTranslationService.translateItem(updatedItem, property, translationTool, true);
 		if(! StringUtils.isBlank(translatedText))
 		{
-			results.put(EnrichmentConstants.POJOFieldText, translatedText);
-			results.put(EnrichmentConstants.POJOFieldLanguage, EnrichmentConstants.defaultTargetTranslationLang2Letter);
+			results.put(EnrichmentConstants.FIELD_TEXT, translatedText);
+			results.put(EnrichmentConstants.FIELD_LANG, EnrichmentConstants.defaultTargetTranslationLang2Letter);
 		}
 		return results;
 	}
@@ -463,10 +463,10 @@ public class EnrichmentNERServiceImpl {
 	
 	public NamedEntityAnnotationCollection createAnnotationsFullWorkflow(String storyId, String itemId, String property, List<String> storyFieldsToUpdateOtherEntities) throws Exception {
 		if(itemId!=null) {
-			enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
+		    ItemEntityImpl updatedItem = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
 		}
 		else {
-			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, storyFieldsToUpdateOtherEntities);
+		    StoryEntityImpl updatedStory = enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyId, storyFieldsToUpdateOtherEntities);
 		}
 		
 		NamedEntityAnnotationCollection existingAnnos = getAnnotations(storyId, itemId, property);
@@ -480,7 +480,7 @@ public class EnrichmentNERServiceImpl {
 				String nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 				List<String> linkingList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(EnrichmentConstants.WIKIDATA_LINKING,",")));
 				List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
-				if(itemId!=null) {
+				if(itemId!=null) {//TODO should reuse the item object
 					createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, EnrichmentConstants.defaultTranslationTool, false);
 				}
 				else {
