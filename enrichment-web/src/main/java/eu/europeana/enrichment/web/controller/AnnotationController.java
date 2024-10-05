@@ -88,7 +88,7 @@ public class AnnotationController extends BaseRest {
 			verifyReadAccess(request);
 			
 			if(property==null) {
-				property = itemId!=null ? EnrichmentConstants.STORY_ITEM_TRANSCRIPTION : EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+				property = itemId!=null ? EnrichmentConstants.TRANSCRIPTION : EnrichmentConstants.DESCRIPTION;
 			}
 
 			NamedEntityAnnotationCollection result = enrichmentNerService.getAnnotations(storyId, itemId, property);
@@ -111,7 +111,7 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 		
 		if(property==null) {
-			property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
+			property=EnrichmentConstants.TRANSCRIPTION;
 		}
 		
 		verifyWriteAccess(Operations.CREATE, request);
@@ -137,7 +137,7 @@ public class AnnotationController extends BaseRest {
 			HttpServletRequest request) throws Exception, HttpException {
 
 		if(property==null) {
-			property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+			property=EnrichmentConstants.DESCRIPTION;
 		}
 
 		//check if the api is already locked (i.e. the analysis has been started)

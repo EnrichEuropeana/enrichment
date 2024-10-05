@@ -205,7 +205,12 @@ public class StoryEntityImpl extends BaseEntityImpl {
 
 	
 	public void copyFromStory(StoryEntityImpl story) {
-		this.setModified(new Date());		
+		if(story.getModified() == null) {
+		    this.setModified(new Date());    
+		} else {
+		    this.setModified(story.getModified());
+		}
+	    		
 		this.storyId = story.getStoryId();
 		this.title = story.getTitle();
 		this.source = story.getSource();

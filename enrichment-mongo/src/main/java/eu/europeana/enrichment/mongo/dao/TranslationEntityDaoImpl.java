@@ -89,26 +89,38 @@ public class TranslationEntityDaoImpl implements TranslationEntityDao {
 	
 	@Override
 	public long deleteTranslationEntity(String storyId, String itemId, String type) {
-	    List<Filter> filters = new ArrayList<>();
-	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
-	    	filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
-	    }
-	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
-	    	filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
-	    }
-	    if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(type)) {
-	    	filters.add(eq(EnrichmentConstants.TYPE, type));
-	    }
-
-	    if(filters.size()>0) {
-			return enrichmentDatastore.find(TranslationEntityImpl.class)
-					.filter(filters.toArray(Filter[]::new))
-	                .delete(MorphiaUtils.MULTI_DELETE_OPTS)
-	                .getDeletedCount();
-	    }
-	    else {
-	    	return 0;
-	    }
+	  return deleteTranslationEntity(storyId, itemId, type, false);  
 	}
+
+    @Override
+    public long deleteTranslationEntity(String storyId, String itemId, String type, boolean includeManual) {
+        
+        List<Filter> filters = new ArrayList<>();
+        if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(storyId)) {
+            filters.add(eq(EnrichmentConstants.STORY_ID, storyId));
+        }
+        if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(itemId)) {
+            filters.add(eq(EnrichmentConstants.ITEM_ID, itemId));
+        }
+        if(! EnrichmentConstants.MONGO_SKIP_FIELD.equals(type)) {
+            filters.add(eq(EnrichmentConstants.TYPE, type));
+        }
+        
+        if(!includeManual) {
+            //manual corrected translation have an userId 
+            //delete only if userId is null 
+            filters.add(eq(EnrichmentConstants.USER_ID, null));
+        }
+
+        if(filters.size()>0) {
+                    return enrichmentDatastore.find(TranslationEntityImpl.class)
+                                    .filter(filters.toArray(Filter[]::new))
+                    .delete(MorphiaUtils.MULTI_DELETE_OPTS)
+                    .getDeletedCount();
+        }
+        else {
+            return 0;
+        }
+    }
 
 }

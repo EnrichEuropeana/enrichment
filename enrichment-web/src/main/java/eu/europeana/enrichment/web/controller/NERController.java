@@ -82,7 +82,7 @@ public class NERController extends BaseRest {
 		verifyWriteAccess(Operations.CREATE, request);
 		
 		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
-		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(property==null) property=EnrichmentConstants.DESCRIPTION;
 		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 		if(force==null) force=false;
@@ -125,7 +125,7 @@ public class NERController extends BaseRest {
 		
 		verifyReadAccess(request);
 		
-		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(property==null) property=EnrichmentConstants.DESCRIPTION;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 	
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
@@ -162,7 +162,7 @@ public class NERController extends BaseRest {
 		verifyWriteAccess(Operations.CREATE, request);
 		
 		if(translationTool==null) translationTool=EnrichmentConstants.defaultTranslationTool;
-		if(property==null) property=EnrichmentConstants.STORY_ITEM_TRANSCRIPTION;
+		if(property==null) property=EnrichmentConstants.TRANSCRIPTION;
 		if(linking==null) linking=EnrichmentConstants.WIKIDATA_LINKING;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 		if(force==null) {
@@ -209,7 +209,7 @@ public class NERController extends BaseRest {
 		
 		verifyReadAccess(request);
 
-		if(property==null) property=EnrichmentConstants.STORY_ITEM_DESCRIPTION;
+		if(property==null) property=EnrichmentConstants.DESCRIPTION;
 		if(nerTools==null) nerTools=NerTools.Dbpedia.getStringValue() + "," + NerTools.Stanford.getStringValue();
 	
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));

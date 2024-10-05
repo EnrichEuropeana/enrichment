@@ -80,10 +80,9 @@ public abstract class BaseRest extends BaseRestController {
                 throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
                         TranslationRequest.PARAM_STORY_ITEM_ID, null);
         }
-        if (!(property.equals(EnrichmentConstants.STORY_ITEM_SUMMARY)
-                || property.equals(EnrichmentConstants.STORY_ITEM_DESCRIPTION)
-                || property.equals(EnrichmentConstants.STORY_ITEM_TRANSCRIPTION)
-                || property.equals(EnrichmentConstants.ITEM_HTRDATA)))
+        if (!(property.equals(EnrichmentConstants.SUMMARY)
+                || property.equals(EnrichmentConstants.DESCRIPTION)
+                || property.equals(EnrichmentConstants.TRANSCRIPTION)))
             throw new ParamValidationException(I18nConstants.INVALID_PARAM_VALUE,
                     TranslationRequest.PARAM_TYPE, property);
     }
@@ -125,7 +124,7 @@ public abstract class BaseRest extends BaseRestController {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ID, null);
         if (story.getDescription() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
-                    EnrichmentConstants.STORY_ITEM_DESCRIPTION, null);
+                    EnrichmentConstants.DESCRIPTION, null);
         if (story.getLanguageDescription() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
                     EnrichmentConstants.LANGUAGE_DESCRIPTION, null);
@@ -133,7 +132,7 @@ public abstract class BaseRest extends BaseRestController {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.SOURCE, null);
         if (story.getSummary() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
-                    EnrichmentConstants.STORY_ITEM_SUMMARY, null);
+                    EnrichmentConstants.SUMMARY, null);
         if (story.getLanguageSummary() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
                     EnrichmentConstants.LANGUAGE_SUMMARY, null);
@@ -144,18 +143,16 @@ public abstract class BaseRest extends BaseRestController {
     protected void validateItem(ItemEntityImpl item) throws ParamValidationException {
         if (item.getStoryId() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.STORY_ID, null);
-        if (item.getTranscriptionLanguages() == null && item.getHtrdataTranscriptionLangs() == null) {
+        if (item.getTranscriptionLanguages() == null) {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
-                    "(either " + EnrichmentConstants.TRANSCRIPTION_LANGUAGES + " or "
-                            + EnrichmentConstants.ITEM_HTR_TRANSCRIPTION_LANGUAGES + " should exist)",
+                    EnrichmentConstants.TRANSCRIPTION_LANGUAGES,
                     null);
         }
         if (item.getTitle() == null)
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.TITLE, null);
-        if (item.getTranscriptionText() == null && item.getHtrdataTranscription() == null) {
+        if (item.getTranscriptionText() == null) {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY,
-                    "(either " + EnrichmentConstants.STORY_ITEM_TRANSCRIPTION + " or "
-                            + EnrichmentConstants.ITEM_HTR_TRANSCRIPTION + " should exist)",
+                    EnrichmentConstants.TRANSCRIPTION,
                     null);
         }
         if (item.getItemId() == null)

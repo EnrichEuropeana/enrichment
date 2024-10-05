@@ -6,8 +6,8 @@ import dev.morphia.annotations.Index;
 import dev.morphia.annotations.Indexes;
 
 @Entity(value = "TranslationVersionImpl")
-@Indexes(@Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"),
-        @Field("tool") }))
+@Indexes({ @Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool") }),
+        @Index(fields = { @Field("storyId"), @Field("itemId"), @Field("type"), @Field("tool"), @Field("userId") }) })
 public class TranslationVersionImpl extends BaseTranslationImpl {
 
     public TranslationVersionImpl(BaseTranslationImpl copy) {

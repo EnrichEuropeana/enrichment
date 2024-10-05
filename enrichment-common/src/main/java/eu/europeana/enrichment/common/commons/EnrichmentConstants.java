@@ -129,18 +129,19 @@ public class EnrichmentConstants {
 	public static final String TOOL = "tool";
 	public static final String LANGUAGE = "language";
 	public static final String TYPE = "type";
+	public static final String USER_ID = "userId";
 	public static final String WIKIDATA_ID = "wikidataId";
 	public static final String DBPEDIA_ID = "dbpediaId";
-	public static final String STORY_ITEM_DESCRIPTION = "description";
+	public static final String DESCRIPTION = "description";
 	public static final String LANGUAGE_DESCRIPTION = "languageDescription";
-	public static final String STORY_ITEM_TRANSCRIPTION = "transcription";
-	public static final String ITEM_HTR_TRANSCRIPTION = "htrdataTranscription";
-	public static final String ITEM_HTRDATA = "htrdata";
+	public static final String TRANSCRIPTION = "transcription";
+//	public static final String ITEM_HTR_TRANSCRIPTION = "htrdataTranscription";
+//	public static final String ITEM_HTRDATA = "htrdata";
 	public static final String LANGUAGE_TRANSCRIPTION = "languageTranscription";
 	public static final String TRANSCRIPTION_LANGUAGES = "transcriptionLanguages";
-	public static final String ITEM_HTR_TRANSCRIPTION_LANGUAGES = "htrdataTranscriptionLangs";
+//	public static final String ITEM_HTR_TRANSCRIPTION_LANGUAGES = "htrdataTranscriptionLangs";
 	
-	public static final String STORY_ITEM_SUMMARY = "summary";
+	public static final String SUMMARY = "summary";
 	public static final String LANGUAGE_SUMMARY = "languageSummary";
 	public static final String TITLE = "title";
 	public static final String SOURCE = "source";
@@ -254,10 +255,10 @@ public class EnrichmentConstants {
 	public static final ObjectId MONGO_SKIP_OBJECT_ID_FIELD=new ObjectId();
 	
 	public static final Set<String> transcribathonEnglishLangValues = Set.of("en", "eng", "English", "en || en", "eng || eng", "English || English", "en || eng", "eng || en", "en || English", "English || en", "eng || English", "English || eng");
-	public static final String POJOFieldText = "text";
-	public static final String POJOFieldLanguage = "lang";
+	public static final String FIELD_TEXT = "text";
+	public static final String FIELD_LANG = "lang";
 	
 	//entity type names
-	public static final String ENTITY_TYPE_ANNOTATION = "annotation";
+	public static final String TYPE_ANNOTATION = "annotation";
 }
 
