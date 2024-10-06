@@ -1,5 +1,7 @@
 package eu.europeana.enrichment.web.service.impl;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.exception.ResourceNotFoundException;
 import eu.europeana.enrichment.web.model.TranslationRequest;
 import eu.europeana.enrichment.web.model.TranslationUpdateRequest;
+import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
 
 @Service(EnrichmentConstants.BEAN_ENRICHMENT_TRANSLATION_SERVICE)
@@ -70,6 +73,9 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
     @Autowired
     @Qualifier(EnrichmentConstants.BEAN_ENRICHMENT_PERSISTENT_STORY_ENTITY_SERVICE)
     PersistentStoryEntityService persistentStoryEntityService;
+    
+    @Autowired
+    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
 
     @Override
     public String translateStory(StoryEntityImpl story, String type, String translationTool, boolean translate)
@@ -77,6 +83,7 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
         List<TranslationEntityImpl> dbTranslationEntity = persistentTranslationEntityService
                 .findTranslationEntitiesWithAditionalInformation(story.getStoryId(), null, translationTool,
                         EnrichmentConstants.defaultTargetTranslationLang2Letter, type);
+        //TODO: when forcing translation, we should not return the data from the database but recompute
         if (!dbTranslationEntity.isEmpty()) {
             return dbTranslationEntity.get(0).getTranslatedText();
         }
@@ -131,11 +138,6 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
 
         String textToTranslate = null;
         String sourceLanguage = null;
-//        if (EnrichmentConstants.ITEM_HTRDATA.equalsIgnoreCase(property)
-//                && !StringUtils.isBlank(item.getHtrdataTranscription())) {
-//            textToTranslate = item.getHtrdataTranscription();
-//            sourceLanguage = ModelUtils.getOnlyTranscriptionLanguage(item.getHtrdataTranscriptionLangs());
-//        } else
         //do not use htr data anymore, 
         if (EnrichmentConstants.TRANSCRIPTION.equalsIgnoreCase(property)
                 && !StringUtils.isBlank(item.getTranscriptionText())) {
@@ -302,19 +304,14 @@ public class EnrichmentTranslationServiceImpl implements EnrichmentTranslationSe
     }
 
     @Override
-    public TranslationEntityImpl updateItemTranslation(String storyId, String itemId, TranslationUpdateRequest updateRequest) throws HttpException{
+    public TranslationEntityImpl updateItemTranslation(ItemEntityImpl item, TranslationUpdateRequest updateRequest) throws HttpException{
         
-        ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
-        if(item==null) {
-          throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
-        } 
-        
-
+        assertNotNull(item);
         TranslationEntityImpl dbTranslationEntity;
-        String resourcePath = EnrichmentUtils.buildResourcePath(storyId, itemId, updateRequest.getProperty(), updateRequest.getTranslationTool());
+        String resourcePath = EnrichmentUtils.buildResourcePath(item.getStoryId(), item.getItemId(), updateRequest.getProperty(), updateRequest.getTranslationTool());
         try {
             dbTranslationEntity = persistentTranslationEntityService
-                    .findTranslation(storyId, itemId, updateRequest.getTranslationTool(),
+                    .findTranslation(item.getStoryId(), item.getItemId(), updateRequest.getTranslationTool(),
                             EnrichmentConstants.defaultTargetTranslationLang2Letter, updateRequest.getProperty());
         } catch (EntityRetrievalException e) {
             //SG: consider switching to 400

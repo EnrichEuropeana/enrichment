@@ -106,7 +106,8 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 
     }
 
-    private void removeItemEnrichments(ItemEntityImpl dbItem, String field) {
+    @Override
+    public void removeItemEnrichments(ItemEntityImpl dbItem, String field) {
         //remove previous translations (but not manual corrected translations)
         persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(),
                 field);
@@ -158,7 +159,8 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
         }
     }
 
-    private void removeStoryEnrichments(StoryEntityImpl story, String field) {
+    @Override
+    public void removeStoryEnrichments(StoryEntityImpl story, String field) {
         persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null,
                 field);
         persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null,
