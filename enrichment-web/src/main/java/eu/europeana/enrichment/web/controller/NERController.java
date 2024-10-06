@@ -25,11 +25,14 @@ import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
 import eu.europeana.enrichment.common.serializer.JsonLdSerializer;
+import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.NamedEntityImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.solr.exception.SolrServiceException;
+import eu.europeana.enrichment.web.exception.ResourceNotFoundException;
 import eu.europeana.enrichment.web.service.impl.EnrichmentNERServiceImpl;
+import eu.europeana.enrichment.web.service.impl.EnrichmentUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -42,8 +45,8 @@ public class NERController extends BaseRest {
 	@Autowired
 	EnrichmentNERServiceImpl enrichmentNerService;
 	
-	@Autowired
-	PersistentStoryEntityService persistentStoryEntityService;
+//	@Autowired
+//	PersistentStoryEntityService persistentStoryEntityService;
 	
 	@Autowired 
 	JsonLdSerializer jsonLdSerializer;
@@ -175,22 +178,18 @@ public class NERController extends BaseRest {
 		validateNERTools(nerToolsList);
 		validateNERLinking(linkingList);
 	
+		ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId, false);
+	        if(item==null) {
+	            throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
+	        }
+	        
 		String resultJsonLd = null;
-		if(force) {
-			List<NamedEntityImpl> result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, force);
-			resultJsonLd=jsonLdSerializer.serializeObject(result);			
+		List<NamedEntityImpl> result = enrichmentNerService.getEntities(item.getStoryId(), item.getItemId(), property, nerToolsList);
+                if(force || result.isEmpty()) {
+		    result = enrichmentNerService.createNamedEntitiesForItem(item, property, nerToolsList, linkingList, translationTool, force);
+						
 		}
-		else {
-			List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
-			if(!result.isEmpty()) {
-				resultJsonLd=jsonLdSerializer.serializeObject(result);
-			}
-			else {	
-				result = enrichmentNerService.createNamedEntitiesForItem(storyId, itemId, property, nerToolsList, linkingList, translationTool, false);
-				resultJsonLd=jsonLdSerializer.serializeObject(result);
-			}
-		}
-		
+		resultJsonLd=jsonLdSerializer.serializeObject(result);
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;		
 	}
@@ -215,6 +214,9 @@ public class NERController extends BaseRest {
 		List<String> nerToolsList=new ArrayList<>(Arrays.asList(HelperFunctions.toArray(nerTools,",")));
 		validateBaseParamsForNEROrTranslation(storyId, itemId, property, true);
 		validateNERTools(nerToolsList);
+		
+		//do not remove translation it is needed to save version
+	        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId, false);
 		
 		List<NamedEntityImpl> result = enrichmentNerService.getEntities(storyId, itemId, property, nerToolsList);
 		String resultJsonLd =jsonLdSerializer.serializeObject(result);

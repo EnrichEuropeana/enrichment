@@ -14,12 +14,16 @@ import eu.europeana.api.commons.web.controller.BaseRestController;
 import eu.europeana.api.commons.web.exception.ApplicationAuthenticationException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.definitions.exceptions.EntityRetrievalException;
 import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
+import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
+import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
 import eu.europeana.enrichment.web.model.TranslationRequest;
+import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.impl.EnrichmentAuthorizationService;
 
 public abstract class BaseRest extends BaseRestController {
@@ -30,6 +34,16 @@ public abstract class BaseRest extends BaseRestController {
 
     @Autowired
     private EnrichmentAuthorizationService enrichmentAuthorizationService;
+    
+    @Autowired
+    PersistentItemEntityService persistentItemEntityService;
+
+    @Autowired
+    PersistentStoryEntityService persistentStoryEntityService;
+
+    @Autowired
+    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
+
 
     public BaseRest() {
         super();
@@ -159,4 +173,12 @@ public abstract class BaseRest extends BaseRestController {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.ITEM_ID, null);
     }
 
+    protected ItemEntityImpl retrieveOrFetchItem(String storyId, String itemId, boolean removeTranslation) throws EntityRetrievalException {
+        ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
+        if (item == null) {
+            //fetch item from transcribathon if not available in the database
+            item = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId, removeTranslation);
+        }
+        return item;
+    }
 }

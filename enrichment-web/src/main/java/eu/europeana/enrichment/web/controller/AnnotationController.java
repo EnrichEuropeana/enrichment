@@ -42,14 +42,14 @@ public class AnnotationController extends BaseRest {
 	@Autowired
 	EnrichmentNERServiceImpl enrichmentNerService;
 
-	@Autowired
-	PersistentItemEntityService persistentItemEntityService;
-
-	@Autowired
-	PersistentStoryEntityService persistentStoryEntityService;
-
-    @Autowired
-    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
+//	@Autowired
+//	PersistentItemEntityService persistentItemEntityService;
+//
+//	@Autowired
+//	PersistentStoryEntityService persistentStoryEntityService;
+//
+//    @Autowired
+//    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
 	
     @Autowired
     PersistentPositionEntityServiceImpl persistentPositionEntityService;

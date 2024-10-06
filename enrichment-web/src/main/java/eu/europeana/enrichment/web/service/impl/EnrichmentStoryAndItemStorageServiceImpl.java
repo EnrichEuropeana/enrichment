@@ -50,7 +50,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     @Autowired
     PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;
 
-    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate)
+    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate, boolean removeTranslations)
             throws ClientProtocolException, IOException {
         StoryEntityImpl dbStory = persistentStoryEntityService.findStoryEntity(storyId);
         StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
@@ -66,15 +66,15 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             } else {
                 if (fieldsToUpdate.contains(EnrichmentConstants.DESCRIPTION)
                         && !StringUtils.equals(dbStory.getDescription(), tpStory.getDescription())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.DESCRIPTION);
+                    removeStoryEnrichments(dbStory, EnrichmentConstants.DESCRIPTION, removeTranslations);
                 }
                 if (fieldsToUpdate.contains(EnrichmentConstants.SUMMARY)
                         && !StringUtils.equals(dbStory.getSummary(), tpStory.getSummary())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.SUMMARY);
+                    removeStoryEnrichments(dbStory, EnrichmentConstants.SUMMARY, removeTranslations);
                 }
                 if (fieldsToUpdate.contains(EnrichmentConstants.TRANSCRIPTION)
                         && !StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.TRANSCRIPTION);
+                    removeStoryEnrichments(dbStory, EnrichmentConstants.TRANSCRIPTION, removeTranslations);
                 }
 
                 dbStory.copyFromStory(tpStory);
@@ -83,7 +83,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
         }
     }
 
-    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId) throws EntityRetrievalException {
+    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId, boolean removeTranslation) throws EntityRetrievalException {
         ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
         ItemEntityImpl tpItem;
         try {
@@ -97,9 +97,10 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             return persistentItemEntityService.saveItemEntity(tpItem);
         } else {
             if (isTranscriptionModified(dbItem, tpItem)) {
-                removeItemEnrichments(dbItem, EnrichmentConstants.TRANSCRIPTION);
+                //do not delete translations, they might be neeted by the calling method
+                removeItemEnrichments(dbItem, EnrichmentConstants.TRANSCRIPTION, removeTranslation);
             }
-            
+
             dbItem.copyFromItem(tpItem);
             return persistentItemEntityService.saveItemEntity(dbItem);
         }
@@ -107,26 +108,27 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     }
 
     @Override
-    public void removeItemEnrichments(ItemEntityImpl dbItem, String field) {
-        //remove previous translations (but not manual corrected translations)
-        persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(),
+    public void removeItemEnrichments(ItemEntityImpl dbItem, String field, boolean removeTranslation) {
+        // remove previous translations (but not manual corrected translations)
+        if (removeTranslation) {
+            persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(), field);
+        }
+
+        // TODO: improve, removing names entities is reduntant, the NER Workflow tries
+        // to delete them again them as well
+
+        // remove previous named entities
+        persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(), dbItem.getItemId(),
                 field);
-        
-       //TODO: improve, removing names entities is reduntant, the NER Workflow tries to delete them again them as well
-        
-        //remove previous named entities
-        persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(dbItem.getStoryId(),
-                dbItem.getItemId(), field);
-        //remove previous annotations
-        persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(),
-                dbItem.getItemId(), field,
-                EnrichmentConstants.MONGO_SKIP_FIELD);
+        // remove previous annotations
+        persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(dbItem.getStoryId(), dbItem.getItemId(),
+                field, EnrichmentConstants.MONGO_SKIP_FIELD);
     }
 
     private boolean isTranscriptionModified(ItemEntityImpl dbItem, ItemEntityImpl tpItem) {
         return !StringUtils.equals(dbItem.getTranscriptionText(), tpItem.getTranscriptionText());
     }
-    
+
     public void updateStoriesFromInput(StoryEntityImpl[] stories) {
 
         logger.debug("Uploading new stories to the Mongo DB.");
@@ -139,12 +141,12 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             if (dbStoryEntity != null) {
                 if (!Objects.equals(dbStoryEntity, story)) {
                     if (!StringUtils.equals(dbStoryEntity.getDescription(), story.getDescription())) {
-                        removeStoryEnrichments(story, EnrichmentConstants.DESCRIPTION);
+                        removeStoryEnrichments(story, EnrichmentConstants.DESCRIPTION, false);
                     } else if (!StringUtils.equals(dbStoryEntity.getSummary(), story.getSummary())) {
-                        removeStoryEnrichments(story, EnrichmentConstants.SUMMARY);                        
+                        removeStoryEnrichments(story, EnrichmentConstants.SUMMARY, false);
                     } else if (!StringUtils.equals(dbStoryEntity.getTranscriptionText(),
                             story.getTranscriptionText())) {
-                        removeStoryEnrichments(story, EnrichmentConstants.TRANSCRIPTION);
+                        removeStoryEnrichments(story, EnrichmentConstants.TRANSCRIPTION, false);
                     }
                     dbStoryEntity.copyFromStory(story);
                     persistentStoryEntityService.saveStoryEntity(dbStoryEntity);
@@ -160,13 +162,14 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     }
 
     @Override
-    public void removeStoryEnrichments(StoryEntityImpl story, String field) {
-        persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null,
-                field);
-        persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null,
-                field);
-        persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null,
-                field, EnrichmentConstants.MONGO_SKIP_FIELD);
+    public void removeStoryEnrichments(StoryEntityImpl story, String field,  boolean removeTranslation) {
+        if(removeTranslation) {
+            persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, field);
+        }
+        
+        persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, field);
+        persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, field,
+                EnrichmentConstants.MONGO_SKIP_FIELD);
     }
 
     public void updateItemsFromInput(ItemEntityImpl[] items)
@@ -182,7 +185,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             if (dbItemEntity != null) {
                 if (!Objects.equals(dbItemEntity, item)) {
                     if (isTranscriptionModified(dbItemEntity, item)) {
-                        removeItemEnrichments(dbItemEntity, EnrichmentConstants.TRANSCRIPTION);
+                        removeItemEnrichments(dbItemEntity, EnrichmentConstants.TRANSCRIPTION, false);
                     }
 
                     dbItemEntity.copyFromItem(item);

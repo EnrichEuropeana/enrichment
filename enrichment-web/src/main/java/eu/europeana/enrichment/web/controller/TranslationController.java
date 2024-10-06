@@ -45,15 +45,6 @@ public class TranslationController extends BaseRest {
     @Autowired
     EnrichmentTranslationService enrichmentTranslationService;
 
-    @Autowired
-    PersistentItemEntityService persistentItemEntityService;
-
-    @Autowired
-    PersistentStoryEntityService persistentStoryEntityService;
-
-    @Autowired
-    EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
-
     Logger logger = LogManager.getLogger(getClass());
 
     /**
@@ -143,26 +134,20 @@ public class TranslationController extends BaseRest {
         validateTranslationParams(storyId, itemId, translationTool, property, true);
 
         String result = null;
-        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId);
+        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId, false);
         if(item==null) {
             throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
         } 
 
         //remove previously computed enrichments
-        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, property);
+        //remove also translation
+        //TODO revisit to remove redundant calls to remove enrichments 
+        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, property, true);
         //compute and save translation into DB 
+        //TODO change implementation to update instead of delete and recreate
         result = enrichmentTranslationService.translateItem(item, property, translationTool, true);
 
         return new ResponseEntity<String>(result, HttpStatus.OK);
-    }
-
-    private ItemEntityImpl retrieveOrFetchItem(String storyId, String itemId) throws EntityRetrievalException {
-        ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
-        if (item == null) {
-            //fetch item from transcribathon if not available in the database
-            item = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
-        }
-        return item;
     }
 
     /**
@@ -198,13 +183,15 @@ public class TranslationController extends BaseRest {
                     body.getText());
         }
         
-        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId);
+        //do not remove translation it is needed to save version
+        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId, false);
         if(item==null) {
             throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
         } 
         // if(item==null) throw exception
         //remove previously computed enrichments (could be improved to verify first, if some exists)
-        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, EnrichmentConstants.TRANSCRIPTION);
+        //do not remove translation it is needed to save version
+        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, EnrichmentConstants.TRANSCRIPTION, false);
         TranslationEntityImpl updateItemTranslation = enrichmentTranslationService.updateItemTranslation(item, body);
         String translation = null;
         if(updateItemTranslation != null) {

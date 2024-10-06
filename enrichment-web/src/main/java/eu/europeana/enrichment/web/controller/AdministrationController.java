@@ -52,8 +52,8 @@ public class AdministrationController extends BaseRest {
 	@Autowired
 	ETranslationEuropaServiceImpl eTranslationService;
 	
-        @Autowired
-        EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
+//        @Autowired
+//        EnrichmentStoryAndItemStorageService enrichmentStoryAndItemStorageService;
    
 	/*
 	 * This method represents the /administration/updateStories endpoint,
@@ -101,7 +101,7 @@ public class AdministrationController extends BaseRest {
 		fieldsToUpdate.add(EnrichmentConstants.SUMMARY);
 		Instant start = Instant.now();
 		for (int i = 0; i < storyIdsList.size(); i++) {
-			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i), fieldsToUpdate);
+			enrichmentStoryAndItemStorageService.updateStoryFromTranscribathon(storyIdsList.get(i), fieldsToUpdate, false);
 		}
 		Instant finish = Instant.now();
 		long timeElapsed = Duration.between(start, finish).getSeconds();

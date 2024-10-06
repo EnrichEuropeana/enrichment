@@ -13,18 +13,18 @@ import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 
 public interface EnrichmentStoryAndItemStorageService {
 
-    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate)
+    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate, boolean removeTranslations)
             throws ClientProtocolException, IOException;
 
-    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId) throws EntityRetrievalException;
+    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId, boolean removeTranslation) throws EntityRetrievalException;
 
     public void updateStoriesFromInput(StoryEntityImpl[] stories);
 
     public void updateItemsFromInput(ItemEntityImpl[] items)
             throws NoSuchAlgorithmException, UnsupportedEncodingException;
 
-    void removeItemEnrichments(ItemEntityImpl dbItem, String field);
+    void removeItemEnrichments(ItemEntityImpl dbItem, String field, boolean removeTranslation);
 
-    void removeStoryEnrichments(StoryEntityImpl story, String field);
+    void removeStoryEnrichments(StoryEntityImpl story, String field, boolean removeTranslation);
 
 }
