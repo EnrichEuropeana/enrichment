@@ -4,7 +4,7 @@
   <parent>
     <artifactId>enrichment-services</artifactId>
     <groupId>eu.europeana.enrich</groupId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
   </parent>
   <artifactId>enrichment-tp-api-client</artifactId>
   <name>enrichment-tp-api-client</name>

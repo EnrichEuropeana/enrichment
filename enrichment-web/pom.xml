@@ -19,7 +19,7 @@ http://joinup.ec.europa.eu/software/page/eupl
 		<groupId>eu.europeana.enrich</groupId>
 		<relativePath>../pom.xml</relativePath>
 		<!-- version>${version.enrichmentAPI}</version-->
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.1</version>
 		<artifactId>enrichment-services</artifactId>
 	</parent>
 

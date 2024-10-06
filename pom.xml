@@ -12,7 +12,7 @@
 
 	<groupId>eu.europeana.enrich</groupId>
 	<artifactId>enrichment-services</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>pom</packaging>
 	<name>Enrichment services</name>
 	
@@ -60,7 +60,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<version.enrichmentAPI>0.0.1-SNAPSHOT</version.enrichmentAPI>
+		<version.enrichmentAPI>0.0.1</version.enrichmentAPI>
 		<version.java>11</version.java>
 		<version.junit>5.7.0</version.junit>
 		<version.springSecurity>4.1.0.RELEASE</version.springSecurity>
