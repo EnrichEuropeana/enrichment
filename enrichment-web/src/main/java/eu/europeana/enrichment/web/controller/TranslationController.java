@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import eu.europeana.api.commons.definitions.vocabulary.CommonApiConstants;
 import eu.europeana.api.commons.web.model.vocabulary.Operations;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
+import eu.europeana.enrichment.definitions.exceptions.EntityRetrievalException;
 import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 import eu.europeana.enrichment.definitions.model.impl.TranslationEntityImpl;
@@ -28,9 +29,11 @@ import eu.europeana.enrichment.mongo.service.PersistentItemEntityService;
 import eu.europeana.enrichment.mongo.service.PersistentStoryEntityService;
 import eu.europeana.enrichment.web.common.config.I18nConstants;
 import eu.europeana.enrichment.web.exception.ParamValidationException;
+import eu.europeana.enrichment.web.exception.ResourceNotFoundException;
 import eu.europeana.enrichment.web.model.TranslationUpdateRequest;
 import eu.europeana.enrichment.web.service.EnrichmentStoryAndItemStorageService;
 import eu.europeana.enrichment.web.service.EnrichmentTranslationService;
+import eu.europeana.enrichment.web.service.impl.EnrichmentUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
@@ -132,7 +135,7 @@ public class TranslationController extends BaseRest {
     public ResponseEntity<String> postTranslationItem(@PathVariable("storyId") String storyId,
             @PathVariable("itemId") String itemId,
             @RequestParam(value = "translationTool", required = true, defaultValue = "Google") String translationTool,
-            @RequestParam(value = "property", required = false, defaultValue = "description") String property,
+            @RequestParam(value = "property", required = false, defaultValue = "transcription") String property,
             HttpServletRequest request) throws Exception {
 
         verifyWriteAccess(Operations.CREATE, request);
@@ -140,18 +143,26 @@ public class TranslationController extends BaseRest {
         validateTranslationParams(storyId, itemId, translationTool, property, true);
 
         String result = null;
+        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId);
+        if(item==null) {
+            throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
+        } 
+
+        //remove previously computed enrichments
+        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, property);
+        //compute and save translation into DB 
+        result = enrichmentTranslationService.translateItem(item, property, translationTool, true);
+
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+
+    private ItemEntityImpl retrieveOrFetchItem(String storyId, String itemId) throws EntityRetrievalException {
         ItemEntityImpl item = persistentItemEntityService.findItemEntity(storyId, itemId);
-        //fetch item from transcribathon if not available in the database
         if (item == null) {
+            //fetch item from transcribathon if not available in the database
             item = enrichmentStoryAndItemStorageService.updateItemFromTranscribathon(storyId, itemId);
         }
-        // if(item==null) throw exception
-        if (item != null) {
-            result = enrichmentTranslationService.translateItem(item, property, translationTool, true);
-        }
-
-        ResponseEntity<String> response = new ResponseEntity<String>(result, HttpStatus.OK);
-        return response;
+        return item;
     }
 
     /**
@@ -186,11 +197,21 @@ public class TranslationController extends BaseRest {
             throw new ParamValidationException(I18nConstants.EMPTY_PARAM_MANDATORY, EnrichmentConstants.BODY,
                     body.getText());
         }
-
-        TranslationEntityImpl updateItemTranslation = enrichmentTranslationService.updateItemTranslation(storyId,
-                itemId, body);
-
-        return new ResponseEntity<String>(updateItemTranslation.getTranslatedText(), HttpStatus.OK);
+        
+        ItemEntityImpl item = retrieveOrFetchItem(storyId, itemId);
+        if(item==null) {
+            throw new ResourceNotFoundException("item", EnrichmentUtils.buildResourcePath(storyId, itemId));
+        } 
+        // if(item==null) throw exception
+        //remove previously computed enrichments (could be improved to verify first, if some exists)
+        enrichmentStoryAndItemStorageService.removeItemEnrichments(item, EnrichmentConstants.TRANSCRIPTION);
+        TranslationEntityImpl updateItemTranslation = enrichmentTranslationService.updateItemTranslation(item, body);
+        String translation = null;
+        if(updateItemTranslation != null) {
+            translation = updateItemTranslation.getTranslatedText();
+        }
+        
+        return new ResponseEntity<String>(translation, HttpStatus.OK);
     }
 
     /**
