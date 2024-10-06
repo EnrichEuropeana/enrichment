@@ -1,11 +1,8 @@
 package eu.europeana.enrichment.web.service;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import org.apache.http.client.ClientProtocolException;
 
 import eu.europeana.enrichment.definitions.exceptions.EntityRetrievalException;
 import eu.europeana.enrichment.definitions.model.impl.ItemEntityImpl;
@@ -14,7 +11,7 @@ import eu.europeana.enrichment.definitions.model.impl.StoryEntityImpl;
 public interface EnrichmentStoryAndItemStorageService {
 
     public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate, boolean removeTranslations)
-            throws ClientProtocolException, IOException;
+            throws EntityRetrievalException;
 
     public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId, boolean removeTranslation) throws EntityRetrievalException;
 

@@ -45,19 +45,20 @@ public class EnrichmentTpApiClient {
     EnrichmentConfiguration configuration;
 
     public StoryEntityImpl getStoryFromTranscribathonMinimalStory(String storyId)
-            throws ClientProtocolException, IOException {
+            throws ClientProtocolException, IOException, ApiAccessException {
         Story storyMinimal = getTranscribathonMinimalStory(storyId);
-        if (storyMinimal != null) {
-            return convertTranscribathonStoryToLocalStory(storyMinimal);
-        } else {
-            return null;
-        }
+        
+        if (storyMinimal == null) {
+            throw new ApiAccessException("Cannot retrieve item from TP API V2: " + storyId, null);   
+        } 
+        
+        return convertTranscribathonStoryToLocalStory(storyMinimal);
     }
 
     public ItemEntityImpl getItemFromTranscribathon(String itemId) throws ClientProtocolException, IOException, ApiAccessException {
         ItemV2 tpItem = getTranscribathonItemV2(itemId);
         if (tpItem == null) {
-            throw new ApiAccessException("Cannot retrieve item from TP API V2", null);
+            throw new ApiAccessException("Cannot retrieve item from TP API V2: " + itemId, null);
          } 
         return buildFromTPItemV2(tpItem);
     }

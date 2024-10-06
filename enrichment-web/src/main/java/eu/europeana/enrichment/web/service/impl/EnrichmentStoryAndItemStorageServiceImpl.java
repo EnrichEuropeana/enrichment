@@ -50,40 +50,40 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     @Autowired
     PersistentNamedEntityAnnotationService persistentNamedEntityAnnotationService;
 
-    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate, boolean removeTranslations)
-            throws ClientProtocolException, IOException {
+    public StoryEntityImpl updateStoryFromTranscribathon(String storyId, List<String> fieldsToUpdate,
+            boolean removeTranslations) throws EntityRetrievalException {
         StoryEntityImpl dbStory = persistentStoryEntityService.findStoryEntity(storyId);
-        StoryEntityImpl tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
-        if (tpStory == null) {
-            if (dbStory != null) {
-                return dbStory;
-            } else {
-                return null;
-            }
-        } else {
-            if (dbStory == null) {
-                return persistentStoryEntityService.saveStoryEntity(tpStory);
-            } else {
-                if (fieldsToUpdate.contains(EnrichmentConstants.DESCRIPTION)
-                        && !StringUtils.equals(dbStory.getDescription(), tpStory.getDescription())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.DESCRIPTION, removeTranslations);
-                }
-                if (fieldsToUpdate.contains(EnrichmentConstants.SUMMARY)
-                        && !StringUtils.equals(dbStory.getSummary(), tpStory.getSummary())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.SUMMARY, removeTranslations);
-                }
-                if (fieldsToUpdate.contains(EnrichmentConstants.TRANSCRIPTION)
-                        && !StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText())) {
-                    removeStoryEnrichments(dbStory, EnrichmentConstants.TRANSCRIPTION, removeTranslations);
-                }
-
-                dbStory.copyFromStory(tpStory);
-                return persistentStoryEntityService.saveStoryEntity(dbStory);
-            }
+        StoryEntityImpl tpStory = null;
+        try {
+            tpStory = enrichmentTpApiClient.getStoryFromTranscribathonMinimalStory(storyId);
+        } catch (IOException | ApiAccessException  e) {
+            throw new EntityRetrievalException("Cannot retrieve story from TP API V2: " + storyId);
         }
+
+        if (dbStory == null) {
+            return persistentStoryEntityService.saveStoryEntity(tpStory);
+        } else {
+            if (fieldsToUpdate.contains(EnrichmentConstants.DESCRIPTION)
+                    && !StringUtils.equals(dbStory.getDescription(), tpStory.getDescription())) {
+                removeStoryEnrichments(dbStory, EnrichmentConstants.DESCRIPTION, removeTranslations);
+            }
+            if (fieldsToUpdate.contains(EnrichmentConstants.SUMMARY)
+                    && !StringUtils.equals(dbStory.getSummary(), tpStory.getSummary())) {
+                removeStoryEnrichments(dbStory, EnrichmentConstants.SUMMARY, removeTranslations);
+            }
+            if (fieldsToUpdate.contains(EnrichmentConstants.TRANSCRIPTION)
+                    && !StringUtils.equals(dbStory.getTranscriptionText(), tpStory.getTranscriptionText())) {
+                removeStoryEnrichments(dbStory, EnrichmentConstants.TRANSCRIPTION, removeTranslations);
+            }
+
+            dbStory.copyFromStory(tpStory);
+            return persistentStoryEntityService.saveStoryEntity(dbStory);
+        }
+
     }
 
-    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId, boolean removeTranslation) throws EntityRetrievalException {
+    public ItemEntityImpl updateItemFromTranscribathon(String storyId, String itemId, boolean removeTranslation)
+            throws EntityRetrievalException {
         ItemEntityImpl dbItem = persistentItemEntityService.findItemEntity(storyId, itemId);
         ItemEntityImpl tpItem;
         try {
@@ -97,7 +97,7 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             return persistentItemEntityService.saveItemEntity(tpItem);
         } else {
             if (isTranscriptionModified(dbItem, tpItem)) {
-                //do not delete translations, they might be neeted by the calling method
+                // do not delete translations, they might be neeted by the calling method
                 removeItemEnrichments(dbItem, EnrichmentConstants.TRANSCRIPTION, removeTranslation);
             }
 
@@ -162,11 +162,11 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
     }
 
     @Override
-    public void removeStoryEnrichments(StoryEntityImpl story, String field,  boolean removeTranslation) {
-        if(removeTranslation) {
+    public void removeStoryEnrichments(StoryEntityImpl story, String field, boolean removeTranslation) {
+        if (removeTranslation) {
             persistentTranslationEntityService.deleteTranslationEntity(story.getStoryId(), null, field);
         }
-        
+
         persistentNamedEntityService.deletePositionEntitiesAndNamedEntities(story.getStoryId(), null, field);
         persistentNamedEntityAnnotationService.deleteNamedEntityAnnotation(story.getStoryId(), null, field,
                 EnrichmentConstants.MONGO_SKIP_FIELD);
