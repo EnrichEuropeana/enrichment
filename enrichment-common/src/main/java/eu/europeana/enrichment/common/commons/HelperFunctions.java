@@ -163,20 +163,20 @@ public class HelperFunctions {
 		String fileFullPathName = directory;
 		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
 		
-		saveToFile(fileFullPathName, wikidataURL);
+		saveToFile(fileFullPathName, content);
 	}
 
 	public static void saveToFile (String fileFullPathNameWithExtension, String content) throws IOException
 	{
-	    try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileFullPathNameWithExtension))))
-	    {    	
-			bw.write(content);	
-		    logger.debug("File: " + fileFullPathNameWithExtension + ", is written successfully to the location!");
-			    
-		} catch (IOException ioe) 
-	    {
-			throw ioe;
-	    }	    
+	  if(content==null) return;
+	  try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileFullPathNameWithExtension))))
+	  {    	
+		bw.write(content);	
+		logger.debug("File: " + fileFullPathNameWithExtension + ", is written successfully to the location!");	    
+	  } catch (IOException ioe) 
+	  {
+		throw ioe;
+	  }	    
 	}
 
 	
