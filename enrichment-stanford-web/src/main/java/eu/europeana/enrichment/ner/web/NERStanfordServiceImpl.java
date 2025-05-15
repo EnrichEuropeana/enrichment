@@ -29,9 +29,10 @@ public class NERStanfordServiceImpl{
 	
 	public NERStanfordServiceImpl(String model) {
 	    if (model == null || model.isEmpty()) {
-	    	System.err.println("NERStanfordServiceImp: No model for classifier defined");
+	      System.err.println("NERStanfordServiceImp: No model for classifier defined");
 	    } else {
-	    	this.classifier = CRFClassifier.getClassifierNoExceptions(model);
+	      System.out.println("The following stanford NER model is used: " + model);
+	      this.classifier = CRFClassifier.getClassifierNoExceptions(model);
 	    } 
 	}
 
