@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: stanford-NER-en-hpa
+  name: stanford-ner-en-hpa
 spec:
   maxReplicas: ${MAX_REPLICAS}
   minReplicas: ${MIN_REPLICAS}
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: stanford-NER-en-deployment
+    name: stanford-ner-en-deployment
   behavior:
     scaleDown:
       stabilizationWindowSeconds: 900

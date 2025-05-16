@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stanford-NER-en-deployment
+  name: stanford-ner-en-deployment
 spec:
   # selector.matchLabels is provided via Kustomize ()
   #selector:
@@ -11,8 +11,8 @@ spec:
   template:
     spec:
       containers:
-      - name: stanford-NER-en
-        image: stevanetic/stanford-NER-en
+      - name: stanford-ner-en
+        image: stevanetic/stanford-ner-en
         env:
           - name: SPRING_CONFIG_NAME
             value: "application,stanfordNer"

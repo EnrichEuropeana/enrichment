@@ -1,13 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: stanford-NER-en-deployment
+  name: stanford-ner-en-deployment
 spec:
   replicas: 1
   template:
     spec:
       containers:
-        - name: stanford-NER-en
+        - name: stanford-ner-en
           imagePullPolicy: Always
           env:
             - name: JAVA_TOOL_OPTIONS

@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: stanford-NER-en-service
+  name: stanford-ner-en-service
 spec:
   ## selector provided via kustomize
   #selector:
-  #  app: stanford-NER-en
+  #  app: stanford-ner-en
   ports:
     - name: http
       port: 80

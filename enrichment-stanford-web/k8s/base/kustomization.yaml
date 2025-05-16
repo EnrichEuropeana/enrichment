@@ -4,7 +4,7 @@ resources:
 labels:
   - includeSelectors: true
     pairs:
-      app: stanford-NER-en
+      app: stanford-ner-en
           
 #generate config mapping for log4j2.xml file
 configMapGenerator:
