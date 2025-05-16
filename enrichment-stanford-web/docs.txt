@@ -1,0 +1,2 @@
+- please replace the pom.xml with the pom-war.xml file for building the .war executable, that was previously deployed to the test server and used for the stanford NER analysis;
+also delete the class NERStanfordApp

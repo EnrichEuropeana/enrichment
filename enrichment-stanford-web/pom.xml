@@ -9,20 +9,27 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <artifactId>ROOT</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <!-- version>${version.enrichmentAPI}</version-->
   <name>enrichment-stanford-web</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <version.maven-surfire-plugin>2.19.1</version.maven-surfire-plugin>
+    <version.log4j2>2.13.3</version.log4j2>
   </properties>
   <dependencies>
   		<dependency>
 			<groupId>eu.europeana.enrich</groupId>
-  			<artifactId>enrichment-ner</artifactId>
+  			<artifactId>enrichment-definition</artifactId>
 			<version>${version.enrichmentAPI}</version>			
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>${version.json}</version>
+		</dependency>
+
 <!-- 		<dependency> -->
 <!--     		<groupId>edu.stanford.nlp</groupId> -->
 <!--     		<artifactId>stanford-corenlp</artifactId> -->
@@ -75,6 +82,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
@@ -172,7 +190,6 @@
   </dependencies>
   <build>
   		<!--  plugins -->
-		<pluginManagement>
 			<plugins>
 				<!--
 				<plugin>
@@ -190,39 +207,36 @@
 <!-- 				</configuration> -->
 <!-- 			</plugin> -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-			    <version>${version.maven-surfire-plugin}</version>
-				<configuration>
-	    		<testFailureIgnore>true</testFailureIgnore>
-				</configuration>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>build-info</goal>
+						</goals>
+						<configuration>
+							<additionalProperties>
+								<project.description>${project.description}</project.description>
+								<!-- For some reason BuildProperties.getName()
+								doesn't return the correct value,
+                           so we set the name under a different property                      -->
+								<project.name>${project.name}</project.name>
+							</additionalProperties>
+						</configuration>
+					</execution>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>executable</classifier>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-<!-- banned dependencies which will cause project build to fail -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>enforce-banned-dependencies</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>        
-                  <!-- deps with excludes will be banned -->      
-                    <exclude>org.springframework.boot:spring-boot-starter-logging</exclude>
-                  </excludes>
-                </bannedDependencies>
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+      
 	</plugins>
-	</pluginManagement>	
   <finalName>${project.artifactId}</finalName>
   </build>
 </project>

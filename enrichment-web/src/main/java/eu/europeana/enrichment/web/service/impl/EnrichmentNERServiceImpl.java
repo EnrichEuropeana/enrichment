@@ -283,7 +283,8 @@ public class EnrichmentNERServiceImpl {
 	private boolean isRestrictedClassificationType(String type) {
 		if(!type.equalsIgnoreCase(NERClassification.AGENT.toString()) 
 			&& !type.equalsIgnoreCase(NERClassification.PLACE.toString())
-			&& !type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())) {
+			&& !type.equalsIgnoreCase(NERClassification.ORGANIZATION.toString())
+			&& !type.equalsIgnoreCase(NERClassification.MISC.toString())) {
 			return true;
 		}
 		else return false;

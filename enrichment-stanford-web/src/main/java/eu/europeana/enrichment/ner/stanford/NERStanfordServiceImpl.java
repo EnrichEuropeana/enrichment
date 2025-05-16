@@ -1,13 +1,13 @@
-package eu.europeana.enrichment.ner.web;
+package eu.europeana.enrichment.ner.stanford;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -20,6 +20,7 @@ import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
 //@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN)
 public class NERStanfordServiceImpl{
 
+    Logger logger=LogManager.getLogger(getClass());
 	private CRFClassifier<CoreLabel> classifier;
 	
 	/*
@@ -29,9 +30,9 @@ public class NERStanfordServiceImpl{
 	
 	public NERStanfordServiceImpl(String model) {
 	    if (model == null || model.isEmpty()) {
-	      System.err.println("NERStanfordServiceImp: No model for classifier defined");
+	      logger.info("NERStanfordServiceImp: No model for classifier defined");
 	    } else {
-	      System.out.println("The following stanford NER model is used: " + model);
+	      logger.info("The following stanford NER model is used: " + model);
 	      this.classifier = CRFClassifier.getClassifierNoExceptions(model);
 	    } 
 	}

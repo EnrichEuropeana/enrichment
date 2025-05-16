@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.web.config;
+package eu.europeana.enrichment.ner.stanford.config;
 
 import java.util.Collections;
 
@@ -42,7 +42,7 @@ public class SwaggerConfig {
     return new Docket(DocumentationType.SWAGGER_2)
         .apiInfo(apiInfo())
         .select()
-        .apis(RequestHandlerSelectors.basePackage("eu.europeana.enrichment"))
+        .apis(RequestHandlerSelectors.basePackage("eu.europeana.enrichment.ner.stanford"))
         .paths(PathSelectors.any())
         .build();
   }
