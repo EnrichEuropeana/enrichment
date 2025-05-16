@@ -36,7 +36,7 @@ public class DBpediaSpotlight implements InitializingBean{
 	/** Create a JAXB unmarshaller for each thread */
 	private ThreadLocal<Unmarshaller> unmarshaller;
 
-	private final String DBPEDIA_SPARQL_URL = "http://dbpedia.org/sparql?default-graph-uri=http://dbpedia.org";
+	private final String DBPEDIA_SPARQL_URL = "http://dbpedia.org/sparql?";
 	private final String DBPEDIA_SPARQL_QUERY_PATTERN = "DEFINE sql:describe-mode \"SPO\" DESCRIBE <%s>";
 	private final String DBPEDIA_SPARQL_FORMAT = "application/rdf+xml";
 	
@@ -69,7 +69,32 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 			if(responseStr==null) return null;
 			
 		    InputStream stream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
-		    dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+		    
+		    int retry=0;
+		    int retryMax=3;
+		    //retry n times because sometimes the page may be unresponsive
+		    while(true) {
+    		    try {
+    		      dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
+    		      break;
+    		    } catch (JAXBException ex) {
+    		      logger.error("Exception during unmarschalling the dbpedia response for the url (sometimes the page returns 'under maintenance'): " + dbpediaUrl);
+    		      logger.error("The dbpedia response when exception occured: " + responseStr);
+      		      retry++;
+      		      if(retry==retryMax) {
+      		        return null;
+      		      }
+      		      
+      		      try {
+      		        Thread.sleep(10000);
+                  } catch (InterruptedException e1) {
+                  }
+      		      
+    	          responseStr = createRequest(dbpediaUrl);
+    	          if(responseStr==null) return null;
+    	          stream = new ByteArrayInputStream(responseStr.getBytes(StandardCharsets.UTF_8));
+      		    }
+		    }
 
 //		    try {
 //		    	dbpediaResp = ((DBpediaResponseHeader) unmarshaller.get().unmarshal(stream)).getResult();
@@ -106,8 +131,11 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 	private String createRequest(String dbpediaUrl) throws Exception {
 			String query = String.format(DBPEDIA_SPARQL_QUERY_PATTERN, dbpediaUrl);
 			String wholeUrl = DBPEDIA_SPARQL_URL;
+			wholeUrl += URLEncoder.encode("default-graph-uri=http://dbpedia.org", StandardCharsets.UTF_8.toString());
 			wholeUrl += "&query=" + URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-			wholeUrl += "&format=" + URLEncoder.encode(DBPEDIA_SPARQL_FORMAT, StandardCharsets.UTF_8.toString());	
+			wholeUrl += "&format=" + URLEncoder.encode(DBPEDIA_SPARQL_FORMAT, StandardCharsets.UTF_8.toString());
+			//this last line of parameters is added afterwards and can also be omitted
+			//wholeUrl += "&timeout=30000&signal_void=on&signal_unconnected=on";
 			
 			URIBuilder builder = new URIBuilder(wholeUrl);
 

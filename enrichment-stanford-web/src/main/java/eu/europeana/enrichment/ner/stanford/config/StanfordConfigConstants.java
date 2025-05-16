@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.web.config;
+package eu.europeana.enrichment.ner.stanford.config;
 
 public class StanfordConfigConstants {
 	public static final String BEAN_STANFORD_CONFIGURATION= "stanfordConfiguration";

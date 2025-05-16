@@ -56,8 +56,9 @@ solr.connection.url = http://<ip_of_the_database_server>:8983/solr
 #solr.facetLimit=750
 
 # saving Wikidata info into files
-# folder to store files created by the application (e.g. in wikidata subfolder) 
+# folder to store files created by the application (e.g. in wikidata subfolder), also contains some configs (e.g. a wikidata-types subfolder etc.) 
 #enrich.directory = /opt/app/enrich/data/
+enrich.directory = /home/ait/enrich/
 #enrich.wikidata.json.base.url=https://www.wikidata.org/wiki/Special:EntityData/
 
 # base URL of TP API

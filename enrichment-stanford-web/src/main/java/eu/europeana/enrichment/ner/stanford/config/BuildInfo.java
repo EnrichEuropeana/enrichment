@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.web.config;
+package eu.europeana.enrichment.ner.stanford.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

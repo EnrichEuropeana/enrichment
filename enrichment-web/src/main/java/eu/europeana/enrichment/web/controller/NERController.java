@@ -108,6 +108,7 @@ public class NERController extends BaseRest {
 				resultJsonLd=jsonLdSerializer.serializeObject(result);
 			}
 		}
+		logger.info("NER analysis has been completed.");
 		ResponseEntity<String> response = new ResponseEntity<String>(resultJsonLd, HttpStatus.OK);
 		return response;
 	}

@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.web.controller;
+package eu.europeana.enrichment.ner.stanford.controller;
 
 import javax.annotation.Resource;
 
@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import eu.europeana.enrichment.ner.web.NERStanfordServiceImpl;
+import eu.europeana.enrichment.ner.stanford.NERStanfordServiceImpl;
 import io.swagger.annotations.ApiOperation;
 
 @RestController

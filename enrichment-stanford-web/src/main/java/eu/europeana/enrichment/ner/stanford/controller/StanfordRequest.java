@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.web.controller;
+package eu.europeana.enrichment.ner.stanford.controller;
 
 /*
  * This class represents the Rest Post body structure for

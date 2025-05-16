@@ -412,11 +412,15 @@ public class WikidataServiceImpl implements WikidataService {
 					return responeString;
 				}
 				else {
-					throw new FunctionalRuntimeException("Wikidata response json is invalid (does not contain \"entities\").");
+				  //throw new FunctionalRuntimeException("Wikidata response json is invalid (does not contain \"entities\").");
+				  logger.error("Wikidata response json is invalid (does not contain \"entities\").");
+				  return null;
 				}
 			}
 			else {
-				throw new FunctionalRuntimeException("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
+			  //throw new FunctionalRuntimeException("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
+			  logger.error("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
+			  return null;
 			}
 			
 		} catch (URISyntaxException | IOException e) {
@@ -439,7 +443,7 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			else {
 				logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId, e);
-				throw e;
+				return null;
 			}
 		}
 
@@ -500,6 +504,9 @@ public class WikidataServiceImpl implements WikidataService {
 	@Override
 	public List<List<String>> getJSONFieldFromWikidataJSON(String WikidataJSON, String field) {
 		List<List<String>> result = new ArrayList<List<String>>();
+		if(WikidataJSON==null) {
+		  return result;
+		}
 		try {
 			JSONObject responseJson = new JSONObject(WikidataJSON);
 			JSONObject responseJsonEntities = responseJson.getJSONObject("entities");
