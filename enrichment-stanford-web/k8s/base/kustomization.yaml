@@ -1,0 +1,14 @@
+resources:
+  - deployment.yaml
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app: stanford-NER-en
+          
+#generate config mapping for log4j2.xml file
+configMapGenerator:
+  - name: log4j2-properties
+    files:
+      - log4j2-spring.xml
+          

@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stanford-NER-en-deployment
+spec:
+  # selector.matchLabels is provided via Kustomize ()
+  #selector:
+  #  matchLabels:
+  #    app: enrichment-web
+  ## in jenins use kustomize edit set label app:${APP_NAME}
+  template:
+    spec:
+      containers:
+      - name: stanford-NER-en
+        image: stevanetic/stanford-NER-en
+        env:
+          - name: SPRING_CONFIG_NAME
+            value: "application,stanfordNer"
+        ports:
+          - containerPort: 8080
+        volumeMounts:
+          - name: log4j-config
+            mountPath: "/opt/app/config/log4j2-spring.xml"
+            readOnly: true
+            subPath: log4j2-spring.xml
+                
+      volumes:
+        - name: log4j-config
+          configMap:
+            name: log4j2-properties    

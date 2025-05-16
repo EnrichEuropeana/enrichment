@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stanford-NER-en-ingress
+  annotations:
+    ${K8S_INGRESS_ANNOTATIONS}
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/preserve-trailing-slash: "true"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ${K8S_HOSTNAME}
+      secretName: ${K8S_SECRETNAME}
+  rules:
+    - host: ${K8S_HOSTNAME}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: stanford-NER-en-service
+                port:
+                  number: 80
