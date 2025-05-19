@@ -28,7 +28,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
                 // DataSourceAutoConfiguration.class
         }
 )
-public class NERStanfordApp extends SpringBootServletInitializer {
+public class NERStanfordApp {
 
 //	static Properties props = new Properties();
 //	private static final String SOCKS_PROXY_URL = "socks.proxy.url";
@@ -43,9 +43,9 @@ public class NERStanfordApp extends SpringBootServletInitializer {
         SpringApplication.run(NERStanfordApp.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(NERStanfordApp.class);
-    }
+//    @Override
+//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//        return application.sources(NERStanfordApp.class);
+//    }
   
 }
