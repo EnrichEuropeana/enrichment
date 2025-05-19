@@ -39,3 +39,14 @@ spec:
             limits:
               memory: "${MEMORY_LIMIT}M"
               cpu: "${CPU_LIMIT}m"
+          volumeMounts:
+            - name: stanford-models
+              mountPath: "/opt/app/stanford/classifiers"
+              readOnly: false
+      volumes:
+        - name: stanford-models
+          hostPath:
+            type: Directory
+            path: /app/shared/stanford/classifiers/
+
+

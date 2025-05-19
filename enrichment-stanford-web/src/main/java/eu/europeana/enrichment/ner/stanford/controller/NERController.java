@@ -1,7 +1,6 @@
 package eu.europeana.enrichment.ner.stanford.controller;
 
-import javax.annotation.Resource;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import eu.europeana.enrichment.ner.stanford.NERStanfordServiceImpl;
+import eu.europeana.enrichment.ner.stanford.service.NERStanfordServiceImpl;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
@@ -19,7 +18,7 @@ import io.swagger.annotations.ApiOperation;
 @EnableCaching
 public class NERController {
 
-	@Resource
+	@Autowired
 	NERStanfordServiceImpl nerStanfordServiceOrigin;
 	
 	/*
