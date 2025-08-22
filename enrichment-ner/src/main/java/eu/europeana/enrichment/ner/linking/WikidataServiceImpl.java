@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -22,6 +21,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -37,11 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
 import eu.europeana.enrichment.common.commons.HelperFunctions;
-import eu.europeana.enrichment.common.exceptions.FunctionalRuntimeException;
 import eu.europeana.enrichment.definitions.model.WikidataAgent;
 import eu.europeana.enrichment.definitions.model.WikidataEntity;
 import eu.europeana.enrichment.definitions.model.WikidataOrganization;
@@ -395,13 +393,40 @@ public class WikidataServiceImpl implements WikidataService {
 		return retValue;
 	}
 	
+	private String retryCreateRequestWikiId (int [] retryArgs, String wikidataId, Exception e) throws Exception {
+	  if(retryArgs.length==0) {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e1) {
+        }
+        return createRequestWikiId(wikidataId, 1);
+      }
+      else if(retryArgs.length==1 && retryArgs[0]<3) {
+          try {
+              Thread.sleep(3000);
+          } catch (InterruptedException e1) {
+          }
+          return createRequestWikiId(wikidataId, retryArgs[0]+1);             
+      }
+      else {
+        if(e != null) {
+          logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId, e);
+        }
+        else {
+          logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId);
+        }
+        return null;
+      }
+	}
+	
 	private String createRequestWikiId(String wikidataId, int... retry) throws Exception {
 		int retryArgs[] = retry;
 		try {
 			String Q_identifier = wikidataId.substring(wikidataId.lastIndexOf("/") + 1);			
 			URIBuilder builder = new URIBuilder(configuration.getEnrichWikidataJsonBaseUrl() + Q_identifier + ".json");
 
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			//CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			CloseableHttpClient httpClient = HttpClients.custom().setUserAgent("Mozilla/5.0 Firefox/26.0").build();
 			HttpGet request = new HttpGet(builder.build());
 			request.addHeader("content-type", "application/json");
 			request.addHeader("accept", "application/json");
@@ -419,32 +444,17 @@ public class WikidataServiceImpl implements WikidataService {
 			}
 			else {
 			  //throw new FunctionalRuntimeException("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
-			  logger.error("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code.");
-			  return null;
+			  logger.warn("Wikidata response for the wikidata id: " + wikidataId + " failed, and did not return the 200 status code. Retrying ...");
+			  //retry
+	          return retryCreateRequestWikiId(retryArgs, wikidataId, null);
+			  //return null;
 			}
 			
 		} catch (URISyntaxException | IOException e) {
 			// TODO Auto-generated catch block
-			logger.log(Level.ERROR, "Exception during the wikidata service call for wikidata id: " + wikidataId, e);
+			logger.log(Level.WARN, "Exception during the wikidata service call for wikidata id: " + wikidataId, e);
 			//retry
-			if(retryArgs.length==0) {
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e1) {
-				}
-				return createRequestWikiId(wikidataId, 1);
-			}
-			else if(retryArgs.length==1 && retryArgs[0]<3) {
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e1) {
-				}
-				return createRequestWikiId(wikidataId, retryArgs[0]+1);				
-			}
-			else {
-				logger.log(Level.ERROR, "Data could not be fetched from wikidata service after a couple of tries for wikidata id: " + wikidataId, e);
-				return null;
-			}
+			return retryCreateRequestWikiId(retryArgs, wikidataId, e);
 		}
 
 	}
