@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stanford-ner-en-deployment
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: stanford-ner-en
+          imagePullPolicy: Always
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: "-Dlogging.config=/opt/app/config/log4j2-spring.xml"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: "/${APP_CONTEXT_PATH}"  
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /${APP_CONTEXT_PATH}/actuator/health/liveness
+              httpHeaders:
+              - name: Accept
+                value: application/json
+            initialDelaySeconds: ${LIVE_CHECK_INIT_DELAY}
+            periodSeconds: ${LIVE_CHECK_PERIOD}   
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /${APP_CONTEXT_PATH}/actuator/health/readiness
+              httpHeaders:
+              - name: Accept
+                value: application/json
+            initialDelaySeconds: ${READY_CHECK_INIT_DELAY}
+            periodSeconds: ${READY_CHECK_PERIOD}  
+          resources:
+            requests:
+              memory: "${MEMORY_REQUEST}M"
+              cpu: "${CPU_REQUEST}m"
+            limits:
+              memory: "${MEMORY_LIMIT}M"
+              cpu: "${CPU_LIMIT}m"
+          volumeMounts:
+            - name: stanford-models
+              mountPath: "/opt/app/stanford/classifiers"
+              readOnly: false
+      volumes:
+        - name: stanford-models
+          hostPath:
+            type: Directory
+            path: /app/shared/stanford/classifiers/
+
+

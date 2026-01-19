@@ -103,7 +103,7 @@ DESCRIBE <http://dbpedia.org/resource/Vienna>
 //				return null;
 //			}
 
-		    if(dbpediaResp.getWikipageRedirect()==null || dbpediaResp.getWikidataUrls().size()>0) {
+		    if(dbpediaResp==null || dbpediaResp.getWikipageRedirect()==null || dbpediaResp.getWikidataUrls().size()>0) {
 		    	redirect=false;
 		    }
 		    else {

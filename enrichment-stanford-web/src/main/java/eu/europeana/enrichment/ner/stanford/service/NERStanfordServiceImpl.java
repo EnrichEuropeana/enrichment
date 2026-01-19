@@ -1,4 +1,4 @@
-package eu.europeana.enrichment.ner.stanford;
+package eu.europeana.enrichment.ner.stanford.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -16,25 +18,29 @@ import eu.europeana.enrichment.definitions.model.impl.PositionEntityImpl;
 import eu.europeana.enrichment.definitions.model.vocabulary.NERClassification;
 import eu.europeana.enrichment.definitions.model.vocabulary.NERStanfordClassification;
 import eu.europeana.enrichment.definitions.model.vocabulary.NerTools;
+import eu.europeana.enrichment.ner.stanford.StanfordConfiguration;
+import eu.europeana.enrichment.ner.stanford.config.StanfordConfigConstants;
 
-//@Service(AppConfigConstants.BEAN_ENRICHMENT_NER_STANFORD_SERVICE_ORIGIN)
+@Service(StanfordConfigConstants.BEAN_STANFORD_SERVICE)
 public class NERStanfordServiceImpl{
 
-    Logger logger=LogManager.getLogger(getClass());
-	private CRFClassifier<CoreLabel> classifier;
+  Logger logger=LogManager.getLogger(getClass());
+  private CRFClassifier<CoreLabel> classifier;
 	
 	/*
 	 * This class constructor loads a model for the Stanford named
 	 * entity recognition and classification
 	 */
 	
-	public NERStanfordServiceImpl(String model) {
-	    if (model == null || model.isEmpty()) {
-	      logger.info("NERStanfordServiceImp: No model for classifier defined");
-	    } else {
-	      logger.info("The following stanford NER model is used: " + model);
-	      this.classifier = CRFClassifier.getClassifierNoExceptions(model);
-	    } 
+    @Autowired
+	public NERStanfordServiceImpl(StanfordConfiguration config) {
+	  String model=config.getStanfordModel();
+	  if (model == null || model.isEmpty()) {
+	    logger.error("NERStanfordServiceImp: No model for classifier defined");
+	  } else {
+	    logger.info("The following stanford NER model is used: " + model);
+	    this.classifier = CRFClassifier.getClassifierNoExceptions(model);
+	  } 
 	}
 
 	public String getEntities(String text) {

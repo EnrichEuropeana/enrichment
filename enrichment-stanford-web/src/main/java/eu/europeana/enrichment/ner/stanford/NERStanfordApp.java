@@ -16,7 +16,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 /**
  * Main application. Allows deploying as a war and logs instance data when deployed in Cloud Foundry
  */
-@SpringBootApplication(scanBasePackages = {"eu.europeana.enrichment.ner.stanford"},
+@SpringBootApplication(scanBasePackages = "eu.europeana.enrichment.ner.stanford",
         exclude = {
                 // Remove these exclusions to re-enable security
                 SecurityAutoConfiguration.class,
@@ -25,11 +25,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
                 DataSourceAutoConfiguration.class, 
                 DataSourceTransactionManagerAutoConfiguration.class, 
                 HibernateJpaAutoConfiguration.class
-//                DataSourceAutoConfiguration.class
+                // DataSourceAutoConfiguration.class
         }
 )
-
-public class NERStanfordApp extends SpringBootServletInitializer {
+public class NERStanfordApp {
 
 //	static Properties props = new Properties();
 //	private static final String SOCKS_PROXY_URL = "socks.proxy.url";
@@ -40,15 +39,13 @@ public class NERStanfordApp extends SpringBootServletInitializer {
      * @throws IOException 
      * @throws URISyntaxException 
      */
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        
+    public static void main(String[] args) throws IOException, URISyntaxException {        
         SpringApplication.run(NERStanfordApp.class, args);
     }
-    
- 
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(NERStanfordApp.class);
-    }
+//    @Override
+//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//        return application.sources(NERStanfordApp.class);
+//    }
+  
 }
