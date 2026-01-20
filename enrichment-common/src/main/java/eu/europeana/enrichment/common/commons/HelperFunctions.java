@@ -178,17 +178,18 @@ public class HelperFunctions {
 		throw ioe;
 	  }	    
 	}
-
 	
 	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
 		String fileFullPathName = directory;
 		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
-		return readFileFromDisk(fileFullPathName);
+		
+		return readWikidataFileFromDisk(fileFullPathName);
+		
 	}
 	
-	public static String readFileFromDisk (String fileFullPathWithExtension) throws IOException 
+	public static String readWikidataFileFromDisk (String fileFullPathWithExtension) throws IOException 
 	{
     	File file = new File(fileFullPathWithExtension);
     	/* This logic will make sure that the file 
@@ -208,8 +209,15 @@ public class HelperFunctions {
 	        } catch (IOException e) {
 				throw e;
 	        }
-
-			return content;
+			
+		    //check that file contains "entities" like in the output of the wikidata request
+			if(content!=null && content.contains("entities")) {
+			  return content;
+			}
+			else {
+			  file.delete();
+			  return null;
+			}
 		}
 		/*
 		 * The file can also be read in this way
