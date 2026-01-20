@@ -426,8 +426,8 @@ public class WikidataServiceImpl implements WikidataService {
 			URIBuilder builder = new URIBuilder(configuration.getEnrichWikidataJsonBaseUrl() + Q_identifier + ".json");
 
 			//CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-			CloseableHttpClient httpClient = HttpClients.custom()
-				.setUserAgent("Transcribathon-Enrichment-API/1.0 (https://ffdigitalservices.com/#Transcribathon)").build();
+			CloseableHttpClient httpClient = HttpClients.custom().setUserAgent("Transcribathon-Enrichment-API/1.0 (https://ffdigitalservices.com/#Transcribathon)").build();
+            //CloseableHttpClient httpClient = HttpClients.custom().setUserAgent("Mozilla/5.0 Firefox/26.0").build();
 
 			HttpGet request = new HttpGet(builder.build());
 			request.addHeader("content-type", "application/json");
@@ -474,10 +474,14 @@ public class WikidataServiceImpl implements WikidataService {
 				}				
 			}
 
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			//CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+			//CloseableHttpClient httpClient = HttpClients.custom().setUserAgent("Mozilla/5.0 Firefox/26.0").build();
+			CloseableHttpClient httpClient = HttpClients.custom().setUserAgent("Transcribathon-Enrichment-API/1.0 (https://ffdigitalservices.com/#Transcribathon)").build();
+
 			HttpGet request = new HttpGet(builder.build());
 			request.addHeader("content-type", "application/json");
 			request.addHeader("accept", "application/json");
+			request.addHeader("Accept-Encoding", "gzip,deflate");
 			HttpResponse result = httpClient.execute(request);
 			String responeString = EntityUtils.toString(result.getEntity(), "UTF-8");
 			
