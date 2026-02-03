@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class HelperFunctions {
 		}
 		CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultHeaders(defaultHeaders).build();
 
-		HttpResponse result;
+		HttpResponse result=null;
 		if(content!=null && !content.isEmpty())
 		{
 			HttpPost request = new HttpPost(baseUrl);
@@ -72,7 +73,8 @@ public class HelperFunctions {
 			result = httpClient.execute(request);
 		}
 
-		if(result.getEntity()==null) {
+		if(result.getStatusLine().getStatusCode()<200 || result.getStatusLine().getStatusCode()>=300 
+		    || result.getEntity()==null) {
 			return null;
 		}
 		
@@ -179,17 +181,17 @@ public class HelperFunctions {
 	  }	    
 	}
 	
-	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
+	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL, int notOlderThanDays) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
 		String fileFullPathName = directory;
 		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
 		
-		return readWikidataFileFromDisk(fileFullPathName);
+		return readWikidataFileFromDisk(fileFullPathName, notOlderThanDays);
 		
 	}
 	
-	public static String readWikidataFileFromDisk (String fileFullPathWithExtension) throws IOException 
+	public static String readWikidataFileFromDisk (String fileFullPathWithExtension, int notOlderThanDays) throws IOException 
 	{
     	File file = new File(fileFullPathWithExtension);
     	/* This logic will make sure that the file 
@@ -210,8 +212,16 @@ public class HelperFunctions {
 				throw e;
 	        }
 			
-		    //check that file contains "entities" like in the output of the wikidata request
-			if(content!=null && content.contains("entities")) {
+		    /*
+		    check that the file contains "entities" like in the output of the wikidata request,
+		    and that is not older then the defined date/time
+		    */
+	        long fileModifiedMillisec = file.lastModified();
+	        Date now = new Date();
+	        long nowMillisec=now.getTime();
+	        double diffInDays=(nowMillisec-fileModifiedMillisec)/(1000.0*60*60*24);
+
+			if(content!=null && content.contains("entities") && diffInDays<=notOlderThanDays) {
 			  return content;
 			}
 			else {
