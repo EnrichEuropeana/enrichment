@@ -97,7 +97,10 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
             return persistentItemEntityService.saveItemEntity(tpItem);
         } else {
             if (isTranscriptionModified(dbItem, tpItem)) {
-                removeItemEnrichments(dbItem, EnrichmentConstants.TRANSCRIPTION);
+              //remove previous translations (but not manual corrected translations)
+              persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(),
+                  EnrichmentConstants.TRANSCRIPTION);  
+              removeItemEnrichments(dbItem, EnrichmentConstants.TRANSCRIPTION);
             }
             
             dbItem.copyFromItem(tpItem);
@@ -108,10 +111,6 @@ public class EnrichmentStoryAndItemStorageServiceImpl implements EnrichmentStory
 
     @Override
     public void removeItemEnrichments(ItemEntityImpl dbItem, String field) {
-        //remove previous translations (but not manual corrected translations)
-        persistentTranslationEntityService.deleteTranslationEntity(dbItem.getStoryId(), dbItem.getItemId(),
-                field);
-        
        //TODO: improve, removing names entities is reduntant, the NER Workflow tries to delete them again them as well
         
         //remove previous named entities
