@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.CompletableFuture;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
 import eu.europeana.api.commons.web.exception.HttpException;
 import eu.europeana.enrichment.common.commons.EnrichmentConfiguration;
 import eu.europeana.enrichment.common.commons.EnrichmentConstants;
@@ -517,7 +515,7 @@ public class EnrichmentNERServiceImpl {
 		//create annotation
 		if(preferredWikiId!=null) {
 			//compute the annotation fields
-			String wikidataJSONLocal = HelperFunctions.getWikidataJsonFromLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId);
+			String wikidataJSONLocal = HelperFunctions.getWikidataJsonFromLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId, configuration.getEnrichWikidataNotOlderThanDays());
 			String wikidataJSON=wikidataJSONLocal;
 			if(StringUtils.isBlank(wikidataJSON)) 	
 			{
@@ -528,14 +526,21 @@ public class EnrichmentNERServiceImpl {
 			
 			//compute the pref label
 			String entityPrefLabel = ne.getLabel();
+			String entityPrefLabelDefaultAllLang=null;
 			Map<String,List<String>> prefLabelMap = null;
 			List<List<String>> jsonElement = null;
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
 			if(!jsonElement.isEmpty())
 			{ 
 				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-				if(prefLabelMap!=null && prefLabelMap.get("en")!=null && prefLabelMap.get("en").size()>0)
-					entityPrefLabel = prefLabelMap.get("en").get(0);
+				if(prefLabelMap!=null) {
+				  if(prefLabelMap.get("en")!=null && prefLabelMap.get("en").size()>0) {
+				    entityPrefLabel = prefLabelMap.get("en").get(0);
+				  }
+				  if(prefLabelMap.get("mul")!=null && prefLabelMap.get("mul").size()>0) {
+				    entityPrefLabelDefaultAllLang = prefLabelMap.get("mul").get(0);
+                  }				  
+				}
 			}
 
 			//compute other body fields
@@ -630,8 +635,10 @@ public class EnrichmentNERServiceImpl {
 			//computing score
 			double score=computeScoreForAnnotations(foundByNer, linkedByNer);
 									
-			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
-					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
+			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),
+			    configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, 
+			    ne.getLabel(), entityPrefLabel, entityPrefLabelDefaultAllLang, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
+			    body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
 			return persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
 		}
 		return null;
@@ -647,7 +654,7 @@ public class EnrichmentNERServiceImpl {
 		//create annotation
 		if(preferredWikiId!=null) {
 			//compute the annotation fields
-			String wikidataJSONLocal = HelperFunctions.getWikidataJsonFromLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId);
+			String wikidataJSONLocal = HelperFunctions.getWikidataJsonFromLocalFileCache(configuration.getEnrichWikidataDirectory(), preferredWikiId, configuration.getEnrichWikidataNotOlderThanDays());
 			String wikidataJSON=wikidataJSONLocal;
 			if(StringUtils.isBlank(wikidataJSON)) 	
 			{
@@ -658,14 +665,21 @@ public class EnrichmentNERServiceImpl {
 			
 			//compute the pref label
 			String entityPrefLabel = ne.getLabel();
+			String entityPrefLabelDefaultAllLang=null;
 			Map<String,List<String>> prefLabelMap = null;
 			List<List<String>> jsonElement = null;
 			jsonElement = wikidataService.getJSONFieldFromWikidataJSON(wikidataJSON,EnrichmentConstants.PREFLABEL_JSONPROP);
 			if(!jsonElement.isEmpty())
 			{ 
 				prefLabelMap = HelperFunctions.convertListOfListOfStringToMapOfStringAndListOfString(jsonElement);
-				if(prefLabelMap!=null && prefLabelMap.get("en")!=null && prefLabelMap.get("en").size()>0)
-					entityPrefLabel = prefLabelMap.get("en").get(0);
+				if(prefLabelMap!=null) {
+				  if(prefLabelMap.get("en")!=null && prefLabelMap.get("en").size()>0) {
+				    entityPrefLabel = prefLabelMap.get("en").get(0);
+				  }
+				  if(prefLabelMap.get("mul")!=null && prefLabelMap.get("mul").size()>0) {
+                    entityPrefLabelDefaultAllLang = prefLabelMap.get("mul").get(0);
+                  }
+				}
 			}
 
 			//compute other body fields
@@ -760,8 +774,11 @@ public class EnrichmentNERServiceImpl {
 			//computing score
 			double score=computeScoreForAnnotations(foundByNer, linkedByNer);
 									
-			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, ne.getLabel(), entityPrefLabel, pe.getFieldUsedForNER(), ne.getType(), score, foundByNer, linkedByNer,
-					body_description, body_givenName, body_familyName, body_professionOrOccupation, body_lat, body_long);
+			NamedEntityAnnotationImpl newAnno = new NamedEntityAnnotationImpl(configuration.getAnnotationsIdBaseUrl(),
+			    configuration.getAnnotationsTargetItemsBaseUrl(),pe.getStoryId(), pe.getItemId(), preferredWikiId, 
+			    ne.getLabel(), entityPrefLabel, entityPrefLabelDefaultAllLang, pe.getFieldUsedForNER(), ne.getType(), 
+			    score, foundByNer, linkedByNer, body_description, body_givenName, body_familyName, body_professionOrOccupation, 
+			    body_lat, body_long);
 			persistentNamedEntityAnnotationService.saveNamedEntityAnnotation(newAnno);
 			return CompletableFuture.completedFuture(true);
 		}
