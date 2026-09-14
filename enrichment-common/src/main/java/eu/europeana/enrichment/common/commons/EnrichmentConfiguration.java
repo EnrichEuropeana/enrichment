@@ -71,6 +71,9 @@ public class EnrichmentConfiguration {
 
     @Value("${enrich.wikidata.json.base.url: 'https://www.wikidata.org/wiki/Special:EntityData/'}")
     private String enrichWikidataJsonBaseUrl;
+    
+    @Value("${enrich.wikidata.notOlderThanDays: 365}")
+    private int enrichWikidataNotOlderThanDays;
 
     @Value("${transcribathon.api.base.url}")
     private String transcribathonApiBaseUrl;
@@ -325,6 +328,10 @@ public class EnrichmentConfiguration {
     public String getEnrichWikidataJsonBaseUrl() {
         return enrichWikidataJsonBaseUrl;
     }
+    
+    public int getEnrichWikidataNotOlderThanDays() {
+      return enrichWikidataNotOlderThanDays;
+    } 
 
     public String getWikidataSubclassesNaturalPerson() {
         return wikidataSubclassesNaturalPerson;
