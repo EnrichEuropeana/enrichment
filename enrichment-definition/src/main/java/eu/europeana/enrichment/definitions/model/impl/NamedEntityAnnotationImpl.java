@@ -99,8 +99,11 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 	public NamedEntityAnnotationImpl () {
 	}
 	
-	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String prop, String entityTypeParam,
-			double score, List<String> foundByNerTools, List<String> linkedByNerTools, String body_description, String body_givenName, String body_familyName, List<String> body_professionOrOccupation, Float body_lat, Float body_long) {
+	public NamedEntityAnnotationImpl (String idBaseUrlPar, String targetItemsBaseUrlPar, String storyId, 
+	    String itemId, String wikidataId, String entityHiddenLabel, String entityPrefLabel, String entityPrefLabelDefaultAllLang,
+	    String prop, String entityTypeParam, double score, List<String> foundByNerTools, List<String> linkedByNerTools, 
+	    String body_description, String body_givenName, String body_familyName, List<String> body_professionOrOccupation, 
+	    Float body_lat, Float body_long) {
 
 		idBaseUrl=idBaseUrlPar;
 		targetItemsBaseUrl=targetItemsBaseUrlPar;
@@ -140,6 +143,9 @@ public class NamedEntityAnnotationImpl extends BaseEntityImpl implements NamedEn
 
 		Map<String,String> bodyPrefLabel = new HashMap<String, String>();
 		bodyPrefLabel.put("en", entityPrefLabel);
+		if(! StringUtils.isBlank(entityPrefLabelDefaultAllLang)) {
+		  bodyPrefLabel.put("mul", entityPrefLabelDefaultAllLang);
+		}
 		this.body.put("prefLabel", bodyPrefLabel);
 		
 		Map<String,String> bodyHiddenLabel = new HashMap<String, String>();

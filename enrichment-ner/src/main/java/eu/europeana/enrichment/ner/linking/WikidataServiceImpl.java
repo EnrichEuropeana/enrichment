@@ -20,7 +20,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.Level;
@@ -645,7 +644,7 @@ public class WikidataServiceImpl implements WikidataService {
 	public WikidataEntity getWikidataEntityAndSaveToLocalCache(String wikidataURL, String type, boolean matchType) throws Exception {
 		
 		//trying to get the wikidata json from a local cache file, if does not exist fetch from wikidata and save into a cache file
-		String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL);
+		String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataURL, configuration.getEnrichWikidataNotOlderThanDays());
 		String wikidataJSON=wikidataJSONLocalCache;
 		if(StringUtils.isBlank(wikidataJSON)) 	
 		{
@@ -1267,7 +1266,7 @@ public class WikidataServiceImpl implements WikidataService {
 			return null;
 		}
 		for(String wikidataId : wikiIds) {
-			String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId);
+			String wikidataJSONLocalCache = HelperFunctions.getWikidataJsonFromLocalFileCache(wikidataDirectory, wikidataId, configuration.getEnrichWikidataNotOlderThanDays());
 			String wikidataJSON=null;
 			if(! StringUtils.isBlank(wikidataJSONLocalCache)) {
 				wikidataJSON=wikidataJSONLocalCache;

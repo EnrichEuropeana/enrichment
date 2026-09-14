@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +26,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import eu.europeana.enrichment.common.exceptions.FunctionalRuntimeException;
 
 public class HelperFunctions {
 	
@@ -55,9 +57,16 @@ public class HelperFunctions {
 				defaultHeaders.add(new BasicHeader(headerEntry.getKey(), headerEntry.getValue()));
 		    }
 		}
-		CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultHeaders(defaultHeaders).build();
+		
+        //CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultHeaders(defaultHeaders).build();
 
-		HttpResponse result;
+		// Enable automatic redirects for ALL HTTP methods (GET, HEAD, POST, PUT, DELETE)
+        CloseableHttpClient httpClient = HttpClients.custom()
+            .setRedirectStrategy(new LaxRedirectStrategy())
+            .setDefaultHeaders(defaultHeaders)
+            .build();
+
+		HttpResponse result=null;
 		if(content!=null && !content.isEmpty())
 		{
 			HttpPost request = new HttpPost(baseUrl);
@@ -72,8 +81,12 @@ public class HelperFunctions {
 			result = httpClient.execute(request);
 		}
 
-		if(result.getEntity()==null) {
-			return null;
+		if(result.getStatusLine().getStatusCode()!=200) {
+          throw new FunctionalRuntimeException("During the http request to: " + baseUrl + ", an error in the response "
+              + "happened with the error code: " + result.getStatusLine().getStatusCode());
+		}
+		if (result.getEntity()==null) {
+		  return null;
 		}
 		
 		return EntityUtils.toString(result.getEntity(), "UTF-8");
@@ -179,17 +192,17 @@ public class HelperFunctions {
 	  }	    
 	}
 	
-	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL) throws IOException
+	public static String getWikidataJsonFromLocalFileCache (String directory, String wikidataURL, int notOlderThanDays) throws IOException
 	{
 		String fileName = wikidataURL.substring(wikidataURL.lastIndexOf("/") + 1);
 		String fileFullPathName = directory;
 		fileFullPathName += "/" + "wikidata-" + "entity-" + fileName + ".json";
 		
-		return readWikidataFileFromDisk(fileFullPathName);
+		return readWikidataFileFromDisk(fileFullPathName, notOlderThanDays);
 		
 	}
 	
-	public static String readWikidataFileFromDisk (String fileFullPathWithExtension) throws IOException 
+	public static String readWikidataFileFromDisk (String fileFullPathWithExtension, int notOlderThanDays) throws IOException 
 	{
     	File file = new File(fileFullPathWithExtension);
     	/* This logic will make sure that the file 
@@ -210,8 +223,16 @@ public class HelperFunctions {
 				throw e;
 	        }
 			
-		    //check that file contains "entities" like in the output of the wikidata request
-			if(content!=null && content.contains("entities")) {
+		    /*
+		    check that the file contains "entities" like in the output of the wikidata request,
+		    and that is not older then the defined date/time
+		    */
+	        long fileModifiedMillisec = file.lastModified();
+	        Date now = new Date();
+	        long nowMillisec=now.getTime();
+	        double diffInDays=(nowMillisec-fileModifiedMillisec)/(1000.0*60*60*24);
+
+			if(content!=null && content.contains("entities") && diffInDays<=notOlderThanDays) {
 			  return content;
 			}
 			else {
